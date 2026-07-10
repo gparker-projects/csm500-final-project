@@ -16,9 +16,9 @@ mod nlp;
 
 // check by going to: http://127.0.0.1:8000/db
 async fn machine_learn_test(_req: HttpRequest) -> impl Responder {
+  let store = nlp::NLP{}.execute();
   
-  
-  format!("Rust POC WebDBML!")
+  format!("Rust POC WebDBML2! {}", store.await.to_string())
 }
 
 
