@@ -1,4 +1,5 @@
-use sqlx::postgres::{PgPoolOptions, PgPool}; //, PgRow};
+use sqlx::postgres::{PgPoolOptions, PgPool, PgRow};
+use sqlx::Row;
 use serde::{Deserialize, Serialize};
 
 //  B. Gruber, Rust web development: with Warp, Tokio, and Reqwest. Shelter Island, NY: Manning Publications Co, 2023.
@@ -7,9 +8,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct User {
     pub id: String,
-    pub title: String,
-    pub content: String,
-    pub tags: String,
+    pub username: String,
+    pub email: String,
+    pub created_at: String,
 }
 
 #[derive(Debug, Clone)]
@@ -33,16 +34,25 @@ impl Store {
         }
     }
 
-    pub async fn get_users( &self, limit: Option<i32>, offset: i32, ) -> Result< Vec<User>, std::io::Error> {
+    pub async fn get_users(&self,
+                           limit: Option<i32>,
+                           offset: i32, 
+                          ) -> Result< Vec<User>, std::io::Error> {
 
-        let rows = match sqlx::query("SELECT * from users LIMIT $1 OFFSET $2")
+        match sqlx::query("SELECT * from USERS LIMIT $1 OFFSET $2")
             .bind(limit)
             .bind(offset)
+            .map(|row: PgRow| User {
+                id: row.get("id"),
+                username: row.get("username"),
+                email: row.get("email"),
+                created_at: row.get("created_at"),
+            })
             .fetch_all(&self.connection)
             .await
         {
-            Ok(_) => Ok(()),
+            Ok(USERS) => Ok(USERS),
             Err(e) => panic!("Couldn't establish DB connection: {}", e),
-        };
+        }
     }
 }

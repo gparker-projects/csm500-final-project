@@ -7,6 +7,8 @@ use actix_web::{web, App, HttpRequest, HttpServer, Responder};
 // https://learning.oreilly.com/library/view/rust-web-development/9781617299001/OEBPS/Text/07.htm#sigil_toc_id_85
 // https://github.com/Rust-Web-Development/code  
 
+mod Store;
+
 async fn greet(req: HttpRequest) -> impl Responder {
   let name = req.match_info().get("name").unwrap_or("World");
   format!("Rust POC webDB {}!", &name)
@@ -16,7 +18,7 @@ async fn greet(req: HttpRequest) -> impl Responder {
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
 
-  let store = store::Store::new("postgres://postgres:csm500@localhost:5432/csm500").await;
+  let _store = Store::Store::new("postgres://postgres:csm500@localhost:5432/csm500").await;
 
   HttpServer::new(|| {
   App::new()
