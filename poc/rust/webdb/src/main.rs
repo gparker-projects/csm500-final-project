@@ -7,7 +7,7 @@ use actix_web::{web, App, HttpRequest, HttpServer, Responder};
 // https://learning.oreilly.com/library/view/rust-web-development/9781617299001/OEBPS/Text/07.htm#sigil_toc_id_85
 // https://github.com/Rust-Web-Development/code  
 
-mod AuthObjects;
+mod auth_objects;
 
 async fn greet(req: HttpRequest) -> impl Responder {
   let name = req.match_info().get("name").unwrap_or("World");
@@ -15,7 +15,7 @@ async fn greet(req: HttpRequest) -> impl Responder {
 }
 
 async fn db(_req: HttpRequest) -> impl Responder {
-  let store = AuthObjects::AuthObjects::new("postgres://postgres:csm500@localhost:5432/csm500").await;
+  let store = auth_objects::AuthObjects::new("postgres://postgres:csm500@localhost:5432/csm500").await;
 
   let users = store.get_users( Some(10), 0).await.expect("May be no users");
 
