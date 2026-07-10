@@ -14,11 +14,11 @@ pub struct User {
 }
 
 #[derive(Debug, Clone)]
-pub struct Store {
+pub struct auth_objects {
     pub connection: PgPool,
 }
 
-impl Store {
+impl auth_objects {
     pub async fn new(db_url: &str) -> Self {
         let db_pool = match PgPoolOptions::new()
             .max_connections(5)
@@ -29,7 +29,7 @@ impl Store {
             Err(e) => panic!("Couldn't establish DB connection: {}", e),
         };
 
-        Store {
+        auth_objects {
             connection: db_pool,
         }
     }
@@ -51,7 +51,7 @@ impl Store {
             .fetch_all(&self.connection)
             .await
         {
-            Ok(USERS) => Ok(USERS),
+            Ok(results_users) => Ok(results_users),
             Err(e) => panic!("Couldn't establish DB connection: {}", e),
         }
     }
