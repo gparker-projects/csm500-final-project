@@ -16,6 +16,8 @@ async fn greet(req: HttpRequest) -> impl Responder {
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
 
+  let store = store::Store::new("postgres://postgres:csm500@localhost:5432/csm500").await;
+
   HttpServer::new(|| {
   App::new()
     .route("/", web::get().to( greet ))
