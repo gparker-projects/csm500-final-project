@@ -6,19 +6,18 @@ use serde::{Deserialize, Serialize};
 // https://learning.oreilly.com/library/view/rust-web-development/9781617299001/OEBPS/Text/07.htm#sigil_toc_id_85
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct User {
-    pub id: String,
+pub struct User{
+    pub id: i32,
     pub username: String,
     pub email: String,
-    pub created_at: String,
 }
 
 #[derive(Debug, Clone)]
-pub struct auth_objects {
+pub struct AuthObjects {
     pub connection: PgPool,
 }
 
-impl auth_objects {
+impl AuthObjects {
     pub async fn new(db_url: &str) -> Self {
         let db_pool = match PgPoolOptions::new()
             .max_connections(5)
@@ -29,7 +28,7 @@ impl auth_objects {
             Err(e) => panic!("Couldn't establish DB connection: {}", e),
         };
 
-        auth_objects {
+        AuthObjects {
             connection: db_pool,
         }
     }
@@ -46,7 +45,7 @@ impl auth_objects {
                 id: row.get("id"),
                 username: row.get("username"),
                 email: row.get("email"),
-                created_at: row.get("created_at"),
+                //created_at: row.get("created_at"),
             })
             .fetch_all(&self.connection)
             .await
