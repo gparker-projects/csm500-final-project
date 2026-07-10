@@ -9,9 +9,34 @@ serde_json = "1.0"
 tokio = { version = "1", features = ["full"] }
 # We can omit the version number for local imports
 log = "0.4"
-env_logger = "0.11"
-tracing = { version = "0.1", features = ["log"] }
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+#env_logger = "0.11"
+#tracing = { version = "0.1", features = ["log"] }
+#tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 sqlx = { version = "0.8", features = ["runtime-tokio", "tls-rustls", "postgres", "macros", "migrate", "uuid", "chrono"] }
 actix-web = "4.14.0"
 chrono = "0.4.45"
+ndarray = "0.17.2"
+ort = { version = "2.0.0-rc.12", features = [ "fetch-models" ] }
+tokenizers = { version = "0.23.1", default-features = false, features = [ "onig" ] }
+
+[features]
+load-dynamic = [ "ort/load-dynamic" ]
+
+cuda = [ "ort/cuda" ]
+tensorrt = [ "ort/tensorrt" ]
+openvino = [ "ort/openvino" ]
+onednn = [ "ort/onednn" ]
+directml = [ "ort/directml" ]
+nnapi = [ "ort/nnapi" ]
+coreml = [ "ort/coreml" ]
+xnnpack = [ "ort/xnnpack" ]
+rocm = [ "ort/rocm" ]
+acl = [ "ort/acl" ]
+armnn = [ "ort/armnn" ]
+tvm = [ "ort/tvm" ]
+migraphx = [ "ort/migraphx" ]
+rknpu = [ "ort/rknpu" ]
+vitis = [ "ort/vitis" ]
+cann = [ "ort/cann" ]
+qnn = [ "ort/qnn" ]
+webgpu = [ "ort/webgpu" ]
