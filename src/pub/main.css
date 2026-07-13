@@ -15,3 +15,10 @@ p {
   font-family: verdana;
   font-size: 20px;
 }
+
+<!-- https://www.w3schools.com/css/css_navbar.asp -->
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}

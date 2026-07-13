@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<!-- https://www.w3schools.com/css/css_navbar_vertical.asp -->
+<html>
+<head>
+<style>
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  width: 130px;
+  background-color: #C9D5E3;
+  height: 100%;
+  position: fixed; /* stick, even on scroll */
+  overflow: auto; /* scrolling if the sidenav has too much content */
+
+}
+
+li a {
+  display: block;
+  color: black;
+  padding: 8px 16px;
+  text-decoration: none;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+li a:hover {
+  background-color: #448DD1;
+  color: white;
+}
+
+.menuActive {
+  background-color: #376BA4;
+  color: white;
+}
+</style>
+</head>
+<body>
+
+<div>
+<p>Maple EMR:</p>
+<ul>
+  <li><a class="menuActive" href="javascript:void(0)">Home</a></li>
+  <li><a href="javascript:void(0)">News</a></li>
+  <li><a href="javascript:void(0)">Contact</a></li>
+  <li><a href="javascript:void(0)">About</a></li>
+</ul>
+</div>
+
+</body>
+</html>
