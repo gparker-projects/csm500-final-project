@@ -1,1 +1,17 @@
 //placeholder for CSS
+
+<!-- https://www.w3schools.com/css/default.asp -->
+
+body {
+  background-color: lightblue;
+}
+
+h1 {
+  color: red;
+  text-align: center;
+}
+
+p {
+  font-family: verdana;
+  font-size: 20px;
+}
