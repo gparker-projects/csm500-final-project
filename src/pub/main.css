@@ -7,7 +7,7 @@ body {
 }
 
 h1 {
-  color: red;
+  color: #448DD1;
   text-align: center;
 }
 
@@ -21,4 +21,58 @@ ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
+}
+
+#div1 {  
+  border-radius: 25px;
+  border: 2px solid #376BA4;
+  padding: 20px; 
+  width: 200px;
+  height: 150px;
+}
+
+label {
+  display: block;
+  font-family: verdana;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+input[type=text] {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  box-sizing: border-box;
+  border: 2px #376BA4;
+  border-radius: 8px;
+  font-family: verdana;
+  font-size: 12px;
+}
+
+input[type=password] {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  box-sizing: border-box;
+  border: 2px #376BA4;
+  border-radius: 8px;
+  font-family: verdana;
+  font-size: 12px;
+}
+
+input[type=button], input[type=submit], input[type=reset] {
+  background-color: #376BA4;
+  border: none;
+  color: white;
+  padding: 16px 32px;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
