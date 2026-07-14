@@ -41,31 +41,60 @@ li a:hover {
   color: white;
 }
 
+.box {
+    position:relative;
+}
+
 #roundblueboxRight {
-  border-radius: 25px;
+  border-radius: 12px;
   border: 2px solid #376BA4;
-  padding: 8px;
-  width: 200px;
-  height: 80px;
-  position: absolute; /* stick, even on scroll */
+  padding: 6px;
+  //width: 200px;
+  //height: 80px;
+  position: absolute;
+
   align: right;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   cursor: move;
   z-index: 1000;
-  top: 400px;
-  left: 400px;
+  //top: 50px;
+  //left: 600px;
+  bottom: 0px;
+  right: 0px;
   width: 400px;
 }
 
 input[type=text] {
   width: 100%;
-  padding: 12px;
+  padding: 8px;
   margin: 10px 0;
   box-sizing: border-box;
-  border: 2px #376BA4;
-  border-radius: 8px;
+  border: 2px #C9D5E3;
+  border-radius: 4px;
   font-family: verdana;
   font-size: 12px;
+}
+
+input[type=button], input[type=submit], input[type=reset] {
+  background-color: #376BA4;
+  border: none;
+  color: white;
+  padding: 4px 4px;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
+  background-color: #448dd1;
+  border: none;
+  color: white;
+  padding: 4px 4px;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 8px;
 }
 
 </style>
@@ -83,12 +112,15 @@ input[type=text] {
 </ul>
 </div>
 
-<div id="roundblueboxRight" align="right">
-<form action="/nlpcmd">
-  <!--label for="Username"></label-->
-  <input type="text" id="nlpCmd" name="nlpCmd" placeholder="How can I help?">
-  <input type="submit" value=">>">
-</form>
+<div class="box">
+	<div id="roundblueboxRight" align="right">
+	<form action="/nlpcmd">
+	  <!--label for="Username"></label-->
+	  <input type="text" id="nlpCmd" name="nlpCmd" placeholder="How can I help?">
+	  <input type="submit" value=">>">
+	</form>
+	</div>
 </div>
+
 </body>
 </html>
