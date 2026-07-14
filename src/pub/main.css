@@ -23,13 +23,19 @@ ul {
   padding: 0;
 }
 
-#div1 {  
+#roundbluebox {  
   border-radius: 25px;
   border: 2px solid #376BA4;
   padding: 20px; 
   width: 200px;
   height: 150px;
 }
+
+#apptitle {
+  color: #448DD1;
+  text-align: center;
+}
+
 
 label {
   display: block;
