@@ -1,6 +1,7 @@
 use sqlx::postgres::{PgPoolOptions, PgPool, PgRow};
 use sqlx::Row;
 use serde::{Deserialize, Serialize};
+//mod errors;
 
 //  B. Gruber, Rust web development: with Warp, Tokio, and Reqwest. Shelter Island, NY: Manning Publications Co, 2023.
 // https://learning.oreilly.com/library/view/rust-web-development/9781617299001/OEBPS/Text/07.htm#sigil_toc_id_85
@@ -19,13 +20,14 @@ pub struct AuthObjects {
 
 impl AuthObjects {
     pub async fn new(db_url: &str) -> Self {
+
         let db_pool = match PgPoolOptions::new()
             .max_connections(5)
             .connect(db_url)
             .await
         {
             Ok(pool) => pool,
-            Err(e) => panic!("Couldn't establish DB connection: {}", e),
+            Err(e) => panic!("{}", e),
         };
 
         AuthObjects {
@@ -51,7 +53,7 @@ impl AuthObjects {
             .await
         {
             Ok(results_users) => Ok(results_users),
-            Err(e) => panic!("Couldn't establish DB connection: {}", e),
+             Err(e) => panic!("{}", e),
         }
     }
 }
