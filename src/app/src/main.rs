@@ -1,7 +1,7 @@
 //use std::ptr::null;
 
 use actix_web::{web, App, HttpRequest, HttpServer, HttpResponse, Responder};
-
+use serde::Deserialize; //pg 51 of ZeroToProd
 ///
 /// # Main program executable for the project
 ///
@@ -26,20 +26,35 @@ mod errors;
 const DB_CONN_STR: &str = "postgres://postgres:csm500@localhost:5432/csm500";
 
 
+#[derive(serde::Deserialize)]
+pub struct LoginFormData {
+    #[serde(rename = "mplUsername")]
+    username: String,
+    #[serde(rename = "mplPassword")]
+    password: String,
+}
+
 /// performs a connect to the database
 /// 
 /// check by going to: http://127.0.0.1:8000/db
 /// 
-async fn login(_req: HttpRequest) -> impl Responder {
-  // TODO: use a pool instead, as this will block another query/result in multiple connections the DB may not be able to accomodate
-  let cur_db_conn = auth_objects::AuthObjects::new(DB_CONN_STR).await;
-  let users = cur_db_conn.get_users( Some(10), 0).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
+async fn login(req: web::Form<LoginFormData>) -> impl Responder {
+  
+  //let user_name = req.match_info().get("mplusername").unwrap_or("AAA");
+  //let user_password = req.match_info().get("mplpassword").unwrap_or("BBB");
 
-  let mut s = String::new();
-  for row in users.iter() {                          // row: &User
-      s = s + &row.id.to_string() + " " + &row.username + "; ";
-  }
-  format!("Users: {}, #{}", s, users.len())
+  HttpResponse::Ok().body(format!("Got user: {}", req.username));
+  HttpResponse::Ok().body(format!("Got user: {}", req.password));
+  
+  
+  //let cur_db_conn = auth_objects::AuthObjects::new(DB_CONN_STR).await;
+  //let users = cur_db_conn.get_users( Some(10), 0).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
+
+  //let mut s = String::new();
+ // for row in users.iter() {                          // row: &User
+  //    s = s + &row.id.to_string() + " " + &row.username + "; ";
+ // }
+  format!("U/P: {}/{}", req.username, req.password)
 }
 
 
@@ -81,7 +96,7 @@ async fn db(_req: HttpRequest) -> impl Responder {
 /// Allows a monitoring services to perform a basic "is the application up?" check
 /// 
 async fn is_it_up() -> impl Responder {
-  HttpResponse::Ok()
+  HttpResponse::Ok().body("MapleEMR is Up")
 }
 
 /// # Main program
@@ -98,7 +113,7 @@ async fn main() -> std::io::Result<()> {
   HttpServer::new(|| {
   App::new()
     .route("/", web::get().to( welcome ))
-    .route("/login", web::get().to( login ))
+    .route("/login", web::post().to( login ))
     .route("/ml", web::get().to( machine_learn_test ))
     .route("/db", web::get().to( db ))
     .route("/isItUp", web::get().to( is_it_up ))    
