@@ -1,7 +1,7 @@
 //use std::ptr::null;
 
 use actix_web::{web, App, HttpRequest, HttpServer, HttpResponse, Responder};
-use serde::Deserialize; //pg 51 of ZeroToProd
+//use serde::Deserialize; //pg 51 of ZeroToProd
 ///
 /// # Main program executable for the project
 ///
@@ -25,7 +25,6 @@ mod errors;
 
 const DB_CONN_STR: &str = "postgres://postgres:csm500@localhost:5432/csm500";
 
-
 #[derive(serde::Deserialize)]
 pub struct LoginFormData {
     #[serde(rename = "mplUsername")]
@@ -39,22 +38,17 @@ pub struct LoginFormData {
 /// check by going to: http://127.0.0.1:8000/db
 /// 
 async fn login(req: web::Form<LoginFormData>) -> impl Responder {
-  
-  //let user_name = req.match_info().get("mplusername").unwrap_or("AAA");
-  //let user_password = req.match_info().get("mplpassword").unwrap_or("BBB");
-
-  HttpResponse::Ok().body(format!("Got user: {}", req.username));
-  HttpResponse::Ok().body(format!("Got user: {}", req.password));
-  
-  
-  //let cur_db_conn = auth_objects::AuthObjects::new(DB_CONN_STR).await;
+    
+  let cur_db_conn = auth_objects::AuthObjects::new(DB_CONN_STR).await;
   //let users = cur_db_conn.get_users( Some(10), 0).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
+  let user_can_login = cur_db_conn.can_user_login(req.username.clone(), req.password.clone()).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
 
-  //let mut s = String::new();
- // for row in users.iter() {                          // row: &User
-  //    s = s + &row.id.to_string() + " " + &row.username + "; ";
- // }
-  format!("U/P: {}/{}", req.username, req.password)
+  if user_can_login {
+    HttpResponse::Ok().body( format!("User can login: {}", req.username) )
+  }
+  else{
+    HttpResponse::Ok().body( format!("Login denied for {}", req.username) )
+  }
 }
 
 

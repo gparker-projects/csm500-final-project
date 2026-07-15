@@ -19,6 +19,9 @@ pub struct AuthObjects {
 }
 
 impl AuthObjects {
+
+    /// Creates a new AuthObjects object, with a database pool for use by other calls
+    /// 
     pub async fn new(db_url: &str) -> Self {
 
         let db_pool = match PgPoolOptions::new()
@@ -35,6 +38,8 @@ impl AuthObjects {
         }
     }
 
+    /// Returns a list of users from the database
+    /// 
     pub async fn get_users(&self,
                            limit: Option<i32>,
                            offset: i32, 
@@ -53,7 +58,51 @@ impl AuthObjects {
             .await
         {
             Ok(results_users) => Ok(results_users),
-             Err(e) => panic!("{}", e),
+            Err(e) => panic!("{}", e),
         }
     }
+
+    /// Checks the user is in the database, and that the password matches (TODO)
+    /// Returns a true/false value
+    /// 
+    pub async fn can_user_login(&self,
+                            user_name: String, 
+                            user_password: String,
+                          ) -> Result< bool, std::io::Error> {
+
+        #[derive(sqlx::FromRow)]
+        struct SingleResult{
+            pub count: i64,
+        }
+
+        let query = format!("SELECT COUNT(ID) FROM USERS WHERE USERNAME = '{}'", user_name);// and PASSWORD = '$2'");
+
+        println!("Query: {}", query);
+
+        match sqlx::query(&query)
+          //  .bind(limit)
+          //  .bind(offset)a
+            .map(|row: PgRow| SingleResult {
+                count: row.get("count"),
+            })
+            .fetch_all(&self.connection)
+            .await
+        {
+            Ok(results) => {
+                if results[0].count == 0{
+                    println!("No results for: {} ({})", user_name, results[0].count);
+                    Ok(false)
+                }
+                else {
+                    println!("Successful login (results found) for: {}", user_name);
+                    Ok(true)
+                }
+            } 
+            Err(_e) => {
+                println!("Error on login for: {}", user_name);
+                Ok(false)
+            }
+        }
+    }
+    
 }
