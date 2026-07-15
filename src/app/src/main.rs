@@ -1,6 +1,6 @@
 //use std::ptr::null;
 
-use actix_web::{web, App, HttpRequest, HttpServer, HttpResponse, Responder};
+use actix_web::{web, App, HttpRequest, HttpServer, HttpResponse, Responder, web::Redirect};
 //use serde::Deserialize; //pg 51 of ZeroToProd
 ///
 /// # Main program executable for the project
@@ -23,6 +23,7 @@ mod auth_objects;
 mod nlp;
 mod errors;
 
+// application-wide database string; should come from a configurable parameter file (TODO)
 const DB_CONN_STR: &str = "postgres://postgres:csm500@localhost:5432/csm500";
 
 #[derive(serde::Deserialize)]
@@ -40,14 +41,15 @@ pub struct LoginFormData {
 async fn login(req: web::Form<LoginFormData>) -> impl Responder {
     
   let cur_db_conn = auth_objects::AuthObjects::new(DB_CONN_STR).await;
-  //let users = cur_db_conn.get_users( Some(10), 0).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
   let user_can_login = cur_db_conn.can_user_login(req.username.clone(), req.password.clone()).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
 
   if user_can_login {
     HttpResponse::Ok().body( format!("User can login: {}", req.username) )
+    //Redirect::to("").permanent()
   }
   else{
     HttpResponse::Ok().body( format!("Login denied for {}", req.username) )
+    //Redirect::to("/login").permanent()
   }
 }
 

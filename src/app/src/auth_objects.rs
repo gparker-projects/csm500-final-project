@@ -70,18 +70,19 @@ impl AuthObjects {
                             user_password: String,
                           ) -> Result< bool, std::io::Error> {
 
+        // may not be needed, but this works: a single result/single variable to capture the count (true/false)
+        // from the datbase query
         #[derive(sqlx::FromRow)]
         struct SingleResult{
             pub count: i64,
         }
 
-        let query = format!("SELECT COUNT(ID) FROM USERS WHERE USERNAME = '{}'", user_name);// and PASSWORD = '$2'");
+        // query the database for a user that matches the username and password (TODO)
+        let query = format!("SELECT COUNT(ID) FROM USERS WHERE USERNAME = '{}' AND PASSWORD = '{}'", user_name, user_password);
 
         println!("Query: {}", query);
 
         match sqlx::query(&query)
-          //  .bind(limit)
-          //  .bind(offset)a
             .map(|row: PgRow| SingleResult {
                 count: row.get("count"),
             })
@@ -89,6 +90,8 @@ impl AuthObjects {
             .await
         {
             Ok(results) => {
+                // if there are no results or an error, the query did not find a valid user for the username/pw combo
+                // if there is an exact match only, then the procedure succeeds.
                 if results[0].count == 0{
                     println!("No results for: {} ({})", user_name, results[0].count);
                     Ok(false)
