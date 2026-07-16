@@ -56,12 +56,12 @@ async fn login(req: web::Form<LoginFormData>) -> impl Responder {
 
 /// performs an execution of the NLP engine
 /// 
-/// check by going to: http://127.0.0.1:8000/nlp
+/// check by going to: http://127.0.0.1:8000/ml
 /// 
 async fn machine_learn_test(_req: HttpRequest) -> impl Responder {
   let store = nlp::NLP{}.execute();
   
-  format!("Rust POC WebDBML2! {}", store.await.to_string())
+  HttpResponse::Ok().body(format!("<html><body><b>Rust</b> POC WebDBML2! {}</body></html>", store.await.to_string())) 
 }
 
 /// Basic landing page type response
@@ -70,7 +70,7 @@ async fn machine_learn_test(_req: HttpRequest) -> impl Responder {
 ///
 async fn welcome(req: HttpRequest) -> impl Responder {
   let name = req.match_info().get("name").unwrap_or("World");
-  format!("Rust POC webDB {}!", &name)
+  HttpResponse::Ok().body(format!("Rust POC webDB {}!", &name))
 }
 
 /// performs a connect to the database
@@ -86,13 +86,20 @@ async fn db(_req: HttpRequest) -> impl Responder {
   for row in users.iter() {                          // row: &User
       s = s + &row.id.to_string() + " " + &row.username + "; ";
   }
-  format!("Users: {}, #{}", s, users.len())
+  HttpResponse::Ok().body(format!("Users: {}, #{}", s, users.len()))
 }
 
 /// Allows a monitoring services to perform a basic "is the application up?" check
 /// 
 async fn is_it_up() -> impl Responder {
   HttpResponse::Ok().body("MapleEMR is Up")
+}
+
+
+/// Main workspace page of the application, to be supplemented with lots of Javascript, CSS and API calls
+/// 
+async fn workspace() -> impl Responder {
+  HttpResponse::Ok().body("MapleEMR Workspace")
 }
 
 /// # Main program
@@ -108,8 +115,9 @@ async fn main() -> std::io::Result<()> {
   // use the Builder pattern to add one route at a time
   HttpServer::new(|| {
   App::new()
-    .route("/", web::get().to( welcome ))
+    .route("/", web::get().to( login ))
     .route("/login", web::post().to( login ))
+    .route("/maple", web::post().to( workspace )) // main workspace
     .route("/ml", web::get().to( machine_learn_test ))
     .route("/db", web::get().to( db ))
     .route("/isItUp", web::get().to( is_it_up ))    

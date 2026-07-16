@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<!-- https://www.w3schools.com/css/css_navbar_vertical.asp -->
-<html>
-<head>
-<style>
 .apptitle {
   color: #448DD1;
   text-align: left;
   font-size: 24px;
-   font-weight: bold;
+  font-weight: bold;
 }
 
 ul {
@@ -41,27 +36,8 @@ li a:hover {
   color: white;
 }
 
-.box {
+.nlpCommandAreaCls {
     position:relative;
-}
-
-#roundblueboxRight {
-  border-radius: 12px;
-  border: 2px solid #376BA4;
-  padding: 6px;
-  //width: 200px;
-  //height: 80px;
-  position: absolute;
-
-  align: right;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  cursor: move;
-  z-index: 1000;
-  //top: 50px;
-  //left: 600px;
-  bottom: 0px;
-  right: 0px;
-  width: 400px;
 }
 
 input[type=text] {
@@ -73,6 +49,8 @@ input[type=text] {
   border-radius: 4px;
   font-family: verdana;
   font-size: 12px;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 input[type=button], input[type=submit], input[type=reset] {
@@ -97,30 +75,23 @@ input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
   border-radius: 8px;
 }
 
-</style>
-</head>
-<body>
-
-<div class="apptitle">MapleEMR</div>
-<p>
-<ul>
-  <li><a class="menuActive" href="javascript:void(0)">PATIENT1_LASTNM, Name</a></li>
-  <li><a href="javascript:void(0)">&nbsp;&nbsp;&nbsp;Medications</a></li>
-  <li><a href="javascript:void(0)">&nbsp;&nbsp;&nbsp;Orders</a></li>
-  <li><a href="javascript:void(0)">&nbsp;&nbsp;&nbsp;Allergies</a></li>
-  <li><a href="javascript:void(0)">PATIENT2_LASTNM, Name</a></li>
-</ul>
-</div>
-
-<div class="box">
-	<div id="roundblueboxRight" align="right">
-	<form action="/nlpcmd">
-	  <!--label for="Username"></label-->
-	  <input type="text" id="nlpCmd" name="nlpCmd" placeholder="How can I help?">
-	  <input type="submit" value=">>">
-	</form>
-	</div>
-</div>
-
-</body>
-</html>
+#nlpCommandArea {
+  border-radius: 12px;
+  border: 2px solid #376BA4;
+  padding: 6px;
+  //width: 200px;
+  //height: 80px;
+  position: absolute;
+  background-color: white;
+  align: right;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  cursor: move;
+  z-index: 1000;
+  //top: 50px;
+  //left: 600px;
+  bottom: 0px;
+  right: 0px;
+  width: 400px;
+  display: flex;
+  flex-wrap: wrap;
+}
