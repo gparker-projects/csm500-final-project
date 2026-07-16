@@ -3,20 +3,55 @@
 <HEAD>
   <TITLE>Maple EMR</TITLE>
   <link rel="stylesheet" href="./pub/main.css">
+
+  <script>
+  <!-- REFs: https://www.w3schools.com/js/js_validation.asp
+             https://stackoverflow.com/questions/42803866/form-is-submitting-even-after-validation-function-returning-false
+  -->
+  function validateForm() {
+    const errLabel = document.getElementById('errLabel');
+    errLabel.textContent = '';
+    let isValid = true;
+
+    if (document.getElementById('mplUsername').value.trim() == '') {
+      errLabel.textContent = "Username is required.";
+      errLabel.style = "color: red";
+      isValid = false;
+    }
+
+    if (document.getElementById('mplPassword').value.trim() == '') {
+	  errLabel.textContent = "Password is required.";
+	  errLabel.style = "color: red";
+	  isValid = false;
+    }
+
+    if (!isValid) {
+      event.preventDefault();       // Stop the form from submitting if there are errors
+    }
+    else{
+      loginForm.submit();
+    }
+
+    // If isValid remains true, the browser automatically proceeds to submit!
+    return isValid;
+  }
+  </script>
 </HEAD>
 <BODY>
 
 <h1>Welcome to MapleEMR</h1>
 
 <div align="center">
+<label id="errLabel"></label><br>
 
-<div id="roundbluebox" align="center">
-<form action="http://127.0.0.1:8000/login" method="post">
+<div id="roundbluebox" align="center" >
+<form action="http://127.0.0.1:8000/login" method="post" id="loginForm" onSubmit="event.preventDefault(); return validateForm()">
+
   <label for="Username">Username</label>
-  <input type="text" id="mplUsername" name="mplUsername" placeholder="Enter your user name">
+  <input type="text" id="mplUsername" name="mplUsername" placeholder="Enter your user name" onClick="document.getElementById('errLabel').textContent='';">
 
   <label for="Password">Password</label>
-  <input type="password" id="mplPassword" name="mplPassword" placeholder="Enter your user password">
+  <input type="password" id="mplPassword" name="mplPassword" placeholder="Enter your user password" onClick="document.getElementById('errLabel').textContent='';">
 
   <input type="submit" value="Submit">
 </form>
