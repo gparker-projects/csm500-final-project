@@ -3,25 +3,50 @@
 <body>
 <script>
 <!-- from Javascript from Beginner to Professional, Svekis L, Putten M, Percival R; Chapter 10 -->
+function submitNLPrompt(){
 
-function performNLPrompt(){
+   document.getElementById("leftMenu").innerHTML = document.getElementById("leftMenu").innerHTML + "(revised)";
+   document.getElementById("mainContentArea").innerHTML = "(new)";
+   document.getElementById("nlPrompt").innerHTML = document.getElementById("nlPrompt").innerHTML + "(revised)";
 
-   document.getElementById("section1").innerHTML = "section1";
-   document.getElementById("section2").innerHTML = "section2";
-   document.getElementById("section3").innerHTML = "section3";
+   //userPrompt = "port mandy to the ER";
+   userPrompt = "sht";
+   //userPrompt = "this prompt is too long for the ";
 
-   alert("Got here");
+   // collect the user's prompt from the form and validate if it can be submitted to the NL engine
+   validPrompt = validateNLPrompt( userPrompt );
+
+   // validPrompt = false; // for testing only
+   if (validPrompt.length == 0) {
+      document.getElementById("mainContentArea").innerHTML = "Prompt accepted";
+   }
+   else{
+      document.getElementById("mainContentArea").innerHTML = "Invalid prompt: " + validPrompt;
+   }
+
+   //alert("Done");
+}
+
+// Validates the content of prompt from the user before sending it to the ML engine.
+//
+function validateNLPrompt(userPrompt){
+    alert("user prompted: " + userPrompt);
+
+    // check for lengths
+    if ( userPrompt.length > 100 ) return "Prompt is too long";
+    if ( userPrompt.length < 4 ) return "Prompt is too short";
+
+    // replace patient names with codifiers
+    return "";
 }
 </script>
-<div id="one" onclick="performNLPrompt()">Don't click here!</div>
+  <div id="leftMenu"><b>leftMenu</b></div>
 
+  <div id="mainContentArea">mainContentArea</div>
 
-  <div id="section1"><b>test1</b></div>
+  <div id="nlPrompt"><b>nlPrompt</b></div>
+  <p><p>
 
-  <div id="section2"><b>test2</b></div>
-
-  <div id="section3">test3</div>
-
-
+  <div id="one" onclick="submitNLPrompt()">Submit</div>
 </body>
 </html>
