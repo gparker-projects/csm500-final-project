@@ -2,16 +2,18 @@
 <html>
 <body>
 <script>
-function stop(){
+<!-- from Javascript from Beginner to Professional, Svekis L, Putten M, Percival R; Chapter 10 -->
 
- document.getElementById("section1").innerHTML = "section1";
-      document.getElementById("section2").innerHTML = "section2";
-      document.getElementById("section3").innerHTML = "section3";
+function performNLPrompt(){
 
-alert("Ouch! Stop it!");
+   document.getElementById("section1").innerHTML = "section1";
+   document.getElementById("section2").innerHTML = "section2";
+   document.getElementById("section3").innerHTML = "section3";
+
+   alert("Got here");
 }
 </script>
-<div id="one" onclick="stop()">Don't click here!</div>
+<div id="one" onclick="performNLPrompt()">Don't click here!</div>
 
 
   <div id="section1"><b>test1</b></div>
