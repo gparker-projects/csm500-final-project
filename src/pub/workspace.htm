@@ -30,8 +30,10 @@
 		event.preventDefault();       // Stop the form from submitting if there are errors
 	  }
 	  else{
-	    alert("Submitting prompt: " + userPrompt);
-		nlpCommandForm.submit();
+	    //alert("Submitting prompt: " + userPrompt);
+		//nlpCommandForm.submit();
+
+		document.getElementById("mainContentArea").innerHTML = ("<b>Prompt accepted: " + userPrompt + "</b>");
 	  }
 
 	  // If isValid remains true, the browser automatically proceeds to submit!
@@ -53,6 +55,8 @@
 		</ul>
 	</div>
 </div>
+
+<div id="mainContentArea" align="center">Main Content Area (Default)</div>
 
 <div id="nlpCommandArea" align="right" class="nlpCommandAreaCls">
   <form action="http://127.0.0.1:8000/nlpcmd" method="post" id="nlpCommandForm" onSubmit="event.preventDefault(); return validateNLPrompt()" align="right" class="nlpCommandAreaCls">
