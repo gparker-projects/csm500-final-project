@@ -33,7 +33,15 @@
 	    //alert("Submitting prompt: " + userPrompt);
 		//nlpCommandForm.submit();
 
-		document.getElementById("mainContentArea").innerHTML = ("<b>Prompt accepted: " + userPrompt + "</b>");
+        let newBody = "<b>Prompt accepted: " + userPrompt + "</b><p>";
+
+        newBody = newBody + "<table>";
+        newBody = newBody + "  <tr><th>Title</th><th>Title</th><th>Title</th></tr>";
+        newBody = newBody + "  <tr><td>Bob</td><td>Daily</td><td>2025</td></tr>";
+        newBody = newBody + "  <tr><td>Bugs</td><td>Bunny</td><td>1910</td></tr>";
+        newBody = newBody + "</table>";
+
+		document.getElementById("mainContentArea").innerHTML = (newBody);
 	  }
 
 	  // If isValid remains true, the browser automatically proceeds to submit!
@@ -56,7 +64,15 @@
 	</div>
 </div>
 
-<div id="mainContentArea" align="center">Main Content Area (Default)</div>
+<div id="mainContentArea" align="center">
+Main Content Area (Default)
+<p>
+<table>
+  <tr><th>Title</th><th>Title</th><th>Title</th></tr>
+  <tr><td>Data</td><td>Data</td><td>Data</td></tr>
+  <tr><td>Data</td><td>Data</td><td>Data</td></tr>
+</table>
+</div>
 
 <div id="nlpCommandArea" align="right" class="nlpCommandAreaCls">
   <form action="http://127.0.0.1:8000/nlpcmd" method="post" id="nlpCommandForm" onSubmit="event.preventDefault(); return validateNLPrompt()" align="right" class="nlpCommandAreaCls">
