@@ -3,6 +3,41 @@
 <html>
 <head>
   <link rel="stylesheet" href="workspace.css">
+<!-- from Javascript from Beginner to Professional, Svekis L, Putten M, Percival R; Chapter 10
+  //Aynsc calls:
+  //   https://www.geeksforgeeks.org/javascript/async-await-function-in-javascript/
+  //   https://www.w3schools.com/js/js_async_await.asp
+  //   from Javascript from Beginner to Professional, Svekis L, Putten M, Percival R; Ch13
+  //REFs: https://www.w3schools.com/js/js_validation.asp
+  //             https://stackoverflow.com/questions/42803866/form-is-submitting-even-after-validation-function-returning-false
+  //
+-->
+  <script>
+    function validateNLPrompt() {
+      const errLabel = document.getElementById('errLabel');
+      errLabel.textContent = '';
+      userPrompt = document.getElementById('nlpCmd').value.trim();
+      let isValid = true;
+      document.getElementById('nlpCmd').value = "";
+
+	  if (userPrompt == '') {
+		errLabel.textContent = "Please enter a prompt.";
+		errLabel.style = "color: red";
+		isValid = false;
+	  }
+
+	  if (!isValid) {
+		event.preventDefault();       // Stop the form from submitting if there are errors
+	  }
+	  else{
+	    alert("Submitting prompt: " + userPrompt);
+		nlpCommandForm.submit();
+	  }
+
+	  // If isValid remains true, the browser automatically proceeds to submit!
+	  return isValid;
+    }
+  </script>
 </head>
 <body>
 
@@ -20,9 +55,12 @@
 </div>
 
 <div id="nlpCommandArea" align="right" class="nlpCommandAreaCls">
-  <form action="/nlpcmd" id="nlpCommandForm" align="right" class="nlpCommandAreaCls">
+  <form action="http://127.0.0.1:8000/nlpcmd" method="post" id="nlpCommandForm" onSubmit="event.preventDefault(); return validateNLPrompt()" align="right" class="nlpCommandAreaCls">
+
 	<input type="text" id="nlpCmd" name="nlpCmd" placeholder="How can I help?">
 	<input type="submit" value=">>">
+	<p>
+	<label id="errLabel">
   </form>
 </div>
 
