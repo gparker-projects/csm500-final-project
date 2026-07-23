@@ -16,9 +16,9 @@
     function validateNLPrompt() {
       const errLabel = document.getElementById('errLabel');
       errLabel.textContent = '';
-      userPrompt = document.getElementById('nlpCmd').value.trim();
+      userPrompt = document.getElementById('prompt').value.trim();
       let isValid = true;
-      document.getElementById('nlpCmd').value = "";
+      //document.getElementById('prompt').value = "";
 
 	  if (userPrompt == '') {
 		errLabel.textContent = "Please enter a prompt.";
@@ -30,16 +30,48 @@
 		event.preventDefault();       // Stop the form from submitting if there are errors
 	  }
 	  else{
-	    //alert("Submitting prompt: " + userPrompt);
-		//nlpCommandForm.submit();
+	    // alert("Submitting prompt: " + userPrompt);
+		// nlpCommandForm.submit();
 
-        let newBody = "<b>Prompt accepted: " + userPrompt + "</b><p>";
+	    // replace with Request/Promise from
+	    // https://www.digitalocean.com/community/tutorials/how-to-use-the-javascript-fetch-api-to-get-data#fetch-api-vs-ajax-vs-axios
 
-        newBody = newBody + "<table>";
-        newBody = newBody + "  <tr><th>Title</th><th>Title</th><th>Title</th></tr>";
-        newBody = newBody + "  <tr><td>Bob</td><td>Daily</td><td>2025</td></tr>";
-        newBody = newBody + "  <tr><td>Bugs</td><td>Bunny</td><td>1910</td></tr>";
-        newBody = newBody + "</table>";
+		//const url = "http://127.0.0.1:8000/nlprompt";
+
+        const url = "http://localhost:8000/nlprompt";
+
+
+		let data = {
+		  prompt: 'put Sammy to bed'
+		};
+
+		let request = new Request(url, {
+		  method: 'POST',
+		  body: data
+		  headers: {
+		    'Content-Type': 'text/plain'
+		  }
+		});
+
+		fetch(url, { method: "POST", request })
+		  .then((response) => {
+			if (!response.ok) throw new Error(response.status);
+			//
+		  })
+		  .then((data) => {
+			newBody = data;           // only usable inside here
+		  })
+	  .catch((error) => console.error(error));
+
+        alert("New body: " + newBody);
+
+        //let newBody = "<b>Prompt accepted: " + userPrompt + "</b><p>";
+
+        //newBody = newBody + "<table>";
+        //newBody = newBody + "  <tr><th>Title</th><th>Title</th><th>Title</th></tr>";
+        //newBody = newBody + "  <tr><td>Bob</td><td>Daily</td><td>2025</td></tr>";
+        //newBody = newBody + "  <tr><td>Bugs</td><td>Bunny</td><td>1910</td></tr>";
+        //newBody = newBody + "</table>";
 
 		document.getElementById("mainContentArea").innerHTML = (newBody);
 	  }
@@ -75,9 +107,9 @@ Main Content Area (Default)
 </div>
 
 <div id="nlpCommandArea" align="right" class="nlpCommandAreaCls">
-  <form action="http://127.0.0.1:8000/nlpcmd" method="post" id="nlpCommandForm" onSubmit="event.preventDefault(); return validateNLPrompt()" align="right" class="nlpCommandAreaCls">
+  <form action="http://127.0.0.1:8000/nlprompt" method="post" id="nlpCommandForm" onSubmit="event.preventDefault(); return validateNLPrompt()" align="right" class="nlpCommandAreaCls">
 
-	<input type="text" id="nlpCmd" name="nlpCmd" placeholder="How can I help?">
+	<input type="text" id="prompt" name="prompt" placeholder="How can I help?">
 	<input type="submit" value=">>">
 	<p>
 	<label id="errLabel">

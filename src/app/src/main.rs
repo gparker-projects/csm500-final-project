@@ -34,6 +34,14 @@ pub struct LoginFormData {
     password: String,
 }
 
+#[derive(serde::Deserialize)]
+pub struct NLPromptFormData {
+    #[serde(rename = "prompt")]
+    prompt: String,
+}
+
+
+
 /// performs a connect to the database
 /// 
 /// check by going to: http://127.0.0.1:8000/db
@@ -53,6 +61,16 @@ async fn login(req: web::Form<LoginFormData>) -> impl Responder {
   }
 }
 
+/// performs a natural language prompt using the built in engine
+/// 
+/// check by going to: http://127.0.0.1:8000/db
+/// 
+async fn natural_language_prompt(req: web::Form<NLPromptFormData>) -> impl Responder {
+    println!("Received prompt for: {}", req.prompt);
+
+    HttpResponse::Ok().body( format!("NL Response: {}", req.prompt) )
+}
+
 
 /// performs an execution of the NLP engine
 /// 
@@ -62,15 +80,6 @@ async fn machine_learn_test(_req: HttpRequest) -> impl Responder {
   let store = nlp::NLP{}.execute();
   
   HttpResponse::Ok().body(format!("<html><body><b>Rust</b> POC WebDBML2! {}</body></html>", store.await.to_string())) 
-}
-
-/// Basic landing page type response
-/// 
-/// check by going to: http://127.0.0.1:8000/
-///
-async fn welcome(req: HttpRequest) -> impl Responder {
-  let name = req.match_info().get("name").unwrap_or("World");
-  HttpResponse::Ok().body(format!("Rust POC webDB {}!", &name))
 }
 
 /// performs a connect to the database
@@ -118,6 +127,7 @@ async fn main() -> std::io::Result<()> {
     .route("/", web::get().to( login ))
     .route("/login", web::post().to( login ))
     .route("/maple", web::post().to( workspace )) // main workspace
+    .route("/nlprompt", web::post().to( natural_language_prompt ))
     .route("/ml", web::get().to( machine_learn_test ))
     .route("/db", web::get().to( db ))
     .route("/isItUp", web::get().to( is_it_up ))    
