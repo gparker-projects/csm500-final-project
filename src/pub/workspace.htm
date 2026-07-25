@@ -29,7 +29,7 @@
 		event.preventDefault();       // Stop the form from submitting if there are errors
 	  }
 	  else{
-	    alert("Submitting prompt: " + userPrompt);
+	    console.log("Submitting prompt: " + userPrompt);
 
 	   // nlpCommandForm.submit();
 
@@ -38,7 +38,7 @@
 
         let newBody = getData(userPrompt);
 
-        alert("New body: " + newBody);
+        console.log("New body: " + newBody);
 
 		document.getElementById("mainContentArea").innerHTML = (newBody);
 	  }
@@ -49,28 +49,32 @@
 
     function getData(userPrompt){
       const url = "http://localhost:8000/nlprompt";
-	  //const url = "http://127.0.0.1:8000/nlprompt";
+      let results = null;
 
-      let results = "";
-      let data = {
-			  prompt: 'put Sammy to bed'
-	     };
+      console.log("In getData(): " + userPrompt);
 
-		let request = new Request(url, {
-		  method: 'POST',
-		  body: data,
-		  headers: {
-			'Content-Type': 'text/plain'
-		  }
-		});
-
-		fetch(url, { method: "POST", request })
-		  .then((response) => {
-			if (!response.ok) throw new Error(response.status);
-			//
+      // refs: https://stackoverflow.com/questions/46640024/how-do-i-post-form-data-with-fetch-api
+      //       https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+      //       JS from Beginner to Prof, pg 417
+      //
+	  fetch(url, {
+	           method: "POST",
+	           headers: {
+	               'Content-Type': 'application/x-www-form-urlencoded',
+			       'Accept': 'application/json'
+               },
+	           body: new URLSearchParams({ prompt: userPrompt })
+	        })
+	      .then((response) => {
+			if (!response.ok){
+			  console.log("Response error:" + response.status);
+			  throw new Error(response.status);
+			}
+			return response.text();
 		  })
 		  .then((data) => {
-			results = data;           // only usable inside here
+		    results = data;
+			console.log(data);
 		  })
 	  .catch((error) => console.error(error));
 

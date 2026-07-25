@@ -1,6 +1,7 @@
 //use std::ptr::null;
 
 use actix_web::{web, App, HttpRequest, HttpServer, HttpResponse, Responder, web::Redirect};
+use actix_cors::Cors;
 //use serde::Deserialize; //pg 51 of ZeroToProd
 ///
 /// # Main program executable for the project
@@ -75,6 +76,7 @@ async fn natural_language_prompt(req: web::Form<NLPromptFormData>) -> impl Respo
 /// performs an execution of the NLP engine
 /// 
 /// check by going to: http://127.0.0.1:8000/ml
+///                    http://localhost:8000/ml
 /// 
 async fn machine_learn_test(_req: HttpRequest) -> impl Responder {
   let store = nlp::NLP{}.execute();
@@ -84,7 +86,8 @@ async fn machine_learn_test(_req: HttpRequest) -> impl Responder {
 
 /// performs a connect to the database
 /// 
-/// check by going to: http://127.0.0.1:8000/db
+/// check by going to: http://127.0.0.1:8000/db 
+///                    http://localhost:8000/db
 /// 
 async fn db(_req: HttpRequest) -> impl Responder {
   // TODO: use a pool instead, as this will block another query/result in multiple connections the DB may not be able to accomodate
@@ -115,22 +118,35 @@ async fn workspace() -> impl Responder {
 /// 
 /// Loads the NLP engine and adds handlers for key paths of the web application
 /// 
+/// Ref: Add CORS headers to allow javascript connectivity
+///      ->  https://docs.rs/actix-cors/latest/actix_cors/struct.Cors.html 
+/// 
 /// Returns std::io::Result<()> for 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
   
 //  //nlp::NLP{}.execute();
+// https://docs.rs/actix-cors/latest/actix_cors/struct.Cors.html 
 
   // use the Builder pattern to add one route at a time
   HttpServer::new(|| {
   App::new()
-    .route("/", web::get().to( login ))
-    .route("/login", web::post().to( login ))
-    .route("/maple", web::post().to( workspace )) // main workspace
-    .route("/nlprompt", web::post().to( natural_language_prompt ))
-    .route("/ml", web::get().to( machine_learn_test ))
-    .route("/db", web::get().to( db ))
-    .route("/isItUp", web::get().to( is_it_up ))    
+          .wrap(
+            Cors::default()
+                //.allowed_origin("http://localhost:8000") // Restrict to specific origin
+                .allow_any_origin() // not great... will have to do for now
+                .allowed_methods(vec!["GET", "POST"])
+                .allowed_headers(vec![actix_web::http::header::AUTHORIZATION, actix_web::http::header::ACCEPT])
+                .allow_any_header()
+                .max_age(3600),
+        )
+        .route("/", web::get().to( login ))
+        .route("/login", web::post().to( login ))
+        .route("/maple", web::post().to( workspace )) // main workspace
+        .route("/nlprompt", web::post().to( natural_language_prompt ))
+        .route("/ml", web::get().to( machine_learn_test ))
+        .route("/db", web::get().to( db ))
+        .route("/isItUp", web::get().to( is_it_up ))    
   })
   .bind("127.0.0.1:8000")?
   .run()
