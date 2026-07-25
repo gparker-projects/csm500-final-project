@@ -18,7 +18,6 @@
       errLabel.textContent = '';
       userPrompt = document.getElementById('prompt').value.trim();
       let isValid = true;
-      //document.getElementById('prompt').value = "";
 
 	  if (userPrompt == '') {
 		errLabel.textContent = "Please enter a prompt.";
@@ -30,26 +29,38 @@
 		event.preventDefault();       // Stop the form from submitting if there are errors
 	  }
 	  else{
-	    // alert("Submitting prompt: " + userPrompt);
-		// nlpCommandForm.submit();
+	    alert("Submitting prompt: " + userPrompt);
+
+	   // nlpCommandForm.submit();
 
 	    // replace with Request/Promise from
 	    // https://www.digitalocean.com/community/tutorials/how-to-use-the-javascript-fetch-api-to-get-data#fetch-api-vs-ajax-vs-axios
 
-		//const url = "http://127.0.0.1:8000/nlprompt";
+        let newBody = getData(userPrompt);
 
-        const url = "http://localhost:8000/nlprompt";
+        alert("New body: " + newBody);
 
+		document.getElementById("mainContentArea").innerHTML = (newBody);
+	  }
 
-		let data = {
-		  prompt: 'put Sammy to bed'
-		};
+	  // If isValid remains true, the browser automatically proceeds to submit!
+	  return isValid;
+    }
+
+    function getData(userPrompt){
+      const url = "http://localhost:8000/nlprompt";
+	  //const url = "http://127.0.0.1:8000/nlprompt";
+
+      let results = "";
+      let data = {
+			  prompt: 'put Sammy to bed'
+	     };
 
 		let request = new Request(url, {
 		  method: 'POST',
-		  body: data
+		  body: data,
 		  headers: {
-		    'Content-Type': 'text/plain'
+			'Content-Type': 'text/plain'
 		  }
 		});
 
@@ -59,25 +70,11 @@
 			//
 		  })
 		  .then((data) => {
-			newBody = data;           // only usable inside here
+			results = data;           // only usable inside here
 		  })
 	  .catch((error) => console.error(error));
 
-        alert("New body: " + newBody);
-
-        //let newBody = "<b>Prompt accepted: " + userPrompt + "</b><p>";
-
-        //newBody = newBody + "<table>";
-        //newBody = newBody + "  <tr><th>Title</th><th>Title</th><th>Title</th></tr>";
-        //newBody = newBody + "  <tr><td>Bob</td><td>Daily</td><td>2025</td></tr>";
-        //newBody = newBody + "  <tr><td>Bugs</td><td>Bunny</td><td>1910</td></tr>";
-        //newBody = newBody + "</table>";
-
-		document.getElementById("mainContentArea").innerHTML = (newBody);
-	  }
-
-	  // If isValid remains true, the browser automatically proceeds to submit!
-	  return isValid;
+	  return results;
     }
   </script>
 </head>
