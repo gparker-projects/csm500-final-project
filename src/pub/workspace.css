@@ -95,3 +95,40 @@ input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
   display: flex;
   flex-wrap: wrap;
 }
+
+/*---------------------- Table styles ----------------------
+  Ref: https://www.w3schools.com/css/css_table.asp
+*/
+
+table {
+  border-collapse: collapse;
+  border: 1px solid green;
+  padding: 10px;
+  width: auto;
+}
+
+th {
+  height: auto;
+  text-align: left;
+  padding: 10px;
+  background-color: #376BA4;
+  color: white;
+}
+
+td {
+  height: auto;
+  text-align: left;
+  padding: 10px;
+}
+
+tr:hover {
+  background-color: #559DD8;
+}
+
+tr:nth-child(even) {
+  background-color: #C9D5E3;
+}
+
+div.tablecontainer {
+  overflow-x: auto;
+}

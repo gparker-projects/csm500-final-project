@@ -23,6 +23,7 @@ use actix_cors::Cors;
 mod auth_objects;
 mod nlp;
 mod errors;
+mod html_formatter;
 
 // application-wide database string; should come from a configurable parameter file (TODO)
 const DB_CONN_STR: &str = "postgres://postgres:csm500@localhost:5432/csm500";
@@ -69,10 +70,22 @@ async fn login(req: web::Form<LoginFormData>) -> impl Responder {
 async fn natural_language_prompt(req: web::Form<NLPromptFormData>) -> impl Responder {
     println!("Received prompt for: {}", req.prompt);
 
-    println!("Returning: {}", format!("<b>Rust POC WebDBML2! {}</b>", req.prompt));
+    //println!("Returning: {}", format!("<b>Rust POC WebDBML2! {}</b>", req.prompt));
+
+    let data = vec!["a","b","c","d","e"];
+    let head = vec!["ColA","ColB","ColC","ColD","ColE"];
+
+    let mut results_sbuf = String::with_capacity(50); // Single heap allocation
+    results_sbuf.push_str("<div><table>\n"); //class=\"data-table\"
+
+    results_sbuf.push_str( &html_formatter::HTMLFormatter::format_row(head, true) );
+    results_sbuf.push_str( &html_formatter::HTMLFormatter::format_row(data, false) );
+
+    results_sbuf.push_str("</table></div>\n<br>\n");
 
     //HttpResponse::Ok().body( format!("NL Response: {}", req.prompt) )
-    HttpResponse::Ok().body(format!("<b>Rust POC WebDBML2! {}</b>", req.prompt)) 
+    //HttpResponse::Ok().body(format!("<b>Rust POC WebDBML2! {}</b>", req.prompt)) 
+    HttpResponse::Ok().body(format!("{}", results_sbuf)) 
 }
 
 
@@ -82,9 +95,9 @@ async fn natural_language_prompt(req: web::Form<NLPromptFormData>) -> impl Respo
 ///                    http://localhost:8000/ml
 /// 
 async fn machine_learn_test(_req: HttpRequest) -> impl Responder {
-  let store = nlp::NLP{}.execute();
+  let results = nlp::NLP{}.execute();
   
-  HttpResponse::Ok().body(format!("<b>machine_learn_test {}</b>", store.await.to_string())) 
+  HttpResponse::Ok().body(format!("<b>machine_learn_test {}</b>", results.await.to_string())) 
 }
 
 /// performs a connect to the database
