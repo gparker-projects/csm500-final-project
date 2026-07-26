@@ -13,7 +13,7 @@
   //
 -->
   <script>
-    function validateNLPrompt() {
+    async function validateNLPrompt() {
       const errLabel = document.getElementById('errLabel');
       errLabel.textContent = '';
       userPrompt = document.getElementById('prompt').value.trim();
@@ -30,15 +30,18 @@
 	  }
 	  else{
 	    console.log("Submitting prompt: " + userPrompt);
-
-	   // nlpCommandForm.submit();
-
 	    // replace with Request/Promise from
 	    // https://www.digitalocean.com/community/tutorials/how-to-use-the-javascript-fetch-api-to-get-data#fetch-api-vs-ajax-vs-axios
 
-        let newBody = getData(userPrompt);
-
-        console.log("New body: " + newBody);
+        var newBody = null;
+        try {
+          var newBody = await getData(userPrompt);
+          console.log("New body: " + newBody);
+        }
+        catch (error){
+          console.log("Error occurred: " + error);
+          newBody = "Error occurred: " + error;
+        }
 
 		document.getElementById("mainContentArea").innerHTML = (newBody);
 	  }
@@ -49,34 +52,35 @@
 
     function getData(userPrompt){
       const url = "http://localhost:8000/nlprompt";
-      let results = null;
+      var results = null;
 
-      console.log("In getData(): " + userPrompt);
+      //console.log("In getData(): " + userPrompt);
 
       // refs: https://stackoverflow.com/questions/46640024/how-do-i-post-form-data-with-fetch-api
       //       https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
       //       JS from Beginner to Prof, pg 417
       //
-	  fetch(url, {
-	           method: "POST",
-	           headers: {
-	               'Content-Type': 'application/x-www-form-urlencoded',
-			       'Accept': 'application/json'
-               },
-	           body: new URLSearchParams({ prompt: userPrompt })
-	        })
-	      .then((response) => {
-			if (!response.ok){
-			  console.log("Response error:" + response.status);
-			  throw new Error(response.status);
-			}
-			return response.text();
-		  })
-		  .then((data) => {
-		    results = data;
-			console.log(data);
-		  })
-	  .catch((error) => console.error(error));
+	  results = fetch(url, {
+				   method: "POST",
+				   headers: {
+					   'Content-Type': 'application/x-www-form-urlencoded',
+					   'Accept': 'application/json'
+				   },
+				    body: new URLSearchParams({ prompt: userPrompt })
+				   })
+				  .then((response) => {
+                      if (!response.ok){
+					    console.log("Response error:" + response.status);
+					    throw new Error(response.status);
+					  }
+					  return response.text();
+				   })
+				   .then((data) => {
+					  results = data;
+					  console.log("Response data: " + data);
+					  return data;
+				   })
+			      .catch((error) => console.error(error));
 
 	  return results;
     }

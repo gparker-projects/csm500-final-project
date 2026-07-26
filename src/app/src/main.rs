@@ -1,6 +1,6 @@
 //use std::ptr::null;
 
-use actix_web::{web, App, HttpRequest, HttpServer, HttpResponse, Responder, web::Redirect};
+use actix_web::{web, App, HttpRequest, HttpServer, HttpResponse, Responder}; //, web::Redirect
 use actix_cors::Cors;
 //use serde::Deserialize; //pg 51 of ZeroToProd
 ///
@@ -69,7 +69,10 @@ async fn login(req: web::Form<LoginFormData>) -> impl Responder {
 async fn natural_language_prompt(req: web::Form<NLPromptFormData>) -> impl Responder {
     println!("Received prompt for: {}", req.prompt);
 
-    HttpResponse::Ok().body( format!("NL Response: {}", req.prompt) )
+    println!("Returning: {}", format!("<b>Rust POC WebDBML2! {}</b>", req.prompt));
+
+    //HttpResponse::Ok().body( format!("NL Response: {}", req.prompt) )
+    HttpResponse::Ok().body(format!("<b>Rust POC WebDBML2! {}</b>", req.prompt)) 
 }
 
 
@@ -81,7 +84,7 @@ async fn natural_language_prompt(req: web::Form<NLPromptFormData>) -> impl Respo
 async fn machine_learn_test(_req: HttpRequest) -> impl Responder {
   let store = nlp::NLP{}.execute();
   
-  HttpResponse::Ok().body(format!("<html><body><b>Rust</b> POC WebDBML2! {}</body></html>", store.await.to_string())) 
+  HttpResponse::Ok().body(format!("<b>machine_learn_test {}</b>", store.await.to_string())) 
 }
 
 /// performs a connect to the database
