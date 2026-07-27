@@ -1,9 +1,9 @@
 
 use chrono::{DateTime, Utc};
 
-mod dao{
+mod dto{
     /// -------------------------------------------------------------------
-    /// Defines a Data Object for a Patient
+    /// Defines a Data Transfer Object for a Patient
     /// -------------------------------------------------------------------
     /// 
     #[derive(serde::Deserialize)]

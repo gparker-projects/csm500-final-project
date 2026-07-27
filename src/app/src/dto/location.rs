@@ -1,9 +1,9 @@
 
 use chrono::{DateTime, Utc};
 
-mod dao{
+mod dto{
     /// -------------------------------------------------------------------
-    /// Defines a Data Object for a Location, which is a very specific and 
+    /// Defines a Data Transfer Object for a Location, which is a very specific and 
     /// identifiable physical position within the hospital. This is separated
     /// from the Site, which is a higher level and more generalized area.
     /// -------------------------------------------------------------------

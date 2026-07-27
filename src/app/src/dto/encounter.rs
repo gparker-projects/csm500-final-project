@@ -1,8 +1,8 @@
 use chrono::{DateTime, Utc};
 
-mod dao{
+mod dto{
     /// -------------------------------------------------------------------
-    /// Defines a Data Object for a (Patient) Encounter, which represents
+    /// Defines a Data Transfer Object for a (Patient) Encounter, which represents
     /// an event whereby a patient has attended the hospital to have one or 
     /// more interventions applied to them.
     /// -------------------------------------------------------------------

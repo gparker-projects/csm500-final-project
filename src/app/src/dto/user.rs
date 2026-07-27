@@ -1,8 +1,8 @@
 use chrono::{DateTime, Utc};
 
-mod dao{
+mod dto{
     /// -------------------------------------------------------------------
-    /// Defines a Data Object for a User
+    /// Defines a Data Transfer Object for a User
     /// -------------------------------------------------------------------
     /// 
     #[derive(serde::Deserialize)]
