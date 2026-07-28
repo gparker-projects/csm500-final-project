@@ -80,6 +80,7 @@ async fn natural_language_prompt(req: web::Form<NLPromptFormData>) -> impl Respo
 
     results_sbuf.push_str( &html_formatter::HTMLFormatter::format_row(head, true) );
     results_sbuf.push_str( &html_formatter::HTMLFormatter::format_row(data, false) );
+    
 
     results_sbuf.push_str("</table></div>\n<br>\n");
 
