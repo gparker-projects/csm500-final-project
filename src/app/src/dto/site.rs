@@ -1,6 +1,4 @@
 
-use chrono::{DateTime, Utc};
-
 mod dto{
     /// -------------------------------------------------------------------
     /// Defines a Data Transfer Object for a Site
@@ -9,7 +7,7 @@ mod dto{
     #[derive(serde::Deserialize)]
     pub struct Site {
         #[serde(rename = "Id")]
-        ID: Integer, // D BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
+        ID: u32, // D BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
         #[serde(rename = "Name")]
         Name: String, // NAME VARCHAR(200) UNIQUE NOT NULL, 
         #[serde(rename = "Address")]
@@ -23,7 +21,7 @@ mod dto{
     impl Site {
         /// Basic constructor
         /// 
-        pub fn new(ID: Integer,
+        pub fn new(ID: u32,
                 Name: String,
                 Address: String,
                 MunicipalName: String,

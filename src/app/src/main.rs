@@ -1,5 +1,3 @@
-//use std::ptr::null;
-
 use actix_web::{web, App, HttpRequest, HttpServer, HttpResponse, Responder}; //, web::Redirect
 use actix_cors::Cors;
 //use serde::Deserialize; //pg 51 of ZeroToProd
@@ -23,8 +21,10 @@ use actix_cors::Cors;
 mod auth_objects;
 mod nlp;
 mod errors;
-mod html_formatter;
-mod web_content;
+mod dto;
+mod webc;
+
+use crate::webc::web_content::WebContentFactory;
 
 // application-wide database string; should come from a configurable parameter file (TODO)
 const DB_CONN_STR: &str = "postgres://postgres:csm500@localhost:5432/csm500";
@@ -79,8 +79,8 @@ async fn natural_language_prompt(req: web::Form<NLPromptFormData>) -> impl Respo
     let mut results_sbuf = String::with_capacity(50); // Single heap allocation
     results_sbuf.push_str("<div><table>\n"); //class=\"data-table\"
 
-    results_sbuf.push_str( &html_formatter::HTMLFormatter::format_row(head, true) );
-    results_sbuf.push_str( &html_formatter::HTMLFormatter::format_row(data, false) );
+    results_sbuf.push_str( &HTMLFormatter::format_row(head, true) );
+    results_sbuf.push_str( &HTMLFormatter::format_row(data, false) );
     
 
     results_sbuf.push_str("</table></div>\n<br>\n");
@@ -143,7 +143,7 @@ async fn workspace() -> impl Responder {
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
 
-  let mut wcf = web_content::WebContentFactory::new("static");
+  let wcf = WebContentFactory::new("static");
 
 //  //nlp::NLP{}.execute();
 // https://docs.rs/actix-cors/latest/actix_cors/struct.Cors.html 

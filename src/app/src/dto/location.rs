@@ -1,6 +1,3 @@
-
-use chrono::{DateTime, Utc};
-
 mod dto{
     /// -------------------------------------------------------------------
     /// Defines a Data Transfer Object for a Location, which is a very specific and 
@@ -11,36 +8,40 @@ mod dto{
     #[derive(serde::Deserialize)]
     pub struct Location {
         #[serde(rename = "Id")]
-        ID: Integer, // ID BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
+        id: u32, // ID BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
         #[serde(rename = "Name")]
-        Name: String, // NAME VARCHAR(200) UNIQUE NOT NULL, 
+        name: String, // NAME VARCHAR(200) UNIQUE NOT NULL, 
         #[serde(rename = "Building")]
-        Building: String, // BUILDING VARCHAR(200), 
+        building: String, // BUILDING VARCHAR(200), 
         #[serde(rename = "Floor")]
-        Floor: String, // FLOOR VARCHAR(200), 
+        floor: String, // FLOOR VARCHAR(200), 
         #[serde(rename = "Wing")]
-        Wing: String, //  WING VARCHAR(200),
+        wing: String, //  WING VARCHAR(200),
         #[serde(rename = "Notes")]
-        Notes: String, //   NOTES VARCHAR(2000),
+        notes: String, //   NOTES VARCHAR(2000),
         #[serde(rename = "SiteId")]
-        SiteId: Integer, //  SITE_ID BIGINT NOT NULL REFERENCES SITE (ID),
+        site_id: u32, //  SITE_ID BIGINT NOT NULL REFERENCES SITE (ID),
     } 
 
     impl Location {
         /// Basic constructor
         /// 
-        pub fn new(ID: Integer,
-                Name: String,
-                Address: String,
-                MunicipalName: String,
-                PostalCode: String
+        pub fn new(id: u32,
+                name: String,
+                building: String,
+                floor: String,
+                wing: String,
+                notes: String,
+                site_id: u32
                 ) -> Self {
             Self { 
-                ID,
-                Name,
-                Address,
-                MunicipalName,
-                PostalCode
+                id,
+                name,
+                building,
+                floor,
+                wing,
+                notes,
+                site_id
             }
         }
     }

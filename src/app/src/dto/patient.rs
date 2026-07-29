@@ -1,7 +1,7 @@
 
-use chrono::{DateTime, Utc};
-
 mod dto{
+    use chrono::{DateTime, Local};
+
     /// -------------------------------------------------------------------
     /// Defines a Data Transfer Object for a Patient
     /// -------------------------------------------------------------------
@@ -9,7 +9,7 @@ mod dto{
     #[derive(serde::Deserialize)]
     pub struct Patient {
         #[serde(rename = "Id")]
-        ID: Integer, // D BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
+        ID: u32, // D BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
         #[serde(rename = "LegalFirstName")]
         LegalFirstName: String, // LEGAL_FIRST_NAME VARCHAR(100), 
         #[serde(rename = "LegalLastName")]
@@ -17,23 +17,23 @@ mod dto{
         #[serde(rename = "LegalMiddleNames")]
         LegalMiddleNames: String, // LEGAL_MIDDLE_NAMES VARCHAR(100), 
         #[serde(rename = "SIN")]
-        SIN: Integer, // SIN NUMERIC(7) UNIQUE, 
+        SIN: u32, // SIN NUMERIC(7) UNIQUE, 
         #[serde(rename = "BirthDate")]
-        BirthDate: DateTime, // BIRTHDATE TIMESTAMP,
+        BirthDate: DateTime<Local>, // BIRTHDATE TIMESTAMP,
         #[serde(rename = "LocationID")]
-        LocationID: Integer, // LOCATION_ID BIGINT REFERENCES LOCATION (ID),
+        LocationID: u32, // LOCATION_ID BIGINT REFERENCES LOCATION (ID),
     }
 
     impl Patient {
         /// Basic constructor
         /// 
-        pub fn new(ID: Integer,
+        pub fn new(ID: u32,
                 LegalFirstName: String,
                 LegalLastName: String,
                 LegalMiddleNames: String,
-                SIN: Integer,
-                BirthDate: DateTime,
-                LocationID: Integer
+                SIN: u32,
+                BirthDate: DateTime<Local>,
+                LocationID: u32
                 ) -> Self {
             Self { 
                 ID,

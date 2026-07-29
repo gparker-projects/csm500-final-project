@@ -1,10 +1,7 @@
 /// -------------------------------------------------------------------
 /// module for creating web (HTML) content
 /// -------------------------------------------------------------------'
-
 use std::fs;
-use std::io; //::{self, BufRead};
-//use std::path::Path;
 use derive_more::Display;
 use std::collections::HashMap;
 
@@ -19,13 +16,11 @@ pub enum WebContentTile {
     WCTypeLoginTile,
     #[display("Patient List Tile")]
     WCTypePatientListTile,
-    #[display("Patient Summary Tile")]
-    WCTypePatientSummaryTile,
-    #[display("Patient Detail Tile")]
-    WCTypePatientDetailTile,
+    //#[display("Patient Summary Tile")]
+    //WCTypePatientSummaryTile,
+    //#[display("Patient Detail Tile")]
+    //WCTypePatientDetailTile,
 }
-
-
 
 /// -------------------------------------------------------------------
 /// Create a factory for generating web content
@@ -36,7 +31,6 @@ pub struct WebContentFactory
 }
 
 impl WebContentFactory {
-
 
     /// https://doc.rust-lang.org/rust-by-example/std_misc/file/read_lines.html#a-more-efficient-approach
     /// 
@@ -55,7 +49,7 @@ impl WebContentFactory {
         contents = fs::read_to_string(filename).expect("Error while reading ");
         tiles.insert(WebContentTile::WCTypePatientListTile, contents ); 
 
-          WebContentFactory { tile_hashmap: tiles } 
+        WebContentFactory { tile_hashmap: tiles } 
     }
 
 }

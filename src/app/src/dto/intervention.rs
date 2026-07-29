@@ -1,5 +1,3 @@
-use chrono::{DateTime, Utc};
-
 mod dto{
     /// -------------------------------------------------------------------
     /// Defines a Data Transfer Object for a (Patient) Intervention, which represents
@@ -10,37 +8,37 @@ mod dto{
     #[derive(serde::Deserialize)]
     pub struct Intervention {
         #[serde(rename = "Id")]
-        ID: Integer, // D BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
+        id: u32, // D BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
         #[serde(rename = "InterventionCode")]
-        InterventionCode: String, // INTERVENTION_CODE VARCHAR(10),
+        intervention_code: String, // INTERVENTION_CODE VARCHAR(10),
         #[serde(rename = "Description")]
-        Description: String, // DESCRIPTION VARCHAR(2000),
+        description: String, // DESCRIPTION VARCHAR(2000),
         #[serde(rename = "Notes")]
-        Notes: String, // NOTES VARCHAR(2000),  
+        notes: String, // NOTES VARCHAR(2000),  
         #[serde(rename = "LocationId")]
-        LocationId: Integer, // LOCATION_ID BIGINT REFERENCES LOCATION (ID),
+        location_id: u32, // LOCATION_ID BIGINT REFERENCES LOCATION (ID),
         #[serde(rename = "UsersId")]
-        UsersId: Integer //   USERS_ID BIGINT REFERENCES USERS (ID)
+        users_id: u32 //   USERS_ID BIGINT REFERENCES USERS (ID)
     } 
 
 
     impl Intervention {
         /// Basic constructor
         /// 
-        pub fn new(Id: Integer,
-                InterventionCode: String,
-                Description: String,
-                Notes: String,
-                LocationId: Integer,
-                UsersId: Integer
+        pub fn new(id: u32,
+                intervention_code: String,
+                description: String,
+                notes: String,
+                location_id: u32,
+                users_id: u32
                 ) -> Self {
             Self { 
-                Id,
-                InterventionCode,
-                Description,
-                Notes,
-                LocationId,
-                UsersId
+                id,
+                intervention_code,
+                description,
+                notes,
+                location_id,
+                users_id
             }
         }
     }
