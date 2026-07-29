@@ -143,7 +143,10 @@ async fn workspace() -> impl Responder {
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
 
-  let wcf = WebContentFactory::new("static");
+    //let path = std::env::current_dir().expect("Base path to executable could not be found");
+    //println!("Current dir: {}", path.display());
+
+    //let wcf = MapleEMR::webc::web_content::WebContentFactory::new(&path.display().to_string());
 
 //  //nlp::NLP{}.execute();
 // https://docs.rs/actix-cors/latest/actix_cors/struct.Cors.html 
