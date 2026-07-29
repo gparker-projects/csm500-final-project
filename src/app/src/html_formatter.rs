@@ -1,7 +1,8 @@
 /// -------------------------------------------------------------------
 /// Struct ease the fomatting of HTML
 /// 
-/// 
+/// Note: During development, many HTML-generartion crates were found (https://docs.rs/releases/search?query=html) ...and promptly ignored. Of the many viewed, they provided no
+///       meaningful benefit over the DIY approach used here, and would have resulted in more, less flexible code. 
 /// 
 /// -------------------------------------------------------------------
 pub struct HTMLFormatter; // no variables at this time

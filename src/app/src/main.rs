@@ -24,6 +24,7 @@ mod auth_objects;
 mod nlp;
 mod errors;
 mod html_formatter;
+mod web_content;
 
 // application-wide database string; should come from a configurable parameter file (TODO)
 const DB_CONN_STR: &str = "postgres://postgres:csm500@localhost:5432/csm500";
@@ -141,7 +142,9 @@ async fn workspace() -> impl Responder {
 /// Returns std::io::Result<()> for 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
-  
+
+  let mut wcf = web_content::WebContentFactory::new("static");
+
 //  //nlp::NLP{}.execute();
 // https://docs.rs/actix-cors/latest/actix_cors/struct.Cors.html 
 
