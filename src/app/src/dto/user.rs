@@ -1,7 +1,6 @@
 
 mod dto{
     use chrono::{DateTime, Local};
-    use serde::{Deserialize, Serialize};
 
     /// -------------------------------------------------------------------
     /// Defines a Data Transfer Object for a User

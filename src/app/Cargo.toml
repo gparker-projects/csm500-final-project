@@ -10,7 +10,7 @@ tokio = { version = "1", features = ["full"] }
 log = "0.4"
 sqlx = { version = "0.8", features = ["runtime-tokio", "tls-rustls", "postgres", "macros", "migrate", "uuid", "chrono"] }
 actix-web = "4.14.0"
-chrono = "0.4.45"
+chrono = {version = "0.4.45", features = ["serde"] }
 ndarray = "0.17.2"
 ort = { version = "2.0.0-rc.12", features = [ "fetch-models" ] }
 tokenizers = { version = "0.23.1", default-features = false, features = [ "onig" ] }

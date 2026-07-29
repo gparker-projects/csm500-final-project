@@ -79,8 +79,8 @@ async fn natural_language_prompt(req: web::Form<NLPromptFormData>) -> impl Respo
     let mut results_sbuf = String::with_capacity(50); // Single heap allocation
     results_sbuf.push_str("<div><table>\n"); //class=\"data-table\"
 
-    results_sbuf.push_str( &HTMLFormatter::format_row(head, true) );
-    results_sbuf.push_str( &HTMLFormatter::format_row(data, false) );
+    results_sbuf.push_str( &webc::html_formatter::HTMLFormatter::format_row(head, true) );
+    results_sbuf.push_str( &webc::html_formatter::HTMLFormatter::format_row(data, false) );
     
 
     results_sbuf.push_str("</table></div>\n<br>\n");
