@@ -1,5 +1,6 @@
 use actix_web::{web, App, HttpRequest, HttpServer, HttpResponse, Responder}; //, web::Redirect
 use actix_cors::Cors;
+use actix_files::*;
 //use serde::Deserialize; //pg 51 of ZeroToProd
 ///
 /// # Main program executable for the project
@@ -153,8 +154,6 @@ async fn workspace() -> impl Responder {
   HttpResponse::Ok().body(redirect_page)
 }
 
-
-
 /// # Main program
 /// 
 /// Loads the NLP engine and adds handlers for key paths of the web application
@@ -183,14 +182,14 @@ async fn main() -> std::io::Result<()> {
                 .allow_any_header()
                 .max_age(3600),
         )
-        //.service(web::redirect("/", "/index.htm"))
         .route("/", web::get().to( default_route ))
         .route("/login", web::post().to( login ))
         .route("/maple", web::post().to( workspace )) // main workspace
         .route("/nlprompt", web::post().to( natural_language_prompt ))
         .route("/ml", web::get().to( machine_learn_test ))
         .route("/db", web::get().to( db ))
-        .route("/isItUp", web::get().to( is_it_up ))    
+        .route("/isItUp", web::get().to( is_it_up ))
+        .service(Files::new("/webc/", "./webc"))  // ref: ttps://actix.rs/docs/static-files/
   })
   .bind("127.0.0.1:8000")?
   .run()

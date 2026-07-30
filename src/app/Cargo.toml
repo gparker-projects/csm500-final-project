@@ -16,6 +16,7 @@ ort = { version = "2.0.0-rc.12", features = [ "fetch-models" ] }
 tokenizers = { version = "0.23.1", default-features = false, features = [ "onig" ] }
 derive_more = "2.1.1"
 actix-cors = "0.7.1"
+actix-files = "0.6.10"
 
 [features]
 load-dynamic = [ "ort/load-dynamic" ]

@@ -1,0 +1,83 @@
+//placeholder for CSS
+
+<!-- https://www.w3schools.com/css/default.asp -->
+
+body {
+  background-color: lightblue;
+}
+
+h1 {
+  color: #448DD1;
+  text-align: center;
+}
+
+p {
+  font-family: verdana;
+  font-size: 20px;
+}
+
+<!-- https://www.w3schools.com/css/css_navbar.asp -->
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+#roundbluebox {  
+  border-radius: 25px;
+  border: 2px solid #376BA4;
+  padding: 20px; 
+  width: 200px;
+  height: 150px;
+}
+
+#apptitle {
+  color: #448DD1;
+  text-align: center;
+}
+
+label {
+  display: block;
+  font-family: verdana;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+input[type=text] {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  box-sizing: border-box;
+  border: 2px #376BA4;
+  border-radius: 8px;
+  font-family: verdana;
+  font-size: 12px;
+}
+
+input[type=password] {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  box-sizing: border-box;
+  border: 2px #376BA4;
+  border-radius: 8px;
+  font-family: verdana;
+  font-size: 12px;
+}
+
+input[type=button], input[type=submit], input[type=reset] {
+  background-color: #376BA4;
+  border: none;
+  color: white;
+  padding: 16px 32px;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
