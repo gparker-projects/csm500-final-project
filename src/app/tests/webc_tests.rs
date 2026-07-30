@@ -1,14 +1,12 @@
 ///
-/// Ref: Unit Testing in Rust is actually easy! - Flo Woelki (https://youtu.be/6wAFdBVJbwc?si=KdJfqvRdcXi9-mqo) - LOL NOT easy
+/// Unit & Integration tests for the Web Content (webc) module
 ///
-
+/// Ref: Unit Testing in Rust is actually easy! - Flo Woelki (https://youtu.be/6wAFdBVJbwc?si=KdJfqvRdcXi9-mqo) - LOL NOT easy
+/// 
 #[cfg(test)]
 mod tests {
 
-  //use super::*; // provides access to all the rest of the code
-  //use MapleEMR::webc::web_content;
-
-    use MapleEMR::webc::web_content::WebContentTile;
+  use MapleEMR::webc::web_content::WebContentItem;
 
   #[test]
   fn test_web_content_load() {
@@ -23,9 +21,9 @@ mod tests {
 
     let wcf = MapleEMR::webc::web_content::WebContentFactory::new(&newpath);
     // content factor should have two entries currently
-    assert_eq!(wcf.get_tile_count(), 2); 
+    assert_eq!(wcf.get_tile_count(), 3); 
 
-    let tmp_tile = wcf.get_tile(WebContentTile::WCTypeLoginTile);
+    let tmp_tile = wcf.get_tile(WebContentItem::WCTypeLoginTile);
     //println!("WCTypeLoginTile: {}", tmp_tile.clone());
     // check data was actually loaded
     assert!(tmp_tile.len() > 0); 

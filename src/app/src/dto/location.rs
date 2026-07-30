@@ -8,19 +8,19 @@ mod dto{
     #[derive(serde::Deserialize)]
     pub struct Location {
         #[serde(rename = "Id")]
-        id: u32, // ID BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
+        pub id: u32, // ID BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
         #[serde(rename = "Name")]
-        name: String, // NAME VARCHAR(200) UNIQUE NOT NULL, 
+        pub name: String, // NAME VARCHAR(200) UNIQUE NOT NULL, 
         #[serde(rename = "Building")]
-        building: String, // BUILDING VARCHAR(200), 
+        pub building: String, // BUILDING VARCHAR(200), 
         #[serde(rename = "Floor")]
-        floor: String, // FLOOR VARCHAR(200), 
+        pub floor: String, // FLOOR VARCHAR(200), 
         #[serde(rename = "Wing")]
-        wing: String, //  WING VARCHAR(200),
+        pub wing: String, //  WING VARCHAR(200),
         #[serde(rename = "Notes")]
-        notes: String, //   NOTES VARCHAR(2000),
+        pub notes: String, //   NOTES VARCHAR(2000),
         #[serde(rename = "SiteId")]
-        site_id: u32, //  SITE_ID BIGINT NOT NULL REFERENCES SITE (ID),
+        pub site_id: u32, //  SITE_ID BIGINT NOT NULL REFERENCES SITE (ID),
     } 
 
     impl Location {
