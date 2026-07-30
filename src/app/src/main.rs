@@ -43,14 +43,12 @@ pub struct NLPromptFormData {
     prompt: String,
 }
 
-
-
 /// performs a connect to the database
 /// 
 /// check by going to: http://127.0.0.1:8000/db
 /// 
 async fn login(req: web::Form<LoginFormData>) -> impl Responder {
-    
+  println!("-> /login Requested");
   let cur_db_conn = auth_objects::AuthObjects::new(DB_CONN_STR).await;
   let user_can_login = cur_db_conn.can_user_login(req.username.clone(), req.password.clone()).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
 
@@ -69,7 +67,7 @@ async fn login(req: web::Form<LoginFormData>) -> impl Responder {
 /// check by going to: http://127.0.0.1:8000/db
 /// 
 async fn natural_language_prompt(req: web::Form<NLPromptFormData>) -> impl Responder {
-    println!("Received prompt for: {}", req.prompt);
+    println!("-> /nlprompt Requested; prompt: \"{}\"", req.prompt);
 
     //println!("Returning: {}", format!("<b>Rust POC WebDBML2! {}</b>", req.prompt));
 
@@ -97,6 +95,7 @@ async fn natural_language_prompt(req: web::Form<NLPromptFormData>) -> impl Respo
 ///                    http://localhost:8000/ml
 /// 
 async fn machine_learn_test(_req: HttpRequest) -> impl Responder {
+  println!("-> /ml Requested");
   let results = nlp::NLP{}.execute();
   
   HttpResponse::Ok().body(format!("<b>machine_learn_test {}</b>", results.await.to_string())) 
@@ -108,6 +107,7 @@ async fn machine_learn_test(_req: HttpRequest) -> impl Responder {
 ///                    http://localhost:8000/db
 /// 
 async fn db(_req: HttpRequest) -> impl Responder {
+  println!("-> /db Requested");
   // TODO: use a pool instead, as this will block another query/result in multiple connections the DB may not be able to accomodate
   let cur_db_conn = auth_objects::AuthObjects::new(DB_CONN_STR).await;
   let users = cur_db_conn.get_users( Some(10), 0).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
@@ -122,15 +122,38 @@ async fn db(_req: HttpRequest) -> impl Responder {
 /// Allows a monitoring services to perform a basic "is the application up?" check
 /// 
 async fn is_it_up() -> impl Responder {
+  println!("-> /isItUp Requested");
   HttpResponse::Ok().body("MapleEMR is Up")
 }
 
+///
+/// default route when nothing else is specified by the user
+///
+async fn default_route() -> impl Responder {
+  println!("-> /default_route Requested");
 
+  let path = std::env::current_dir().expect("Base path to executable could not be found").display().to_string() + "\\webc\\static\\";
+  println!("Default Route base dir: {}", path.clone());
+  let wcf = MapleEMR::webc::web_content::WebContentFactory::new(&path);
+  let redirect_page = wcf.get_tile(MapleEMR::webc::web_content::WebContentItem::WCTypeLoginTile);
+
+  HttpResponse::Ok().body(redirect_page)
+}
+
+///
 /// Main workspace page of the application, to be supplemented with lots of Javascript, CSS and API calls
 /// 
 async fn workspace() -> impl Responder {
-  HttpResponse::Ok().body("MapleEMR Workspace")
+  println!("-> /maple Requested");
+  let path = std::env::current_dir().expect("Base path to executable could not be found").display().to_string() + "\\webc\\static\\";
+  println!("Default Route base dir: {}", path.clone());
+  let wcf = MapleEMR::webc::web_content::WebContentFactory::new(&path);
+  let redirect_page = wcf.get_tile(MapleEMR::webc::web_content::WebContentItem::WCTypeWorkspacePage);
+
+  HttpResponse::Ok().body(redirect_page)
 }
+
+
 
 /// # Main program
 /// 
@@ -143,13 +166,10 @@ async fn workspace() -> impl Responder {
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
 
-    //let path = std::env::current_dir().expect("Base path to executable could not be found");
-    //println!("Current dir: {}", path.display());
-
-    //let wcf = MapleEMR::webc::web_content::WebContentFactory::new(&path.display().to_string());
-
 //  //nlp::NLP{}.execute();
 // https://docs.rs/actix-cors/latest/actix_cors/struct.Cors.html 
+
+  println!("MapleEMR is running! Access via: http://127.0.0.1:8000");
 
   // use the Builder pattern to add one route at a time
   HttpServer::new(|| {
@@ -163,7 +183,8 @@ async fn main() -> std::io::Result<()> {
                 .allow_any_header()
                 .max_age(3600),
         )
-        .route("/", web::get().to( login ))
+        //.service(web::redirect("/", "/index.htm"))
+        .route("/", web::get().to( default_route ))
         .route("/login", web::post().to( login ))
         .route("/maple", web::post().to( workspace )) // main workspace
         .route("/nlprompt", web::post().to( natural_language_prompt ))
