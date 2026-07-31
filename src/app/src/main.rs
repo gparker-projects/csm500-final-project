@@ -1,4 +1,8 @@
-use actix_web::{web, App, HttpRequest, HttpServer, HttpResponse, Responder}; //, web::Redirect
+use actix_web::error::ParseError::Status;
+use actix_web::{web, App, HttpRequest, HttpServer, HttpResponse, Responder};
+use actix_web::http::StatusCode;
+use MapleEMR::webc::web_content::{WebContentFactory, WebContentItem}; 
+
 use actix_cors::Cors;
 use actix_files::*;
 //use serde::Deserialize; //pg 51 of ZeroToProd
@@ -25,8 +29,6 @@ mod errors;
 mod dto;
 mod webc;
 
-use crate::webc::web_content::WebContentFactory;
-
 // application-wide database string; should come from a configurable parameter file (TODO)
 const DB_CONN_STR: &str = "postgres://postgres:csm500@localhost:5432/csm500";
 
@@ -46,6 +48,9 @@ pub struct NLPromptFormData {
 
 /// performs a connect to the database
 /// 
+/// REF: https://stackoverflow.com/questions/75369137/rust-actix-web-how-to-change-method-when-using-actix-webwebredirecttou
+///      https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Redirections#temporary_redirections
+///      
 /// check by going to: http://127.0.0.1:8000/db
 /// 
 async fn login(req: web::Form<LoginFormData>) -> impl Responder {
@@ -54,12 +59,12 @@ async fn login(req: web::Form<LoginFormData>) -> impl Responder {
   let user_can_login = cur_db_conn.can_user_login(req.username.clone(), req.password.clone()).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
 
   if user_can_login {
-    HttpResponse::Ok().body( format!("User can login: {}", req.username) )
-    //Redirect::to("").permanent()
+    println!("User can login: {} redirect to /home", req.username.clone());
+    actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SEE_OTHER)
   }
   else{
-    HttpResponse::Ok().body( format!("Login denied for {}", req.username) )
-    //Redirect::to("/login").permanent()
+    println!("Login denied for {} redirect back to /<default route>", req.username.clone());
+    actix_web::web::Redirect::to("/").using_status_code(StatusCode::SEE_OTHER)
   }
 }
 
@@ -132,26 +137,30 @@ async fn is_it_up() -> impl Responder {
 ///
 async fn default_route() -> impl Responder {
   println!("-> /default_route Requested");
-
-  let path = std::env::current_dir().expect("Base path to executable could not be found").display().to_string() + "\\webc\\static\\";
-  println!("Default Route base dir: {}", path.clone());
-  let wcf = MapleEMR::webc::web_content::WebContentFactory::new(&path);
-  let redirect_page = wcf.get_tile(MapleEMR::webc::web_content::WebContentItem::WCTypeLoginTile);
+  let redirect_page = WebContentFactory::new(&get_static_path_base()).get_tile(WebContentItem::WCTypeLoginTile);
 
   HttpResponse::Ok().body(redirect_page)
 }
+
 
 ///
 /// Main workspace page of the application, to be supplemented with lots of Javascript, CSS and API calls
 /// 
 async fn workspace() -> impl Responder {
   println!("-> /maple Requested");
-  let path = std::env::current_dir().expect("Base path to executable could not be found").display().to_string() + "\\webc\\static\\";
-  println!("Default Route base dir: {}", path.clone());
-  let wcf = MapleEMR::webc::web_content::WebContentFactory::new(&path);
-  let redirect_page = wcf.get_tile(MapleEMR::webc::web_content::WebContentItem::WCTypeWorkspacePage);
+  let redirect_page = WebContentFactory::new(&get_static_path_base()).get_tile(WebContentItem::WCTypeWorkspacePage);
 
   HttpResponse::Ok().body(redirect_page)
+}
+
+
+///
+/// Obtains the web static path base, which is used to retrieve many sources of static content
+/// 
+fn get_static_path_base() -> String{
+   //let path = see below
+   //println!("Default Route base dir: {}", path.clone());
+   return std::env::current_dir().expect("Base path to executable could not be found").display().to_string() + "\\webc\\static\\";
 }
 
 /// # Main program
@@ -184,7 +193,7 @@ async fn main() -> std::io::Result<()> {
         )
         .route("/", web::get().to( default_route ))
         .route("/login", web::post().to( login ))
-        .route("/maple", web::post().to( workspace )) // main workspace
+        .route("/home", web::post().to( workspace )) // main workspace
         .route("/nlprompt", web::post().to( natural_language_prompt ))
         .route("/ml", web::get().to( machine_learn_test ))
         .route("/db", web::get().to( db ))
