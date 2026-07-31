@@ -2,21 +2,19 @@
 -- Loads seed patient data for the system.
 -- -------------------------------------------------------------------------------------
 
-INSERT INTO PATIENT (
-  LEGAL_FIRST_NAME, 
-  LEGAL_LAST_NAME, 
-  LEGAL_MIDDLE_NAMES, 
-  SIN, 
-  BIRTHDATE, 
-  LOCATION_ID)
-VALUES (
-'',
-'',
-'',
-'',
-'',
-1
-);
+INSERT INTO patient(
+       legal_first_name,
+	   legal_last_name,
+	   legal_middle_names,
+	   sin,
+	   birthdate,
+	   location_id)
+VALUES ('Sun',
+	   '',
+	   'Tzu',
+	   888444888,
+	   '2000-01-01 06:00:01-00',
+	   9);
 
 
 INSERT INTO INTERVENTION (
