@@ -1,11 +1,18 @@
-//re: https://www.datacamp.com/doc/postgresql/insert
+-- -------------------------------------------------------------------------------------
+-- Loads data required for the basic functioning of the application, using acute facilities
+--  from the Fraser Health Authority (and Eagle Ridge Hospital specifically) as a model
+--  for the data. All information is publically available (addresses, roomes),
+--  fictitous/generalized (role names) or invented (e.g. PERMISSIONs)
+--
+-- REF: https://www.datacamp.com/doc/postgresql/insert
+-- -------------------------------------------------------------------------------------
 
 BEGIN;
 INSERT INTO SITE (NAME, ADDRESS, MUNICIPAL_NAME, POSTAL_CODE)
 VALUES
-('Eagle Ridge Hospital', '475 Guildford Way', 'Port Moody', 'V3H 3W9'),
-('Surrey Memorial Hospital', '13750 96 Ave', 'Surrey', 'V3V 1Z2'),
-('Royal Columbian Hospital', '330 E Columbia St.', 'New Westminster', 'V3L 3W7');
+('Eagle Ridge Hospital', '475 Guildford Way', 'Port Moody', 'V3H3W9'),
+('Surrey Memorial Hospital', '13750 96 Ave', 'Surrey', 'V3V1Z2'),
+('Royal Columbian Hospital', '330 E Columbia St.', 'New Westminster', 'V3L3W7');
 COMMIT;
 
 BEGIN;
@@ -19,9 +26,9 @@ VALUES
 ('Administration', 'Main', '','1', '110', '', 1),
 ('Ambulatory Daycare', 'Main', '','1', '120', '', 1),
 ('Cardiology', 'Main', '','1', '122', '', 1),
-('Emergency Room', 'Main', '','1', 'Area 1', '', 1),
-('Emergency Room', 'Main', '','1', 'Area 2', '', 1),
-('Emergency Room', 'Main', '','1', 'Area 3', '', 1),
+('Emergency Room A1', 'Main', '','1', 'Area 1', '', 1),
+('Emergency Room A2', 'Main', '','1', 'Area 2', '', 1),
+('Emergency Room A3', 'Main', '','1', 'Area 3', '', 1),
 ('Foundation', 'Main', '','1', '125', '', 1),
 ('Gift Shop', 'Main', '','1', '130', '', 1),
 ('Home Health Office', 'Main', '','1', '135', '', 1),
@@ -34,10 +41,10 @@ VALUES
 ('Surgical Daycare', 'Main', '','1', '170', '', 1),
 ('Laboratory', 'Main', '','1', '175', '', 1),
 ('Medical Imaging', 'Main', '','1', '180', '', 1),
-('Medicine', 'Main', 'East', '2', 'E2A', '', 1),
-('Medicine', 'Main', 'West', '2', 'W2B', '', 1),
-('Medicine', 'Main', 'Central', '2', 'C2B', '', 1),
-('Medicine', 'Main', 'East', '2', 'E2B', '', 1),
+('Medicine E2A', 'Main', 'East', '2', 'E2A', '', 1),
+('Medicine W2B', 'Main', 'West', '2', 'W2B', '', 1),
+('Medicine C2B', 'Main', 'Central', '2', 'C2B', '', 1),
+('Medicine E2B', 'Main', 'East', '2', 'E2B', '', 1),
 ('Surgery and Medicine', 'Main', 'West', '2', 'W2A', '', 1),
 ('Monitored Care', 'Main', 'Central','2', 'MCU', '', 1),
 ('Pharmacy', 'Main', 'Central','2', 'Pharmacy', '', 1),
@@ -47,20 +54,20 @@ COMMIT;
 BEGIN;
 INSERT INTO DEPARTMENT (NAME, EXPIRY_DATETIME)
 VALUES
-('Admission', '2050-01-01 23:59:59-00'),
-('Ambulatory', '2050-01-01 23:59:59-00'),
-('Cardiology '2050-01-01 23:59:59-00'),
-('Emergency', '2050-01-01 23:59:59-00'),
-('Housekeeping', '2050-01-01 23:59:59-00'),
-('Laboratory', '2050-01-01 23:59:59-00'),
-('Medical Imaging', '2050-01-01 23:59:59-00'),
-('Medicine', '2050-01-01 23:59:59-00'),
-('Monitored Care', '2050-01-01 23:59:59-00'),
+('Admission',        '2050-01-01 23:59:59-00'),
+('Ambulatory',       '2050-01-01 23:59:59-00'),
+('Cardiology',       '2050-01-01 23:59:59-00'),
+('Emergency',        '2050-01-01 23:59:59-00'),
+('Housekeeping',     '2050-01-01 23:59:59-00'),
+('Laboratory',       '2050-01-01 23:59:59-00'),
+('Medical Imaging',  '2050-01-01 23:59:59-00'),
+('Medicine',         '2050-01-01 23:59:59-00'),
+('Monitored Care',   '2050-01-01 23:59:59-00'),
 ('Outpatient Rehab', '2050-01-01 23:59:59-00'),
-('Pathology', '2050-01-01 23:59:59-00'),
-('Pharmacy', '2050-01-01 23:59:59-00'),
+('Pathology',        '2050-01-01 23:59:59-00'),
+('Pharmacy',         '2050-01-01 23:59:59-00'),
 ('Surgical Daycare', '2050-01-01 23:59:59-00'),
-('Surgical Unit', '2050-01-01 23:59:59-00');
+('Surgical Unit',    '2050-01-01 23:59:59-00');
 COMMIT;
 
 BEGIN;

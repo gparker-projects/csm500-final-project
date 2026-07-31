@@ -1,3 +1,7 @@
+-- -------------------------------------------------------------------------------------
+-- Loads seed database, schema and user data for the system.
+-- -------------------------------------------------------------------------------------
+
 CREATE ROLE CLINICAL_USER WITH LOGIN PASSWORD 'csm500_clinical';
 
 CREATE USER sbob WITH PASSWORD 'csm500';
