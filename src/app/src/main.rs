@@ -1,7 +1,8 @@
 use actix_web::error::ParseError::Status;
-use actix_web::{web, App, HttpRequest, HttpServer, HttpResponse, Responder};
+use actix_web::{get, web, App, HttpRequest, HttpServer, HttpResponse, Responder};
 use actix_web::http::StatusCode;
 use MapleEMR::webc::web_content::{WebContentFactory, WebContentItem}; 
+//use std::sync::Mutex; // needed for thread safety per https://actix.rs/docs/application/
 
 use actix_cors::Cors;
 use actix_files::*;
@@ -45,6 +46,21 @@ pub struct NLPromptFormData {
     #[serde(rename = "prompt")]
     prompt: String,
 }
+
+///
+/// Stores application-wide state/variables
+/// REF: https://actix.rs/docs/application/
+/// 
+struct AppState {
+    app_version: String,
+    wcf: WebContentFactory,
+    //wcf: Mutex<WebContentFactory>,
+    //database pool
+    //web static content cache
+}
+
+
+
 
 /// performs a connect to the database
 /// 
@@ -135,27 +151,33 @@ async fn is_it_up() -> impl Responder {
 ///
 /// default route when nothing else is specified by the user
 ///
-async fn default_route() -> impl Responder {
+//async fn default_route() -> impl Responder {
+async fn default_route(data: web::Data<AppState>) -> impl Responder {
   println!("-> /default_route Requested");
-  let redirect_page = WebContentFactory::new(&get_static_path_base()).get_tile(WebContentItem::WCTypeLoginTile);
+  //let redirect_page = WebContentFactory::new(&get_static_path_base()).get_tile(WebContentItem::WCTypeLoginTile);
+ // HttpResponse::Ok().body(redirect_page)
 
-  HttpResponse::Ok().body(redirect_page)
+  let wcf = &data.wcf; // https://actix.rs/docs/application/
+  HttpResponse::Ok().body( wcf.get_tile(WebContentItem::WCTypeLoginTile) )
 }
 
 
 ///
 /// Main workspace page of the application, to be supplemented with lots of Javascript, CSS and API calls
 /// 
-async fn workspace() -> impl Responder {
+async fn workspace(data: web::Data<AppState>) -> impl Responder {
   println!("-> /maple Requested");
-  let redirect_page = WebContentFactory::new(&get_static_path_base()).get_tile(WebContentItem::WCTypeWorkspacePage);
+  //let redirect_page = WebContentFactory::new(&get_static_path_base()).get_tile(WebContentItem::WCTypeWorkspacePage);
+  //HttpResponse::Ok().body(redirect_page)
 
-  HttpResponse::Ok().body(redirect_page)
+  let wcf = &data.wcf; // https://actix.rs/docs/application/
+  HttpResponse::Ok().body( wcf.get_tile(WebContentItem::WCTypeWorkspacePage) )
 }
 
 
 ///
-/// Obtains the web static path base, which is used to retrieve many sources of static content
+/// Helper function: obtains the web static path base, which is used to retrieve many sources of static content
+/// TODO: if this is not being used anywhere other than WebContentFactory, can we remove it?
 /// 
 fn get_static_path_base() -> String{
    //let path = see below
@@ -190,6 +212,14 @@ async fn main() -> std::io::Result<()> {
                 .allowed_headers(vec![actix_web::http::header::AUTHORIZATION, actix_web::http::header::ACCEPT])
                 .allow_any_header()
                 .max_age(3600),
+        )
+        .app_data(  // this enclosure allows the session state to be created and made available to all routes. actix_web magic.
+            web::Data::new( AppState {
+                app_version: "v1.0".to_string(),
+                //wcf: Mutex::new( WebContentFactory::new(&get_static_path_base()) )
+                wcf: WebContentFactory::new(&get_static_path_base()) 
+              }
+            )
         )
         .route("/", web::get().to( default_route ))
         .route("/login", web::post().to( login ))
