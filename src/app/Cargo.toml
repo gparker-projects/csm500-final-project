@@ -17,6 +17,7 @@ tokenizers = { version = "0.23.1", default-features = false, features = [ "onig"
 derive_more = "2.1.1"
 actix-cors = "0.7.1"
 actix-files = "0.6.10"
+actix-session = { version = "0.11.0", features = ["cookie-session", "redis-session"] }
 
 [features]
 load-dynamic = [ "ort/load-dynamic" ]

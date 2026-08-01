@@ -1,12 +1,15 @@
-use actix_web::error::ParseError::Status;
-use actix_web::{get, web, App, HttpRequest, HttpServer, HttpResponse, Responder};
+use actix_web::{web, App, HttpRequest, HttpServer, HttpResponse, Responder};
 use actix_web::http::StatusCode;
-use MapleEMR::webc::web_content::{WebContentFactory, WebContentItem}; 
-//use std::sync::Mutex; // needed for thread safety per https://actix.rs/docs/application/
-
+use actix_web::cookie::Key;
 use actix_cors::Cors;
 use actix_files::*;
-//use serde::Deserialize; //pg 51 of ZeroToProd
+use actix_session::{storage::CookieSessionStore, Session, SessionMiddleware}; //, storage::RedisSessionStore} // for user session management: https://docs.rs/actix-session/latest/actix_session/
+// TODO: ideally we'd use an external session store, not just cookies. Until the application is largely working, we'll have to leave this for now. //storage::RedisSessionStore}; 
+
+use MapleEMR::webc::web_content::{WebContentFactory, WebContentItem}; 
+
+//use std::sync::Mutex; // needed for thread safety per https://actix.rs/docs/application/
+
 ///
 /// # Main program executable for the project
 ///
@@ -51,16 +54,48 @@ pub struct NLPromptFormData {
 /// Stores application-wide state/variables
 /// REF: https://actix.rs/docs/application/
 /// 
-struct AppState {
+struct AppSession {
     app_version: String,
     wcf: WebContentFactory,
+    app_key: Key,
     //wcf: Mutex<WebContentFactory>,
     //database pool
     //web static content cache
 }
 
+///
+/// Stores user session variables
+/// REF: https://docs.rs/actix-session/latest/actix_session/struct.SessionMiddleware.html
+/// 
+#[derive(serde::Serialize, serde::Deserialize)]
+struct UserSession {
+    user_id: String,
+    user_display_name: String,
+    email: String,
+    // current patients
+    // department
+    // permissions
+    // preferences
+}
 
+impl UserSession {
 
+  fn get_patients(){
+    todo!();
+  }
+
+  fn get_department(){
+    todo!();
+  }
+
+  fn get_permissions(){
+    todo!();
+  }
+
+  fn get_preferences(){
+    todo!();
+  }
+}
 
 /// performs a connect to the database
 /// 
@@ -69,18 +104,33 @@ struct AppState {
 ///      
 /// check by going to: http://127.0.0.1:8000/db
 /// 
-async fn login(req: web::Form<LoginFormData>) -> impl Responder {
+async fn login(req: web::Form<LoginFormData>, session: Session) -> impl Responder {
   println!("-> /login Requested");
   let cur_db_conn = auth_objects::AuthObjects::new(DB_CONN_STR).await;
   let user_can_login = cur_db_conn.can_user_login(req.username.clone(), req.password.clone()).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
 
   if user_can_login {
     println!("User can login: {} redirect to /home", req.username.clone());
+
+    // initialize user session (this is the only location it can occur), for an authenticated user
+    //  ref: https://docs.rs/actix-admin/latest/actix_admin/prelude/struct.Session.html
+    session.insert("USER_SESSION", UserSession {
+       user_id: req.username.clone(),
+       user_display_name: "User, Fake".to_string(),
+       email: "fake@email.com".to_string(),
+    }).expect("User Session could not be constructed");
+  
     actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SEE_OTHER)
   }
   else{
     println!("Login denied for {} redirect back to /<default route>", req.username.clone());
+    //TODO: make a more robust and informative login error page
+
+    session.purge(); // destroy any session that may be present; preventative measure to reduce attack vector
     actix_web::web::Redirect::to("/").using_status_code(StatusCode::SEE_OTHER)
+
+    //let wcf = &data.wcf; // https://actix.rs/docs/application/
+    //HttpResponse::Ok().body( wcf.get_tile(WebContentItem::WCTypeLoginTile) )
   }
 }
 
@@ -109,7 +159,6 @@ async fn natural_language_prompt(req: web::Form<NLPromptFormData>) -> impl Respo
     //HttpResponse::Ok().body(format!("<b>Rust POC WebDBML2! {}</b>", req.prompt)) 
     HttpResponse::Ok().body(format!("{}", results_sbuf)) 
 }
-
 
 /// performs an execution of the NLP engine
 /// 
@@ -152,7 +201,7 @@ async fn is_it_up() -> impl Responder {
 /// default route when nothing else is specified by the user
 ///
 //async fn default_route() -> impl Responder {
-async fn default_route(data: web::Data<AppState>) -> impl Responder {
+async fn default_route(data: web::Data<AppSession>, session: Session) -> impl Responder {
   println!("-> /default_route Requested");
   //let redirect_page = WebContentFactory::new(&get_static_path_base()).get_tile(WebContentItem::WCTypeLoginTile);
  // HttpResponse::Ok().body(redirect_page)
@@ -165,15 +214,20 @@ async fn default_route(data: web::Data<AppState>) -> impl Responder {
 ///
 /// Main workspace page of the application, to be supplemented with lots of Javascript, CSS and API calls
 /// 
-async fn workspace(data: web::Data<AppState>) -> impl Responder {
+async fn workspace(data: web::Data<AppSession>, session: Session) -> impl Responder {
   println!("-> /maple Requested");
-  //let redirect_page = WebContentFactory::new(&get_static_path_base()).get_tile(WebContentItem::WCTypeWorkspacePage);
-  //HttpResponse::Ok().body(redirect_page)
+
+  let user_session: UserSession = session.get("USER_SESSION").expect("User session coudl invalid").unwrap(); // retrieve user session info
 
   let wcf = &data.wcf; // https://actix.rs/docs/application/
-  HttpResponse::Ok().body( wcf.get_tile(WebContentItem::WCTypeWorkspacePage) )
-}
+  let mut content = wcf.get_tile(WebContentItem::WCTypeWorkspacePage); // retrieve the page base content
 
+  // construct some alternate content for the page
+  let user_identity_string = "<label id=\"userIdentityLbl\"><b>".to_owned() + &user_session.user_display_name + "</b>";
+  content = content.replace("<label id=\"userIdentityLbl\">", &user_identity_string);  // replace default string
+
+  HttpResponse::Ok().body( content )
+}
 
 ///
 /// Helper function: obtains the web static path base, which is used to retrieve many sources of static content
@@ -183,6 +237,14 @@ fn get_static_path_base() -> String{
    //let path = see below
    //println!("Default Route base dir: {}", path.clone());
    return std::env::current_dir().expect("Base path to executable could not be found").display().to_string() + "\\webc\\static\\";
+}
+
+///
+/// Provides the secret key for the application, usually from a config file (TODO)
+/// REF: https://docs.rs/actix-web/latest/actix_web/cookie/struct.Key.html
+/// 
+fn get_application_secret_key() -> Key {
+   Key::generate() // TODO: change this to pull from a config file instead
 }
 
 /// # Main program
@@ -203,7 +265,10 @@ async fn main() -> std::io::Result<()> {
 
   // use the Builder pattern to add one route at a time
   HttpServer::new(|| {
-  App::new()
+
+      let tmp_app_key = get_application_secret_key(); // create within the enclosure to make sure it is available and consistent for the two uses below
+
+      App::new()
           .wrap(
             Cors::default()
                 //.allowed_origin("http://localhost:8000") // Restrict to specific origin
@@ -214,16 +279,18 @@ async fn main() -> std::io::Result<()> {
                 .max_age(3600),
         )
         .app_data(  // this enclosure allows the session state to be created and made available to all routes. actix_web magic.
-            web::Data::new( AppState {
+            web::Data::new( AppSession {
                 app_version: "v1.0".to_string(),
                 //wcf: Mutex::new( WebContentFactory::new(&get_static_path_base()) )
-                wcf: WebContentFactory::new(&get_static_path_base()) 
+                wcf: WebContentFactory::new(&get_static_path_base()),
+                app_key: tmp_app_key.clone()
               }
             )
         )
+        .wrap(SessionMiddleware::new(CookieSessionStore::default(), tmp_app_key.clone())) // for user session
         .route("/", web::get().to( default_route ))
         .route("/login", web::post().to( login ))
-        .route("/home", web::post().to( workspace )) // main workspace
+        .route("/home", web::get().to( workspace )) // main workspace
         .route("/nlprompt", web::post().to( natural_language_prompt ))
         .route("/ml", web::get().to( machine_learn_test ))
         .route("/db", web::get().to( db ))
