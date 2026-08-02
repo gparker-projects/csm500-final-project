@@ -1,3 +1,4 @@
+use actix_web::error::HttpError;
 use actix_web::{web, App, HttpRequest, HttpServer, HttpResponse, Responder};
 use actix_web::http::StatusCode;
 use actix_web::cookie::Key;
@@ -97,43 +98,6 @@ impl UserSession {
   }
 }
 
-/// performs a connect to the database
-/// 
-/// REF: https://stackoverflow.com/questions/75369137/rust-actix-web-how-to-change-method-when-using-actix-webwebredirecttou
-///      https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Redirections#temporary_redirections
-///      
-/// check by going to: http://127.0.0.1:8000/db
-/// 
-async fn login(req: web::Form<LoginFormData>, session: Session) -> impl Responder {
-  println!("-> /login Requested");
-  let cur_db_conn = auth_objects::AuthObjects::new(DB_CONN_STR).await;
-  let user_can_login = cur_db_conn.can_user_login(req.username.clone(), req.password.clone()).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
-
-  if user_can_login {
-    println!("User can login: {} redirect to /home", req.username.clone());
-
-    // initialize user session (this is the only location it can occur), for an authenticated user
-    //  ref: https://docs.rs/actix-admin/latest/actix_admin/prelude/struct.Session.html
-    session.insert("USER_SESSION", UserSession {
-       user_id: req.username.clone(),
-       user_display_name: "User, Fake".to_string(),
-       email: "fake@email.com".to_string(),
-    }).expect("User Session could not be constructed");
-  
-    actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SEE_OTHER)
-  }
-  else{
-    println!("Login denied for {} redirect back to /<default route>", req.username.clone());
-    //TODO: make a more robust and informative login error page
-
-    session.purge(); // destroy any session that may be present; preventative measure to reduce attack vector
-    actix_web::web::Redirect::to("/").using_status_code(StatusCode::SEE_OTHER)
-
-    //let wcf = &data.wcf; // https://actix.rs/docs/application/
-    //HttpResponse::Ok().body( wcf.get_tile(WebContentItem::WCTypeLoginTile) )
-  }
-}
-
 /// performs a natural language prompt using the built in engine
 /// 
 /// check by going to: http://127.0.0.1:8000/db
@@ -190,6 +154,42 @@ async fn db(_req: HttpRequest) -> impl Responder {
   HttpResponse::Ok().body(format!("Users: {}, #{}", s, users.len()))
 }
 
+/// performs a connect to the database
+/// 
+/// REF: https://stackoverflow.com/questions/75369137/rust-actix-web-how-to-change-method-when-using-actix-webwebredirecttou
+///      https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Redirections#temporary_redirections
+///      
+/// check by going to: http://127.0.0.1:8000/db
+/// 
+async fn login(session: Session, req: web::Form<LoginFormData>, data: web::Data<AppSession>, ) -> impl Responder { // Box<dyn Responder<>> { //
+  println!("-> /login Requested");
+
+  let cur_db_conn = auth_objects::AuthObjects::new(DB_CONN_STR).await;
+  let user_can_login = cur_db_conn.can_user_login(req.username.clone(), req.password.clone()).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
+
+  if user_can_login {
+    println!("User can login: {} redirect to /home", req.username.clone());
+
+    // initialize user session (this is the only location it can occur), for an authenticated user
+    //  ref: https://docs.rs/actix-admin/latest/actix_admin/prelude/struct.Session.html
+    session.insert("USER_SESSION", UserSession {
+       user_id: req.username.clone(),
+       user_display_name: "User, Fake".to_string(),
+       email: "fake@email.com".to_string(),
+    }).expect("User Session could not be constructed");
+  
+     actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SEE_OTHER) // Box::new()
+  }
+  else{
+    println!("Login denied for {} redirect back to /<default route>", req.username.clone());
+
+    // do not PURGE before this; it will trash the session including this new key
+    let _ignore = session.insert("VALIDATION_ERRORS".to_string(), "Invalid user or password. Please try again.");
+    actix_web::web::Redirect::to("/").using_status_code(StatusCode::SEE_OTHER)
+  }
+}
+
+
 /// Allows a monitoring services to perform a basic "is the application up?" check
 /// 
 async fn is_it_up() -> impl Responder {
@@ -205,9 +205,37 @@ async fn default_route(data: web::Data<AppSession>, session: Session) -> impl Re
   println!("-> /default_route Requested");
   //let redirect_page = WebContentFactory::new(&get_static_path_base()).get_tile(WebContentItem::WCTypeLoginTile);
  // HttpResponse::Ok().body(redirect_page)
+ 
+  let wcf = &data.wcf; 
+  println!("Checking session for Validation errors");
+  
+  match session.get::<String>("VALIDATION_ERRORS"){
+    Ok(Some(validation_errors))=> {
+       println!("Ok(Some()) Validation errors present in session: {}", &validation_errors);
+       // if the login form had validation errors, then we need to show them in the regenerated page.
 
-  let wcf = &data.wcf; // https://actix.rs/docs/application/
-  HttpResponse::Ok().body( wcf.get_tile(WebContentItem::WCTypeLoginTile) )
+       let mut content = wcf.get_tile(WebContentItem::WCTypeLoginTile); // retrieve the page base content
+
+       // construct alternate content for the page
+       let alt_content = "<label id=\"errLabel\" style=\"color: red\"><b>".to_owned() + &validation_errors + "</b>"; //.expect("User session invalid")
+
+       content = content.replace("<label id=\"errLabel\">", &alt_content);   // retrieve validation errors; they are just raw text for now
+
+       session.purge(); // minimize attack vectors by purging the session 
+
+       HttpResponse::Ok().body( content )
+    },
+    Ok( None )=> {
+      //println!("Ok( None ) No errors present in session");
+      println!("Ok( None ) No active session");
+      HttpResponse::Ok().body( wcf.get_tile(WebContentItem::WCTypeLoginTile) )
+    },
+    Err(_)=> {
+      //println!("Ok( None ) No errors present in session");
+      println!("Session does not exist");
+      HttpResponse::Ok().body( wcf.get_tile(WebContentItem::WCTypeLoginTile) )
+    },
+  }
 }
 
 
@@ -217,8 +245,7 @@ async fn default_route(data: web::Data<AppSession>, session: Session) -> impl Re
 async fn workspace(data: web::Data<AppSession>, session: Session) -> impl Responder {
   println!("-> /maple Requested");
 
-  let user_session: UserSession = session.get("USER_SESSION").expect("User session coudl invalid").unwrap(); // retrieve user session info
-
+  let user_session: UserSession = session.get("USER_SESSION").unwrap().expect("User session invalid"); // retrieve user session info
   let wcf = &data.wcf; // https://actix.rs/docs/application/
   let mut content = wcf.get_tile(WebContentItem::WCTypeWorkspacePage); // retrieve the page base content
 
