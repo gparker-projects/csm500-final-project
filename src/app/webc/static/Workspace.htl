@@ -88,17 +88,17 @@
 </head>
 <body>
 
-<div class="apptitle"><img src="/webc/img/mapleLogo.png" height="60px" width="200px"></div>
+<div class="apptitle"><img src="/webc/img/mapleLogo.png"><div class="userIdentification" id="userIdentityLbl"></div></div>
 <p>
-	<div id="leftMenu" align="left">
-		<ul>
-		  <li><a class="menuActive" href="javascript:void(0)">PATIENT1_LASTNM, Name</a></li>
-		  <li><a href="javascript:void(0)">&nbsp;&nbsp;&nbsp;Medications</a></li>
-		  <li><a href="javascript:void(0)">&nbsp;&nbsp;&nbsp;Orders</a></li>
-		  <li><a href="javascript:void(0)">&nbsp;&nbsp;&nbsp;Allergies</a></li>
-		  <li><a href="javascript:void(0)">PATIENT2_LASTNM, Name</a></li>
-		</ul>
-	</div>
+<div id="leftMenu" align="left">
+  <ul>
+    <li><a class="menuActive" href="javascript:void(0)">PATIENT1_LASTNM, Name</a></li>
+    <li><a href="javascript:void(0)">&nbsp;&nbsp;&nbsp;Medications</a></li>
+    <li><a href="javascript:void(0)">&nbsp;&nbsp;&nbsp;Orders</a></li>
+    <li><a href="javascript:void(0)">&nbsp;&nbsp;&nbsp;Allergies</a></li>
+    <li><a href="javascript:void(0)">PATIENT2_LASTNM, Name</a></li>
+  </ul>
+</div>
 </div>
 
 <div id="mainContentArea" align="center">
@@ -122,7 +122,7 @@ Main Content Area (Default)
 </div>
 
 <div id="footer" align="left" class="">
-  <label id="userIdentityLbl"></label>
+  
 </div>
 
 </body>

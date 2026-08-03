@@ -1,4 +1,4 @@
-mod dto{
+pub mod dto{
     /// -------------------------------------------------------------------
     /// Defines a Data Transfer Object for a Location, which is a very specific and 
     /// identifiable physical position within the hospital. This is separated

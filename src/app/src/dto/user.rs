@@ -1,35 +1,36 @@
 
-mod dto{
-    use chrono::{DateTime, Local};
+pub mod dto{
+    use serde::{Deserialize, Serialize};
+    use chrono::{NaiveDateTime, Local};
 
     /// -------------------------------------------------------------------
     /// Defines a Data Transfer Object for a User
     /// -------------------------------------------------------------------
     /// 
-    #[derive(serde::Deserialize)]
+    #[derive(Deserialize, Serialize, Debug, Clone)]
     pub struct User {
-        #[serde(rename = "Id")]
-        id: u32, // D BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
-        #[serde(rename = "Name")]
-        name: String, // NAME VARCHAR(200) NOT NULL, 
-        #[serde(rename = "UserName")]
-        user_name: String, // USERNAME VARCHAR(50) UNIQUE NOT NULL, 
-        #[serde(rename = "Email")]
-        email: String, // EMAIL VARCHAR(100),  
-        #[serde(rename = "CreatedTimestamp")]
-        created_timestamp: DateTime<Local>, // CREATED_AT TIMESTAMP DEFAULT NOW(),
-        #[serde(rename = "Password")]
-        password: String, //   PASSWORD VARCHAR(30),
+        #[serde(rename = "ID")]
+        pub id: i64, // iD BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
+        #[serde(rename = "NAME")]
+        pub name: String, // NAME VARCHAR(200) NOT NULL, 
+        #[serde(rename = "USERNAME")]
+        pub user_name: String, // USERNAME VARCHAR(50) UNIQUE NOT NULL, 
+        #[serde(rename = "EMAIL")]
+        pub email: String, // EMAIL VARCHAR(100),  
+        #[serde(rename = "CREATED_AT")]
+        pub created_timestamp: NaiveDateTime, // CREATED_AT TIMESTAMP DEFAULT NOW(),
+        #[serde(rename = "PASSWORD")]
+        pub password: String, //   PASSWORD VARCHAR(30),
     } 
 
     impl User {
         /// Basic constructor
         /// 
-        pub fn new(id: u32,
+        pub fn new(id: i64,
                 name: String,
                 user_name: String,
                 email: String,
-                created_timestamp: DateTime<Local>,
+                created_timestamp: NaiveDateTime,
                 password: String
                 ) -> Self {
             Self { 

@@ -96,6 +96,11 @@ input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
   flex-wrap: wrap;
 }
 
+#userIdentification {
+  font-family: verdana;
+  font-size: 9px;
+}
+
 /*---------------------- Table styles ----------------------
   Ref: https://www.w3schools.com/css/css_table.asp
 */

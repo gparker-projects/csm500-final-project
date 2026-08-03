@@ -138,24 +138,6 @@ async fn machine_learn_test(_req: HttpRequest) -> impl Responder {
 
 /// performs a connect to the database
 /// 
-/// check by going to: http://127.0.0.1:8000/db 
-///                    http://localhost:8000/db
-/// 
-async fn db(_req: HttpRequest) -> impl Responder {
-  println!("-> /db Requested");
-  // TODO: use a pool instead, as this will block another query/result in multiple connections the DB may not be able to accomodate
-  let cur_db_conn = auth_objects::AuthObjects::new(DB_CONN_STR).await;
-  let users = cur_db_conn.get_users( Some(10), 0).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
-
-  let mut s = String::new();
-  for row in users.iter() {                          // row: &User
-      s = s + &row.id.to_string() + " " + &row.username + "; ";
-  }
-  HttpResponse::Ok().body(format!("Users: {}, #{}", s, users.len()))
-}
-
-/// performs a connect to the database
-/// 
 /// REF: https://stackoverflow.com/questions/75369137/rust-actix-web-how-to-change-method-when-using-actix-webwebredirecttou
 ///      https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Redirections#temporary_redirections
 ///      
@@ -165,30 +147,33 @@ async fn login(session: Session, req: web::Form<LoginFormData>, data: web::Data<
   println!("-> /login Requested");
 
   let cur_db_conn = auth_objects::AuthObjects::new(DB_CONN_STR).await;
+  //let user_can_login = cur_db_conn.can_user_login(req.username.clone(), req.password.clone()).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
+
   let user_can_login = cur_db_conn.can_user_login(req.username.clone(), req.password.clone()).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
 
-  if user_can_login {
-    println!("User can login: {} redirect to /home", req.username.clone());
+  match user_can_login {
+    Some (current_user) => {
+      println!("User can login: {} redirect to /home", req.username.clone());
 
-    // initialize user session (this is the only location it can occur), for an authenticated user
-    //  ref: https://docs.rs/actix-admin/latest/actix_admin/prelude/struct.Session.html
-    session.insert("USER_SESSION", UserSession {
-       user_id: req.username.clone(),
-       user_display_name: "User, Fake".to_string(),
-       email: "fake@email.com".to_string(),
-    }).expect("User Session could not be constructed");
-  
-     actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SEE_OTHER) // Box::new()
-  }
-  else{
-    println!("Login denied for {} redirect back to /<default route>", req.username.clone());
+      // initialize user session (this is the only location it can occur), for an authenticated user
+      //  ref: https://docs.rs/actix-admin/latest/actix_admin/prelude/struct.Session.html
+      session.insert("USER_SESSION", UserSession {
+        user_id: req.username.clone(),
+        user_display_name: req.username.clone(),
+        email: "fake@email.com".to_string(),
+      }).expect("User Session could not be constructed");
+    
+      actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SEE_OTHER) // Box::new()
+    }
+    None => {
+      println!("Login denied for {} redirect back to /<default route>", req.username.clone());
 
-    // do not PURGE before this; it will trash the session including this new key
-    let _ignore = session.insert("VALIDATION_ERRORS".to_string(), "Invalid user or password. Please try again.");
-    actix_web::web::Redirect::to("/").using_status_code(StatusCode::SEE_OTHER)
+      // do not PURGE before this; it will trash the session including this new key
+      let _ignore = session.insert("VALIDATION_ERRORS".to_string(), "Invalid user or password. Please try again.");
+      actix_web::web::Redirect::to("/").using_status_code(StatusCode::SEE_OTHER)
+    }
   }
 }
-
 
 /// Allows a monitoring services to perform a basic "is the application up?" check
 /// 
@@ -243,15 +228,15 @@ async fn default_route(data: web::Data<AppSession>, session: Session) -> impl Re
 /// Main workspace page of the application, to be supplemented with lots of Javascript, CSS and API calls
 /// 
 async fn workspace(data: web::Data<AppSession>, session: Session) -> impl Responder {
-  println!("-> /maple Requested");
+  println!("-> /home Requested");
 
   let user_session: UserSession = session.get("USER_SESSION").unwrap().expect("User session invalid"); // retrieve user session info
   let wcf = &data.wcf; // https://actix.rs/docs/application/
   let mut content = wcf.get_tile(WebContentItem::WCTypeWorkspacePage); // retrieve the page base content
 
   // construct some alternate content for the page
-  let user_identity_string = "<label id=\"userIdentityLbl\"><b>".to_owned() + &user_session.user_display_name + "</b>";
-  content = content.replace("<label id=\"userIdentityLbl\">", &user_identity_string);  // replace default string
+  let user_identity_string = "id=\"userIdentityLbl\"><b>".to_owned() + &user_session.user_display_name + "</b>";
+  content = content.replace("id=\"userIdentityLbl\">", &user_identity_string);  // replace default string
 
   HttpResponse::Ok().body( content )
 }
@@ -320,7 +305,7 @@ async fn main() -> std::io::Result<()> {
         .route("/home", web::get().to( workspace )) // main workspace
         .route("/nlprompt", web::post().to( natural_language_prompt ))
         .route("/ml", web::get().to( machine_learn_test ))
-        .route("/db", web::get().to( db ))
+        //.route("/db", web::get().to( db ))
         .route("/isItUp", web::get().to( is_it_up ))
         .service(Files::new("/webc/", "./webc"))  // ref: ttps://actix.rs/docs/static-files/
   })

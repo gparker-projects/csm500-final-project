@@ -1,16 +1,12 @@
 use sqlx::postgres::{PgPoolOptions, PgPool, PgRow};
 use sqlx::Row;
-use serde::{Deserialize, Serialize};
+//use serde::{Deserialize, Serialize};
+
+//use crate::dto::user;
+use crate::dto::user::dto::User;
 
 //  B. Gruber, Rust web development: with Warp, Tokio, and Reqwest. Shelter Island, NY: Manning Publications Co, 2023.
 // https://learning.oreilly.com/library/view/rust-web-development/9781617299001/OEBPS/Text/07.htm#sigil_toc_id_85
-
-#[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct User{
-    pub id: i32,
-    pub username: String,
-    pub email: String,
-}
 
 #[derive(Debug, Clone)]
 pub struct AuthObjects {
@@ -37,74 +33,49 @@ impl AuthObjects {
         }
     }
 
-    /// Returns a list of users from the database
-    /// 
-    pub async fn get_users(&self,
-                           limit: Option<i32>,
-                           offset: i32, 
-                          ) -> Result< Vec<User>, std::io::Error> {
-
-        match sqlx::query("SELECT * from USERS LIMIT $1 OFFSET $2")
-            .bind(limit)
-            .bind(offset)
-            .map(|row: PgRow| User {
-                id: row.get("id"),
-                username: row.get("username"),
-                email: row.get("email"),
-                //created_at: row.get("created_at"),
-            })
-            .fetch_all(&self.connection)
-            .await
-        {
-            Ok(results_users) => Ok(results_users),
-            Err(e) => panic!("{}", e),
-        }
-    }
-
     /// Checks the user is in the database, and that the password matches (TODO)
     /// Returns a true/false value
     /// 
     pub async fn can_user_login(&self,
                             user_name: String, 
                             user_password: String,
-                          ) -> Result< bool, std::io::Error> {
-
-        // may not be needed, but this works: a single result/single variable to capture the count (true/false)
-        // from the datbase query
-        #[derive(sqlx::FromRow)]
-        struct SingleResult{
-            pub count: i64,
-        }
+                          ) -> Result< Option<User>, std::io::Error> {
 
         // query the database for a user that matches the username and password (TODO)
-        let query = format!("SELECT COUNT(ID) FROM USERS WHERE USERNAME = '{}' AND PASSWORD = '{}'", user_name, user_password);
+        let query = format!("SELECT id, name, username, email, created_at, password FROM USERS WHERE USERNAME = '{}' AND PASSWORD = '{}'", user_name, user_password);
 
         println!("Query: {}", query);
 
         match sqlx::query(&query)
-            .map(|row: PgRow| SingleResult {
-                count: row.get("count"),
-            })
-            .fetch_all(&self.connection)
-            .await
+        .fetch_optional(&self.connection)
+        .await
         {
-            Ok(results) => {
-                // if there are no results or an error, the query did not find a valid user for the username/pw combo
-                // if there is an exact match only, then the procedure succeeds.
-                if results[0].count == 0{
-                    println!("No results for: {} ({})", user_name, results[0].count);
-                    Ok(false)
-                }
-                else {
-                    println!("Successful login (results found) for: {}", user_name);
-                    Ok(true)
-                }
-            } 
-            Err(_e) => {
-                println!("Error on login for: {}", user_name);
-                Ok(false)
+            Ok( Some(row) ) => {
+                println!("Successful login (results found) for: {}", user_name);
+                Ok( Some (   {
+                        let new_id: i64 = row.get("id");  // Rust to Postgresql mappings: https://docs.rs/sqlx/latest/sqlx/postgres/types/index.html
+                        let created_at: chrono::NaiveDateTime = row.get("created_at");
+                      
+                        User {
+                            id: new_id,
+                            name: row.get("name"),
+                            user_name: row.get("username"),
+                            email: row.get("email"),
+                            created_timestamp: created_at, 
+                            password: row.get("password"),
+                        }
+                    }
+                ) )
+            }
+            Ok(None) => {
+                println!("No user found for: {}", user_name);
+                Ok( None )
+            }
+            Err(err) => {
+                println!("Error on login for: {} ({})", user_name, err);
+                Ok( None )
             }
         }
-    }
+    }    
     
 }
