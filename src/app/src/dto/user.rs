@@ -1,7 +1,7 @@
 
 pub mod dto{
     use serde::{Deserialize, Serialize};
-    use chrono::{NaiveDateTime, Local};
+    use chrono::{NaiveDateTime}; //, Local};
 
     /// -------------------------------------------------------------------
     /// Defines a Data Transfer Object for a User

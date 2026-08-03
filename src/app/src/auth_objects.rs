@@ -1,9 +1,8 @@
-use sqlx::postgres::{PgPoolOptions, PgPool, PgRow};
+use sqlx::postgres::{PgPoolOptions, PgPool}; //, PgRow};
 use sqlx::Row;
-//use serde::{Deserialize, Serialize};
-
-//use crate::dto::user;
+use std::io::{Error, ErrorKind};
 use crate::dto::user::dto::User;
+use crate::dto::userauthorization::dto::*;
 
 //  B. Gruber, Rust web development: with Warp, Tokio, and Reqwest. Shelter Island, NY: Manning Publications Co, 2023.
 // https://learning.oreilly.com/library/view/rust-web-development/9781617299001/OEBPS/Text/07.htm#sigil_toc_id_85
@@ -14,7 +13,6 @@ pub struct AuthObjects {
 }
 
 impl AuthObjects {
-
     /// Creates a new AuthObjects object, with a database pool for use by other calls
     /// 
     pub async fn new(db_url: &str) -> Self {
@@ -79,46 +77,46 @@ impl AuthObjects {
         }
     }   
 
-
     ///
     /// Given a user id, obtain all the user permissions that user has. Contains the linkages between the department, permission and user.
     /// 
     pub async fn get_user_permissions(&self, user_id: i64 ) -> Result< Option<UserAuthorization>, std::io::Error> {
         // construct query - we have a denormalized data structure here to save joins, so the table has all the Id's someone would ever need
-        // first user is users_id = 3
         let query = format!("SELECT department_id, permission_id FROM public.user_permission where active_flag = 'Y' and users_id = {} group by department_id, permission_id order by permission_id", user_id);
         //println!("Query: {}", query);
 
-        match sqlx::query(&query)
-        .fetch_optional(&self.connection)
+        // https://docs.rs/sqlx/latest/sqlx/fn.query_as.html
+        // https://stackoverflow.com/questions/67243108/mapping-nm-relations-into-vec-using-sqlx
+        //
+        let rows: Vec<(i64, i64)> = sqlx::query_as(&query)
+        .fetch_all(&self.connection)
         .await
-        {
-            Ok( Some(row) ) => {
-                println!("Successful Authorization (results found) for: {}", user_id);
-                Ok( Some (   {
-                        let new_id: i64 = row.get("id");  // Rust to Postgresql mappings: https://docs.rs/sqlx/latest/sqlx/postgres/types/index.html
-                        let created_at: chrono::NaiveDateTime = row.get("created_at");
+        .unwrap_or_default(); 
 
-                        User {
-                            id: new_id,
-                            name: row.get("name"),
-                            user_name: row.get("username"),
-                            email: row.get("email"),
-                            created_timestamp: created_at, 
-                            password: row.get("password"),
-                        }
-                    }
-                ) )
-            }
-            Ok(None) => {
-                println!("No Authorization found for: {}", user_id);
-                Ok( None )
-            }
-            Err(err) => {
-                println!("Error on collect Authorization for: {} ({})", user_id, err);
-                Ok( None )
-            }
+        if rows.is_empty() {
+            let errmsg = format!("No permissions found for user_id: {}", user_id);
+            println!("{}", errmsg); // had to use https://doc.rust-lang.org/std/io/struct.Error.html to return Error here
+            return Err(Error::new(ErrorKind::Other, errmsg));
         }
+
+        let mut perms: Vec<Permission> = Vec::with_capacity(rows.len());
+        for row in rows {
+            let dept_id: i64 = row.0;
+            let perm_id: i64 = row.1;
+
+            perms.push(
+                Permission {
+                    department_id: dept_id,
+                    permission_id: perm_id,
+                }
+            );
+        }
+        
+        let result = UserAuthorization {
+            granted_permissions: perms
+        };
+        Ok(Some(result))
+        
     }    
     
 }
