@@ -157,16 +157,17 @@ async fn login(session: Session, req: web::Form<LoginFormData>, data: web::Data<
 
       // initialize user session (this is the only location it can occur), for an authenticated user
       //  ref: https://docs.rs/actix-admin/latest/actix_admin/prelude/struct.Session.html
+      // copy values from the db into the session; will use a different type of object than the DTO.user
       session.insert("USER_SESSION", UserSession {
-        user_id: req.username.clone(),
-        user_display_name: req.username.clone(),
-        email: "fake@email.com".to_string(),
+        user_id: current_user.id.to_string(), 
+        user_display_name: current_user.name + " (" + &current_user.user_name + ")",
+        email: current_user.email,
       }).expect("User Session could not be constructed");
     
       actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SEE_OTHER) // Box::new()
     }
     None => {
-      println!("Login denied for {} redirect back to /<default route>", req.username.clone());
+      println!("Login denied for {} redirect back to /<default route>", req.username.clone()); // must use the user from the session as DB was not successful
 
       // do not PURGE before this; it will trash the session including this new key
       let _ignore = session.insert("VALIDATION_ERRORS".to_string(), "Invalid user or password. Please try again.");
@@ -185,11 +186,8 @@ async fn is_it_up() -> impl Responder {
 ///
 /// default route when nothing else is specified by the user
 ///
-//async fn default_route() -> impl Responder {
 async fn default_route(data: web::Data<AppSession>, session: Session) -> impl Responder {
   println!("-> /default_route Requested");
-  //let redirect_page = WebContentFactory::new(&get_static_path_base()).get_tile(WebContentItem::WCTypeLoginTile);
- // HttpResponse::Ok().body(redirect_page)
  
   let wcf = &data.wcf; 
   println!("Checking session for Validation errors");
