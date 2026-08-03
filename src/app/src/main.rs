@@ -154,6 +154,10 @@ async fn login(session: Session, req: web::Form<LoginFormData>, data: web::Data<
   match user_can_login {
     Some (current_user) => {
       println!("User can login: {} redirect to /home", req.username.clone());
+      let uid: i64 = current_user.id;
+
+      let user_perms = cur_db_conn.get_user_permissions( uid ).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
+      println!("get_user_permissions() returned");
 
       // initialize user session (this is the only location it can occur), for an authenticated user
       //  ref: https://docs.rs/actix-admin/latest/actix_admin/prelude/struct.Session.html
@@ -220,7 +224,6 @@ async fn default_route(data: web::Data<AppSession>, session: Session) -> impl Re
     },
   }
 }
-
 
 ///
 /// Main workspace page of the application, to be supplemented with lots of Javascript, CSS and API calls
