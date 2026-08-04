@@ -41,7 +41,7 @@ impl AuthObjects {
 
         // query the database for a user that matches the username and password
         // columns MUST be lowercase and mapped as such below, Rust can not translate them
-        let query = format!("SELECT id, name, username, email, created_at, password FROM USERS WHERE USERNAME = '{}' AND PASSWORD = '{}'", user_name, user_password);
+        let query = format!("SELECT id, name, username, email, created_timestamp, password FROM USERS WHERE USERNAME = '{}' AND PASSWORD = '{}'", user_name, user_password);
 
         //println!("Query: {}", query);
 
@@ -53,7 +53,7 @@ impl AuthObjects {
                 println!("Successful login (results found) for: {}", user_name);
                 Ok( Some (   {
                         let new_id: i64 = row.get("id");  // Rust to Postgresql mappings: https://docs.rs/sqlx/latest/sqlx/postgres/types/index.html
-                        let created_at: chrono::NaiveDateTime = row.get("created_at");
+                        let created_at: chrono::NaiveDateTime = row.get("created_timestamp");
 
                         User {
                             id: new_id,

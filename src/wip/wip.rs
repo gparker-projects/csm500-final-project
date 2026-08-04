@@ -39,6 +39,7 @@ async fn db(_req: HttpRequest) -> impl Responder {
 
         println!("Query: {}", query);
 
+
         match sqlx::query(&query)
             .map(|row: PgRow| SingleResult {
                 count: row.get("count"),
