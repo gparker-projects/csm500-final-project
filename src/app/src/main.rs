@@ -5,6 +5,7 @@ use actix_web::cookie::Key;
 use actix_cors::Cors;
 use actix_files::*;
 use actix_session::{storage::CookieSessionStore, Session, SessionMiddleware}; //, storage::RedisSessionStore} // for user session management: https://docs.rs/actix-session/latest/actix_session/
+use crate::dto::userauthorization::dto::*;
 // TODO: ideally we'd use an external session store, not just cookies. Until the application is largely working, we'll have to leave this for now. //storage::RedisSessionStore}; 
 
 use MapleEMR::webc::web_content::{WebContentFactory, WebContentItem}; 
@@ -69,33 +70,13 @@ struct AppSession {
 /// REF: https://docs.rs/actix-session/latest/actix_session/struct.SessionMiddleware.html
 /// 
 #[derive(serde::Serialize, serde::Deserialize)]
-struct UserSession {
-    user_id: String,
-    user_display_name: String,
-    email: String,
+pub struct UserSession {
+    pub user_id: String,
+    pub user_display_name: String,
+    pub email: String,
+    pub user_authorizations: UserAuthorization,   // for permissions and departments
     // current patients
-    // department
-    // permissions
     // preferences
-}
-
-impl UserSession {
-
-  fn get_patients(){
-    todo!();
-  }
-
-  fn get_department(){
-    todo!();
-  }
-
-  fn get_permissions(){
-    todo!();
-  }
-
-  fn get_preferences(){
-    todo!();
-  }
 }
 
 /// performs a natural language prompt using the built in engine
@@ -156,8 +137,8 @@ async fn login(session: Session, req: web::Form<LoginFormData>, data: web::Data<
       println!("User can login: {} redirect to /home", req.username.clone());
       let uid: i64 = current_user.id;
 
-      let user_perms = cur_db_conn.get_user_permissions( uid ).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
-      println!("get_user_permissions() returned");
+      let user_perms = cur_db_conn.get_user_permissions( uid ).await.expect( &errors::DatabaseError::NotFoundError.to_string() ).unwrap();
+      //println!("get_user_permissions() returned");
 
       // initialize user session (this is the only location it can occur), for an authenticated user
       //  ref: https://docs.rs/actix-admin/latest/actix_admin/prelude/struct.Session.html
@@ -166,6 +147,7 @@ async fn login(session: Session, req: web::Form<LoginFormData>, data: web::Data<
         user_id: current_user.id.to_string(), 
         user_display_name: current_user.name + " (" + &current_user.user_name + ")",
         email: current_user.email,
+        user_authorizations: user_perms,
       }).expect("User Session could not be constructed");
     
       actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SEE_OTHER) // Box::new()

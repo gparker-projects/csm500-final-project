@@ -50,13 +50,36 @@ pub mod dto{
         }
 
         // confirms the permission set has a specific permission; ignores department
-        pub fn has_permission(p_id: i64) -> bool{
-            return true; //todo
+        pub fn has_permission(&self, p_id: i64) -> bool{
+            for p in self.granted_permissions.iter() {
+                if p.permission_id == p_id {
+                    return true;
+                } 
+            }
+            return false;
         }
 
         // confirms the permission set has a specific permission, for a department
-        pub fn has_permission_for_dept(p_id: i64, department_id: i64) -> bool{
-            return true; //todo
+        pub fn has_permission_for_dept(&self, p_id: i64, department_id: i64) -> bool{
+            for p in self.granted_permissions.iter() {
+                if p.permission_id == p_id && p.department_id == department_id {
+                    return true;
+                } 
+            }
+            return false;
         }
+
+        // todo: remove?
+        // returns a list of the unique departments in an initialized UserAuthorization object
+       // pub fn get_departments(&self) => Vec<i64> {
+       //     let results = Vec<i64>;
+
+       //     for p in self.granted_permissions.iter() {
+       //         if p.permission_id == p_id && p.department_id == department_id {
+       //             return true;
+       //         } 
+       //     }
+      //      return results;
+       // }
     }
 }
