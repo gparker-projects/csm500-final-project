@@ -50,6 +50,7 @@ pub mod dto{
         }
 
         // confirms the permission set has a specific permission; ignores department
+        // TODO: if there is time, this could be done with a HashSet instead. Small dataset however will not benefit much.
         pub fn has_permission(&self, p_id: i64) -> bool{
             for p in self.granted_permissions.iter() {
                 if p.permission_id == p_id {
@@ -60,6 +61,7 @@ pub mod dto{
         }
 
         // confirms the permission set has a specific permission, for a department
+        // TODO: if there is time, this could be done with a HashSet instead. Small dataset however will not benefit much.
         pub fn has_permission_for_dept(&self, p_id: i64, department_id: i64) -> bool{
             for p in self.granted_permissions.iter() {
                 if p.permission_id == p_id && p.department_id == department_id {

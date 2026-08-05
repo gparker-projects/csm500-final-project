@@ -27,19 +27,18 @@ pub mod dto{
         /// Basic constructor
         /// 
         pub fn new(id: i64,
-                name: String,
-                user_name: String,
-                email: String,
-                created_timestamp: NaiveDateTime,
-                password: String
+                   name: String,
+                   user_name: String,
+                   email: String,
+                   created_timestamp: NaiveDateTime,
+                   password: String
                 ) -> Self {
-            Self { 
-                id,
-                name,
-                user_name,
-                email,
-                created_timestamp,
-                password
+            Self { id,
+                   name,
+                   user_name,
+                   email,
+                   created_timestamp,
+                   password
             }
         }
     }

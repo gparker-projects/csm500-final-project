@@ -26,3 +26,42 @@ where location_id in (
 	  where users_id = 2
 	    and up.site_id = l.site_id)
 )
+
+------------------------------------------------------------------------------------------------------------------
+
+intervention_code
+-------------------
+Bandage
+Bloodwork
+CT Scan
+MRI
+Medication
+Port
+Referral
+Surgery
+Suture
+Transfusion
+X-Ray
+Other
+
+care_type_code
+-------------------
+Admit
+Triage
+Discharge
+Consult
+Direct Care
+Examination
+Surgery
+Treatment
+Other
+
+
+status_code
+-------------------
+New (Unassigned)
+Pending (Assigned)
+In Progress
+On Hold
+Complete
+Archived

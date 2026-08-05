@@ -52,15 +52,15 @@ impl AuthObjects {
             Ok( Some(row) ) => {
                 println!("Successful login (results found) for: {}", user_name);
                 Ok( Some (   {
-                        let new_id: i64 = row.get("id");  // Rust to Postgresql mappings: https://docs.rs/sqlx/latest/sqlx/postgres/types/index.html
-                        let created_at: chrono::NaiveDateTime = row.get("created_timestamp");
+                        let tmp_new_id: i64 = row.get("id");  // Rust to Postgresql mappings: https://docs.rs/sqlx/latest/sqlx/postgres/types/index.html
+                        let tmp_created_at: chrono::NaiveDateTime = row.get("created_timestamp");
 
                         User {
-                            id: new_id,
+                            id: tmp_new_id,
                             name: row.get("name"),
                             user_name: row.get("username"),
                             email: row.get("email"),
-                            created_timestamp: created_at, 
+                            created_timestamp: tmp_created_at, 
                             password: row.get("password"),
                         }
                     }
@@ -102,16 +102,16 @@ impl AuthObjects {
         println!("Loading permissions");
         let mut perms: Vec<Permission> = Vec::with_capacity(rows.len());
         for row in rows {
-            let dept_id: i64 = row.0;
-            let perm_id: i64 = row.1;
+            let tmp_dept_id: i64 = row.0;
+            let tmp_perm_id: i64 = row.1;
 
             perms.push(
                 Permission {
-                    department_id: dept_id,
-                    permission_id: perm_id,
+                    department_id: tmp_dept_id,
+                    permission_id: tmp_perm_id,
                 }
             );
-            println!("Load: ({},{})", dept_id, perm_id);
+            //println!("Load: ({},{})", dept_id, perm_id);
         }
         
         let result = UserAuthorization {

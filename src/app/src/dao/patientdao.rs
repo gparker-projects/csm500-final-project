@@ -1,9 +1,11 @@
 pub mod dao{
+    //use MapleEMR::dto::intervention::dto::Intervention;
     use sqlx::postgres::{PgPoolOptions, PgPool}; 
     use sqlx::Row;
     use std::io::{Error, ErrorKind};
-    use crate::dto::user::dto::User;
-    use crate::dto::userauthorization::dto::*;
+    use crate::dto::patient::dto::*;
+    use crate::dto::intervention::dto::*;
+    use crate::dto::encounter::dto::*;
 
     #[derive(Debug, Clone)]
     pub struct PatientDAO {
@@ -25,47 +27,105 @@ pub mod dao{
                 Err(e) => panic!("{}", e),
             };
 
-            AuthObjects {
+            PatientDAO {
                 connection: db_pool,
             }
         }
 
         /// Finds and returns the data for a specific patient
         /// 
-        pub async fn get_admit_patient(&self, user_id: i64, patient_id: i64) -> Result< Option<User>, std::io::Error> {
-            todo();
-
-            /**
-             * data for patient, encounter, patient_care_assignment
-             */
-            Ok( None )
+        /// 
+        #[allow(dead_code)]
+        pub async fn get_admit_patient(&self, user_id: i64, patient_id: i64) -> Result< Option<Patient>, std::io::Error> {
+            todo!();
         }
 
         /// Finds and returns any patients that are currently assigned to the user
         /// 
-        pub async fn get_assigned_patients(&self, user_id: i64, include_discharged: bool) -> Result< Option<User>, std::io::Error> {
-            todo();
-            /*
-            SELECT p.id "patient_id", e.id "encounter_id", e.location_id, legal_first_name, legal_last_name, legal_middle_names, sin, birthdate, admit_timestamp, admission_notes, discharge_notes, discharge_timestamp
-            FROM patient p
-            join encounter e on p.id = e.patient_id
-            where location_id = (
-                select l.id
-                from location l
-                where site_id in (
-                select site_id
-                from user_permission up
-                where users_id = 2
-                    and up.site_id = l.site_id)
-            )
-            */
-            Ok( None )
+        /// REFs: https://docs.rs/sqlx/latest/sqlx/fn.query_as.html
+        ///       https://stackoverflow.com/questions/67243108/mapping-nm-relations-into-vec-using-sqlx
+        ///       https://doc.rust-lang.org/std/io/struct.Error.html - for return Error
+        /// 
+        pub async fn get_assigned_patients(&self, user_id: i64, _include_discharged: bool) -> Result< Option< Vec<Patient> >, std::io::Error> {
+            let query = format!(r##"
+                SELECT p.id "patient_id", e.id "encounter_id", e.location_id, sin, legal_first_name, legal_last_name, legal_middle_names,
+                       birthdate, admit_timestamp,
+                       admit_notes, discharge_notes, discharge_timestamp
+                FROM patient p
+                join encounter e on p.id = e.patient_id
+                where location_id = (
+                    select l.id
+                    from location l
+                    where site_id in (
+                      select site_id
+                      from user_permission up
+                      where users_id = {}
+                        and up.site_id = l.site_id)  )"##, user_id);
+
+            println!("get_user_permissions Query: {}", query);
+
+            let rows: Vec<(i64, i64, i64, i64,     // patient/encounter/location/sin
+                           String, String, String, // legal_first_name, legal_last_name, legal_middle_names
+                           chrono::NaiveDateTime, chrono::NaiveDateTime, // birthdate, admit_timestamp
+                           String, String, //admission_notes, discharge_notes
+                           chrono::NaiveDateTime //discharge_timestamp
+                        )> = sqlx::query_as(&query)
+            .fetch_all(&self.connection)
+            .await
+            .unwrap_or_default(); 
+
+            if rows.is_empty() {
+                println!("No patients found for user_id: {}", user_id);
+            }
+            else{
+                println!("Loading patients");
+                let mut results: Vec<Patient> = Vec::with_capacity(rows.len());
+                for row in rows {
+                    let tmp_pat_id: i64 = row.0; // patient_id
+                    let tmp_enc_id: i64 = row.1; // encounter_id
+                    let tmp_loc_id: i64 = row.2; // location_id
+                    let tmp_sin:    i64 = row.3; // sin
+
+                    let tmp_legal_first_name = row.4; //legal_first_name
+                    let tmp_legal_last_name = row.5; // legal_last_name
+                    let tmp_legal_middle_names =  row.6; // legal_middle_names
+
+                    let tmp_birthdate: chrono::NaiveDateTime = row.7; //tmp_birthdate
+                    let tmp_admit_timestamp: chrono::NaiveDateTime = row.8;// admit_timestamp
+                    let tmp_admit_notes = row.9; // admission_notes
+                    let tmp_discharge_notes = row.10;  // discharge_notes
+                    let tmp_discharge_timestamp: chrono::NaiveDateTime = row.11; // discharge_timestamp
+
+                    results.push(
+                        Patient {
+                            id: tmp_pat_id,
+                            encounter_id: tmp_enc_id,
+                            legal_first_name: tmp_legal_first_name,
+                            legal_last_name: tmp_legal_last_name,
+                            legal_middle_names: tmp_legal_middle_names,
+                            sin: tmp_sin,
+                            birth_date: tmp_birthdate,
+                            location_id: tmp_loc_id,
+
+                            admit_timestamp: tmp_admit_timestamp,
+                            admit_notes: tmp_admit_notes,
+                            discharge_timestamp: tmp_discharge_timestamp,
+                            discharge_notes: tmp_discharge_notes,
+                        }
+                    );
+                }
+                return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
+            }
+            
+            //Ok( None )
+            Ok( Some( Vec::new() ) )
         }
 
         /// Finds and returns any patients that are at a facility, regardless of if they are assigned to the user or not
-        /// 
-        pub async fn get_site_patients(&self, user_id: i64, include_discharged: bool) -> Result< Option<User>, std::io::Error> {
-            todo();
+        ///
+        #[allow(dead_code)]
+        pub async fn get_site_patients(&self, user_id: i64, include_discharged: bool) -> Result< Option<Patient>, std::io::Error> {
+            todo!();
             /*
                 SELECT p.id "patient_id", e.id "encounter_id", e.location_id, legal_first_name, legal_last_name, legal_middle_names, sin, birthdate, admit_timestamp, admit_notes, discharge_notes, discharge_timestamp
                 FROM patient p
@@ -80,52 +140,50 @@ pub mod dao{
                         and up.site_id = l.site_id)
                 )
             */
-            Ok( None )
         }
 
         /// Finds and returns the data for a specific patient
         /// 
-        pub async fn get_patient_details(&self, user_id: i64, patient_id: i64) -> Result< Option<User>, std::io::Error> {
-            todo();
-
-            /**
-             * select * from patient, encounter
+        #[allow(dead_code)]
+        pub async fn get_patient_details(&self, user_id: i64, patient_id: i64) -> Result< Option<Patient>, std::io::Error> {
+            todo!();
+            /*
+              select * from patient, encounter
              */
-            Ok( None )
         }
 
         /// Updates the fields of a specific patient
         /// 
-        pub async fn update_patient_details(&self, user_id: i64, patient_id: i64) -> Result< Option<User>, std::io::Error> {
+        #[allow(dead_code)]
+        pub async fn update_patient_details(&self, user_id: i64, patient_id: i64) -> Result< Option<Patient>, std::io::Error> {
             /*
             
              */
-            todo();
-            Ok( None )
+            todo!();
         }
 
         /// Finds and returns all interventions based on an encounter
         /// 
-        pub async fn get_interventions(&self, encounter_id: i64) -> Result< Option<User>, std::io::Error> {
-            todo();
+        #[allow(dead_code)]
+        pub async fn get_interventions(&self, encounter_id: i64) -> Result< Option<Intervention>, std::io::Error> {
+            todo!();
             /*
             select id "intervention_id", intervention_code, description, notes, location_id, users_id, status_code
             from intervention
             where encounter_id = 3
              */
-            Ok( None )
         }
 
         /// Finds and returns all encounters based on an encounter
         /// 
-        pub async fn get_encounters(&self, encounter_id: i64) -> Result< Option<User>, std::io::Error> {
-            todo();
+        #[allow(dead_code)]
+        pub async fn get_encounters(&self, encounter_id: i64) -> Result< Option<Encounter>, std::io::Error> {
+            todo!();
             /*
             select id "intervention_id", intervention_code, description, notes, location_id, users_id, status_code
             from intervention
             where encounter_id = 3
              */
-            Ok( None )
         }
 
     }

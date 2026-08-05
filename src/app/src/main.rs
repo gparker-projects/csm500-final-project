@@ -1,4 +1,4 @@
-use actix_web::error::HttpError;
+//use actix_web::error::HttpError;
 use actix_web::{web, App, HttpRequest, HttpServer, HttpResponse, Responder};
 use actix_web::http::StatusCode;
 use actix_web::cookie::Key;
@@ -6,6 +6,8 @@ use actix_cors::Cors;
 use actix_files::*;
 use actix_session::{storage::CookieSessionStore, Session, SessionMiddleware}; //, storage::RedisSessionStore} // for user session management: https://docs.rs/actix-session/latest/actix_session/
 use crate::dto::userauthorization::dto::*;
+use crate::dao::patientdao::dao::PatientDAO;
+
 // TODO: ideally we'd use an external session store, not just cookies. Until the application is largely working, we'll have to leave this for now. //storage::RedisSessionStore}; 
 
 use MapleEMR::webc::web_content::{WebContentFactory, WebContentItem}; 
@@ -34,6 +36,7 @@ mod nlp;
 mod errors;
 mod dto;
 mod webc;
+mod dao;
 
 // application-wide database string; should come from a configurable parameter file (TODO)
 const DB_CONN_STR: &str = "postgres://postgres:csm500@localhost:5432/csm500";
@@ -79,6 +82,14 @@ pub struct UserSession {
     // preferences
 }
 
+
+impl UserSession {
+
+  fn get_userid_as_i64(&self) -> i64{
+      let result: i64 = self.user_id.parse().unwrap();
+      return result;
+  }
+}
 /// performs a natural language prompt using the built in engine
 /// 
 /// check by going to: http://127.0.0.1:8000/db
@@ -135,10 +146,10 @@ async fn login(session: Session, req: web::Form<LoginFormData>, data: web::Data<
   match user_can_login {
     Some (current_user) => {
       println!("User can login: {} redirect to /home", req.username.clone());
-      let uid: i64 = current_user.id;
 
+      let uid: i64 = current_user.id;
       let user_perms = cur_db_conn.get_user_permissions( uid ).await.expect( &errors::DatabaseError::NotFoundError.to_string() ).unwrap();
-      //println!("get_user_permissions() returned");
+      // TODO: catch this for users without data
 
       // initialize user session (this is the only location it can occur), for an authenticated user
       //  ref: https://docs.rs/actix-admin/latest/actix_admin/prelude/struct.Session.html
@@ -217,7 +228,27 @@ async fn workspace(data: web::Data<AppSession>, session: Session) -> impl Respon
   let wcf = &data.wcf; // https://actix.rs/docs/application/
   let mut content = wcf.get_tile(WebContentItem::WCTypeWorkspacePage); // retrieve the page base content
 
-  // construct some alternate content for the page
+  println!("in workspace");
+  // get patients at the user's facility, for display
+  let dao = PatientDAO::new(DB_CONN_STR).await;
+  //let dao = dao::patientdao::dao::PatientDAO::new(DB_CONN_STR).await;
+
+  
+  println!("retrieving patients for user's facility");
+  let qry_results = dao.get_assigned_patients(user_session.get_userid_as_i64(), false).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
+
+  match qry_results {
+    Some (patient_list) => {
+       //println!("Retrieved: {} patients", patient_list));
+       println!("Retrieved SOME patients");
+    }
+    None => {
+      println!("No patients");
+    }
+  }
+  // and adjust the menu
+
+  // add the user's identity
   let user_identity_string = "id=\"userIdentityLbl\"><b>".to_owned() + &user_session.user_display_name + "</b>";
   content = content.replace("id=\"userIdentityLbl\">", &user_identity_string);  // replace default string
 

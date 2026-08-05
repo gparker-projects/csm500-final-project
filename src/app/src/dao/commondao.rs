@@ -1,8 +1,12 @@
+#![allow(unused_variables)]
+#![allow(warnings)]
+
 pub mod dao{
     use sqlx::postgres::{PgPoolOptions, PgPool}; 
     use sqlx::Row;
     use std::io::{Error, ErrorKind};
 
+  
     #[derive(Debug, Clone)]
     pub struct CommonDAO {
         pub connection: PgPool,
@@ -22,7 +26,7 @@ pub mod dao{
                 Err(e) => panic!("{}", e),
             };
 
-            AuthObjects {
+            CommonDAO {
                 connection: db_pool,
             }
         }
@@ -33,7 +37,7 @@ pub mod dao{
 
         ///
         pub fn get_locations(&self){
-            // SELECT id "location_id", name, building, wing, floor, room_identifier, notes FROM location where site_id = 9
+            // SELECT id "location_id", name, building, wing, floor, room_identifier, notes FROM location where site_id = 1
         }
 
     }
