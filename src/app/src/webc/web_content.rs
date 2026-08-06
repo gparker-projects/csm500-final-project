@@ -5,6 +5,8 @@ use std::fs;
 use derive_more::Display;
 use std::collections::HashMap;
 
+use crate::dto::patient::dto::Patient;
+
 /// Enumeration for Web Content Tiles, each representing a tile of information
 /// to be presented by the application
 /// 
@@ -60,7 +62,7 @@ impl WebContentFactory {
     }
 
     ///
-    /// returns the number of tiles that have been loaded into the factory.
+    /// DEBUG only: returns the number of tiles that have been loaded into the factory.
     /// 
     pub fn get_tile_count(&self) -> usize {
         return self.tile_hashmap.len();
@@ -73,5 +75,71 @@ impl WebContentFactory {
     /// 
     pub fn get_tile(&self, tile_type: WebContentItem) -> String {
         return self.tile_hashmap[&tile_type].clone();
+    }
+
+    ///
+    /// Provide rendering of a list of patients, as a screen tile
+    /// 
+    pub fn get_patient_list_tile(&self, patient_list: Vec<Patient>) -> String {
+        let mut results_sbuf = String::with_capacity(100); 
+
+        results_sbuf.push_str("<table>");
+        results_sbuf.push_str("  <tr><th>Last Name</th><th>First Name</th><th>SIN</th></tr>"); 
+
+        for p in patient_list{
+            results_sbuf.push_str("  <tr>");
+            results_sbuf.push_str("<td><a href='id="); 
+            results_sbuf.push_str( &p.id.to_string() ); 
+            results_sbuf.push_str("'>"); 
+            results_sbuf.push_str( &p.legal_last_name ); 
+            results_sbuf.push_str("</a></td><td>"); 
+            results_sbuf.push_str( &p.legal_first_name );
+            results_sbuf.push_str("</td><td>"); 
+            results_sbuf.push_str( &p.sin.to_string() ); 
+            results_sbuf.push_str("</td>"); 
+            results_sbuf.push_str("  </tr>\n");
+        }
+        results_sbuf.push_str("</table>");
+
+        return results_sbuf;
+    }
+
+    ///
+    /// Provide HTML for the main system menu; replaces tag: <!--MapleEMR::LegacyMenu-->
+    /// 
+    pub fn get_standard_menu(&self, patient_list: Vec<Patient>) -> String {
+        let mut results_sbuf = String::with_capacity(100); 
+
+        let template_sub_items = r#"<li><a class="menuNotCurrentSmall" href="javascript:selectPatientSub({id},1)">&nbsp;&nbsp;&nbsp;Medications</a></li>
+                                    <li><a class="menuNotCurrentSmall" href="javascript:selectPatientSub({id},2)">&nbsp;&nbsp;&nbsp;Orders</a></li>
+                                    <li><a class="menuNotCurrentSmall" href="javascript:selectPatientSub({id},3)">&nbsp;&nbsp;&nbsp;Allergies</a></li>
+                                    "#;
+
+        let mut first_entry: bool = true;
+
+        results_sbuf.push_str("<div id=\"leftMenu\" align=\"left\"><ul>");
+        for p in patient_list{
+            if ! first_entry {
+               results_sbuf.push_str("<li><a class=\"menuNotCurrent\"href=\"javascript:selectPatient("); 
+            }
+            else{
+               results_sbuf.push_str("<li><a class=\"menuCurrent\" href=\"javascript:selectPatient(");
+               first_entry = false;
+            }
+            results_sbuf.push_str( &p.id.to_string() ); 
+            results_sbuf.push_str(")\">");
+            results_sbuf.push_str( &p.legal_last_name ); 
+            results_sbuf.push_str(",&nbsp;"); 
+            results_sbuf.push_str( &p.legal_first_name );
+            results_sbuf.push_str("</a></li>\n");
+
+            let mut sub_menus = template_sub_items.clone();
+            let mut sub_menus = sub_menus.replace("{id}", &p.id.to_string());  // replace default string       
+
+            results_sbuf.push_str(&sub_menus);
+        }
+        results_sbuf.push_str("</ul></div>");
+
+        return results_sbuf;
     }
 }

@@ -90,25 +90,13 @@
 
 <div class="apptitle"><img src="/webc/img/mapleLogo.png"><div class="userIdentification" id="userIdentityLbl"></div></div>
 <p>
-<div id="leftMenu" align="left">
-  <ul>
-    <li><a class="menuActive" href="javascript:void(0)">PATIENT1_LASTNM, Name</a></li>
-    <li><a href="javascript:void(0)">&nbsp;&nbsp;&nbsp;Medications</a></li>
-    <li><a href="javascript:void(0)">&nbsp;&nbsp;&nbsp;Orders</a></li>
-    <li><a href="javascript:void(0)">&nbsp;&nbsp;&nbsp;Allergies</a></li>
-    <li><a href="javascript:void(0)">PATIENT2_LASTNM, Name</a></li>
-  </ul>
-</div>
+<!--MapleEMR::LegacyMenu-->
 </div>
 
 <div id="mainContentArea" align="center">
-Main Content Area (Default)
+Current Patients
 <p>
-<table>
-  <tr><th>Title</th><th>Title</th><th>Title</th></tr>
-  <tr><td>Data</td><td>Data</td><td>Data</td></tr>
-  <tr><td>Data</td><td>Data</td><td>Data</td></tr>
-</table>
+<!--MapleEMR::PatientList-->
 </div>
 
 <div id="nlpCommandArea" align="right" class="nlpCommandAreaCls">

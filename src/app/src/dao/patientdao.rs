@@ -1,14 +1,11 @@
 pub mod dao{
-    //use MapleEMR::dto::intervention::dto::Intervention;
     use sqlx::postgres::{PgPoolOptions, PgPool}; 
-    //use sqlx::Row;
-    use std::io::{Error, ErrorKind};
-    //use std::ptr::null;
+    //use std::io::{Error, ErrorKind};
     use crate::dto::patient::dto::*;
     use crate::dto::intervention::dto::*;
     use crate::dto::encounter::dto::*;
 
-    use chrono::{Utc, NaiveDateTime};
+    //use chrono::{Utc, NaiveDateTime};
 
     #[derive(Debug, Clone)]
     pub struct PatientDAO {
@@ -39,7 +36,7 @@ pub mod dao{
         /// 
         /// 
         #[allow(dead_code)]
-        pub async fn get_admit_patient(&self, user_id: i64, patient_id: i64) -> Result< Option<Patient>, std::io::Error> {
+        pub async fn get_admit_patient(&self, _user_id: i64, _patient_id: i64) -> Result< Option<Patient>, std::io::Error> {
             todo!();
         }
 
@@ -65,10 +62,7 @@ pub mod dao{
                                             from user_permission up
                                             where users_id = {}
                                                 and up.site_id = l.site_id)  )"##, user_id);
-
-            println!("get_user_permissions Query: {}", query);
-
-            //"int8" => JsonValue::Number(row.try_get(i).unwrap().into()), // from https://github.com/tauri-apps/plugins-workspace/issues/10
+            //println!("get_user_permissions Query: {}", query);
 
             let rows: Vec<(i64, i64, i64, String, String, String,
                            String, String,
@@ -128,7 +122,7 @@ pub mod dao{
         /// Finds and returns any patients that are at a facility, regardless of if they are assigned to the user or not
         ///
         #[allow(dead_code)]
-        pub async fn get_site_patients(&self, user_id: i64, include_discharged: bool) -> Result< Option<Patient>, std::io::Error> {
+        pub async fn get_site_patients(&self, _user_id: i64, _include_discharged: bool) -> Result< Option<Patient>, std::io::Error> {
             todo!();
             /*
                 SELECT p.id "patient_id", e.id "encounter_id", e.location_id, legal_first_name, legal_last_name, legal_middle_names, sin, birthdate, admit_timestamp, admit_notes, discharge_notes, discharge_timestamp
@@ -149,7 +143,7 @@ pub mod dao{
         /// Finds and returns the data for a specific patient
         /// 
         #[allow(dead_code)]
-        pub async fn get_patient_details(&self, user_id: i64, patient_id: i64) -> Result< Option<Patient>, std::io::Error> {
+        pub async fn get_patient_details(&self, _user_id: i64, _patient_id: i64) -> Result< Option<Patient>, std::io::Error> {
             todo!();
             /*
               select * from patient, encounter
@@ -159,7 +153,7 @@ pub mod dao{
         /// Updates the fields of a specific patient
         /// 
         #[allow(dead_code)]
-        pub async fn update_patient_details(&self, user_id: i64, patient_id: i64) -> Result< Option<Patient>, std::io::Error> {
+        pub async fn update_patient_details(&self, _user_id: i64, _patient_id: i64) -> Result< Option<Patient>, std::io::Error> {
             /*
             
              */
@@ -169,7 +163,7 @@ pub mod dao{
         /// Finds and returns all interventions based on an encounter
         /// 
         #[allow(dead_code)]
-        pub async fn get_interventions(&self, encounter_id: i64) -> Result< Option<Intervention>, std::io::Error> {
+        pub async fn get_interventions(&self, _encounter_id: i64) -> Result< Option<Intervention>, std::io::Error> {
             todo!();
             /*
             select id "intervention_id", intervention_code, description, notes, location_id, users_id, status_code
@@ -181,7 +175,7 @@ pub mod dao{
         /// Finds and returns all encounters based on an encounter
         /// 
         #[allow(dead_code)]
-        pub async fn get_encounters(&self, encounter_id: i64) -> Result< Option<Encounter>, std::io::Error> {
+        pub async fn get_encounters(&self, _encounter_id: i64) -> Result< Option<Encounter>, std::io::Error> {
             todo!();
             /*
             select id "intervention_id", intervention_code, description, notes, location_id, users_id, status_code

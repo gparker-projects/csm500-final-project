@@ -10,7 +10,7 @@ use crate::dao::patientdao::dao::PatientDAO;
 
 // TODO: ideally we'd use an external session store, not just cookies. Until the application is largely working, we'll have to leave this for now. //storage::RedisSessionStore}; 
 
-use MapleEMR::webc::web_content::{WebContentFactory, WebContentItem}; 
+use crate::webc::web_content::{WebContentFactory, WebContentItem}; 
 
 //use std::sync::Mutex; // needed for thread safety per https://actix.rs/docs/application/
 
@@ -82,9 +82,7 @@ pub struct UserSession {
     // preferences
 }
 
-
 impl UserSession {
-
   fn get_userid_as_i64(&self) -> i64{
       let result: i64 = self.user_id.parse().unwrap();
       return result;
@@ -135,12 +133,10 @@ async fn machine_learn_test(_req: HttpRequest) -> impl Responder {
 ///      
 /// check by going to: http://127.0.0.1:8000/db
 /// 
-async fn login(session: Session, req: web::Form<LoginFormData>, data: web::Data<AppSession>, ) -> impl Responder { // Box<dyn Responder<>> { //
+async fn login(user_session: Session, req: web::Form<LoginFormData>, _app_session: web::Data<AppSession>, ) -> impl Responder { // Box<dyn Responder<>> { //
   println!("-> /login Requested");
 
   let cur_db_conn = auth_objects::AuthObjects::new(DB_CONN_STR).await;
-  //let user_can_login = cur_db_conn.can_user_login(req.username.clone(), req.password.clone()).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
-
   let user_can_login = cur_db_conn.can_user_login(req.username.clone(), req.password.clone()).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
 
   match user_can_login {
@@ -154,7 +150,7 @@ async fn login(session: Session, req: web::Form<LoginFormData>, data: web::Data<
       // initialize user session (this is the only location it can occur), for an authenticated user
       //  ref: https://docs.rs/actix-admin/latest/actix_admin/prelude/struct.Session.html
       // copy values from the db into the session; will use a different type of object than the DTO.user
-      session.insert("USER_SESSION", UserSession {
+      user_session.insert("USER_SESSION", UserSession {
         user_id: current_user.id.to_string(), 
         user_display_name: current_user.name + " (" + &current_user.user_name + ")",
         email: current_user.email,
@@ -167,7 +163,7 @@ async fn login(session: Session, req: web::Form<LoginFormData>, data: web::Data<
       println!("Login denied for {} redirect back to /<default route>", req.username.clone()); // must use the user from the session as DB was not successful
 
       // do not PURGE before this; it will trash the session including this new key
-      let _ignore = session.insert("VALIDATION_ERRORS".to_string(), "Invalid user or password. Please try again.");
+      let _ignore = user_session.insert("VALIDATION_ERRORS".to_string(), "Invalid user or password. Please try again.");
       actix_web::web::Redirect::to("/").using_status_code(StatusCode::SEE_OTHER)
     }
   }
@@ -183,13 +179,13 @@ async fn is_it_up() -> impl Responder {
 ///
 /// default route when nothing else is specified by the user
 ///
-async fn default_route(data: web::Data<AppSession>, session: Session) -> impl Responder {
+async fn default_route(app_session: web::Data<AppSession>, user_session: Session) -> impl Responder {
   println!("-> /default_route Requested");
  
-  let wcf = &data.wcf; 
+  let wcf = &app_session.wcf; 
   println!("Checking session for Validation errors");
   
-  match session.get::<String>("VALIDATION_ERRORS"){
+  match user_session.get::<String>("VALIDATION_ERRORS"){
     Ok(Some(validation_errors))=> {
        println!("Ok(Some()) Validation errors present in session: {}", &validation_errors);
        // if the login form had validation errors, then we need to show them in the regenerated page.
@@ -198,10 +194,9 @@ async fn default_route(data: web::Data<AppSession>, session: Session) -> impl Re
 
        // construct alternate content for the page
        let alt_content = "<label id=\"errLabel\" style=\"color: red\"><b>".to_owned() + &validation_errors + "</b>"; //.expect("User session invalid")
-
        content = content.replace("<label id=\"errLabel\">", &alt_content);   // retrieve validation errors; they are just raw text for now
 
-       session.purge(); // minimize attack vectors by purging the session 
+       user_session.purge(); // minimize attack vectors by purging the session 
 
        HttpResponse::Ok().body( content )
     },
@@ -221,29 +216,30 @@ async fn default_route(data: web::Data<AppSession>, session: Session) -> impl Re
 ///
 /// Main workspace page of the application, to be supplemented with lots of Javascript, CSS and API calls
 /// 
-async fn workspace(data: web::Data<AppSession>, session: Session) -> impl Responder {
-  println!("-> /home Requested");
+async fn workspace(app_session: web::Data<AppSession>, user_session: Session) -> impl Responder {
+  println!("-> /home Response");
 
-  let user_session: UserSession = session.get("USER_SESSION").unwrap().expect("User session invalid"); // retrieve user session info
-  let wcf = &data.wcf; // https://actix.rs/docs/application/
+  let user_session: UserSession = user_session.get("USER_SESSION").unwrap().expect("User session invalid"); // retrieve user session info
+  let wcf = &app_session.wcf; // https://actix.rs/docs/application/
   let mut content = wcf.get_tile(WebContentItem::WCTypeWorkspacePage); // retrieve the page base content
 
-  println!("in workspace");
   // get patients at the user's facility, for display
   let dao = PatientDAO::new(DB_CONN_STR).await;
-  //let dao = dao::patientdao::dao::PatientDAO::new(DB_CONN_STR).await;
-
-  
-  println!("retrieving patients for user's facility");
   let qry_results = dao.get_assigned_patients(user_session.get_userid_as_i64(), false).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
-
   match qry_results {
     Some (patient_list) => {
-       //println!("Retrieved: {} patients", patient_list));
-       println!("Retrieved SOME patients");
+       println!("Retrieved {} patients:", patient_list.len());
+       for p in patient_list.clone(){
+          println!(" > {} \n", p);
+       }
+       let mut patient_list_html = wcf.get_patient_list_tile(patient_list.clone()); 
+       content = content.replace("<!--MapleEMR::PatientList-->", &patient_list_html);  // replace default string
+
+       let mut std_menu_html = wcf.get_standard_menu(patient_list.clone()); 
+       content = content.replace("<!--MapleEMR::LegacyMenu-->", &std_menu_html);  // replace default string       
     }
     None => {
-      println!("No patients");
+      println!("No patients found");
     }
   }
   // and adjust the menu

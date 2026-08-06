@@ -1,7 +1,8 @@
 
 pub mod dto{
     use serde::{Deserialize, Serialize};
-    use chrono::{NaiveDateTime}; //, Local};
+    use chrono::{NaiveDateTime}; 
+    use std::fmt;
 
     /// -------------------------------------------------------------------
     /// Defines a Data Transfer Object for a Patient
@@ -70,6 +71,21 @@ pub mod dto{
                    discharge_timestamp,
                    discharge_notes
             }
+        }
+    }
+
+    /// Implements a .to_string() for the Patient 
+    /// 
+    /// ref: https://loige.co/how-to-to-string-in-rust/
+    /// 
+    impl fmt::Display for Patient {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            let mut results: String = "Patient Id: ".to_owned() + &self.id.to_string() ;
+
+            results =  results + &"\nlegal_first_name: " + &self.legal_first_name;
+            results =  results + &"\nlegal_last_name: " + &self.legal_last_name;
+
+            f.write_str(&results)
         }
     }
 }
