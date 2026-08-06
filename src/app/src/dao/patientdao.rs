@@ -1,9 +1,9 @@
 pub mod dao{
     //use MapleEMR::dto::intervention::dto::Intervention;
     use sqlx::postgres::{PgPoolOptions, PgPool}; 
-    use sqlx::Row;
+    //use sqlx::Row;
     use std::io::{Error, ErrorKind};
-use std::ptr::null;
+    //use std::ptr::null;
     use crate::dto::patient::dto::*;
     use crate::dto::intervention::dto::*;
     use crate::dto::encounter::dto::*;
