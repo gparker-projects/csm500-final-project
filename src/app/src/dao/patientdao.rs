@@ -3,6 +3,7 @@ pub mod dao{
     use sqlx::postgres::{PgPoolOptions, PgPool}; 
     use sqlx::Row;
     use std::io::{Error, ErrorKind};
+use std::ptr::null;
     use crate::dto::patient::dto::*;
     use crate::dto::intervention::dto::*;
     use crate::dto::encounter::dto::*;
@@ -49,7 +50,11 @@ pub mod dao{
         ///       https://doc.rust-lang.org/std/io/struct.Error.html - for return Error
         /// 
         pub async fn get_assigned_patients(&self, user_id: i64, _include_discharged: bool) -> Result< Option< Vec<Patient> >, std::io::Error> {
-            let query = format!(r##"SELECT p.id, e.id, e.location_id, legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as "legal_middle_names" 
+            let query = format!(r##"SELECT p.id, e.id, e.location_id, legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as "legal_middle_names",
+                                            COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
+                                            birthdate, admit_timestamp,
+	                                        discharge_timestamp as "discharge_timestamp?",
+                                            sin
                                         FROM patient p
                                         join encounter e on p.id = e.patient_id
                                         where location_id in (
@@ -63,8 +68,13 @@ pub mod dao{
 
             println!("get_user_permissions Query: {}", query);
 
-            let rows: Vec<(i64, i64, i64,
-                           String, String, String
+            //"int8" => JsonValue::Number(row.try_get(i).unwrap().into()), // from https://github.com/tauri-apps/plugins-workspace/issues/10
+
+            let rows: Vec<(i64, i64, i64, String, String, String,
+                           String, String,
+                           chrono::NaiveDateTime, chrono::NaiveDateTime, 
+                           Option<chrono::NaiveDateTime>,
+                           i32
                           )> = sqlx::query_as(&query)
             .fetch_all(&self.connection) 
             .await
@@ -84,22 +94,15 @@ pub mod dao{
                     
                     let tmp_legal_first_name = row.3; //legal_first_name
                     let tmp_legal_last_name = row.4; // legal_last_name
-                    let  tmp_legal_middle_names = row.5;
-                    //let tmp_lmn: Option<String> = Some(row.5); // legal_middle_names
-                    //let mut tmp_legal_middle_names: String = "".to_string();
+                    let tmp_legal_middle_names = row.5;
 
-                   //// match tmp_lmn {
-                   //    Some(name) => tmp_legal_middle_names = name,
-                    //    None => tmp_legal_middle_names = "".to_string(),
-                    //}
+                    let tmp_admit_notes = row.6; // admission_notes
+                    let tmp_discharge_notes = row.7;  // discharge_notes
 
-                    //let tmp_sin:    i64 = row.5; // sin
-
-                    //let tmp_birthdate: chrono::NaiveDateTime = row.7; //tmp_birthdate
-                    //let tmp_admit_timestamp: chrono::NaiveDateTime = row.8;// admit_timestamp
-                    //let tmp_admit_notes = row.9; // admission_notes
-                    //let tmp_discharge_notes = row.10;  // discharge_notes
-                    //let tmp_discharge_timestamp: chrono::NaiveDateTime = row.11; // discharge_timestamp
+                    let tmp_birthdate: chrono::NaiveDateTime = row.8; //tmp_birthdate
+                    let tmp_admit_timestamp: chrono::NaiveDateTime = row.9;// admit_timestamp
+                    let tmp_discharge_timestamp = row.10;// chrono::NaiveDateTime; 
+                    let tmp_sin:    i32 = row.11; // SIN
 
                     results.push(
                         Patient {
@@ -108,21 +111,18 @@ pub mod dao{
                             legal_first_name:  tmp_legal_first_name, //"DUMMY".to_string(),
                             legal_last_name: tmp_legal_last_name,//"DUMMY".to_string(), 
                             legal_middle_names: tmp_legal_middle_names, //"DUMMY".to_string(),
-                            sin: 0, //tmp_sin,
-                            birth_date: Utc::now().naive_utc(), //tmp_birthdate,
+                            sin: tmp_sin,
+                            birth_date: tmp_birthdate, //Utc::now().naive_utc(), 
                             location_id: tmp_loc_id,
-
-                            admit_timestamp: Utc::now().naive_utc(), //tmp_admit_timestamp,
-                            admit_notes: "DUMMY".to_string(), //tmp_admit_notes,
-                            discharge_timestamp: Utc::now().naive_utc(), //tmp_discharge_timestamp,
-                            discharge_notes: "DUMMY".to_string(), //tmp_discharge_notes,
+                            admit_timestamp:tmp_admit_timestamp, //Utc::now().naive_utc(), 
+                            admit_notes: tmp_admit_notes,//"DUMMY".to_string(), 
+                            discharge_timestamp: tmp_discharge_timestamp,//Utc::now().naive_utc(), 
+                            discharge_notes: tmp_discharge_notes,//"DUMMY".to_string(), 
                         }
                     );
                 }
                 return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
             }
-
-            Ok( Some( Vec::new() ) )
         }
 
         /// Finds and returns any patients that are at a facility, regardless of if they are assigned to the user or not

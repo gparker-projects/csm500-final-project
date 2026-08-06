@@ -21,7 +21,7 @@ pub mod dto{
         #[serde(rename = "legal_middle_names")]
         pub legal_middle_names: String, // LEGAL_MIDDLE_NAMES VARCHAR(100), 
         #[serde(rename = "sin")]
-        pub sin: i64, // SIN NUMERIC(7) UNIQUE, 
+        pub sin: i32, // SIN NUMERIC(9) UNIQUE, 
         #[serde(rename = "birthdate")]
         pub birth_date: NaiveDateTime, // BIRTHDATE TIMESTAMP,
         #[serde(rename = "location_id")]
@@ -33,7 +33,7 @@ pub mod dto{
         #[serde(rename = "admit_notes")]
         pub admit_notes: String,
         #[serde(rename = "discharge_timestamp")]
-        pub discharge_timestamp: NaiveDateTime, 
+        pub discharge_timestamp: Option<NaiveDateTime>, 
         #[serde(rename = "discharge_notes")]
         pub discharge_notes: String
     }
@@ -46,13 +46,13 @@ pub mod dto{
                    legal_first_name: String,
                    legal_last_name: String,
                    legal_middle_names: String,
-                   sin: i64,
+                   sin: i32,
                    birth_date: NaiveDateTime,
                    location_id: i64,
 
                    admit_timestamp: NaiveDateTime,
                    admit_notes: String,
-                   discharge_timestamp: NaiveDateTime,
+                   discharge_timestamp: Option<NaiveDateTime>,
                    discharge_notes: String,
                 ) -> Self {
             Self { 

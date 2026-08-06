@@ -5,4 +5,7 @@
 - result wrapped options: 
 - SQL column names (of results) must always be lower case
 
+OMG type compatibility between POSTGRES and Rust is difficult
 - i64 in Rust = BIGINT in Postgresql; https://docs.rs/sqlx/latest/sqlx/postgres/types/index.html
+
+- use of futures with async for unit testing: requires a compiler predicate
