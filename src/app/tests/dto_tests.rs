@@ -12,7 +12,7 @@ mod tests {
   fn test_dtos() {
 
     // instantiate a DTO to prove it accepts data, but more importantly, detect unexpected changes to it that will break the application
-    let obj = MapleEMR::dto::intervention::Intervention::new( 0,//  id,
+    let obj = MapleEMR::dto::intervention::dto::Intervention::new( 0,//  id,
               "intervention_code".to_string(), //  intervention_code,
               "description".to_string(), //  description,
               "notes".to_string(), //  notes,
