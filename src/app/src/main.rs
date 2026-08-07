@@ -6,8 +6,8 @@ use actix_cors::Cors;
 use actix_files::*;
 use actix_session::{storage::CookieSessionStore, Session, SessionMiddleware}; //, storage::RedisSessionStore} // for user session management: https://docs.rs/actix-session/latest/actix_session/
 use crate::dto::userauthorization::dto::*;
-use crate::dao::patientdao::dao::PatientDAO;
-use crate::dao::auth_dao::dao::AuthDAO;
+use crate::dao::patient_dao::PatientDAO;
+use crate::dao::auth_dao::AuthDAO;
 
 // TODO: ideally we'd use an external session store, not just cookies. Until the application is largely working, we'll have to leave this for now. //storage::RedisSessionStore}; 
 

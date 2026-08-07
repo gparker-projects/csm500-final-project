@@ -1,126 +1,124 @@
-pub mod dao{
-    use sqlx::postgres::{PgPoolOptions, PgPool}; //, PgRow};
-    use sqlx::Row;
-    use std::io::{Error, ErrorKind};
-    use crate::dto::user::dto::User;
-    use crate::dto::userauthorization::dto::*;
+use sqlx::postgres::{PgPoolOptions, PgPool}; //, PgRow};
+use sqlx::Row;
+use std::io::{Error, ErrorKind};
+use crate::dto::user::dto::User;
+use crate::dto::userauthorization::dto::*;
 
-    //  B. Gruber, Rust web development: with Warp, Tokio, and Reqwest. Shelter Island, NY: Manning Publications Co, 2023.
-    // https://learning.oreilly.com/library/view/rust-web-development/9781617299001/OEBPS/Text/07.htm#sigil_toc_id_85
+//  B. Gruber, Rust web development: with Warp, Tokio, and Reqwest. Shelter Island, NY: Manning Publications Co, 2023.
+// https://learning.oreilly.com/library/view/rust-web-development/9781617299001/OEBPS/Text/07.htm#sigil_toc_id_85
 
-    #[derive(Debug, Clone)]
-    pub struct AuthDAO {
-        pub connection: PgPool,
+#[derive(Debug, Clone)]
+pub struct AuthDAO {
+    pub connection: PgPool,
+}
+
+impl AuthDAO {
+    /// Creates a new AuthObjects object, with a database pool for use by other calls
+    /// 
+    pub async fn new(db_url: &str) -> Self {
+
+        let db_pool = match PgPoolOptions::new()
+            .max_connections(5)
+            .connect(db_url)
+            .await
+        {
+            Ok(pool) => pool,
+            Err(e) => panic!("{}", e),
+        };
+
+        AuthDAO {
+            connection: db_pool,
+        }
     }
 
-    impl AuthDAO {
-        /// Creates a new AuthObjects object, with a database pool for use by other calls
-        /// 
-        pub async fn new(db_url: &str) -> Self {
+    /// Checks the user is in the database, and that the password matches (TODO)
+    /// Returns a true/false value
+    /// 
+    pub async fn can_user_login(&self,
+                            user_name: String, 
+                            user_password: String,
+                        ) -> Result< Option<User>, std::io::Error> {
 
-            let db_pool = match PgPoolOptions::new()
-                .max_connections(5)
-                .connect(db_url)
-                .await
-            {
-                Ok(pool) => pool,
-                Err(e) => panic!("{}", e),
-            };
+        // query the database for a user that matches the username and password
+        // columns MUST be lowercase and mapped as such below, Rust can not translate them
+        let query = format!("SELECT id, name, username, email, created_timestamp, password FROM USERS WHERE USERNAME = '{}' AND PASSWORD = '{}'", user_name, user_password);
 
-            AuthDAO {
-                connection: db_pool,
+        //println!("Query: {}", query);
+
+        match sqlx::query(&query)
+        .fetch_optional(&self.connection)
+        .await
+        {
+            Ok( Some(row) ) => {
+                println!("Successful login (results found) for: {}", user_name);
+                Ok( Some (   {
+                        let tmp_new_id: i64 = row.get("id");  // Rust to Postgresql mappings: https://docs.rs/sqlx/latest/sqlx/postgres/types/index.html
+                        let tmp_created_at: chrono::NaiveDateTime = row.get("created_timestamp");
+
+                        User {
+                            id: tmp_new_id,
+                            name: row.get("name"),
+                            user_name: row.get("username"),
+                            email: row.get("email"),
+                            created_timestamp: tmp_created_at, 
+                            password: row.get("password"),
+                        }
+                    }
+                ) )
+            }
+            Ok(None) => {
+                println!("No user found for: {}", user_name);
+                Ok( None )
+            }
+            Err(err) => {
+                println!("Error on login for: {} ({})", user_name, err);
+                Ok( None )
             }
         }
+    }   
 
-        /// Checks the user is in the database, and that the password matches (TODO)
-        /// Returns a true/false value
-        /// 
-        pub async fn can_user_login(&self,
-                                user_name: String, 
-                                user_password: String,
-                            ) -> Result< Option<User>, std::io::Error> {
+    ///
+    /// Given a user id, obtain all the user permissions that user has. Contains the linkages between the department, permission and user.
+    /// 
+    pub async fn get_user_permissions(&self, user_id: i64 ) -> Result< Option<UserAuthorization>, std::io::Error> {
+        // construct query - we have a denormalized data structure here to save joins, so the table has all the Id's someone would ever need
+        let query = format!("SELECT department_id, permission_id FROM public.user_permission where active_flag = 'Y' and users_id = {} group by department_id, permission_id order by permission_id", user_id);
+        println!("get_user_permissions Query: {}", query);
 
-            // query the database for a user that matches the username and password
-            // columns MUST be lowercase and mapped as such below, Rust can not translate them
-            let query = format!("SELECT id, name, username, email, created_timestamp, password FROM USERS WHERE USERNAME = '{}' AND PASSWORD = '{}'", user_name, user_password);
+        // https://docs.rs/sqlx/latest/sqlx/fn.query_as.html
+        // https://stackoverflow.com/questions/67243108/mapping-nm-relations-into-vec-using-sqlx
+        //
+        let rows: Vec<(i64, i64)> = sqlx::query_as(&query)
+        .fetch_all(&self.connection)
+        .await
+        .unwrap_or_default(); 
 
-            //println!("Query: {}", query);
+        if rows.is_empty() {
+            let errmsg = format!("No permissions found for user_id: {}", user_id);
+            println!("{}", errmsg); // had to use https://doc.rust-lang.org/std/io/struct.Error.html to return Error here
+            return Err(Error::new(ErrorKind::Other, errmsg));
+        }
 
-            match sqlx::query(&query)
-            .fetch_optional(&self.connection)
-            .await
-            {
-                Ok( Some(row) ) => {
-                    println!("Successful login (results found) for: {}", user_name);
-                    Ok( Some (   {
-                            let tmp_new_id: i64 = row.get("id");  // Rust to Postgresql mappings: https://docs.rs/sqlx/latest/sqlx/postgres/types/index.html
-                            let tmp_created_at: chrono::NaiveDateTime = row.get("created_timestamp");
+        println!("Loading permissions");
+        let mut perms: Vec<Permission> = Vec::with_capacity(rows.len());
+        for row in rows {
+            let tmp_dept_id: i64 = row.0;
+            let tmp_perm_id: i64 = row.1;
 
-                            User {
-                                id: tmp_new_id,
-                                name: row.get("name"),
-                                user_name: row.get("username"),
-                                email: row.get("email"),
-                                created_timestamp: tmp_created_at, 
-                                password: row.get("password"),
-                            }
-                        }
-                    ) )
+            perms.push(
+                Permission {
+                    department_id: tmp_dept_id,
+                    permission_id: tmp_perm_id,
                 }
-                Ok(None) => {
-                    println!("No user found for: {}", user_name);
-                    Ok( None )
-                }
-                Err(err) => {
-                    println!("Error on login for: {} ({})", user_name, err);
-                    Ok( None )
-                }
-            }
-        }   
-
-        ///
-        /// Given a user id, obtain all the user permissions that user has. Contains the linkages between the department, permission and user.
-        /// 
-        pub async fn get_user_permissions(&self, user_id: i64 ) -> Result< Option<UserAuthorization>, std::io::Error> {
-            // construct query - we have a denormalized data structure here to save joins, so the table has all the Id's someone would ever need
-            let query = format!("SELECT department_id, permission_id FROM public.user_permission where active_flag = 'Y' and users_id = {} group by department_id, permission_id order by permission_id", user_id);
-            println!("get_user_permissions Query: {}", query);
-
-            // https://docs.rs/sqlx/latest/sqlx/fn.query_as.html
-            // https://stackoverflow.com/questions/67243108/mapping-nm-relations-into-vec-using-sqlx
-            //
-            let rows: Vec<(i64, i64)> = sqlx::query_as(&query)
-            .fetch_all(&self.connection)
-            .await
-            .unwrap_or_default(); 
-
-            if rows.is_empty() {
-                let errmsg = format!("No permissions found for user_id: {}", user_id);
-                println!("{}", errmsg); // had to use https://doc.rust-lang.org/std/io/struct.Error.html to return Error here
-                return Err(Error::new(ErrorKind::Other, errmsg));
-            }
-
-            println!("Loading permissions");
-            let mut perms: Vec<Permission> = Vec::with_capacity(rows.len());
-            for row in rows {
-                let tmp_dept_id: i64 = row.0;
-                let tmp_perm_id: i64 = row.1;
-
-                perms.push(
-                    Permission {
-                        department_id: tmp_dept_id,
-                        permission_id: tmp_perm_id,
-                    }
-                );
-                //println!("Load: ({},{})", dept_id, perm_id);
-            }
-            
-            let result = UserAuthorization {
-                granted_permissions: perms
-            };
-            Ok(Some(result))
-            
-        }    
+            );
+            //println!("Load: ({},{})", dept_id, perm_id);
+        }
         
-    }
+        let result = UserAuthorization {
+            granted_permissions: perms
+        };
+        Ok(Some(result))
+        
+    }    
+    
 }
