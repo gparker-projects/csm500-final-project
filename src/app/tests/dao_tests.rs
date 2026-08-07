@@ -5,7 +5,7 @@
 /// 
 #[cfg(test)]
 mod tests {
-  use MapleEMR::dao::patientdao::dao::PatientDAO;
+  use MapleEMR::dao::patient_dao::PatientDAO;
 
   const DB_CONN_STR: &str = "postgres://postgres:csm500@localhost:5432/csm500";
 

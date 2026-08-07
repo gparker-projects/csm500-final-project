@@ -4,4 +4,4 @@ pub mod location;
 pub mod patient;
 pub mod site;
 pub mod user;
-pub mod userauthorization;
+pub mod user_auth;

@@ -5,7 +5,7 @@ use actix_web::cookie::Key;
 use actix_cors::Cors;
 use actix_files::*;
 use actix_session::{storage::CookieSessionStore, Session, SessionMiddleware}; //, storage::RedisSessionStore} // for user session management: https://docs.rs/actix-session/latest/actix_session/
-use crate::dto::userauthorization::dto::*;
+use crate::dto::user_auth::*;
 use crate::dao::patient_dao::PatientDAO;
 use crate::dao::auth_dao::AuthDAO;
 

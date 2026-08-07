@@ -5,7 +5,7 @@ use std::fs;
 use derive_more::Display;
 use std::collections::HashMap;
 
-use crate::dto::patient::dto::Patient;
+use crate::dto::patient::Patient;
 
 /// Enumeration for Web Content Tiles, each representing a tile of information
 /// to be presented by the application

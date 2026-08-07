@@ -1,8 +1,8 @@
 use sqlx::postgres::{PgPoolOptions, PgPool}; //, PgRow};
 use sqlx::Row;
 use std::io::{Error, ErrorKind};
-use crate::dto::user::dto::User;
-use crate::dto::userauthorization::dto::*;
+use crate::dto::user::User;
+use crate::dto::user_auth::*;
 
 //  B. Gruber, Rust web development: with Warp, Tokio, and Reqwest. Shelter Island, NY: Manning Publications Co, 2023.
 // https://learning.oreilly.com/library/view/rust-web-development/9781617299001/OEBPS/Text/07.htm#sigil_toc_id_85

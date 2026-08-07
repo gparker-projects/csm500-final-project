@@ -1,7 +1,7 @@
 use sqlx::postgres::{PgPoolOptions, PgPool}; 
-use crate::dto::patient::dto::*;
-use crate::dto::intervention::dto::*;
-use crate::dto::encounter::dto::*;
+use crate::dto::patient::*;
+use crate::dto::intervention::*;
+use crate::dto::encounter::*;
 
 #[derive(Debug, Clone)]
 pub struct PatientDAO {
