@@ -133,8 +133,7 @@ impl WebContentFactory {
             results_sbuf.push_str( &p.legal_first_name );
             results_sbuf.push_str("</a></li>\n");
 
-            let mut sub_menus = template_sub_items.clone();
-            let mut sub_menus = sub_menus.replace("{id}", &p.id.to_string());  // replace default string       
+            let sub_menus = template_sub_items.replace("{id}", &p.id.to_string());  // replace default string       
 
             results_sbuf.push_str(&sub_menus);
         }
