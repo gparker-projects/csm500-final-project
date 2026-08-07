@@ -6,8 +6,8 @@
 #[cfg(test)]
 mod tests {
 
-  use dto::intervention::Intervention;
-  use dto::patient::Patient;
+  use MapleEMR::dto::patient::Patient;
+  use MapleEMR::dto::intervention::Intervention;
   use chrono::{Utc, NaiveDateTime};
 
     ///
