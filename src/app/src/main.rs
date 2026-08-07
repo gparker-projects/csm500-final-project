@@ -7,6 +7,7 @@ use actix_files::*;
 use actix_session::{storage::CookieSessionStore, Session, SessionMiddleware}; //, storage::RedisSessionStore} // for user session management: https://docs.rs/actix-session/latest/actix_session/
 use crate::dto::userauthorization::dto::*;
 use crate::dao::patientdao::dao::PatientDAO;
+use crate::dao::auth_dao::dao::AuthDAO;
 
 // TODO: ideally we'd use an external session store, not just cookies. Until the application is largely working, we'll have to leave this for now. //storage::RedisSessionStore}; 
 
@@ -31,7 +32,6 @@ use crate::webc::web_content::{WebContentFactory, WebContentItem};
 /// [2] S. Lyu and A. Rzeznik, Practical Rust Projects: Build Serverless, AI, Machine Learning, Embedded, Game, and Web Applications. Berkeley, CA: Apress, 2023. doi: DOI:%2010.1007/978-1-4842-9331-7.
 /// https://github.com/LukeMathWalker/zero-to-production
 ///
-mod auth_objects;
 mod nlp;
 mod errors;
 mod dto;
@@ -40,6 +40,9 @@ mod dao;
 
 // application-wide database string; should come from a configurable parameter file (TODO)
 const DB_CONN_STR: &str = "postgres://postgres:csm500@localhost:5432/csm500";
+
+const USER_SESSION : &str = r##"USER_SESSION"##;
+const VALIDATION_ERRORS : &str = r##"VALIDATION_ERRORS"##;
 
 #[derive(serde::Deserialize)]
 pub struct LoginFormData {
@@ -136,7 +139,7 @@ async fn machine_learn_test(_req: HttpRequest) -> impl Responder {
 async fn login(user_session: Session, req: web::Form<LoginFormData>, _app_session: web::Data<AppSession>, ) -> impl Responder { // Box<dyn Responder<>> { //
   println!("-> /login Requested");
 
-  let cur_db_conn = auth_objects::AuthObjects::new(DB_CONN_STR).await;
+  let cur_db_conn = AuthDAO::new(DB_CONN_STR).await;
   let user_can_login = cur_db_conn.can_user_login(req.username.clone(), req.password.clone()).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
 
   match user_can_login {
@@ -150,7 +153,7 @@ async fn login(user_session: Session, req: web::Form<LoginFormData>, _app_sessio
       // initialize user session (this is the only location it can occur), for an authenticated user
       //  ref: https://docs.rs/actix-admin/latest/actix_admin/prelude/struct.Session.html
       // copy values from the db into the session; will use a different type of object than the DTO.user
-      user_session.insert("USER_SESSION", UserSession {
+      user_session.insert(USER_SESSION, UserSession {
         user_id: current_user.id.to_string(), 
         user_display_name: current_user.name + " (" + &current_user.user_name + ")",
         email: current_user.email,
@@ -163,7 +166,7 @@ async fn login(user_session: Session, req: web::Form<LoginFormData>, _app_sessio
       println!("Login denied for {} redirect back to /<default route>", req.username.clone()); // must use the user from the session as DB was not successful
 
       // do not PURGE before this; it will trash the session including this new key
-      let _ignore = user_session.insert("VALIDATION_ERRORS".to_string(), "Invalid user or password. Please try again.");
+      let _ignore = user_session.insert(VALIDATION_ERRORS, "Invalid user or password. Please try again.");
       actix_web::web::Redirect::to("/").using_status_code(StatusCode::SEE_OTHER)
     }
   }
@@ -185,7 +188,7 @@ async fn default_route(app_session: web::Data<AppSession>, user_session: Session
   let wcf = &app_session.wcf; 
   println!("Checking session for Validation errors");
   
-  match user_session.get::<String>("VALIDATION_ERRORS"){
+  match user_session.get::<String>(VALIDATION_ERRORS){
     Ok(Some(validation_errors))=> {
        println!("Ok(Some()) Validation errors present in session: {}", &validation_errors);
        // if the login form had validation errors, then we need to show them in the regenerated page.
@@ -219,12 +222,17 @@ async fn default_route(app_session: web::Data<AppSession>, user_session: Session
 async fn workspace(app_session: web::Data<AppSession>, user_session: Session) -> impl Responder {
   println!("-> /home Response");
 
-  let user_session: UserSession = user_session.get("USER_SESSION").unwrap().expect("User session invalid"); // retrieve user session info
+  const PATIENT_TILE_TAG : &str = r##"<div id="MapleEMR::PatientList"><div/>"##;
+  const LEGACY_MENU_TILE_TAG : &str = r##"<div id="MapleEMR::LegacyMenu"><div/>"##;
+  const _USER_COMMANDS_TILE_TAG : &str = r##"<div id="MapleEMR::UserCommands"><div/>"##;
+
+  let user_session: UserSession = user_session.get(USER_SESSION).unwrap().expect("User session invalid"); // retrieve user session info
   let wcf = &app_session.wcf; // https://actix.rs/docs/application/
   let mut content = wcf.get_tile(WebContentItem::WCTypeWorkspacePage); // retrieve the page base content
 
   // get patients at the user's facility, for display
   let dao = PatientDAO::new(DB_CONN_STR).await;
+
   let qry_results = dao.get_assigned_patients(user_session.get_userid_as_i64(), false).await.expect( &errors::DatabaseError::NotFoundError.to_string() );
   match qry_results {
     Some (patient_list) => {
@@ -232,11 +240,11 @@ async fn workspace(app_session: web::Data<AppSession>, user_session: Session) ->
        for p in patient_list.clone(){
           println!(" > {} \n", p);
        }
-       let mut patient_list_html = wcf.get_patient_list_tile(patient_list.clone()); 
-       content = content.replace("<!--MapleEMR::PatientList-->", &patient_list_html);  // replace default string
+       let patient_list_html = wcf.get_patient_list_tile(patient_list.clone()); 
+       content = content.replace(PATIENT_TILE_TAG, &patient_list_html);  // replace default string
 
-       let mut std_menu_html = wcf.get_standard_menu(patient_list.clone()); 
-       content = content.replace("<!--MapleEMR::LegacyMenu-->", &std_menu_html);  // replace default string       
+       let std_menu_html = wcf.get_standard_menu(patient_list.clone()); 
+       content = content.replace(LEGACY_MENU_TILE_TAG, &std_menu_html);  // replace default string       
     }
     None => {
       println!("No patients found");

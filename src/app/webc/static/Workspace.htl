@@ -90,13 +90,17 @@
 
 <div class="apptitle"><img src="/webc/img/mapleLogo.png"><div class="userIdentification" id="userIdentityLbl"></div></div>
 <p>
-<!--MapleEMR::LegacyMenu-->
-</div>
+<div id="MapleEMR::LegacyMenu"><div/>
 
 <div id="mainContentArea" align="center">
 Current Patients
 <p>
 <!--MapleEMR::PatientList-->
+
+<div id="MapleEMR::PatientList"><div/>
+
+<div id="MapleEMR::UserCommands"><div/>
+
 </div>
 
 <div id="nlpCommandArea" align="right" class="nlpCommandAreaCls">

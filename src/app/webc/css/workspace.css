@@ -131,6 +131,9 @@ table {
 th {
   height: auto;
   text-align: left;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: normal;
+  font-size: 12px;
   padding: 10px;
   background-color: #376BA4;
   color: white;
@@ -139,6 +142,9 @@ th {
 td {
   height: auto;
   text-align: left;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: normal;
+  font-size: 12px;
   padding: 10px;
 }
 

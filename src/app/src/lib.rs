@@ -1,4 +1,3 @@
-pub mod auth_objects;
 pub mod dao;
 pub mod dto;
 pub mod errors;
