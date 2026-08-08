@@ -1,4 +1,19 @@
-//use actix_web::error::HttpError;
+//! # Main program executable for the project
+//!
+//!      CSM500 Project (April - October 2026)
+//!         Graham Parker (Student ID: 240120522)
+//! 
+//! REFERENCES
+//! 
+//! Refs for Web and DB:
+//! [1] B. Gruber, Rust web development: with Warp, Tokio, and Reqwest. Shelter Island, NY: Manning Publications Co, 2023.
+//! https://learning.oreilly.com/library/view/rust-web-development/9781617299001/OEBPS/Text/07.htm#sigil_toc_id_85
+//! https://github.com/Rust-Web-Development/code
+//! 
+//! Refs for ML code:
+//! [2] S. Lyu and A. Rzeznik, Practical Rust Projects: Build Serverless, AI, Machine Learning, Embedded, Game, and Web Applications. Berkeley, CA: Apress, 2023. doi: DOI:%2010.1007/978-1-4842-9331-7.
+//! https://github.com/LukeMathWalker/zero-to-production
+//!
 use actix_web::{web, App, HttpRequest, HttpServer, HttpResponse, Responder};
 use actix_web::http::StatusCode;
 use actix_web::cookie::Key;
@@ -8,41 +23,18 @@ use actix_session::{storage::CookieSessionStore, Session, SessionMiddleware}; //
 use crate::dto::user_auth::*;
 use crate::dao::patient_dao::PatientDAO;
 use crate::dao::auth_dao::AuthDAO;
+//use crate::nlp::NLP; 
 
 // TODO: ideally we'd use an external session store, not just cookies. Until the application is largely working, we'll have to leave this for now. //storage::RedisSessionStore}; 
-
 use crate::webc::web_content::{WebContentFactory, WebContentItem}; 
 
-//use std::sync::Mutex; // needed for thread safety per https://actix.rs/docs/application/
-
-///
-/// # Main program executable for the project
-///
-///      CSM500 Project (April - October 2026)
-///         Graham Parker (Student ID: 240120522)
-/// 
-/// REFERENCES
-/// 
-/// Refs for Web and DB:
-/// [1] B. Gruber, Rust web development: with Warp, Tokio, and Reqwest. Shelter Island, NY: Manning Publications Co, 2023.
-/// https://learning.oreilly.com/library/view/rust-web-development/9781617299001/OEBPS/Text/07.htm#sigil_toc_id_85
-/// https://github.com/Rust-Web-Development/code
-/// 
-/// Refs for ML code:
-/// [2] S. Lyu and A. Rzeznik, Practical Rust Projects: Build Serverless, AI, Machine Learning, Embedded, Game, and Web Applications. Berkeley, CA: Apress, 2023. doi: DOI:%2010.1007/978-1-4842-9331-7.
-/// https://github.com/LukeMathWalker/zero-to-production
-///
-mod nlp;
 mod constants;
 mod dto;
 mod webc;
 mod dao;
+mod nlp;
 
-// application-wide database string; should come from a configurable parameter file (TODO)
-//const DB_CONN_STR: &str = "postgres://postgres:csm500@localhost:5432/csm500";
-
-//const USER_SESSION : &str = r##"USER_SESSION"##;
-//const VALIDATION_ERRORS : &str = r##"VALIDATION_ERRORS"##;
+//use std::sync::Mutex; // needed for thread safety per https://actix.rs/docs/application/
 
 #[derive(serde::Deserialize)]
 pub struct LoginFormData {
@@ -64,11 +56,9 @@ pub struct NLPromptFormData {
 /// 
 struct AppSession {
     app_version: String,
-    wcf: WebContentFactory,
+    wcf: WebContentFactory,    //wcf: Mutex<WebContentFactory>,
     app_key: Key,
-    //wcf: Mutex<WebContentFactory>,
-    //database pool
-    //web static content cache
+    //todo: add database pool
 }
 
 ///
@@ -98,35 +88,14 @@ impl UserSession {
 async fn natural_language_prompt(req: web::Form<NLPromptFormData>) -> impl Responder {
     println!("-> /nlprompt Requested; prompt: \"{}\"", req.prompt);
 
-    //println!("Returning: {}", format!("<b>Rust POC WebDBML2! {}</b>", req.prompt));
-
-    let data = vec!["a","b","c","d","e"];
-    let head = vec!["ColA","ColB","ColC","ColD","ColE"];
-
     let mut results_sbuf = String::with_capacity(50); // Single heap allocation
-    results_sbuf.push_str("<div><table>\n"); //class=\"data-table\"
+    results_sbuf.push_str("<b>PLACEHOLDER CONTENT/b>\n");
 
-    results_sbuf.push_str( &webc::html_formatter::HTMLFormatter::format_row(head, true) );
-    results_sbuf.push_str( &webc::html_formatter::HTMLFormatter::format_row(data, false) );
-    
+    // these are the ACTUAL execution from the POC
+      //let results = nlp::NLP{}.execute();
+      //HttpResponse::Ok().body(format!("<b>machine_learn_test {}</b>", results.await.to_string())) 
 
-    results_sbuf.push_str("</table></div>\n<br>\n");
-
-    //HttpResponse::Ok().body( format!("NL Response: {}", req.prompt) )
-    //HttpResponse::Ok().body(format!("<b>Rust POC WebDBML2! {}</b>", req.prompt)) 
     HttpResponse::Ok().body(format!("{}", results_sbuf)) 
-}
-
-/// performs an execution of the NLP engine
-/// 
-/// check by going to: http://127.0.0.1:8000/ml
-///                    http://localhost:8000/ml
-/// 
-async fn machine_learn_test(_req: HttpRequest) -> impl Responder {
-  println!("-> /ml Requested");
-  let results = nlp::NLP{}.execute();
-  
-  HttpResponse::Ok().body(format!("<b>machine_learn_test {}</b>", results.await.to_string())) 
 }
 
 /// performs a connect to the database
@@ -172,6 +141,7 @@ async fn login(user_session: Session, req: web::Form<LoginFormData>, _app_sessio
   }
 }
 
+///
 /// Allows a monitoring services to perform a basic "is the application up?" check
 /// 
 async fn is_it_up() -> impl Responder {
@@ -193,7 +163,7 @@ async fn default_route(app_session: web::Data<AppSession>, user_session: Session
        println!("Ok(Some()) Validation errors present in session: {}", &validation_errors);
        // if the login form had validation errors, then we need to show them in the regenerated page.
 
-       let mut content = wcf.get_tile(WebContentItem::WCTypeLoginTile); // retrieve the page base content
+       let mut content = wcf.get_home_tile(); // retrieve the page base content
 
        // construct alternate content for the page
        let alt_content = "<label id=\"errLabel\" style=\"color: red\"><b>".to_owned() + &validation_errors + "</b>"; //.expect("User session invalid")
@@ -210,7 +180,7 @@ async fn default_route(app_session: web::Data<AppSession>, user_session: Session
     },
     Err(_)=> {
       //println!("Ok( None ) No errors present in session");
-      println!("Session does not exist");
+      println!("User session does not exist");
       HttpResponse::Ok().body( wcf.get_tile(WebContentItem::WCTypeLoginTile) )
     },
   }
@@ -219,16 +189,12 @@ async fn default_route(app_session: web::Data<AppSession>, user_session: Session
 ///
 /// Main workspace page of the application, to be supplemented with lots of Javascript, CSS and API calls
 /// 
-async fn workspace(app_session: web::Data<AppSession>, user_session: Session) -> impl Responder {
-  println!("-> /home Response");
+async fn route_to_home(app_session: web::Data<AppSession>, user_session: Session) -> impl Responder {
+  println!("-> /home Route Requested");
 
-  const PATIENT_TILE_TAG : &str = r##"<div id="MapleEMR::PatientList"><div/>"##;
-  const LEGACY_MENU_TILE_TAG : &str = r##"<div id="MapleEMR::LegacyMenu"><div/>"##;
-  const _USER_COMMANDS_TILE_TAG : &str = r##"<div id="MapleEMR::UserCommands"><div/>"##;
-
-  let user_session: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect("User session invalid"); // retrieve user session info
+  let user_session: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
   let wcf = &app_session.wcf; // https://actix.rs/docs/application/
-  let mut content = wcf.get_tile(WebContentItem::WCTypeWorkspacePage); // retrieve the page base content
+  let mut content = wcf.get_home_tile(); // retrieve the page base content
 
   // get patients at the user's facility, for display
   let dao = PatientDAO::new(constants::DB_CONN_STR).await;
@@ -241,10 +207,11 @@ async fn workspace(app_session: web::Data<AppSession>, user_session: Session) ->
           println!(" > {} \n", p);
        }
        let patient_list_html = wcf.get_patient_list_tile(patient_list.clone()); 
-       content = content.replace(PATIENT_TILE_TAG, &patient_list_html);  // replace default string
+       content = content.replace(constants::PATIENT_TILE_TAG, &patient_list_html);  // replace default string
 
+       // todo: offload this to the tile generator; should not be repeated
        let std_menu_html = wcf.get_standard_menu(patient_list.clone()); 
-       content = content.replace(LEGACY_MENU_TILE_TAG, &std_menu_html);  // replace default string       
+       content = content.replace(constants::LEGACY_MENU_TILE_TAG, &std_menu_html);  // replace default string       
     }
     None => {
       println!("No patients found");
@@ -253,6 +220,71 @@ async fn workspace(app_session: web::Data<AppSession>, user_session: Session) ->
   // and adjust the menu
 
   // add the user's identity
+  // todo: offload this to the tile generator; should not be repeated
+  let user_identity_string = "id=\"userIdentityLbl\"><b>".to_owned() + &user_session.user_display_name + "</b>";
+  content = content.replace("id=\"userIdentityLbl\">", &user_identity_string);  // replace default string
+
+  HttpResponse::Ok().body( content )
+}
+
+
+///
+/// A generalized form for 80% of web form submission sitautions, so we dont have a ton of minor forms for one-off uses.
+/// 
+#[derive(serde::Deserialize)]
+pub struct GenerialWebFormData {
+    id: String,
+}
+
+impl GenerialWebFormData {
+  fn get_uid_as_i64(&self) -> i64{
+      let result: i64 = self.id.parse().unwrap();
+      return result;
+  }
+}
+
+///
+/// Route to View Patient details; expects a GenerialWebFormData to have been submitted to reach the route
+///
+async fn route_to_patient_details(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<GenerialWebFormData>) -> impl Responder {
+  println!("-> /patientdtls Route Requested");
+
+  let user_session: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+  let wcf = &app_session.wcf; // 
+  let mut content = wcf.get_home_tile(); // retrieve the page base content
+
+  // get patients at the user's facility
+  let dao = PatientDAO::new(constants::DB_CONN_STR).await;
+  
+  let patient_results = dao.get_patient_details( user_session.get_userid_as_i64(), req.get_uid_as_i64()).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+  match patient_results {
+      Some (patient_details) => {
+         // and adjust the menu
+         let tile_content = wcf.get_patient_details_tile(patient_details.clone()); 
+         content = content.replace(constants::BODY_TILE_CONTENT, &tile_content);  // replace default string
+         println!("Patient details obtained");
+      }
+      None => {
+        println!("No patients found");
+      }
+  }
+
+  // refresh the patients in the menu (only)
+  // todo: offload this to the tile generator; should not be repeated
+  let qry_results = dao.get_assigned_patients(user_session.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+  match qry_results {
+    Some (patient_list) => {
+       // and adjust the menu
+       let std_menu_html = wcf.get_standard_menu(patient_list.clone()); 
+       content = content.replace(constants::LEGACY_MENU_TILE_TAG, &std_menu_html);  // replace default string       
+    }
+    None => {
+      println!("No patients found");
+    }
+  }
+
+  // add the user's identity
+  // todo: offload this to the tile generator; should not be repeated
   let user_identity_string = "id=\"userIdentityLbl\"><b>".to_owned() + &user_session.user_display_name + "</b>";
   content = content.replace("id=\"userIdentityLbl\">", &user_identity_string);  // replace default string
 
@@ -315,15 +347,15 @@ async fn main() -> std::io::Result<()> {
                 wcf: WebContentFactory::new(&get_static_path_base()),
                 app_key: tmp_app_key.clone()
               }
-            )
+            ) 
         )
         .wrap(SessionMiddleware::new(CookieSessionStore::default(), tmp_app_key.clone())) // for user session
         .route("/", web::get().to( default_route ))
         .route("/login", web::post().to( login ))
-        .route("/home", web::get().to( workspace )) // main workspace
+        .route("/home", web::get().to( route_to_home )) // main workspace
+        .route("/patientdtls", web::post().to( route_to_patient_details ))
         .route("/nlprompt", web::post().to( natural_language_prompt ))
-        .route("/ml", web::get().to( machine_learn_test ))
-        //.route("/db", web::get().to( db ))
+        //.route("/ml", web::get().to( machine_learn_test ))
         .route("/isItUp", web::get().to( is_it_up ))
         .service(Files::new("/webc/", "./webc"))  // ref: ttps://actix.rs/docs/static-files/
   })

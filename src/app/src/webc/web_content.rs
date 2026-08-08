@@ -18,8 +18,8 @@ pub enum WebContentItem {
     WCTypeLoginTile,
     #[display("Patient List Tile")]
     WCTypePatientListTile,
-    #[display("Workspace")]
-    WCTypeWorkspacePage,
+    #[display("Home")]
+    WCTypeHomePage,
     //#[display("Patient Summary Tile")]
     //WCTypePatientSummaryTile,
     //#[display("Patient Detail Tile")]
@@ -56,7 +56,7 @@ impl WebContentFactory {
 
         filename = content_root_path.to_owned() + "Workspace.htl";        
         contents = fs::read_to_string(&filename).expect("Error reading tile template file");
-        tiles.insert(WebContentItem::WCTypeWorkspacePage, contents ); 
+        tiles.insert(WebContentItem::WCTypeHomePage, contents ); 
 
         WebContentFactory { tile_hashmap: tiles } 
     }
@@ -66,6 +66,13 @@ impl WebContentFactory {
     /// 
     pub fn get_tile_count(&self) -> usize {
         return self.tile_hashmap.len();
+    }
+
+    ///
+    /// Wrapper method to return the main home page tile.
+    /// 
+    pub fn get_home_tile(&self) -> String {
+        return self.tile_hashmap[&WebContentItem::WCTypeHomePage].clone();
     }
 
     ///
@@ -83,14 +90,19 @@ impl WebContentFactory {
     pub fn get_patient_list_tile(&self, patient_list: Vec<Patient>) -> String {
         let mut results_sbuf = String::with_capacity(100); 
 
+        results_sbuf.push_str("<div id=\"hiddenSection\" style=\"display: none; margin-top: 0px;\">");
+        results_sbuf.push_str("<form action=\"\\patientdtls\" method=\"post\" id=\"navForm\">");
+        results_sbuf.push_str("<input type=\"hidden\" name=\"id\" value=\"TBD\">");
+        results_sbuf.push_str("</form></div>");
+
         results_sbuf.push_str("<table>");
         results_sbuf.push_str("  <tr><th>Last Name</th><th>First Name</th><th>SIN</th></tr>"); 
 
         for p in patient_list{
             results_sbuf.push_str("  <tr>");
-            results_sbuf.push_str("<td><a href='id="); 
+            results_sbuf.push_str("<td><a href=\"#\" onclick=\"redirect_to_patient("  ); 
             results_sbuf.push_str( &p.id.to_string() ); 
-            results_sbuf.push_str("'>"); 
+            results_sbuf.push_str("); return false;\">"); 
             results_sbuf.push_str( &p.legal_last_name ); 
             results_sbuf.push_str("</a></td><td>"); 
             results_sbuf.push_str( &p.legal_first_name );
@@ -99,6 +111,32 @@ impl WebContentFactory {
             results_sbuf.push_str("</td>"); 
             results_sbuf.push_str("  </tr>\n");
         }
+        results_sbuf.push_str("</table>");
+
+        return results_sbuf;
+    }
+
+    ///
+    /// Provide HTML for a single Patient
+    /// 
+    pub fn get_patient_details_tile(&self, p: Patient) -> String {
+        let mut results_sbuf = String::with_capacity(100); 
+
+        results_sbuf.push_str("<table>");
+        results_sbuf.push_str("  <tr><th>Last Name</th><th>First Name</th><th>SIN</th></tr>"); 
+
+        results_sbuf.push_str("  <tr>");
+        results_sbuf.push_str("<td><a href='id="); 
+        results_sbuf.push_str( &p.id.to_string() ); 
+        results_sbuf.push_str("'>"); 
+        results_sbuf.push_str( &p.legal_last_name ); 
+        results_sbuf.push_str("</a></td><td>"); 
+        results_sbuf.push_str( &p.legal_first_name );
+        results_sbuf.push_str("</td><td>"); 
+        results_sbuf.push_str( &p.sin.to_string() ); 
+        results_sbuf.push_str("</td>"); 
+        results_sbuf.push_str("  </tr>\n");
+
         results_sbuf.push_str("</table>");
 
         return results_sbuf;
