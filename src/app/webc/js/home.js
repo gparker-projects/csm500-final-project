@@ -7,6 +7,9 @@
 //REFs: https://www.w3schools.com/js/js_validation.asp
 //             https://stackoverflow.com/questions/42803866/form-is-submitting-even-after-validation-function-returning-false
 //
+// replace with Request/Promise from:
+// https://www.digitalocean.com/community/tutorials/how-to-use-the-javascript-fetch-api-to-get-data#fetch-api-vs-ajax-vs-axios
+//
 
 async function validateNLPrompt() {
   const errLabel = document.getElementById('errLabel');
@@ -25,8 +28,6 @@ async function validateNLPrompt() {
   }
   else{
 	console.log("Submitting prompt: " + userPrompt);
-	// replace with Request/Promise from
-	// https://www.digitalocean.com/community/tutorials/how-to-use-the-javascript-fetch-api-to-get-data#fetch-api-vs-ajax-vs-axios
 
 	var newBody = null;
 	try {
@@ -46,7 +47,7 @@ async function validateNLPrompt() {
 }
 
 function getData(userPrompt){
-  const url = "http://localhost:8000/nlprompt";
+  const url = "/nlprompt";
   var results = null;
 
   //console.log("In getData(): " + userPrompt);
@@ -80,8 +81,13 @@ function getData(userPrompt){
   return results;
 }
 
-function redirect_to_patient(patientid){
-	alert('nav_to_patient(' + patientid + ')');
-	console.log('nav_to_patient(' + patientid + ')');
-	return false;
+async function redirect_to_patient(p_id){
+	//alert('nav_to_patient(' + p_id + ')');
+	console.log('nav_to_patient(' + p_id + ')');
+
+    const data = document.getElementById('target_id');
+    data.value = p_id;
+
+    const frm = document.getElementById('patientDtlsFrm');
+    frm.submit();
 }

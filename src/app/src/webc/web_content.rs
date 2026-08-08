@@ -62,8 +62,9 @@ impl WebContentFactory {
     }
 
     ///
-    /// DEBUG only: returns the number of tiles that have been loaded into the factory.
-    /// 
+    /// TEST only: returns the number of tiles that have been loaded into the factory.
+    ///
+    #[cfg(test)]
     pub fn get_tile_count(&self) -> usize {
         return self.tile_hashmap.len();
     }
@@ -91,8 +92,8 @@ impl WebContentFactory {
         let mut results_sbuf = String::with_capacity(100); 
 
         results_sbuf.push_str("<div id=\"hiddenSection\" style=\"display: none; margin-top: 0px;\">");
-        results_sbuf.push_str("<form action=\"\\patientdtls\" method=\"post\" id=\"navForm\">");
-        results_sbuf.push_str("<input type=\"hidden\" name=\"id\" value=\"TBD\">");
+        results_sbuf.push_str("<form action=\"\\patientdtls\" method=\"post\" id=\"patientDtlsFrm\" name=\"patientDtlsFrm\">");
+        results_sbuf.push_str("<input type=\"hidden\" name=\"target_id\" id=\"target_id\" value=\"0\">");
         results_sbuf.push_str("</form></div>");
 
         results_sbuf.push_str("<table>");
@@ -121,21 +122,17 @@ impl WebContentFactory {
     /// 
     pub fn get_patient_details_tile(&self, p: Patient) -> String {
         let mut results_sbuf = String::with_capacity(100); 
+        results_sbuf.push_str("<H2>Patient Details Tile</H2>");
 
         results_sbuf.push_str("<table>");
-        results_sbuf.push_str("  <tr><th>Last Name</th><th>First Name</th><th>SIN</th></tr>"); 
+        
+        results_sbuf.push_str("  <tr><th class='data-label'>Last Name</th><td class='data-field-ro'>");
+        results_sbuf.push_str(&p.legal_last_name );
+        results_sbuf.push_str( "</td></tr>\n");
 
-        results_sbuf.push_str("  <tr>");
-        results_sbuf.push_str("<td><a href='id="); 
-        results_sbuf.push_str( &p.id.to_string() ); 
-        results_sbuf.push_str("'>"); 
-        results_sbuf.push_str( &p.legal_last_name ); 
-        results_sbuf.push_str("</a></td><td>"); 
-        results_sbuf.push_str( &p.legal_first_name );
-        results_sbuf.push_str("</td><td>"); 
-        results_sbuf.push_str( &p.sin.to_string() ); 
-        results_sbuf.push_str("</td>"); 
-        results_sbuf.push_str("  </tr>\n");
+        results_sbuf.push_str("  <tr><th class='data-label'>First Name</th><td class='data-field-ro'>");
+        results_sbuf.push_str(&p.legal_first_name );
+        results_sbuf.push_str( "</td></tr>\n");
 
         results_sbuf.push_str("</table>");
 

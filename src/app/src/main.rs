@@ -14,7 +14,7 @@
 //! [2] S. Lyu and A. Rzeznik, Practical Rust Projects: Build Serverless, AI, Machine Learning, Embedded, Game, and Web Applications. Berkeley, CA: Apress, 2023. doi: DOI:%2010.1007/978-1-4842-9331-7.
 //! https://github.com/LukeMathWalker/zero-to-production
 //!
-use actix_web::{web, App, HttpRequest, HttpServer, HttpResponse, Responder};
+use actix_web::{web, App, HttpServer, HttpResponse, Responder};
 use actix_web::http::StatusCode;
 use actix_web::cookie::Key;
 use actix_cors::Cors;
@@ -203,11 +203,11 @@ async fn route_to_home(app_session: web::Data<AppSession>, user_session: Session
   match qry_results {
     Some (patient_list) => {
        println!("Retrieved {} patients:", patient_list.len());
-       for p in patient_list.clone(){
-          println!(" > {} \n", p);
-       }
+       //for p in patient_list.clone(){
+       //   println!(" > {} \n", p);
+       //}
        let patient_list_html = wcf.get_patient_list_tile(patient_list.clone()); 
-       content = content.replace(constants::PATIENT_TILE_TAG, &patient_list_html);  // replace default string
+       content = content.replace(constants::BODY_TILE_CONTENT_TAG, &patient_list_html);  // replace default string
 
        // todo: offload this to the tile generator; should not be repeated
        let std_menu_html = wcf.get_standard_menu(patient_list.clone()); 
@@ -233,12 +233,12 @@ async fn route_to_home(app_session: web::Data<AppSession>, user_session: Session
 /// 
 #[derive(serde::Deserialize)]
 pub struct GenerialWebFormData {
-    id: String,
+    target_id: String,
 }
 
 impl GenerialWebFormData {
   fn get_uid_as_i64(&self) -> i64{
-      let result: i64 = self.id.parse().unwrap();
+      let result: i64 = self.target_id.parse().unwrap();
       return result;
   }
 }
@@ -246,9 +246,10 @@ impl GenerialWebFormData {
 ///
 /// Route to View Patient details; expects a GenerialWebFormData to have been submitted to reach the route
 ///
-async fn route_to_patient_details(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<GenerialWebFormData>) -> impl Responder {
+async fn route_to_patient_details(user_session: Session, app_session: web::Data<AppSession>, req: web::Form<GenerialWebFormData>) -> impl Responder {
   println!("-> /patientdtls Route Requested");
 
+  //todo: this should direct to a standard error or login screen when session is lost
   let user_session: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
   let wcf = &app_session.wcf; // 
   let mut content = wcf.get_home_tile(); // retrieve the page base content
@@ -261,8 +262,8 @@ async fn route_to_patient_details(app_session: web::Data<AppSession>, user_sessi
       Some (patient_details) => {
          // and adjust the menu
          let tile_content = wcf.get_patient_details_tile(patient_details.clone()); 
-         content = content.replace(constants::BODY_TILE_CONTENT, &tile_content);  // replace default string
-         println!("Patient details obtained");
+         content = content.replace(constants::BODY_TILE_CONTENT_TAG, &tile_content);  // replace default string
+         println!("Patient details obtained"); //: {}", &tile_content);
       }
       None => {
         println!("No patients found");

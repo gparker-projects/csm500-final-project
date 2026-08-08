@@ -8,8 +8,7 @@ pub const DB_CONN_STR: &str = "postgres://postgres:csm500@localhost:5432/csm500"
 pub const USER_SESSION : &str = r##"USER_SESSION"##;
 pub const VALIDATION_ERRORS : &str = r##"VALIDATION_ERRORS"##;
 
-pub const PATIENT_TILE_TAG : &str = r##"<div id="MapleEMR::PatientList"><div/>"##;
+//pub const PATIENT_TILE_TAG : &str = r##"<div id="MapleEMR::PatientList"><div/>"##;
 pub const LEGACY_MENU_TILE_TAG : &str = r##"<div id="MapleEMR::LegacyMenu"><div/>"##;
-pub const _USER_COMMANDS_TILE_TAG : &str = r##"<div id="MapleEMR::UserCommands"><div/>"##;
-
-pub const BODY_TILE_CONTENT: &str = r##"<div id="MapleEMR::BodyTile"><div/>"##;
+pub const USER_COMMANDS_TILE_TAG : &str = r##"<div id="MapleEMR::UserCommands"><div/>"##;
+pub const BODY_TILE_CONTENT_TAG: &str = r##"<div id="MapleEMR::BodyTile"><div/>"##;

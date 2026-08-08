@@ -3,6 +3,7 @@
 <html>
 <head>
   <link rel="stylesheet" href="/webc/css/workspace.css">
+  <link rel="stylesheet" href="/webc/css/dataentryform.css">
   <script src="/webc/js/home.js"></script>
 </head>
 <body>
@@ -12,13 +13,12 @@
 <div id="MapleEMR::LegacyMenu"><div/>
 
 <div id="mainContentArea" align="center">
-Current Patients
-<p>
-<!--MapleEMR::PatientList-->
 
-<div id="MapleEMR::PatientList"><div/>
+	<div id="MapleEMR::BodyTile"><div/>
 
-<div id="MapleEMR::UserCommands"><div/>
+	<div id="MapleEMR::PatientList"><div/>
+
+	<div id="MapleEMR::UserCommands"><div/>
 
 </div>
 

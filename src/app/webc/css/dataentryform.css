@@ -1,0 +1,24 @@
+.data-label {
+  background-color: #376BA4;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+}
+
+.data-field-ro {
+  background-color: white;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: normal;
+  color: black;
+}
+
+.data-field-rw {
+  background-color: #376BA4;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: normal;
+  color: black;
+  color: #ff0000;
+}
