@@ -22,3 +22,11 @@
   color: black;
   color: #ff0000;
 }
+
+.section-row{
+  background-color: #448DD1;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: normal;
+  font-size: 14px;
+  color: white;
+}

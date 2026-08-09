@@ -1,6 +1,7 @@
 use sqlx::postgres::{PgPoolOptions, PgPool}; 
 use sqlx::Row;
 use std::io::{Error, ErrorKind};
+use chrono::NaiveDateTime;
 use crate::dto::patient::*;
 use crate::dto::intervention::*;
 use crate::dto::encounter::*;
@@ -152,28 +153,92 @@ impl PatientDAO {
                 let tmp_birthdate: chrono::NaiveDateTime = row.8; //tmp_birthdate
                 let tmp_admit_timestamp: chrono::NaiveDateTime = row.9;// admit_timestamp
                 let tmp_discharge_timestamp = row.10;// chrono::NaiveDateTime; 
+                
                 let tmp_sin:    i32 = row.11; // SIN
 
                 results.push(
                     Patient {
                         id: tmp_pat_id,
                         encounter_id: tmp_enc_id,
-                        legal_first_name:  tmp_legal_first_name, //"DUMMY".to_string(),
-                        legal_last_name: tmp_legal_last_name,//"DUMMY".to_string(), 
-                        legal_middle_names: tmp_legal_middle_names, //"DUMMY".to_string(),
+                        legal_first_name:  tmp_legal_first_name, 
+                        legal_last_name: tmp_legal_last_name,
+                        legal_middle_names: tmp_legal_middle_names, 
                         sin: tmp_sin,
-                        birth_date: tmp_birthdate, //Utc::now().naive_utc(), 
+                        birth_date: tmp_birthdate,
                         location_id: tmp_loc_id,
-                        admit_timestamp:tmp_admit_timestamp, //Utc::now().naive_utc(), 
-                        admit_notes: tmp_admit_notes,//"DUMMY".to_string(), 
-                        discharge_timestamp: tmp_discharge_timestamp,//Utc::now().naive_utc(), 
-                        discharge_notes: tmp_discharge_notes,//"DUMMY".to_string(), 
+                        admit_timestamp:tmp_admit_timestamp,
+                        admit_notes: tmp_admit_notes,
+                        discharge_timestamp: tmp_discharge_timestamp,
+                        discharge_notes: tmp_discharge_notes,
                     }
                 );
             }
             return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
         }
     }
+
+    /// Finds and returns all encounters based on an encounter
+    /// 
+    pub async fn get_encounters(&self, patient_id: i64) -> Result< Option< Vec<Encounter> >, std::io::Error> {
+        let query = format!(r##"
+                                    select e.id "encounter_id", admit_timestamp,
+                                        discharge_timestamp as "discharge_timestamp?",
+                                        COALESCE(admit_notes, '') as "admit_notes",
+                                        COALESCE(discharge_notes, '') as "discharge_notes",
+                                        s.name "encounter_site_name",
+                                        CASE WHEN discharge_timestamp is null then 'Y' else 'N' end as "current_encounter"
+                                    from encounter e
+                                    join location l on e.location_id = l.id
+                                    join site s on s.id = l.site_id
+                                    where patient_id = {}
+                                    order by admit_timestamp desc
+                                    "##, patient_id);
+        println!("get_encounters Query: {}", query);
+
+        let rows: Vec<(i64, // encounter_id
+                       NaiveDateTime, // admit_timestamp
+                       Option<chrono::NaiveDateTime>, // discharge_timestamp
+                       String, String, // admit and discharge notes
+                       String, // encounter_site_name
+                       String  // current_encounter
+                      )> = sqlx::query_as(&query)
+        .fetch_all(&self.connection) 
+        .await
+        .unwrap_or_default();
+
+        if rows.is_empty() {
+            println!("No encounters found for patient_id: {} [{}]", patient_id, rows.len());
+            return Ok( Some( Vec::new() ) );
+        }
+        else{
+            println!("Loading {} encounters",  rows.len());
+            let mut results: Vec<Encounter> = Vec::with_capacity(rows.len());
+            for row in rows {
+                let tmp_enc_id: i64 = row.0; // encounter_id
+                let tmp_admit_timestamp: NaiveDateTime = row.1;// admit_timestamp
+                let tmp_discharge_timestamp: Option<NaiveDateTime> = row.2;
+                let tmp_admit_notes = row.3; // admission_notes
+                let tmp_discharge_notes = row.4;  // discharge_notes
+                let encounter_site_name = row.5; // admission_notes
+                let is_current_encounter = row.6; // admission_notes
+
+                results.push(
+                    Encounter {
+                        id: tmp_enc_id,
+                        admit_notes: tmp_admit_notes,
+                        admit_timestamp: tmp_admit_timestamp, 
+                        discharge_notes: tmp_discharge_notes,
+                        discharge_timestamp: tmp_discharge_timestamp,
+                        patient_id: patient_id,
+                        encounter_site_name: encounter_site_name,
+                        is_current_encounter: is_current_encounter,
+                    }
+                );
+            }
+            return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
+        }
+    }
+
 
     /// Finds and returns any patients that are at a facility, regardless of if they are assigned to the user or not
     ///
@@ -199,26 +264,70 @@ impl PatientDAO {
         todo!();
     }
 
+        pub async fn get_encounter(&self, _encounter_id: i64) -> Result< Option<Encounter>, std::io::Error> {
+            todo!();
+            /*
+            select id "intervention_id", intervention_code, description, notes, location_id, users_id, status_code
+            from intervention
+            where encounter_id = 3
+                */
+        }
+
     /// Finds and returns all interventions based on an encounter
     /// 
-    pub async fn get_interventions(&self, _encounter_id: i64) -> Result< Option<Intervention>, std::io::Error> {
-        todo!();
-        /*
-        select id "intervention_id", intervention_code, description, notes, location_id, users_id, status_code
-        from intervention
-        where encounter_id = 3
-            */
+    pub async fn get_interventions(&self, encounter_id: i64) -> Result< Option< Vec<Intervention> >, std::io::Error> {
+
+  let query = format!(r##"select id "intervention_id", encounter_id, intervention_code,
+                                  description, notes,
+                                  location_id, users_id, status_code
+                                  from intervention
+                                  where encounter_id = {}"##, encounter_id);
+        //println!("get_user_permissions Query: {}", query);
+
+        let rows: Vec<(i64, i64, String,
+                       String, String,
+                       i64, i64, String
+                        )> = sqlx::query_as(&query)
+        .fetch_all(&self.connection) 
+        .await
+        .unwrap_or_default();
+
+        if rows.is_empty() {
+            println!("No interventions found for encounter_id: {} [{}]", encounter_id, rows.len());
+            return Ok( Some( Vec::new() ) );
+        }
+        else{
+            println!("Loading {} Interventions",  rows.len());
+            let mut results: Vec<Intervention> = Vec::with_capacity(rows.len());
+            for row in rows {
+                let tmp_intv_id: i64 = row.0; // intervention_id
+                let tmp_enc_id: i64 = row.1; // encounter_id
+                
+                let tmp_intervention_code = row.2; //intervention_code
+                let tmp_description = row.3; // description
+                let tmp_notes = row.4; // notes
+
+                let tmp_location_id: i64 = row.5; // location_id
+                let tmp_users_id: i64 = row.6; // users_id
+
+                let tmp_status_code = row.7; //status_code
+
+                results.push(
+                    Intervention {
+                        id: tmp_intv_id,
+                        encounter_id: tmp_enc_id,
+                        intervention_code: tmp_intervention_code,
+                        description: tmp_description,
+                        notes: tmp_notes,
+                        location_id: tmp_location_id,
+                        users_id: tmp_users_id,
+                        status_code: tmp_status_code
+                    }
+                );
+            }
+            return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
+        }
     }
 
-    /// Finds and returns all encounters based on an encounter
-    /// 
-    pub async fn get_encounters(&self, _encounter_id: i64) -> Result< Option<Encounter>, std::io::Error> {
-        todo!();
-        /*
-        select id "intervention_id", intervention_code, description, notes, location_id, users_id, status_code
-        from intervention
-        where encounter_id = 3
-            */
-    }
 
 }

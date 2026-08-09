@@ -1,4 +1,7 @@
-use chrono::{DateTime, Local};
+use serde::{Deserialize, Serialize};
+use chrono::{NaiveDateTime}; 
+use std::fmt;
+
 
 /// -------------------------------------------------------------------
 /// Defines a Data Transfer Object for a (Patient) Encounter, which represents
@@ -9,44 +12,44 @@ use chrono::{DateTime, Local};
 #[derive(serde::Deserialize)]
 pub struct Encounter {
     #[serde(rename = "id")]
-    id: u32, // D BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
-    #[serde(rename = "AdmitNotes")]
-    admit_notes: String, // ADMIT_NOTES VARCHAR(2000),
-    #[serde(rename = "AuditTimestamp")]
-    audit_timestamp: DateTime<Local>, // ADMIT_TIMESTAMP TIMESTAMP DEFAULT NOW(),
-    #[serde(rename = "DischargeNotes")]
-    discharge_notes: String, // DISCHARGE_NOTES VARCHAR(2000),  
-    #[serde(rename = "DischargeTimestamp")]
-    discharge_timestamp: DateTime<Local>, // DISCHARGE_TIMESTAMP TIMESTAMP, 
-    #[serde(rename = "PatientId")]
-    patient_id: u32,//       PATIENT_ID BIGINT REFERENCES PATIENT (ID),
-    #[serde(rename = "InterventionId")]
-    intervention_id: u32, //   INTERVENTION_ID BIGINT REFERENCES INTERVENTION (ID),
-    #[serde(rename = "SiteId")]
-    site_id: u32 //     SITE_ID BIGINT REFERENCES SITE (ID)
+    pub id: i64, // ID BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
+    #[serde(rename = "admit_notes")]
+    pub admit_notes: String, // ADMIT_NOTES VARCHAR(2000),
+    #[serde(rename = "admit_timestamp")]
+    pub admit_timestamp: NaiveDateTime, // ADMIT_TIMESTAMP TIMESTAMP DEFAULT NOW(),
+    #[serde(rename = "discharge_notes")]
+    pub discharge_notes: String, // DISCHARGE_NOTES VARCHAR(2000),  
+    #[serde(rename = "discharge_timestamp")]
+    pub discharge_timestamp: Option<NaiveDateTime>, 
+    #[serde(rename = "patient_id")]
+    pub patient_id: i64,//       PATIENT_ID BIGINT REFERENCES PATIENT (ID),
+    #[serde(rename = "encounter_site_name")]
+    pub encounter_site_name: String,
+    #[serde(rename = "is_current_encounter")]
+    pub is_current_encounter: String 
 } 
 
 impl Encounter{
     /// Basic constructor
     /// 
-    pub fn new(id: u32,
+    pub fn new(id: i64,
             admit_notes: String,
-            audit_timestamp: DateTime<Local>,
+            admit_timestamp: NaiveDateTime,
             discharge_notes: String,
-            discharge_timestamp: DateTime<Local>,
-            patient_id: u32,
-            intervention_id: u32,
-            site_id: u32
+            discharge_timestamp: Option<NaiveDateTime>,
+            patient_id: i64,
+            encounter_site_name: String,
+            is_current_encounter: String
             ) -> Self {
         Self { 
             id,
             admit_notes,
-            audit_timestamp,
+            admit_timestamp,
             discharge_notes,
             discharge_timestamp,
             patient_id,
-            intervention_id,
-            site_id
+            encounter_site_name,
+            is_current_encounter
         }
     }
 }
