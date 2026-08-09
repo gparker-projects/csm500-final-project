@@ -29,7 +29,7 @@ where location_id in (
 
 ------------------------------------------------------------------------------------------------------------------
 
-intervention_code
+intervention_code - group 1
 -------------------
 Bandage
 Bloodwork
@@ -44,7 +44,18 @@ Transfusion
 X-Ray
 Other
 
-care_type_code
+
+status_code - group 2
+-------------------
+New (Unassigned)
+Pending (Assigned)
+In Progress
+On Hold
+Complete
+Archived
+
+
+care_type_code - group 3
 -------------------
 Admit
 Triage
@@ -55,13 +66,3 @@ Examination
 Surgery
 Treatment
 Other
-
-
-status_code
--------------------
-New (Unassigned)
-Pending (Assigned)
-In Progress
-On Hold
-Complete
-Archived

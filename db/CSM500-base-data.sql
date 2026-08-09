@@ -126,3 +126,118 @@ VALUES
 ('find-allpatients', '2050-01-01 23:59:59-00'),
 ('find-all-dept-patients', '2050-01-01 23:59:59-00');
 COMMIT;
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (1, 1, 'Y', 'Bandage', 'Bandage');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (2, 1, 'Y', 'Bloodwork', 'Bloodwork');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (3, 1, 'Y', 'CT Scan', 'CT Scan');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (4, 1, 'Y', 'MRI', 'MRI');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (5, 1, 'Y', 'Medication', 'Medication');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (6, 1, 'Y', 'Port', 'Patient Transfer');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (7, 1, 'Y', 'Referral', 'Referral');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (8, 1, 'Y', 'Surgery', 'Surgery');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (9, 1, 'Y', 'Suture', 'Suture');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (10, 1, 'Y', 'Transfusion', 'Transfusion');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (11, 1, 'Y', 'X-Ray', 'X-Ray');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (12, 1, 'Y', 'Other', 'Other');
+COMMIT;
+
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (13, 2, 'Y', 'New (Unassigned)', 'New (Unassigned)');
+  
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (14, 2, 'Y', 'Pending (Assigned)', 'Pending (Assigned)');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (15, 2, 'Y', 'In Progress', 'In Progress');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (16, 2, 'Y', 'On Hold', 'On Hold');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (17, 2, 'Y', 'Complete', 'Complete');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (18, 2, 'Y', 'Archived', 'Archived');
+  
+COMMIT;
+
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (19, 3, 'Y', 'Admit', 'Admit');
+  
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (20, 3, 'Y', 'Triage', 'Triage');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (21, 3, 'Y', 'Discharge', 'Discharge');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (22, 3, 'Y', 'Consult', 'Consult');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (23, 3, 'Y', 'Direct Care', 'Direct Care');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (24, 3, 'Y', 'Examination', 'Examination');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (25, 3, 'Y', 'Surgery', 'Surgery');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (26, 3, 'Y', 'Treatment', 'Treatment');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (27, 3, 'Y', 'Other', 'Other');
+
+COMMIT;
