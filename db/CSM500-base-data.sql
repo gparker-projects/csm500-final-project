@@ -241,3 +241,23 @@ INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   VALUES (27, 3, 'Y', 'Other', 'Other');
 
 COMMIT;
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (28, 4, 'Y', 'Scheduled Time', 'Scheduled Time');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (29, 4, 'Y', 'Performed Time', 'Performed Time');
+
+COMMIT;
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (30, 5, 'Y', 'Height (cm)', 'Height (cm)');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (31, 5, 'Y', 'Weight (kg)', 'Weight (kg)');
+
+COMMIT;
