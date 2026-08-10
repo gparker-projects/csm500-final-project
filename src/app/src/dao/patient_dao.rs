@@ -193,7 +193,7 @@ impl PatientDAO {
                                     where patient_id = {}
                                     order by admit_timestamp desc
                                     "##, patient_id);
-        println!("get_encounters Query: {}", query);
+        //println!("get_encounters Query: {}", query);
 
         let rows: Vec<(i64, // encounter_id
                        NaiveDateTime, // admit_timestamp

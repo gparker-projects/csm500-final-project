@@ -9,3 +9,5 @@ OMG type compatibility between POSTGRES and Rust is difficult
 - i64 in Rust = BIGINT in Postgresql; https://docs.rs/sqlx/latest/sqlx/postgres/types/index.html
 
 - use of futures with async for unit testing: requires a compiler predicate
+
+make changes to the design as early as possible, try to use data and database as soon as possible

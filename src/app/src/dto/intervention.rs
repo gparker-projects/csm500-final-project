@@ -3,7 +3,10 @@
 /// some form of medical treatment or operation performed/to be performed
 /// on a patient.
 /// -------------------------------------------------------------------
-/// 
+
+use serde::{Deserialize, Serialize};
+use std::fmt;
+
 #[derive(serde::Deserialize)]
 pub struct Intervention {
     #[serde(rename = "Id")]
@@ -47,5 +50,49 @@ impl Intervention {
             users_id,
             status_code
         }
+    }
+
+    ///
+    /// helper method to return the intervention code, which represents a general group for the type of intervention,
+    /// in a format that can be easily displayed
+    /// 
+    pub fn type_description_for_display(&self) -> String{
+        return self.intervention_code.clone();
+    }
+
+    ///
+    /// helper method to return the description of the current status code, in a format that can be easily displayed
+    /// 
+    pub fn status_for_display(&self) -> String{
+        return self.status_code.clone();
+    }
+
+    ///
+    /// helper method to return the date the intervention is/was scheduled to occur, in a format that can be easily displayed
+    /// 
+    pub fn scheduled_date_for_display(&self) -> String{
+        return "Today()".to_owned();
+    }
+
+    ///
+    /// helper method to return the date the intervention was performed, in a format that can be easily displayed
+    /// 
+    pub fn performed_date_for_display(&self) -> String{
+        return "Today()".to_owned();
+    }
+}
+
+/// Implements a .to_string() for the Intervention 
+/// 
+/// ref: https://loige.co/how-to-to-string-in-rust/
+/// 
+impl fmt::Display for Intervention {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut results: String = "(intervention Id: ".to_owned() + &self.id.to_string() ;
+
+        results =  results + &", intervention_code: " + &self.intervention_code;
+        results =  results + &", status_code: " + &self.status_code + &")";
+
+        f.write_str(&results)
     }
 }

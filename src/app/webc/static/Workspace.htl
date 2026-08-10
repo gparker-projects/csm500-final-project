@@ -8,17 +8,17 @@
 </head>
 <body>
 
-<div class="apptitle"><img src="/webc/img/mapleLogo.png"><div class="userIdentification" id="userIdentityLbl"></div></div>
+<div class="apptitle"><img src="/webc/img/mapleLogo.png"><div id="MapleEMR::UserIdentity"></div></div>
 <p>
-<div id="MapleEMR::LegacyMenu"><div/>
+<div id="MapleEMR::LegacyMenu"></div>
 
 <div id="mainContentArea" align="center">
 
-	<div id="MapleEMR::BodyTile"><div/>
+	<div id="MapleEMR::BodyTile"></div>
 
-	<div id="MapleEMR::PatientList"><div/>
+	<div id="MapleEMR::PatientList"></div>
 
-	<div id="MapleEMR::UserCommands"><div/>
+	<div id="MapleEMR::UserCommands"></div>
 
 </div>
 

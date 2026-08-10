@@ -5,7 +5,10 @@ use std::fs;
 use derive_more::Display;
 use std::collections::HashMap;
 
-use crate::dto::patient::Patient;
+use crate::constants;
+use crate::dto::encounter::*;
+use crate::dto::patient::*;
+use crate::dto::intervention::*;
 
 /// Enumeration for Web Content Tiles, each representing a tile of information
 /// to be presented by the application
@@ -76,6 +79,17 @@ impl WebContentFactory {
         return self.tile_hashmap[&WebContentItem::WCTypeHomePage].clone();
     }
 
+        ///
+    /// Wrapper method to return the main home page tile.
+    /// 
+    pub fn get_home_tile_with_user_identity(&self, user_identity_label: String) -> String {
+        let results = self.tile_hashmap[&WebContentItem::WCTypeHomePage].clone();
+
+        // add the user's identity
+        return results.replace(constants::USER_IDENTITY_TILE_TAG, &user_identity_label)
+    }
+
+
     ///
     /// Obtains a specifically enumerated tile. This method does not require use of Options because we are
     /// keeping the key (tile_type: WebContentItem) tightly controlled at this point, so there is no risk
@@ -91,24 +105,25 @@ impl WebContentFactory {
     pub fn get_patient_list_tile(&self, patient_list: Vec<Patient>) -> String {
         let mut results_sbuf = String::with_capacity(100); 
 
-        results_sbuf.push_str("<div id=\"hiddenSection\" style=\"display: none; margin-top: 0px;\">");
-        results_sbuf.push_str("<form action=\"\\patientdtls\" method=\"post\" id=\"patientDtlsFrm\" name=\"patientDtlsFrm\">");
-        results_sbuf.push_str("<input type=\"hidden\" name=\"target_id\" id=\"target_id\" value=\"0\">");
-        results_sbuf.push_str("</form></div>");
+        //results_sbuf.push_str("<div id=\"hiddenSection\" style=\"display: none; margin-top: 0px;\">");
+        //results_sbuf.push_str("<form action=\"\\patientdtls\" method=\"post\" id=\"patientDtlsFrm\" name=\"patientDtlsFrm\">");
+        //results_sbuf.push_str("<input type=\"hidden\" name=\"target_id\" id=\"target_id\" value=\"0\">");
+        //results_sbuf.push_str("</form></div>");
 
-        results_sbuf.push_str("<table>");
-        results_sbuf.push_str("  <tr><th>Last Name</th><th>First Name</th><th>SIN</th></tr>"); 
+        results_sbuf.push_str(&self.get_hidden_form("patientdtls".to_owned(), "patientDtlsFrm".to_owned()) );
 
-        for p in patient_list{
+        results_sbuf.push_str("<table> <tr><th>Last Name</th><th>First Name</th><th>SIN</th></tr>"); 
+
+        for row in patient_list{
             results_sbuf.push_str("  <tr>");
             results_sbuf.push_str("<td><a href=\"#\" onclick=\"redirect_to_patient("  ); 
-            results_sbuf.push_str( &p.id.to_string() ); 
+            results_sbuf.push_str( &row.id.to_string() ); 
             results_sbuf.push_str("); return false;\">"); 
-            results_sbuf.push_str( &p.legal_last_name ); 
+            results_sbuf.push_str( &row.legal_last_name ); 
             results_sbuf.push_str("</a></td><td>"); 
-            results_sbuf.push_str( &p.legal_first_name );
+            results_sbuf.push_str( &row.legal_first_name );
             results_sbuf.push_str("</td><td>"); 
-            results_sbuf.push_str( &p.sin.to_string() ); 
+            results_sbuf.push_str( &row.sin.to_string() ); 
             results_sbuf.push_str("</td>"); 
             results_sbuf.push_str("  </tr>\n");
         }
@@ -122,10 +137,11 @@ impl WebContentFactory {
     /// 
     pub fn get_patient_details_tile(&self, p: Patient) -> String {
         let mut results_sbuf = String::with_capacity(100); 
-        results_sbuf.push_str("<H2>Patient Details Tile</H2>");
+        //println!(">get_patient_details_tile()");
 
+        // build the header
         results_sbuf.push_str("<table>");
-        
+
         results_sbuf.push_str("  <tr><th class='data-label'>Last Name</th><td class='data-field-ro'>");
         results_sbuf.push_str(&p.legal_last_name );
         results_sbuf.push_str( "</td></tr>\n");
@@ -134,6 +150,116 @@ impl WebContentFactory {
         results_sbuf.push_str(&p.legal_first_name );
         results_sbuf.push_str( "</td></tr>\n");
 
+        results_sbuf.push_str("</table>");
+
+        return results_sbuf;
+    }
+
+
+    ///
+    /// Formats the identity of the user, for replacement of the constants::USER_IDENTITY_TILE_TAG tag
+    /// 
+    pub fn get_user_identity_label(&self,user_display_name: String) -> String{
+        "<div class=\"userIdentification\"id=\"userIdentityLbl\"><b>".to_owned() + &user_display_name + "</b></div>"
+    }
+
+    ///
+    /// Provide full details of a patient
+    /// 
+    /// 
+    pub fn get_patient_details_full_tile(&self, patient_header: String, encounter_section: String, user_identity_label: String, legacy_menu: String//, intv_section, enc_history);
+                                        ) -> String {
+        println!(">get_patient_details_full_tile()");
+        //let mut results_sbuf = String::with_capacity(100);
+        let layout = r##"<h3>Patient Header</h3><p>
+                               <div id="MapleEMR::PatientHeader"></div><p></p>
+                               <h3>Current Encounter</h3>
+                               <div id="MapleEMR::CurrentEncounter"></div><p></p>
+                               <h3>Current Interventions</h3>
+                               <div id="MapleEMR::CurrentInterventions"></div><p></p>
+                               <h3>Encounter History</h3>
+                               <div id="MapleEMR::EncounterHistory"></div>"##; // this one is not a constant as it only appears in this function
+
+        // base content
+        let ht2 = &self.get_home_tile_with_user_identity(user_identity_label).replace(constants::BODY_TILE_CONTENT_TAG, layout); // build the individual sections
+
+        // page body content
+        let ht3 = &ht2.replace(constants::PATIENT_HEADER_TILE_TAG, &patient_header);
+        let ht4 = &ht3.replace(constants::CURRENT_ENCOUNTER_TILE_TAG, &encounter_section);
+        let ht5 = &ht4.replace(constants::CURRENT_INTERVENTIONS_TILE_TAG, "CURRENT_INTERVENTIONS-REPLACED"); // &intv_section);
+        let ht6 = &ht5.replace(constants::ENCOUNTER_HISTORY_TILE_TAG, "ENCOUNTER_HISTORY-REPLACED"); // &enc_history);
+
+        // common content
+        let ht7 = &ht6.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
+
+        return ht7.clone();
+    }
+
+    ///
+    /// Returns a hidden form, used as a technique in several of the list tiles to submit a value for another screen
+    /// 
+    fn get_hidden_form(&self, target_name: String, form_name: String) -> String {
+        let body = r##"<div id="hiddenSection" style="display: none; margin-top: 0px;">");
+                               <form action="\{target_name}" method="post" id="{form_name}" name="{form_name}">
+                               <input type="hidden" name="target_id" id="target_id" value="0">
+                             </form></div>"##;
+
+        body.replace("{form_name}", &form_name).replace("{target_name}", &target_name)
+    }
+
+    ///
+    /// Provide HTML for all of a Patient's encounters
+    /// 
+    pub fn get_encounter_list_tile(&self, encounter_list: Vec<Encounter>) -> String {
+        let mut results_sbuf = String::with_capacity(100); 
+
+        println!(">get_encounter_list_tile()");
+
+        results_sbuf.push_str(&self.get_hidden_form("encounterDtls".to_owned(), "encounterDtlsFrm".to_owned()) );
+
+        results_sbuf.push_str("<table <tr><th>Admit Date</th><th>Site/Facility</th></tr>"); 
+
+        for row in encounter_list{
+            results_sbuf.push_str("  <tr>");
+            results_sbuf.push_str("<td><a href=\"#\" onclick=\"redirect_to_enc("  ); 
+            results_sbuf.push_str( &row.id.to_string() ); 
+            results_sbuf.push_str("); return false;\">"); 
+            results_sbuf.push_str( &row.admit_date_for_display()); 
+            results_sbuf.push_str("</a></td><td>"); 
+            results_sbuf.push_str( &row.encounter_site_name );
+            results_sbuf.push_str("</td>"); 
+            results_sbuf.push_str("  </tr>\n");
+        }
+        results_sbuf.push_str("</table>");
+
+        return results_sbuf;
+    }
+
+    ///
+    /// Provide HTML for all of a (Patient's) Encounter's Interventions
+    /// 
+    pub fn get_intervention_list_tile(&self, intervention_list: Vec<Intervention>) -> String {
+        let mut results_sbuf = String::with_capacity(100); 
+        println!(">get_intervention_list_tile()");
+
+        results_sbuf.push_str(&self.get_hidden_form("intvDtls".to_owned(), "intvDtlsFrm".to_owned()) );
+
+        results_sbuf.push_str("<table <tr><th>Description</th><th>Date Performed</th><th>Date Scheduled</th><th>State</th></tr>"); 
+
+        for row in intervention_list{
+            results_sbuf.push_str("  <tr>");
+            results_sbuf.push_str("<td><a href=\"#\" onclick=\"redirect_to_enc("  ); 
+            results_sbuf.push_str( &row.id.to_string() ); 
+            results_sbuf.push_str("); return false;\">"); 
+            results_sbuf.push_str( &row.type_description_for_display()); 
+            results_sbuf.push_str("</a></td><td>"); 
+            results_sbuf.push_str( &row.performed_date_for_display() );
+            results_sbuf.push_str("</td>"); 
+            results_sbuf.push_str("<td>"); 
+            results_sbuf.push_str( &row.scheduled_date_for_display() );
+            results_sbuf.push_str("</td>"); 
+            results_sbuf.push_str("  </tr>\n");
+        }
         results_sbuf.push_str("</table>");
 
         return results_sbuf;

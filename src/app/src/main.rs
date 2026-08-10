@@ -220,9 +220,9 @@ async fn route_to_home(app_session: web::Data<AppSession>, user_session: Session
   // and adjust the menu
 
   // add the user's identity
-  // todo: offload this to the tile generator; should not be repeated
-  let user_identity_string = "id=\"userIdentityLbl\"><b>".to_owned() + &user_session.user_display_name + "</b>";
-  content = content.replace("id=\"userIdentityLbl\">", &user_identity_string);  // replace default string
+  content = content.replace(constants::USER_IDENTITY_TILE_TAG, &&user_session.user_display_name); 
+
+  //change to get_home_tile_with_user_identity(&&user_session.user_display_name);
 
   HttpResponse::Ok().body( content )
 }
@@ -251,45 +251,59 @@ async fn route_to_patient_details(user_session: Session, app_session: web::Data<
 
   //todo: this should direct to a standard error or login screen when session is lost
   let user_session: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
-  let wcf = &app_session.wcf; // 
-  let mut content = wcf.get_home_tile(); // retrieve the page base content
+  let wcf: &WebContentFactory = &app_session.wcf; 
 
-  // get patients at the user's facility
+  let patient_id: i64 = req.get_uid_as_i64();
+
+  // get base patient data
   let dao = PatientDAO::new(constants::DB_CONN_STR).await;
-  
-  let patient_results = dao.get_patient_details( user_session.get_userid_as_i64(), req.get_uid_as_i64()).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
-  match patient_results {
-      Some (patient_details) => {
-         // and adjust the menu
-         let tile_content = wcf.get_patient_details_tile(patient_details.clone()); 
-         content = content.replace(constants::BODY_TILE_CONTENT_TAG, &tile_content);  // replace default string
-         println!("Patient details obtained"); //: {}", &tile_content);
-      }
-      None => {
-        println!("No patients found");
-      }
-  }
 
+  // get encounters for the patient
+  let enc_results = dao.get_encounters(patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+  let enc_section = match enc_results {
+      Some (encounters) => {
+         println!("Patient details obtained");
+         wcf.get_encounter_list_tile(encounters)
+      }
+      None =>{
+         println!("No Encounters found");
+         "No Encounters found".to_owned()
+      } 
+  };
+
+  // get interventions
+
+  // get patient encounter history
+
+  let patient_results = dao.get_patient_details( user_session.get_userid_as_i64(), patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+  let patient_header = match patient_results {
+      Some (patient_details) => {
+         println!("Patient details obtained"); //: {}", &tile_content);
+         wcf.get_patient_details_tile(patient_details.clone())
+      }
+      None =>{
+         println!("No patients found");
+         "No patients found".to_owned()
+      } 
+  };
+
+  println!("patient_header length = {}", patient_header.len()); //: {}", &tile_content);
+  
   // refresh the patients in the menu (only)
-  // todo: offload this to the tile generator; should not be repeated
   let qry_results = dao.get_assigned_patients(user_session.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
-  match qry_results {
-    Some (patient_list) => {
-       // and adjust the menu
-       let std_menu_html = wcf.get_standard_menu(patient_list.clone()); 
-       content = content.replace(constants::LEGACY_MENU_TILE_TAG, &std_menu_html);  // replace default string       
+  let legacy_menu = match qry_results {
+    Some (patients_for_menu_lst) => {
+      wcf.get_standard_menu(patients_for_menu_lst.clone())
     }
     None => {
       println!("No patients found");
+      "No Patients found".to_owned()
     }
-  }
+  };
 
-  // add the user's identity
-  // todo: offload this to the tile generator; should not be repeated
-  let user_identity_string = "id=\"userIdentityLbl\"><b>".to_owned() + &user_session.user_display_name + "</b>";
-  content = content.replace("id=\"userIdentityLbl\">", &user_identity_string);  // replace default string
+  let consolidated_content = wcf.get_patient_details_full_tile(patient_header, enc_section, user_session.user_display_name, legacy_menu); //, intv_section, enc_history);
 
-  HttpResponse::Ok().body( content )
+  HttpResponse::Ok().body( consolidated_content )
 }
 
 ///
