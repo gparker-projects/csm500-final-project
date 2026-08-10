@@ -105,13 +105,7 @@ impl WebContentFactory {
     pub fn get_patient_list_tile(&self, patient_list: Vec<Patient>) -> String {
         let mut results_sbuf = String::with_capacity(100); 
 
-        //results_sbuf.push_str("<div id=\"hiddenSection\" style=\"display: none; margin-top: 0px;\">");
-        //results_sbuf.push_str("<form action=\"\\patientdtls\" method=\"post\" id=\"patientDtlsFrm\" name=\"patientDtlsFrm\">");
-        //results_sbuf.push_str("<input type=\"hidden\" name=\"target_id\" id=\"target_id\" value=\"0\">");
-        //results_sbuf.push_str("</form></div>");
-
         results_sbuf.push_str(&self.get_hidden_form("patientdtls".to_owned(), "patientDtlsFrm".to_owned()) );
-
         results_sbuf.push_str("<table> <tr><th>Last Name</th><th>First Name</th><th>SIN</th></tr>"); 
 
         for row in patient_list{
@@ -167,10 +161,9 @@ impl WebContentFactory {
     /// Provide full details of a patient
     /// 
     /// 
-    pub fn get_patient_details_full_tile(&self, patient_header: String, encounter_section: String, user_identity_label: String, legacy_menu: String//, intv_section, enc_history);
-                                        ) -> String {
-        println!(">get_patient_details_full_tile()");
-        //let mut results_sbuf = String::with_capacity(100);
+    pub fn get_patient_details_full_tile(&self, patient_header: String, current_encounter: String, encounter_section: String,
+                                                user_identity_label: String, legacy_menu: String, intv_section: String) -> String {
+
         let layout = r##"<h3>Patient Header</h3><p>
                                <div id="MapleEMR::PatientHeader"></div><p></p>
                                <h3>Current Encounter</h3>
@@ -185,9 +178,9 @@ impl WebContentFactory {
 
         // page body content
         let ht3 = &ht2.replace(constants::PATIENT_HEADER_TILE_TAG, &patient_header);
-        let ht4 = &ht3.replace(constants::CURRENT_ENCOUNTER_TILE_TAG, &encounter_section);
-        let ht5 = &ht4.replace(constants::CURRENT_INTERVENTIONS_TILE_TAG, "CURRENT_INTERVENTIONS-REPLACED"); // &intv_section);
-        let ht6 = &ht5.replace(constants::ENCOUNTER_HISTORY_TILE_TAG, "ENCOUNTER_HISTORY-REPLACED"); // &enc_history);
+        let ht4 = &ht3.replace(constants::CURRENT_ENCOUNTER_TILE_TAG, &current_encounter);
+        let ht5 = &ht4.replace(constants::CURRENT_INTERVENTIONS_TILE_TAG, &intv_section); // "CURRENT_INTERVENTIONS-REPLACED"); // 
+        let ht6 = &ht5.replace(constants::ENCOUNTER_HISTORY_TILE_TAG, &encounter_section);
 
         // common content
         let ht7 = &ht6.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
@@ -207,13 +200,35 @@ impl WebContentFactory {
         body.replace("{form_name}", &form_name).replace("{target_name}", &target_name)
     }
 
+
+    
+    pub fn get_single_encounter_summary_tile(&self, encounter: Encounter) -> String {
+        let mut results_sbuf = String::with_capacity(100);
+
+        results_sbuf.push_str("<table <tr><th>Admit Date</th><th>Site/Facility</th></tr>"); 
+
+                results_sbuf.push_str("  <tr>");
+        results_sbuf.push_str("<td><a href=\"#\" onclick=\"redirect_to_enc("  ); 
+        results_sbuf.push_str( &encounter.to_string() ); 
+        results_sbuf.push_str("); return false;\">"); 
+        results_sbuf.push_str( &encounter.admit_date_for_display()); 
+        results_sbuf.push_str("</a></td><td>"); 
+        results_sbuf.push_str( &encounter.encounter_site_name );
+        results_sbuf.push_str("</td>"); 
+        results_sbuf.push_str("  </tr>\n");
+        
+        results_sbuf.push_str("</table>");
+
+        return results_sbuf;
+    }
+
     ///
     /// Provide HTML for all of a Patient's encounters
     /// 
     pub fn get_encounter_list_tile(&self, encounter_list: Vec<Encounter>) -> String {
         let mut results_sbuf = String::with_capacity(100); 
 
-        println!(">get_encounter_list_tile()");
+        //println!(">get_encounter_list_tile()");
 
         results_sbuf.push_str(&self.get_hidden_form("encounterDtls".to_owned(), "encounterDtlsFrm".to_owned()) );
 
@@ -269,6 +284,14 @@ impl WebContentFactory {
     /// Provide HTML for the main system menu; replaces tag: <!--MapleEMR::LegacyMenu-->
     /// 
     pub fn get_standard_menu(&self, patient_list: Vec<Patient>) -> String {
+       return self.get_standard_menu_with_patient(patient_list, constants::INVALID_PATIENT_ID);
+    }
+
+
+    ///
+    /// Provide HTML for the main system menu; replaces tag: <!--MapleEMR::LegacyMenu-->
+    /// 
+    pub fn get_standard_menu_with_patient(&self, patient_list: Vec<Patient>, patient_id: i64) -> String {
         let mut results_sbuf = String::with_capacity(100); 
 
         let template_sub_items = r#"<li><a class="menuNotCurrentSmall" href="javascript:selectPatientSub({id},1)">&nbsp;&nbsp;&nbsp;Medications</a></li>
@@ -278,25 +301,33 @@ impl WebContentFactory {
 
         let mut first_entry: bool = true;
 
-        results_sbuf.push_str("<div id=\"leftMenu\" align=\"left\"><ul>");
+        print!("> get_standard_menu_with_patient({})", patient_id);
+
+        results_sbuf.push_str("<div id=\"legacyMenu\" align=\"left\"><ul><li><a class=\"menuNotCurrent\" href=\"\\home\">My Dashboard</li>");
         for p in patient_list{
-            if ! first_entry {
-               results_sbuf.push_str("<li><a class=\"menuNotCurrent\"href=\"javascript:selectPatient("); 
-            }
-            else{
-               results_sbuf.push_str("<li><a class=\"menuCurrent\" href=\"javascript:selectPatient(");
-               first_entry = false;
-            }
-            results_sbuf.push_str( &p.id.to_string() ); 
-            results_sbuf.push_str(")\">");
-            results_sbuf.push_str( &p.legal_last_name ); 
-            results_sbuf.push_str(",&nbsp;"); 
-            results_sbuf.push_str( &p.legal_first_name );
-            results_sbuf.push_str("</a></li>\n");
 
-            let sub_menus = template_sub_items.replace("{id}", &p.id.to_string());  // replace default string       
+            // either we include ALL patients, OR we only include the current patient
+            if patient_id == constants::INVALID_PATIENT_ID || p.id == patient_id{ 
+                if ! first_entry {
+                  results_sbuf.push_str("<li><a class=\"menuNotCurrent\"href=\"javascript:selectPatient("); 
+                }
+                else{
+                  results_sbuf.push_str("<li><a class=\"menuCurrent\" href=\"javascript:selectPatient(");
+                  first_entry = false;
+                }
+                results_sbuf.push_str( &p.id.to_string() ); 
+                results_sbuf.push_str(")\">");
+                results_sbuf.push_str( &p.legal_last_name ); 
+                results_sbuf.push_str(",&nbsp;"); 
+                results_sbuf.push_str( &p.legal_first_name );
+                results_sbuf.push_str("</a></li>\n");
 
-            results_sbuf.push_str(&sub_menus);
+                if p.id == patient_id {
+                    let sub_menus = template_sub_items.replace("{id}", &p.id.to_string());  // replace default string       
+
+                    results_sbuf.push_str(&sub_menus);
+                }
+            }
         }
         results_sbuf.push_str("</ul></div>");
 

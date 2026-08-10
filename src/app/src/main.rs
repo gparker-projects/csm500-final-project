@@ -258,50 +258,69 @@ async fn route_to_patient_details(user_session: Session, app_session: web::Data<
   // get base patient data
   let dao = PatientDAO::new(constants::DB_CONN_STR).await;
 
+  let mut current_encounter: String = "No Encounters found".to_owned();
+
   // get encounters for the patient
   let enc_results = dao.get_encounters(patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
   let enc_section = match enc_results {
       Some (encounters) => {
-         println!("Patient details obtained");
-         wcf.get_encounter_list_tile(encounters)
+         //println!("Patient details obtained");
+
+         // pull out the current Encounter and get alternate summary tile for it
+         let (current_enc, all_other_encs): (Vec<_>, Vec<_>) = encounters.into_iter().partition(|item| item.is_current_encounter == "Y");
+         if let Some(enc) = current_enc.first(){
+             current_encounter = wcf.get_single_encounter_summary_tile(enc.clone());
+         }
+
+         wcf.get_encounter_list_tile(all_other_encs)
       }
       None =>{
-         println!("No Encounters found");
+         //println!("No Encounters found");
          "No Encounters found".to_owned()
       } 
   };
 
-  // get interventions
+  // get interventions for the patient
+  let intv_results = dao.get_interventions(patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+  let intv_section = match intv_results {
+      Some (intvs) => {
+         //println!("Patient details obtained");
+         wcf.get_intervention_list_tile(intvs)
+      }
+      None =>{
+         //println!("No Encounters found");
+         "No Interventions found".to_owned()
+      } 
+  };
 
   // get patient encounter history
 
   let patient_results = dao.get_patient_details( user_session.get_userid_as_i64(), patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
   let patient_header = match patient_results {
       Some (patient_details) => {
-         println!("Patient details obtained"); //: {}", &tile_content);
+         //println!("Patient details obtained"); //: {}", &tile_content);
          wcf.get_patient_details_tile(patient_details.clone())
       }
       None =>{
-         println!("No patients found");
+         //println!("No patients found");
          "No patients found".to_owned()
       } 
   };
 
-  println!("patient_header length = {}", patient_header.len()); //: {}", &tile_content);
-  
   // refresh the patients in the menu (only)
   let qry_results = dao.get_assigned_patients(user_session.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
   let legacy_menu = match qry_results {
     Some (patients_for_menu_lst) => {
-      wcf.get_standard_menu(patients_for_menu_lst.clone())
+      wcf.get_standard_menu_with_patient(patients_for_menu_lst.clone(), patient_id)
     }
     None => {
-      println!("No patients found");
+      //println!("No patients found");
       "No Patients found".to_owned()
     }
   };
 
-  let consolidated_content = wcf.get_patient_details_full_tile(patient_header, enc_section, user_session.user_display_name, legacy_menu); //, intv_section, enc_history);
+  let consolidated_content = wcf.get_patient_details_full_tile(patient_header, current_encounter, enc_section,
+                                                  user_session.user_display_name, legacy_menu, intv_section); //, enc_history);
 
   HttpResponse::Ok().body( consolidated_content )
 }

@@ -9,6 +9,7 @@ use chrono::{NaiveDateTime};
 use std::fmt;
 
 #[derive(serde::Deserialize)]
+#[derive(Clone)]
 pub struct Encounter {
     #[serde(rename = "id")]
     pub id: i64, // ID BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
