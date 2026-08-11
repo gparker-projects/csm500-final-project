@@ -38,7 +38,7 @@ impl PatientDAO {
                                                 COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
                                                 birthdate, admit_timestamp,
                                                 discharge_timestamp as "discharge_timestamp?",
-                                                sin
+                                                sin, phn
                                             FROM patient p
                                             join encounter e on p.id = e.patient_id
                                             where patient_id = {}"##, patient_id);
@@ -67,6 +67,7 @@ impl PatientDAO {
                 let tmp_admit_timestamp: chrono::NaiveDateTime = row.get("admit_timestamp");// admit_timestamp
                 let tmp_discharge_timestamp = row.get("discharge_timestamp?");// chrono::NaiveDateTime; 
                 let tmp_sin:    i32 = row.get("sin"); // SIN
+                let tmp_phn:    i32 = row.get("phn"); // SIN
 
                 Ok(  Some( 
                         Patient {
@@ -76,6 +77,7 @@ impl PatientDAO {
                             legal_last_name: tmp_legal_last_name,//"DUMMY".to_string(), 
                             legal_middle_names: tmp_legal_middle_names, //"DUMMY".to_string(),
                             sin: tmp_sin,
+                            phn: tmp_phn,
                             birth_date: tmp_birthdate, //Utc::now().naive_utc(), 
                             location_id: tmp_loc_id,
                             admit_timestamp:tmp_admit_timestamp, //Utc::now().naive_utc(), 
@@ -108,7 +110,7 @@ impl PatientDAO {
                                         COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
                                         birthdate, admit_timestamp,
                                         discharge_timestamp as "discharge_timestamp?",
-                                        sin
+                                        sin, phn
                                     FROM patient p
                                     join encounter e on p.id = e.patient_id
                                     where location_id in (
@@ -125,7 +127,7 @@ impl PatientDAO {
                         String, String,
                         chrono::NaiveDateTime, chrono::NaiveDateTime, 
                         Option<chrono::NaiveDateTime>,
-                        i32
+                        i32, i32
                         )> = sqlx::query_as(&query)
         .fetch_all(&self.connection) 
         .await
@@ -155,6 +157,7 @@ impl PatientDAO {
                 let tmp_discharge_timestamp = row.10;// chrono::NaiveDateTime; 
                 
                 let tmp_sin:    i32 = row.11; // SIN
+                let tmp_phn:    i32 = row.12; // phn
 
                 results.push(
                     Patient {
@@ -164,6 +167,7 @@ impl PatientDAO {
                         legal_last_name: tmp_legal_last_name,
                         legal_middle_names: tmp_legal_middle_names, 
                         sin: tmp_sin,
+                        phn: tmp_phn,
                         birth_date: tmp_birthdate,
                         location_id: tmp_loc_id,
                         admit_timestamp:tmp_admit_timestamp,

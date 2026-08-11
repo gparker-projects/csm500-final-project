@@ -105,21 +105,23 @@ impl WebContentFactory {
     pub fn get_patient_list_tile(&self, patient_list: Vec<Patient>) -> String {
         let mut results_sbuf = String::with_capacity(100); 
 
-        results_sbuf.push_str(&self.get_hidden_form("patientdtls".to_owned(), "patientDtlsFrm".to_owned()) );
-        results_sbuf.push_str("<table> <tr><th>Last Name</th><th>First Name</th><th>SIN</th></tr>"); 
-
         for row in patient_list{
-            results_sbuf.push_str("  <tr>");
-            results_sbuf.push_str("<td><a href=\"#\" onclick=\"redirect_to_patient("  ); 
+        results_sbuf.push_str(&self.get_hidden_form("patientdtls".to_owned(), "patientDtlsFrm".to_owned()) );
+
+        
+            results_sbuf.push_str("<table><tr><td><a href=\"#\" onclick=\"redirect_to_patient("  ); 
             results_sbuf.push_str( &row.id.to_string() ); 
             results_sbuf.push_str("); return false;\">"); 
             results_sbuf.push_str( &row.legal_last_name ); 
-            results_sbuf.push_str("</a></td><td>"); 
+            results_sbuf.push_str(","); 
             results_sbuf.push_str( &row.legal_first_name );
-            results_sbuf.push_str("</td><td>"); 
-            results_sbuf.push_str( &row.sin.to_string() ); 
-            results_sbuf.push_str("</td>"); 
-            results_sbuf.push_str("  </tr>\n");
+            results_sbuf.push_str("</a>&nbsp;DOB:&nbsp;"); 
+
+            results_sbuf.push_str( &row.birth_date_for_display() );
+
+           results_sbuf.push_str(" DOB [YEARs] Location</td></tr>"); 
+           results_sbuf.push_str("<tr><td>ADMIT DATE AND TIME FLAGS </td></tr>");
+           results_sbuf.push_str("<tr><td>MEASURES</td></tr>"); 
         }
         results_sbuf.push_str("</table>");
 
@@ -136,7 +138,7 @@ impl WebContentFactory {
         // build the header
         results_sbuf.push_str("<table>");
 
-        results_sbuf.push_str("  <tr><th class='data-label'>Last Name</th><td class='data-field-ro'>");
+        results_sbuf.push_str("  <tr><th class='data-label'>Last, First Name</th><td class='data-field-ro'>");
         results_sbuf.push_str(&p.legal_last_name );
         results_sbuf.push_str( "</td></tr>\n");
 
@@ -211,7 +213,7 @@ impl WebContentFactory {
         results_sbuf.push_str("<td><a href=\"#\" onclick=\"redirect_to_enc("  ); 
         results_sbuf.push_str( &encounter.to_string() ); 
         results_sbuf.push_str("); return false;\">"); 
-        results_sbuf.push_str( &encounter.admit_date_for_display()); 
+        results_sbuf.push_str( &encounter.admit_timestamp_for_display()); 
         results_sbuf.push_str("</a></td><td>"); 
         results_sbuf.push_str( &encounter.encounter_site_name );
         results_sbuf.push_str("</td>"); 
@@ -239,7 +241,7 @@ impl WebContentFactory {
             results_sbuf.push_str("<td><a href=\"#\" onclick=\"redirect_to_enc("  ); 
             results_sbuf.push_str( &row.id.to_string() ); 
             results_sbuf.push_str("); return false;\">"); 
-            results_sbuf.push_str( &row.admit_date_for_display()); 
+            results_sbuf.push_str( &row.admit_timestamp_for_display()); 
             results_sbuf.push_str("</a></td><td>"); 
             results_sbuf.push_str( &row.encounter_site_name );
             results_sbuf.push_str("</td>"); 

@@ -127,6 +127,8 @@ VALUES
 ('find-all-dept-patients', '2050-01-01 23:59:59-00');
 COMMIT;
 
+-- group 1: Intervention Types
+--
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
   VALUES (1, 1, 'Y', 'Bandage', 'Bandage');
@@ -174,9 +176,11 @@ INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
   VALUES (12, 1, 'Y', 'Other', 'Other');
+
 COMMIT;
 
-
+-- group 2: Intervention Status
+--
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
   VALUES (13, 2, 'Y', 'New (Unassigned)', 'New (Unassigned)');
@@ -203,7 +207,8 @@ INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   
 COMMIT;
 
-
+-- group 3: Care Types
+--
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
   VALUES (19, 3, 'Y', 'Admit', 'Admit');
@@ -242,6 +247,8 @@ INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
 
 COMMIT;
 
+-- group 4: Intervention metadata
+--
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
   VALUES (28, 4, 'Y', 'Scheduled Time', 'Scheduled Time');
@@ -252,6 +259,8 @@ INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
 
 COMMIT;
 
+-- group 5: standard measurements; https://canadiem.org/how-to-read-patient-monitors/
+--
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
   VALUES (30, 5, 'Y', 'Height (cm)', 'Height (cm)');
@@ -259,5 +268,37 @@ INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
   VALUES (31, 5, 'Y', 'Weight (kg)', 'Weight (kg)');
+  
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (32, 6, 'Y', 'HR', 'Heart Rate (HR)');
+  
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (33, 6, 'Y', 'BP', 'Blood Pressure (BP)');
 
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (34, 6, 'Y', 'RR', 'Respiratory Rate');
+  
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (35, 6, 'Y', 'SpO2', 'Oxygen Saturation');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (36, 6, 'Y', 'Temp (C)', 'Body Temperature');
+  
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (37, 6, 'Y', 'PL', 'Pain Level');
+  
 COMMIT;
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (38, 1, 'Y', 'Vitals', 'Vitals');
+  
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (39, 1, 'Y', 'xxx', 'xxx');

@@ -20,7 +20,9 @@ pub struct Patient {
     #[serde(rename = "legal_middle_names")]
     pub legal_middle_names: String, // LEGAL_MIDDLE_NAMES VARCHAR(100), 
     #[serde(rename = "sin")]
-    pub sin: i32, // SIN NUMERIC(9) UNIQUE, 
+    pub sin: i32, // SIN INTEGER UNIQUE, 
+    #[serde(rename = "sin")]
+    pub phn: i32, // SIN INTEGER UNIQUE, 
     #[serde(rename = "birthdate")]
     pub birth_date: NaiveDateTime, // BIRTHDATE TIMESTAMP,
     #[serde(rename = "location_id")]
@@ -46,6 +48,7 @@ impl Patient {
                 legal_last_name: String,
                 legal_middle_names: String,
                 sin: i32,
+                phn: i32,
                 birth_date: NaiveDateTime,
                 location_id: i64,
 
@@ -61,6 +64,7 @@ impl Patient {
                 legal_last_name,
                 legal_middle_names,
                 sin,
+                phn,
                 birth_date,
                 location_id,
 
@@ -69,6 +73,27 @@ impl Patient {
                 discharge_timestamp,
                 discharge_notes
         }
+    }
+
+    ///
+    /// helper method to return the birth date (date portion only) in a format that can be easily displayed
+    /// 
+    pub fn birth_date_for_display(&self) -> String{
+        return self.birth_date.format("%d/%m/%Y").to_string();
+    }
+
+    ///
+    /// helper method to return the birth date (date and time) in a format that can be easily displayed
+    /// 
+    pub fn admit_timestamp_for_display(&self) -> String{
+        return self.admit_timestamp.format("%d/%m/%Y %H:%M:%S").to_string();
+    }
+
+    ///
+    /// helper method to return the discharge date (date and time) in a format that can be easily displayed
+    /// 
+    pub fn discharge_timestamp_for_display(&self) -> String{
+        return self.discharge_timestamp.unwrap().format("%d/%m/%Y %H:%M:%S").to_string();
     }
 }
 

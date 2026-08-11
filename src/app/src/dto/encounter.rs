@@ -54,16 +54,16 @@ impl Encounter{
     }
 
     ///
-    /// helper method to return the admit date (date portion only) in a format that can be easily displayed
+    /// helper method to return the admit date (entire timestamp) in a format that can be easily displayed
     /// 
-    pub fn admit_date_for_display(&self) -> String{
+    pub fn admit_timestamp_for_display(&self) -> String{
         return self.admit_timestamp.format("%d/%m/%Y %H:%M:%S").to_string();
     }
 
     ///
-    /// helper method to return the discharge date (date portion only) in a format that can be easily displayed
+    /// helper method to return the discharge date (entire timestamp) in a format that can be easily displayed
     /// 
-    pub fn discharge_date_for_display(&self) -> String{
+    pub fn discharge_timestamp_for_display(&self) -> String{
         return self.discharge_timestamp.unwrap().format("%d/%m/%Y %H:%M:%S").to_string();
     }
 
@@ -77,7 +77,7 @@ impl fmt::Display for Encounter {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut results: String = "(encounter Id: ".to_owned() + &self.id.to_string() ;      
 
-        results =  results + &", admit_timestamp: " + &self.admit_date_for_display();
+        results =  results + &", admit_timestamp: " + &self.admit_timestamp_for_display();
         results =  results + &", encounter_site_name: " + &self.encounter_site_name;
         results =  results + &", is_current_encounter: " + &self.is_current_encounter + &")";
 
