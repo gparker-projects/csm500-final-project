@@ -67,7 +67,7 @@ impl PatientDAO {
                 let tmp_admit_timestamp: chrono::NaiveDateTime = row.get("admit_timestamp");// admit_timestamp
                 let tmp_discharge_timestamp = row.get("discharge_timestamp?");// chrono::NaiveDateTime; 
                 let tmp_sin:    i32 = row.get("sin"); // SIN
-                let tmp_phn:    i32 = row.get("phn"); // SIN
+                let tmp_phn:    i64 = row.get("phn"); // SIN
 
                 Ok(  Some( 
                         Patient {
@@ -121,13 +121,13 @@ impl PatientDAO {
                                         from user_permission up
                                         where users_id = {}
                                             and up.site_id = l.site_id)  )"##, user_id);
-        //println!("get_user_permissions Query: {}", query);
+        //println!("get_assigned_patients Query: {}", query);
 
         let rows: Vec<(i64, i64, i64, String, String, String,
                         String, String,
                         chrono::NaiveDateTime, chrono::NaiveDateTime, 
                         Option<chrono::NaiveDateTime>,
-                        i32, i32
+                        i32, i64
                         )> = sqlx::query_as(&query)
         .fetch_all(&self.connection) 
         .await
@@ -157,7 +157,7 @@ impl PatientDAO {
                 let tmp_discharge_timestamp = row.10;// chrono::NaiveDateTime; 
                 
                 let tmp_sin:    i32 = row.11; // SIN
-                let tmp_phn:    i32 = row.12; // phn
+                let tmp_phn:    i64 = row.12; // phn
 
                 results.push(
                     Patient {

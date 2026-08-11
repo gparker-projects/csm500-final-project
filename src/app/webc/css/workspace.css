@@ -105,16 +105,24 @@ input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
   z-index: 1000;
   //top: 50px;
   //left: 600px;
-  bottom: 0px;
-  right: 0px;
+  bottom: 20px;
+  right: 20px;
   width: 400px;
   display: flex;
   flex-wrap: wrap;
 }
 
-#userIdentification {
-  font-family: verdana;
+#userIdentity {
+  color: #559DD8;
+  text-decoration: none;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 9px;
+  font-weight: normal;
+}
+
+#mainContentArea{
+  position: fixed;
+  left: 2.5in;
 }
 
 /*---------------------- Table styles ----------------------

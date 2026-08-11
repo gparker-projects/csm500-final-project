@@ -8,11 +8,11 @@
 </head>
 <body>
 
-<div class="apptitle"><img src="/webc/img/mapleLogo.png"><div id="MapleEMR::UserIdentity"></div></div>
+<div id="userIdentity"><img src="/webc/img/mapleLogo.png"><div id="MapleEMR::UserIdentity"></div></div>
 <p>
 <div id="MapleEMR::LegacyMenu"></div>
 
-<div id="mainContentArea" align="left">
+<div id="mainContentArea" align="center ">
 
 	<div id="MapleEMR::BodyTile"></div>
 

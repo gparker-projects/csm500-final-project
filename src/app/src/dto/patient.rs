@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use chrono::{NaiveDateTime}; 
+use chrono::{NaiveDateTime, Utc}; 
 use std::fmt;
 
 /// -------------------------------------------------------------------
@@ -21,8 +21,8 @@ pub struct Patient {
     pub legal_middle_names: String, // LEGAL_MIDDLE_NAMES VARCHAR(100), 
     #[serde(rename = "sin")]
     pub sin: i32, // SIN INTEGER UNIQUE, 
-    #[serde(rename = "sin")]
-    pub phn: i32, // SIN INTEGER UNIQUE, 
+    #[serde(rename = "phn")]
+    pub phn: i64, // PHN BIGINT UNIQUE, 
     #[serde(rename = "birthdate")]
     pub birth_date: NaiveDateTime, // BIRTHDATE TIMESTAMP,
     #[serde(rename = "location_id")]
@@ -48,7 +48,7 @@ impl Patient {
                 legal_last_name: String,
                 legal_middle_names: String,
                 sin: i32,
-                phn: i32,
+                phn: i64,
                 birth_date: NaiveDateTime,
                 location_id: i64,
 
@@ -80,6 +80,13 @@ impl Patient {
     /// 
     pub fn birth_date_for_display(&self) -> String{
         return self.birth_date.format("%d/%m/%Y").to_string();
+    }
+
+    ///
+    /// helper method to return the birth date (date portion only) in a format that can be easily displayed
+    /// 
+    pub fn age(&self) -> String{
+      ((Utc::now().naive_utc() - self.birth_date).num_days() / 365).to_string()
     }
 
     ///
