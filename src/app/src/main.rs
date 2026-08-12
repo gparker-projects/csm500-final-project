@@ -23,7 +23,9 @@ use actix_session::{storage::CookieSessionStore, Session, SessionMiddleware}; //
 use crate::dto::user_auth::*;
 use crate::dto::encounter::*;
 use crate::dto::intervention::*;
+use crate::dao::encounter_dao::*;
 use crate::dao::patient_dao::*;
+use crate::dao::intervention_dao::*;
 use crate::dao::auth_dao::AuthDAO;
 //use crate::nlp::NLP; 
 
@@ -201,6 +203,7 @@ async fn route_to_home(app_session: web::Data<AppSession>, user_session: Session
 
   // get patients at the user's facility, for display
   let dao = PatientDAO::new(constants::DB_CONN_STR).await;
+  let idao = InterventionDAO::new(constants::DB_CONN_STR).await;
 
   let qry_results = dao.get_assigned_patients(user_session.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
   match qry_results {
@@ -213,7 +216,7 @@ async fn route_to_home(app_session: web::Data<AppSession>, user_session: Session
 
        for p in patient_list.clone(){
           let cur_enc: Encounter = dao.get_current_encounter(p.id).await.clone();
-          let cur_intv: Intervention = dao.get_most_recent_vitals(cur_enc.id).await.clone(); //get the current encounter for each patient
+          let cur_intv: Intervention = idao.get_most_recent_vitals(cur_enc.id).await.clone(); //get the current encounter for each patient
 
           pwrap.push( PatientWrapper{
               patient: p,
@@ -276,6 +279,7 @@ async fn route_to_patient_details(user_session: Session, app_session: web::Data<
 
   // get base patient data
   let dao = PatientDAO::new(constants::DB_CONN_STR).await;
+  let idao = InterventionDAO::new(constants::DB_CONN_STR).await;
 
   let mut current_encounter: String = "No Encounters found".to_owned();
 
@@ -300,7 +304,7 @@ async fn route_to_patient_details(user_session: Session, app_session: web::Data<
   };
 
   // get all interventions for the patient
-  let intv_results = dao.get_interventions(patient_id, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+  let intv_results = idao.get_interventions(patient_id, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
   let intv_section = match intv_results {
       Some (intvs) => {
          //println!("Patient details obtained");

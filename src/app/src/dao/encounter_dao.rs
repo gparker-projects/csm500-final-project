@@ -1,0 +1,102 @@
+use sqlx::postgres::{PgPoolOptions, PgPool}; 
+use sqlx::Row;
+use std::io::{Error, ErrorKind};
+use chrono::NaiveDateTime;
+use crate::dto::patient::*;
+use crate::dto::intervention::*;
+use crate::dto::encounter::*;
+use crate::constants;
+
+#[derive(Debug, Clone)]
+pub struct EncounterDAO {
+    pub connection: PgPool,
+}
+
+impl EncounterDAO {
+    /// Creates a new Encounter Data Access Object, with a database pool for use by other calls
+    /// todo: centralize the db pool connection instead of creating it here
+    /// 
+    pub async fn new(db_url: &str) -> Self {
+
+        let db_pool = match PgPoolOptions::new()
+            .max_connections(5)
+            .connect(db_url)
+            .await
+        {
+            Ok(pool) => pool,
+            Err(e) => panic!("{}", e),
+        };
+
+        EncounterDAO {
+            connection: db_pool,
+        }
+    }
+
+    ///
+    /// Wrapper method that only requests the current encounter for the patient instead of all of them. This is to improve code clarity.
+    /// 
+    pub async fn get_current_encounter(&self, patient_id: i64) -> Encounter {
+        let tmp : Vec<Encounter> = self.get_encounters(patient_id, true).await.unwrap().expect(constants::DATABASE_ERROR_NOT_FOUND);
+
+        return tmp.first().unwrap().clone();
+    }
+    
+    /// Finds and returns all encounters based on an encounter
+    /// 
+    pub async fn get_encounters(&self, patient_id: i64, current_only: bool) -> Result< Option< Vec<Encounter> >, std::io::Error> {
+        let tmp = match current_only {
+            true => constants::QRY_CURRENT_ENCOUNTER,
+            false => constants::QRY_ALL_ENCOUNTERS
+        };
+
+        let query = tmp.replace("{}", &patient_id.to_string());
+        
+        //println!("get_encounters Query: {}", query);
+
+        let rows: Vec<(i64, // encounter_id
+                       NaiveDateTime, // admit_timestamp
+                       Option<chrono::NaiveDateTime>, // discharge_timestamp
+                       String, String, // admit and discharge notes
+                       String, // encounter_site_name
+                       String,  // current_encounter
+                       String // room_identifier
+                      )> = sqlx::query_as(&query)
+        .fetch_all(&self.connection) 
+        .await
+        .unwrap_or_default();
+
+        if rows.is_empty() {
+            println!("No encounters found for patient_id: {} [{}]", patient_id, rows.len());
+            return Ok( Some( Vec::new() ) );
+        }
+        else{
+            println!("Loading {} encounters",  rows.len());
+            let mut results: Vec<Encounter> = Vec::with_capacity(rows.len());
+            for row in rows {
+                let tmp_enc_id: i64 = row.0; // encounter_id
+                let tmp_admit_timestamp: NaiveDateTime = row.1;// admit_timestamp
+                let tmp_discharge_timestamp: Option<NaiveDateTime> = row.2;
+                let tmp_admit_notes = row.3; // admission_notes
+                let tmp_discharge_notes = row.4;  // discharge_notes
+                let encounter_site_name = row.5; // admission_notes
+                let is_current_encounter = row.6; // admission_notes
+                let tmp_room_identifier = row.7;
+
+                results.push(
+                    Encounter {
+                        id: tmp_enc_id,
+                        admit_notes: tmp_admit_notes,
+                        admit_timestamp: tmp_admit_timestamp, 
+                        discharge_notes: tmp_discharge_notes,
+                        discharge_timestamp: tmp_discharge_timestamp,
+                        patient_id: patient_id,
+                        encounter_site_name: encounter_site_name,
+                        room_identifier: tmp_room_identifier,
+                        is_current_encounter: is_current_encounter,
+                    }
+                );
+            }
+            return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
+        }
+    }
+}
