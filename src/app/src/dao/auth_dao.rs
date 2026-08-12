@@ -83,7 +83,7 @@ impl AuthDAO {
     pub async fn get_user_permissions(&self, user_id: i64 ) -> Result< Option<UserAuthorization>, std::io::Error> {
         // construct query - we have a denormalized data structure here to save joins, so the table has all the Id's someone would ever need
         let query = format!("SELECT department_id, permission_id FROM public.user_permission where active_flag = 'Y' and users_id = {} group by department_id, permission_id order by permission_id", user_id);
-        println!("get_user_permissions Query: {}", query);
+        //println!("get_user_permissions Query: {}", query);
 
         // https://docs.rs/sqlx/latest/sqlx/fn.query_as.html
         // https://stackoverflow.com/questions/67243108/mapping-nm-relations-into-vec-using-sqlx

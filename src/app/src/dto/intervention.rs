@@ -7,14 +7,12 @@
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
-#[derive(serde::Deserialize)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Intervention {
     #[serde(rename = "Id")]
     pub id: i64, // D BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
     #[serde(rename = "encounter_id")]
-    pub encounter_id: i64, // encounter ID BIGINT 
-    #[serde(rename = "intervention_code")]
-    pub intervention_code: String, // INTERVENTION_CODE VARCHAR(10),
+    pub encounter_id: i64, // INTERVENTION_CODE VARCHAR(10),
     #[serde(rename = "description")]
     pub description: String, // DESCRIPTION VARCHAR(2000),
     #[serde(rename = "notes")]
@@ -25,30 +23,43 @@ pub struct Intervention {
     pub users_id: i64, //   USERS_ID BIGINT REFERENCES USERS (ID)
     #[serde(rename = "status_code")]
     pub status_code: String, // status_code VARCHAR(10),
+    #[serde(rename = "intervention_type_id")]
+    pub intervention_type_id: i64,
+    #[serde(rename = "status_id")]
+    pub status_id: i64,
+    #[serde(rename = "intervention_type")]
+    pub intervention_type: String,
+    #[serde(rename = "room_identifier")]
+    pub room_identifier: String,
 } 
-
 
 impl Intervention {
     /// Basic constructor
     /// 
     pub fn new(id: i64,
                encounter_id: i64,
-               intervention_code: String,
                description: String,
                notes: String,
                location_id: i64,
                users_id: i64,
-               status_code: String
+               status_code: String,
+               intervention_type_id: i64,
+               status_id: i64,
+               intervention_type: String,
+               room_identifier: String,
             ) -> Self {
         Self { 
             id,
             encounter_id,
-            intervention_code,
             description,
             notes,
             location_id,
             users_id,
-            status_code
+            status_code,
+            intervention_type_id,
+            status_id,
+            intervention_type,
+            room_identifier
         }
     }
 
@@ -57,7 +68,7 @@ impl Intervention {
     /// in a format that can be easily displayed
     /// 
     pub fn type_description_for_display(&self) -> String{
-        return self.intervention_code.clone();
+        return self.intervention_type.clone();
     }
 
     ///
@@ -90,7 +101,7 @@ impl fmt::Display for Intervention {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut results: String = "(intervention Id: ".to_owned() + &self.id.to_string() ;
 
-        results =  results + &", intervention_code: " + &self.intervention_code;
+        results =  results + &", intervention_type: " + &self.intervention_type;
         results =  results + &", status_code: " + &self.status_code + &")";
 
         f.write_str(&results)

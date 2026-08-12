@@ -8,7 +8,7 @@ use crate::dto::encounter::*;
 use crate::constants;
 
 pub struct PatientWrapper {
-    pub paient: Patient,
+    pub patient: Patient,
     pub current_encounter: Encounter,
     pub most_recent_intervention: Intervention,
 }
@@ -261,20 +261,26 @@ impl PatientDAO {
 
     /// Finds and returns all interventions based on an encounter
     /// 
-    pub async fn get_interventions(&self, encounter_id: i64) -> Result< Option< Vec<Intervention> >, std::io::Error> {
+    pub async fn get_interventions(&self, encounter_id: i64, current_only: bool) -> Result< Option< Vec<Intervention> >, std::io::Error> {
 
-  let query = format!(r##"select id "intervention_id", encounter_id, intervention_code,
-                                         description, notes,
-                                         location_id, users_id, status_code
-                                  from intervention
-                                  where encounter_id = {}
-                                  order by id desc"##, encounter_id); // reverse order to put most recent first
-        println!("get_user_permissions Query: {}", query);
+        let tmp = match current_only {
+            true => constants::QRY_CURRENT_VITALS_FOR_ENC_ID,
+            false => constants::QRY_INTERVENTIONS_FOR_ENC_ID
+        };
+        let query = tmp.replace("{}", &encounter_id.to_string());
 
-        let rows: Vec<(i64, i64, String,
-                       String, String,
-                       i64, i64, String
-                        )> = sqlx::query_as(&query)
+        println!("get_interventions Query: {}", query);
+
+        /*
+        SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,
+                                    intervention_type_id, status_id,
+                                    l.room_identifier,
+                                    ref1.name "intervention_type", 
+                                    ref2.name "status" */
+
+        let rows: Vec<(i64, i64, String, String,
+                       i64, i64, i64, i64,
+                       String, String, String )> = sqlx::query_as(&query)
         .fetch_all(&self.connection) 
         .await
         .unwrap_or_default();
@@ -289,26 +295,30 @@ impl PatientDAO {
             for row in rows {
                 let tmp_intv_id: i64 = row.0; // intervention_id
                 let tmp_enc_id: i64 = row.1; // encounter_id
-                
-                let tmp_intervention_code = row.2; //intervention_code
-                let tmp_description = row.3; // description
-                let tmp_notes = row.4; // notes
+                let tmp_description = row.2; // description
+                let tmp_notes = row.3; // notes
+                let tmp_location_id: i64 = row.4; // location_id
+                let tmp_users_id: i64 = row.5; // users_id
+                let tmp_intervention_type_id: i64 = row.6; //intervention_type_id
+                let tmp_status_id: i64 = row.7; // users_id
+                let tmp_room_identifier = row.8; // tmp_room_identifier
 
-                let tmp_location_id: i64 = row.5; // location_id
-                let tmp_users_id: i64 = row.6; // users_id
-
-                let tmp_status_code = row.7; //status_code
+                let tmp_intervention_type: String = row.9; //intervention_type_id
+                let tmp_status = row.10; //status_code
 
                 results.push(
                     Intervention {
                         id: tmp_intv_id,
                         encounter_id: tmp_enc_id,
-                        intervention_code: tmp_intervention_code,
                         description: tmp_description,
                         notes: tmp_notes,
                         location_id: tmp_location_id,
                         users_id: tmp_users_id,
-                        status_code: tmp_status_code
+                        intervention_type_id: tmp_intervention_type_id,
+                        status_id: tmp_status_id,
+                        room_identifier: tmp_room_identifier,
+                        intervention_type: tmp_intervention_type,
+                        status_code: tmp_status
                     }
                 );
             }
@@ -316,5 +326,21 @@ impl PatientDAO {
         }
     }
 
+
+    ///
+    /// get the most recent intervention for the Encounter that is of a vitals type
+    /// 
+    pub async fn get_most_recent_vitals(&self, encounter_id: i64) ->  Intervention {
+        let tmp : Vec<Intervention> = self.get_interventions(encounter_id, true).await.unwrap().expect(constants::DATABASE_ERROR_NOT_FOUND);
+
+        return tmp.first().unwrap().clone();
+    }
+
+    // TODO: create an equivalent of this for get_current_encounter()
+    pub async fn get_current_encounter(&self, patient_id: i64) -> Encounter {
+        let tmp : Vec<Encounter> = self.get_encounters(patient_id, true).await.unwrap().expect(constants::DATABASE_ERROR_NOT_FOUND);
+
+        return tmp.first().unwrap().clone();
+    }
 
 }

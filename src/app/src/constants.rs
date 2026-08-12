@@ -54,9 +54,39 @@ pub const QRY_CURRENT_ENCOUNTER: &str = r##"
                                       and discharge_timestamp is null
                                     "##;
 
+pub const QRY_INTERVENTIONS_FOR_ENC_ID: &str = r##"
+                                SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,
+                                     intervention_type_id, status_id,
+                                    l.room_identifier,
+                                    ref1.name "intervention_type", 
+                                    ref2.name "status"
+                                FROM intervention i
+                                join location l on  l.id = i.location_id
+                                join common_reference_type ref1 on i.intervention_type_id = ref1.id
+                                join common_reference_type ref2 on i.status_id = ref2.id 
+                                where i.encounter_id = {}
+                                ORDER BY i.id DESC
+                                               "##;
+
+
+pub const QRY_CURRENT_VITALS_FOR_ENC_ID: &str = r##"
+                                SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,
+                                    intervention_type_id, status_id,
+                                    l.room_identifier,
+                                    ref1.name "intervention_type", 
+                                    ref2.name "status"
+                                FROM intervention i
+                                join location l on  l.id = i.location_id
+                                join common_reference_type ref1 on i.intervention_type_id = ref1.id
+                                join common_reference_type ref2 on i.status_id = ref2.id 
+                                where i.encounter_id = {}
+                                  AND i.intervention_type_id = 38
+                                ORDER BY i.id DESC LIMIT 1
+                                                "##; // VITALS ARE REF ID = 38
+
 pub const QRY_ALL_INTERVENTIONS: &str = r##"
-                                 SELECT i.id intv_id, i.description, i.notes, location_id, users_id,
-                                    encounter_id, intervention_type_id, status_id,
+                                 SELECT i.id "intervention_id", encounter_id, i.description, i.notes, location_id, users_id,
+                                     intervention_type_id, status_id,
                                     l.room_identifier,
                                     ref1.name "intervention_type", 
                                     ref2.name "status"

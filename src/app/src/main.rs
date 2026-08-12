@@ -21,7 +21,9 @@ use actix_cors::Cors;
 use actix_files::*;
 use actix_session::{storage::CookieSessionStore, Session, SessionMiddleware}; //, storage::RedisSessionStore} // for user session management: https://docs.rs/actix-session/latest/actix_session/
 use crate::dto::user_auth::*;
-use crate::dao::patient_dao::PatientDAO;
+use crate::dto::encounter::*;
+use crate::dto::intervention::*;
+use crate::dao::patient_dao::*;
 use crate::dao::auth_dao::AuthDAO;
 //use crate::nlp::NLP; 
 
@@ -205,10 +207,23 @@ async fn route_to_home(app_session: web::Data<AppSession>, user_session: Session
     Some (patient_list) => {
        println!("Retrieved {} patients:", patient_list.len());
 
-       for p in patient_list.clone(){
-          let cur_enc = dao.get_encounters(p.id, true); //get the current encounter for each patient
+       println!("WORKING HERE");
 
+       let mut pwrap: Vec<PatientWrapper> = Vec::new();
+
+       for p in patient_list.clone(){
+          let cur_enc: Encounter = dao.get_current_encounter(p.id).await.clone();
+          let cur_intv: Intervention = dao.get_most_recent_vitals(cur_enc.id).await.clone(); //get the current encounter for each patient
+
+          pwrap.push( PatientWrapper{
+              patient: p,
+              current_encounter: cur_enc,
+              most_recent_intervention: cur_intv
+            }
+          );
+          print!("Added pid"); //={} e={} i={}", p.clone().id, cur_enc.clone().id, cur_intv.clone().id);
        }
+
 
        let patient_list_html = wcf.get_patient_list_tile(patient_list.clone()); 
        content = content.replace(constants::BODY_TILE_CONTENT_TAG, &patient_list_html);  // replace default string
@@ -284,8 +299,8 @@ async fn route_to_patient_details(user_session: Session, app_session: web::Data<
       } 
   };
 
-  // get interventions for the patient
-  let intv_results = dao.get_interventions(patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+  // get all interventions for the patient
+  let intv_results = dao.get_interventions(patient_id, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
   let intv_section = match intv_results {
       Some (intvs) => {
          //println!("Patient details obtained");
