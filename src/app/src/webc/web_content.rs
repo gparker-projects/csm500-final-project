@@ -105,8 +105,6 @@ impl WebContentFactory {
     pub fn get_patient_list_tile(&self, patient_list: Vec<Patient>) -> String {
         let mut results_sbuf = String::with_capacity(100); 
 
-        println!("BOOKMARK");
-
         let mut counter: i8 = 1;
 
         results_sbuf.push_str(&self.get_hidden_form("patientdtls".to_owned(), "patientDtlsFrm".to_owned()) );

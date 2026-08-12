@@ -5,6 +5,7 @@ use chrono::NaiveDateTime;
 use crate::dto::patient::*;
 use crate::dto::intervention::*;
 use crate::dto::encounter::*;
+use crate::dao::db_query;
 use crate::constants;
 
 #[derive(Debug, Clone)]
@@ -45,8 +46,8 @@ impl EncounterDAO {
     /// 
     pub async fn get_encounters(&self, patient_id: i64, current_only: bool) -> Result< Option< Vec<Encounter> >, std::io::Error> {
         let tmp = match current_only {
-            true => constants::QRY_CURRENT_ENCOUNTER,
-            false => constants::QRY_ALL_ENCOUNTERS
+            true => db_query::QRY_CURRENT_ENCOUNTER,
+            false => db_query::QRY_ALL_ENCOUNTERS
         };
 
         let query = tmp.replace("{}", &patient_id.to_string());

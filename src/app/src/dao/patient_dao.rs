@@ -6,6 +6,7 @@ use crate::dto::patient::*;
 use crate::dto::intervention::*;
 use crate::dto::encounter::*;
 use crate::constants;
+use crate::dao::db_query;
 
 pub struct PatientWrapper {
     pub patient: Patient,
@@ -41,7 +42,7 @@ impl PatientDAO {
     /// Finds and returns the data for a specific patient
     /// 
     pub async fn get_patient_details(&self, _user_id: i64, patient_id: i64) -> Result< Option<Patient>, std::io::Error> {
-        let tmp: String = constants::QRY_SINGLE_PATIENT_DETAILS.to_owned();
+        let tmp: String = db_query::QRY_SINGLE_PATIENT_DETAILS.to_owned();
         let query = tmp.replace("{}", &patient_id.to_string());
 
         //println!("get_patient_details Query: {}", query);
@@ -106,23 +107,10 @@ impl PatientDAO {
     ///       https://stackoverflow.com/questions/67243108/mapping-nm-relations-into-vec-using-sqlx
     ///       https://doc.rust-lang.org/std/io/struct.Error.html - for return Error
     /// 
-    pub async fn get_assigned_patients(&self, user_id: i64, _include_discharged: bool) -> Result< Option< Vec<Patient> >, std::io::Error> {
-        let query = format!(r##"SELECT p.id, e.id, e.location_id, legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as "legal_middle_names",
-                                        COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
-                                        birthdate, admit_timestamp,
-                                        discharge_timestamp as "discharge_timestamp?",
-                                        sin, phn
-                                    FROM patient p
-                                    join encounter e on p.id = e.patient_id
-                                    where location_id in (
-                                        select l.id
-                                        from location l
-                                        where site_id in (
-                                        select site_id
-                                        from user_permission up
-                                        where users_id = {}
-                                            and up.site_id = l.site_id)  )"##, user_id);
-        //println!("get_assigned_patients Query: {}", query);
+    pub async fn get_patients_at_users_site_no_discharge(&self, user_id: i64, _include_discharged: bool) -> Result< Option< Vec<Patient> >, std::io::Error> {
+
+        let tmp: String = db_query::QRY_ALL_PATIENTS_AT_USERS_SITE_NO_DISCHARGE.to_owned();
+        let query = tmp.replace("{}", &user_id.to_string());
 
         let rows: Vec<(i64, i64, i64, String, String, String,
                         String, String,
@@ -182,66 +170,6 @@ impl PatientDAO {
         }
     }
 
-    /// Finds and returns all encounters based on an encounter
-    /// 
-    pub async fn get_encounters(&self, patient_id: i64, current_only: bool) -> Result< Option< Vec<Encounter> >, std::io::Error> {
-        let tmp = match current_only {
-            true => constants::QRY_CURRENT_ENCOUNTER,
-            false => constants::QRY_ALL_ENCOUNTERS
-        };
-
-        let query = tmp.replace("{}", &patient_id.to_string());
-        
-        //println!("get_encounters Query: {}", query);
-
-        let rows: Vec<(i64, // encounter_id
-                       NaiveDateTime, // admit_timestamp
-                       Option<chrono::NaiveDateTime>, // discharge_timestamp
-                       String, String, // admit and discharge notes
-                       String, // encounter_site_name
-                       String,  // current_encounter
-                       String // room_identifier
-                      )> = sqlx::query_as(&query)
-        .fetch_all(&self.connection) 
-        .await
-        .unwrap_or_default();
-
-        if rows.is_empty() {
-            println!("No encounters found for patient_id: {} [{}]", patient_id, rows.len());
-            return Ok( Some( Vec::new() ) );
-        }
-        else{
-            println!("Loading {} encounters",  rows.len());
-            let mut results: Vec<Encounter> = Vec::with_capacity(rows.len());
-            for row in rows {
-                let tmp_enc_id: i64 = row.0; // encounter_id
-                let tmp_admit_timestamp: NaiveDateTime = row.1;// admit_timestamp
-                let tmp_discharge_timestamp: Option<NaiveDateTime> = row.2;
-                let tmp_admit_notes = row.3; // admission_notes
-                let tmp_discharge_notes = row.4;  // discharge_notes
-                let encounter_site_name = row.5; // admission_notes
-                let is_current_encounter = row.6; // admission_notes
-                let tmp_room_identifier = row.7;
-
-                results.push(
-                    Encounter {
-                        id: tmp_enc_id,
-                        admit_notes: tmp_admit_notes,
-                        admit_timestamp: tmp_admit_timestamp, 
-                        discharge_notes: tmp_discharge_notes,
-                        discharge_timestamp: tmp_discharge_timestamp,
-                        patient_id: patient_id,
-                        encounter_site_name: encounter_site_name,
-                        room_identifier: tmp_room_identifier,
-                        is_current_encounter: is_current_encounter,
-                    }
-                );
-            }
-            return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
-        }
-    }
-
-
         /// Finds and returns the data for a specific patient
     /// 
     /// 
@@ -259,11 +187,5 @@ impl PatientDAO {
     }
 
 
-    // TODO: create an equivalent of this for get_current_encounter()
-    pub async fn get_current_encounter(&self, patient_id: i64) -> Encounter {
-        let tmp : Vec<Encounter> = self.get_encounters(patient_id, true).await.unwrap().expect(constants::DATABASE_ERROR_NOT_FOUND);
-
-        return tmp.first().unwrap().clone();
-    }
 
 }

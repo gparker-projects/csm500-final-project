@@ -10,3 +10,4 @@ pub mod common_dao;
 pub mod encounter_dao;
 pub mod intervention_dao;
 pub mod patient_dao;
+pub mod db_query;

@@ -6,6 +6,7 @@ use crate::dto::patient::*;
 use crate::dto::intervention::*;
 use crate::dto::encounter::*;
 use crate::constants;
+use crate::dao::db_query;
 
 #[derive(Debug, Clone)]
 pub struct InterventionDAO {
@@ -37,8 +38,8 @@ impl InterventionDAO {
     pub async fn get_interventions(&self, encounter_id: i64, current_only: bool) -> Result< Option< Vec<Intervention> >, std::io::Error> {
 
         let tmp = match current_only {
-            true => constants::QRY_CURRENT_VITALS_FOR_ENC_ID,
-            false => constants::QRY_INTERVENTIONS_FOR_ENC_ID
+            true => db_query::QRY_CURRENT_VITALS_FOR_ENC_ID,
+            false => db_query::QRY_INTERVENTIONS_FOR_ENC_ID
         };
         let query = tmp.replace("{}", &encounter_id.to_string());
 
