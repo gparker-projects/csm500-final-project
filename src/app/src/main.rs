@@ -20,13 +20,10 @@ use actix_web::cookie::Key;
 use actix_cors::Cors;
 use actix_files::*;
 use actix_session::{storage::CookieSessionStore, Session, SessionMiddleware}; //, storage::RedisSessionStore} // for user session management: https://docs.rs/actix-session/latest/actix_session/
-use crate::dto::user_auth::*;
-use crate::dto::encounter::*;
-use crate::dto::intervention::*;
-use crate::dao::encounter_dao::*;
-use crate::dao::patient_dao::*;
-use crate::dao::intervention_dao::*;
-use crate::dao::auth_dao::AuthDAO;
+
+use crate::dto::{user_auth::*, encounter::*, intervention::*};
+use crate::dao::{encounter_dao::*, patient_dao::*, intervention_dao::*, auth_dao::*};
+
 //use crate::nlp::NLP; 
 
 // TODO: ideally we'd use an external session store, not just cookies. Until the application is largely working, we'll have to leave this for now. //storage::RedisSessionStore}; 
@@ -209,27 +206,29 @@ async fn route_to_home(app_session: web::Data<AppSession>, user_session: Session
   let qry_results = dao.get_patients_at_users_site_no_discharge(user_session.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
   match qry_results {
     Some (patient_list) => {
-       println!("Retrieved {} patients:", patient_list.len());
-
-       println!("WORKING HERE");
-
+       //println!("Retrieved {} patients:", patient_list.len());
        let mut pwrap: Vec<PatientWrapper> = Vec::new();
 
        for p in patient_list.clone(){
-          let cur_enc: Encounter = edao.get_current_encounter(p.id).await.clone();
-          let cur_intv: Intervention = idao.get_most_recent_vitals(cur_enc.id).await.clone(); //get the current encounter for each patient
+          let cur_enc: Encounter = edao.get_current_encounter(p.id.clone()).await.clone();
+          let cur_intv: Intervention = idao.get_most_recent_vitals(cur_enc.id.clone()).await.clone(); //get the current encounter for each patient
+
+          let tmp_p = p.clone();
+          let tmp_e = cur_enc.clone();
+
+          let tmp_i = cur_intv.clone();
 
           pwrap.push( PatientWrapper{
-              patient: p,
-              current_encounter: cur_enc,
-              most_recent_intervention: cur_intv
-            }
+                  patient: p,
+                  current_encounter: cur_enc,
+                  most_recent_intervention: cur_intv
+              }
           );
-          print!("Added pid"); //={} e={} i={}", p.clone().id, cur_enc.clone().id, cur_intv.clone().id);
+
+          //print!(">> DEBUG Added pid={} e={} i={}", tmp_p, tmp_e, tmp_i);
        }
-
-
-       let patient_list_html = wcf.get_patient_list_tile(patient_list.clone()); 
+       
+       let patient_list_html = wcf.get_home_route_summary_of_patients_tile_using_wrapper(pwrap.clone()); 
        content = content.replace(constants::BODY_TILE_CONTENT_TAG, &patient_list_html);  // replace default string
 
        // todo: offload this to the tile generator; should not be repeated

@@ -6,9 +6,9 @@ use derive_more::Display;
 use std::collections::HashMap;
 
 use crate::constants;
-use crate::dto::encounter::*;
-use crate::dto::patient::*;
-use crate::dto::intervention::*;
+use crate::dto::{patient::*, encounter::*, intervention::*};
+
+use crate::dao::patient_dao::PatientWrapper;
 
 /// Enumeration for Web Content Tiles, each representing a tile of information
 /// to be presented by the application
@@ -72,23 +72,6 @@ impl WebContentFactory {
         return self.tile_hashmap.len();
     }
 
-    ///
-    /// Wrapper method to return the main home page tile.
-    /// 
-    pub fn get_home_tile(&self) -> String {
-        return self.tile_hashmap[&WebContentItem::WCTypeHomePage].clone();
-    }
-
-        ///
-    /// Wrapper method to return the main home page tile.
-    /// 
-    pub fn get_home_tile_with_user_identity(&self, user_identity_label: String) -> String {
-        let results = self.tile_hashmap[&WebContentItem::WCTypeHomePage].clone();
-
-        // add the user's identity
-        return results.replace(constants::USER_IDENTITY_TILE_TAG, &user_identity_label)
-    }
-
 
     ///
     /// Obtains a specifically enumerated tile. This method does not require use of Options because we are
@@ -99,10 +82,52 @@ impl WebContentFactory {
         return self.tile_hashmap[&tile_type].clone();
     }
 
+    // -----------------------------------------------------------------------------------
+    // Common formatters
+    // -----------------------------------------------------------------------------------
+
+    ///
+    /// Returns a hidden form, used as a technique in several of the list tiles to submit a value for another screen
+    /// 
+    fn get_hidden_form(&self, target_name: String, form_name: String) -> String {
+        let body = r##"<div id="hiddenSection" style="display: none; margin-top: 0px;">
+                               <form action="\{target_name}" method="post" id="{form_name}" name="{form_name}">
+                               <input type="hidden" name="target_id" id="target_id" value="0">
+                             </form></div>"##;
+
+        body.replace("{form_name}", &form_name).replace("{target_name}", &target_name)
+    }
+
+    // -----------------------------------------------------------------------------------
+    // Home tile formatters
+    // -----------------------------------------------------------------------------------
+
+    ///
+    /// Wrapper method to return the main home page tile.
+    /// 
+    pub fn get_home_tile(&self) -> String {
+        return self.tile_hashmap[&WebContentItem::WCTypeHomePage].clone();
+    }
+
+    ///
+    /// Wrapper method to return the main home page tile.
+    /// 
+    pub fn get_home_tile_with_user_identity(&self, user_identity_label: String) -> String {
+        let results = self.tile_hashmap[&WebContentItem::WCTypeHomePage].clone();
+
+        // add the user's identity
+        return results.replace(constants::USER_IDENTITY_TILE_TAG, &user_identity_label)
+    }
+
+
+    // -----------------------------------------------------------------------------------
+    // Route formatters
+    // -----------------------------------------------------------------------------------
+
     ///
     /// Provide rendering of a list of patients, as a screen tile
     /// 
-    pub fn get_patient_list_tile(&self, patient_list: Vec<Patient>) -> String {
+    pub fn get_home_route_summary_of_patients_tile_using_wrapper(&self, patient_list: Vec<PatientWrapper>) -> String {
         let mut results_sbuf = String::with_capacity(100); 
 
         let mut counter: i8 = 1;
@@ -110,7 +135,64 @@ impl WebContentFactory {
         results_sbuf.push_str(&self.get_hidden_form("patientdtls".to_owned(), "patientDtlsFrm".to_owned()) );
 
         for row in patient_list{
-  
+
+            let p = row.patient;
+            let e = row.current_encounter;
+            let i = row.most_recent_intervention;
+
+            results_sbuf.push_str("<a href=\"#\" onclick=\"redirect_to_patient("  ); 
+            results_sbuf.push_str( &p.id.to_string() ); 
+            results_sbuf.push_str("); return false;\"><table><tr><td>"); 
+
+            results_sbuf.push_str(&counter.to_string());
+            results_sbuf.push_str(")&nbsp;");
+            results_sbuf.push_str( &p.legal_last_name ); 
+            results_sbuf.push_str(","); 
+            results_sbuf.push_str( &p.legal_first_name );
+            results_sbuf.push_str("&nbsp;<b>DOB:&nbsp;"); 
+
+            results_sbuf.push_str( &p.birth_date_for_display() );
+
+            results_sbuf.push_str("</b>&nbsp;[");
+            results_sbuf.push_str( &p.age() );
+            results_sbuf.push_str("yrs]&nbsp;<i>@</i>");
+
+            results_sbuf.push_str( &e.room_identifier );
+
+            results_sbuf.push_str("&nbsp;&nbsp; Admitted: ");
+            results_sbuf.push_str(&p.admit_timestamp_for_display() );
+            results_sbuf.push_str("</td></tr>");
+
+            results_sbuf.push_str("<tr><td>");
+            results_sbuf.push_str("<i>FLAGS</i><br>");
+            results_sbuf.push_str("</td></tr>");
+
+            results_sbuf.push_str("<tr><td>");
+            results_sbuf.push_str("<i>MEASURES</i><br>"); 
+            results_sbuf.push_str("</td></tr>");
+            results_sbuf.push_str("</table></a><p></p>");
+
+            counter = counter + 1;
+        }
+
+
+        return results_sbuf;
+    }
+
+
+    ///
+    /// Provide rendering of a list of patients, as a screen tile
+    /// 
+    pub fn get_home_route_summary_of_patients_tile(&self, patient_list: Vec<Patient>) -> String {
+        let mut results_sbuf = String::with_capacity(100); 
+
+        let mut counter: i8 = 1;
+
+        results_sbuf.push_str(&self.get_hidden_form("patientdtls".to_owned(), "patientDtlsFrm".to_owned()) );
+
+        for row in patient_list{
+            results_sbuf.push_str("<!-- get_home_route_summary_of_patients_tile() -->");
+
             results_sbuf.push_str("<a href=\"#\" onclick=\"redirect_to_patient("  ); 
             results_sbuf.push_str( &row.id.to_string() ); 
             results_sbuf.push_str("); return false;\"><table><tr><td>"); 
@@ -150,6 +232,10 @@ impl WebContentFactory {
         return results_sbuf;
     }
 
+    // -----------------------------------------------------------------------------------
+    // Patient formatters
+    // -----------------------------------------------------------------------------------
+
     ///
     /// Provide HTML for a single Patient
     /// 
@@ -171,13 +257,6 @@ impl WebContentFactory {
         results_sbuf.push_str("</table>");
 
         return results_sbuf;
-    }
-
-    ///
-    /// Formats the identity of the user, for replacement of the constants::USER_IDENTITY_TILE_TAG tag
-    /// 
-    pub fn get_user_identity_label(&self,user_display_name: String) -> String{
-        "<div class=\"userIdentification\"id=\"userIdentityLbl\"><b>".to_owned() + &user_display_name + "</b></div>"
     }
 
     ///
@@ -211,18 +290,11 @@ impl WebContentFactory {
         return ht7.clone();
     }
 
-    ///
-    /// Returns a hidden form, used as a technique in several of the list tiles to submit a value for another screen
-    /// 
-    fn get_hidden_form(&self, target_name: String, form_name: String) -> String {
-        let body = r##"<div id="hiddenSection" style="display: none; margin-top: 0px;">
-                               <form action="\{target_name}" method="post" id="{form_name}" name="{form_name}">
-                               <input type="hidden" name="target_id" id="target_id" value="0">
-                             </form></div>"##;
-
-        body.replace("{form_name}", &form_name).replace("{target_name}", &target_name)
-    }
    
+    // -----------------------------------------------------------------------------------
+    // Encounter formatters
+    // -----------------------------------------------------------------------------------
+
     pub fn get_single_encounter_summary_tile(&self, encounter: Encounter) -> String {
         let mut results_sbuf = String::with_capacity(100);
 
@@ -300,6 +372,10 @@ impl WebContentFactory {
 
         return results_sbuf;
     }
+
+    // -----------------------------------------------------------------------------------
+    // Menu formatters
+    // -----------------------------------------------------------------------------------
 
     ///
     /// Provide HTML for the main system menu; replaces tag: <!--MapleEMR::LegacyMenu-->

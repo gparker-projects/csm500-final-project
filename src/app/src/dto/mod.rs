@@ -8,6 +8,7 @@
 //! 
 pub mod encounter;
 pub mod intervention;
+pub mod intervention_detail;
 pub mod location;
 pub mod patient;
 pub mod site;

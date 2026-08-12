@@ -1,9 +1,9 @@
 use sqlx::postgres::{PgPoolOptions, PgPool}; 
-use sqlx::Row;
-use std::io::{Error, ErrorKind};
+//use sqlx::Row;
+//use std::io::{Error, ErrorKind};
 use chrono::NaiveDateTime;
-use crate::dto::patient::*;
-use crate::dto::intervention::*;
+//use crate::dto::patient::*;
+//use crate::dto::intervention::*;
 use crate::dto::encounter::*;
 use crate::dao::db_query;
 use crate::constants;
@@ -76,12 +76,12 @@ impl EncounterDAO {
             for row in rows {
                 let tmp_enc_id: i64 = row.0; // encounter_id
                 let tmp_admit_timestamp: NaiveDateTime = row.1;// admit_timestamp
-                let tmp_discharge_timestamp: Option<NaiveDateTime> = row.2;
+                let tmp_discharge_timestamp: Option<NaiveDateTime> = row.2; //discharge_timestamp
                 let tmp_admit_notes = row.3; // admission_notes
                 let tmp_discharge_notes = row.4;  // discharge_notes
-                let encounter_site_name = row.5; // admission_notes
-                let is_current_encounter = row.6; // admission_notes
-                let tmp_room_identifier = row.7;
+                let encounter_site_name = row.5; // encounter_site_name
+                let tmp_room_identifier = row.6; // room_identifier
+                let is_current_encounter = row.7; // is_current_encounter
 
                 results.push(
                     Encounter {

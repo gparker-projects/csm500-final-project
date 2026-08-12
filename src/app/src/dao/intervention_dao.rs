@@ -1,10 +1,8 @@
 use sqlx::postgres::{PgPoolOptions, PgPool}; 
-use sqlx::Row;
-use std::io::{Error, ErrorKind};
+//use sqlx::Row;
+//use std::io::{Error, ErrorKind};
 use chrono::NaiveDateTime;
-use crate::dto::patient::*;
-use crate::dto::intervention::*;
-use crate::dto::encounter::*;
+use crate::dto::{intervention::*, intervention_detail::*};
 use crate::constants;
 use crate::dao::db_query;
 
@@ -92,6 +90,65 @@ impl InterventionDAO {
             return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
         }
     }
+
+    /// Finds and returns all Intervention Details, based on an Intervention
+    /// 
+    pub async fn get_all_intervention_details(&self, intervention_id: i64, type_id: i64) -> Result< Option< Vec<InterventionDetail> >, std::io::Error> {
+
+        let query =  match type_id == constants::NOT_SPECIFIED_ID {
+            true => {
+                let tmp = db_query::QRY_ALL_INTERVENTION_DETAILS;
+                tmp.replace("{}", &intervention_id.to_string())
+            }
+            false => {
+                let tmp =db_query::QRY_ALL_INTERVENTION_DETAILS_FOR_TYPE;
+                let tmp2 = tmp.replace("{1}", &intervention_id.to_string());
+                tmp.replace("{2}", &type_id.to_string())
+            }
+        };
+
+        println!("get_interventions_details Query: {}", query);
+
+        let rows: Vec<(i64, i64, i64,
+                       String, String, NaiveDateTime, String )> = sqlx::query_as(&query)
+        .fetch_all(&self.connection) 
+        .await
+        .unwrap_or_default();
+
+        if rows.is_empty() {
+            println!("No intervention details found for intervention_id: {} [{}]", intervention_id, rows.len());
+            return Ok( Some( Vec::new() ) );
+        }
+        else{
+            println!("Loading {} Intervention Details",  rows.len());
+            let mut results: Vec<InterventionDetail> = Vec::with_capacity(rows.len());
+            for row in rows {
+                let tmp_id: i64 = row.0; // id
+                let tmp_intv_id: i64 = row.1; // intervention_id
+                let tmp_type_id: i64 = row.2; // type_id
+                let tmp_value = row.3; // value
+
+                let tmp_notes = row.4; // notes
+                let tmp_entry_timestamp: NaiveDateTime = row.5; // entry_timestamp
+                let tmp_intervention_type: String = row.6; //intervention_type
+
+
+                results.push(
+                    InterventionDetail {
+                        id: tmp_id,
+                        intervention_id: tmp_intv_id,
+                        type_id: tmp_type_id,
+                        value: tmp_value,
+                        notes: tmp_notes,
+                        entry_timestamp: tmp_entry_timestamp,
+                        intervention_type: tmp_intervention_type
+                    }
+                );
+            }
+            return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
+        }
+    }
+
 
     ///
     /// get the most recent intervention for the Encounter that is of a vitals type

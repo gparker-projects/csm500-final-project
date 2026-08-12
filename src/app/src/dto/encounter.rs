@@ -72,7 +72,7 @@ impl Encounter{
 
 }
 
-/// Implements a .to_string() for the Intervention 
+/// Implements a .to_string() for the Encounter 
 /// 
 /// ref: https://loige.co/how-to-to-string-in-rust/
 /// 

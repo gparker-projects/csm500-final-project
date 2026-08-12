@@ -1,13 +1,11 @@
 use sqlx::postgres::{PgPoolOptions, PgPool}; 
 use sqlx::Row;
-use std::io::{Error, ErrorKind};
 use chrono::NaiveDateTime;
-use crate::dto::patient::*;
-use crate::dto::intervention::*;
-use crate::dto::encounter::*;
-use crate::constants;
-use crate::dao::db_query;
 
+use crate::dao::db_query;
+use crate::dto::{patient::*, encounter::*, intervention::*};
+
+#[derive(Debug, Clone)]
 pub struct PatientWrapper {
     pub patient: Patient,
     pub current_encounter: Encounter,
@@ -65,8 +63,8 @@ impl PatientDAO {
                 let tmp_admit_notes = row.get("admit_notes"); // admission_notes
                 let tmp_discharge_notes = row.get("discharge_notes");  // discharge_notes
 
-                let tmp_birthdate: chrono::NaiveDateTime = row.get("birthdate"); //tmp_birthdate
-                let tmp_admit_timestamp: chrono::NaiveDateTime = row.get("admit_timestamp");// admit_timestamp
+                let tmp_birthdate: NaiveDateTime = row.get("birthdate"); //tmp_birthdate
+                let tmp_admit_timestamp: NaiveDateTime = row.get("admit_timestamp");// admit_timestamp
                 let tmp_discharge_timestamp = row.get("discharge_timestamp?");// chrono::NaiveDateTime; 
                 let tmp_sin:    i32 = row.get("sin"); // SIN
                 let tmp_phn:    i64 = row.get("phn"); // SIN
@@ -141,8 +139,8 @@ impl PatientDAO {
                 let tmp_admit_notes = row.6; // admission_notes
                 let tmp_discharge_notes = row.7;  // discharge_notes
 
-                let tmp_birthdate: chrono::NaiveDateTime = row.8; //tmp_birthdate
-                let tmp_admit_timestamp: chrono::NaiveDateTime = row.9;// admit_timestamp
+                let tmp_birthdate: NaiveDateTime = row.8; //tmp_birthdate
+                let tmp_admit_timestamp: NaiveDateTime = row.9;// admit_timestamp
                 let tmp_discharge_timestamp = row.10;// chrono::NaiveDateTime; 
                 
                 let tmp_sin:    i32 = row.11; // SIN

@@ -111,12 +111,11 @@ impl Patient {
 /// 
 impl fmt::Display for Patient {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut results: String = "Patient Id: ".to_owned() + &self.id.to_string() ;
+        let mut results: String = "(patient Id: ".to_owned() + &self.id.to_string() ;
 
         results =  results + &"\nlegal_first_name: " + &self.legal_first_name;
-        results =  results + &"\nlegal_last_name: " + &self.legal_last_name;
+        results =  results + &"\nlegal_last_name: " + &self.legal_last_name + &")";
 
         f.write_str(&results)
     }
 }
-
