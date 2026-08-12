@@ -79,7 +79,7 @@ impl Patient {
     /// helper method to return the birth date (date portion only) in a format that can be easily displayed
     /// 
     pub fn birth_date_for_display(&self) -> String{
-        return self.birth_date.format("%d/%m/%Y").to_string();
+        return self.birth_date.format("%Y-%b-%d").to_string();
     }
 
     ///
@@ -93,15 +93,16 @@ impl Patient {
     /// helper method to return the birth date (date and time) in a format that can be easily displayed
     /// 
     pub fn admit_timestamp_for_display(&self) -> String{
-        return self.admit_timestamp.format("%d/%m/%Y %H:%M:%S").to_string();
+        return self.admit_timestamp.format("%Y-%b-%d %H:%M:%S").to_string();
     }
 
     ///
     /// helper method to return the discharge date (date and time) in a format that can be easily displayed
     /// 
     pub fn discharge_timestamp_for_display(&self) -> String{
-        return self.discharge_timestamp.unwrap().format("%d/%m/%Y %H:%M:%S").to_string();
+        return self.discharge_timestamp.unwrap().format("%Y-%b-%d %H:%M:%S").to_string();
     }
+
 }
 
 /// Implements a .to_string() for the Patient 

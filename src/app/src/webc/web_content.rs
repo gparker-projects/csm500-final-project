@@ -105,25 +105,49 @@ impl WebContentFactory {
     pub fn get_patient_list_tile(&self, patient_list: Vec<Patient>) -> String {
         let mut results_sbuf = String::with_capacity(100); 
 
-        for row in patient_list{
+        println!("BOOKMARK");
+
+        let mut counter: i8 = 1;
+
         results_sbuf.push_str(&self.get_hidden_form("patientdtls".to_owned(), "patientDtlsFrm".to_owned()) );
 
-        
-            results_sbuf.push_str("<table><tr><td><a href=\"#\" onclick=\"redirect_to_patient("  ); 
+        for row in patient_list{
+  
+            results_sbuf.push_str("<a href=\"#\" onclick=\"redirect_to_patient("  ); 
             results_sbuf.push_str( &row.id.to_string() ); 
-            results_sbuf.push_str("); return false;\">"); 
+            results_sbuf.push_str("); return false;\"><table><tr><td>"); 
+
+            results_sbuf.push_str(&counter.to_string());
+            results_sbuf.push_str(")&nbsp;");
             results_sbuf.push_str( &row.legal_last_name ); 
             results_sbuf.push_str(","); 
             results_sbuf.push_str( &row.legal_first_name );
-            results_sbuf.push_str("</a>&nbsp;DOB:&nbsp;"); 
+            results_sbuf.push_str("&nbsp;<b>DOB:&nbsp;"); 
 
             results_sbuf.push_str( &row.birth_date_for_display() );
 
-           results_sbuf.push_str(" DOB [YEARs] Location</td></tr>"); 
-           results_sbuf.push_str("<tr><td>ADMIT DATE AND TIME FLAGS </td></tr>");
-           results_sbuf.push_str("<tr><td>MEASURES</td></tr>"); 
+            results_sbuf.push_str("</b>&nbsp;[");
+            results_sbuf.push_str( &row.age() );
+            results_sbuf.push_str("yrs]&nbsp;<i>@</i>");
+
+            //results_sbuf.push_str( &row.short_location() );
+
+            results_sbuf.push_str("&nbsp;&nbsp; Admitted: ");
+            results_sbuf.push_str(&row.admit_timestamp_for_display() );
+            results_sbuf.push_str("</td></tr>");
+
+            results_sbuf.push_str("<tr><td>");
+            results_sbuf.push_str("<i>FLAGS</i><br>");
+            results_sbuf.push_str("</td></tr>");
+
+            results_sbuf.push_str("<tr><td>");
+            results_sbuf.push_str("<i>MEASURES</i><br>"); 
+            results_sbuf.push_str("</td></tr>");
+            results_sbuf.push_str("</table></a><p></p>");
+
+            counter = counter + 1;
         }
-        results_sbuf.push_str("</table>");
+
 
         return results_sbuf;
     }
@@ -133,7 +157,7 @@ impl WebContentFactory {
     /// 
     pub fn get_patient_details_tile(&self, p: Patient) -> String {
         let mut results_sbuf = String::with_capacity(100); 
-        //println!(">get_patient_details_tile()");
+        println!(">get_patient_details_tile()");
 
         // build the header
         results_sbuf.push_str("<table>");
@@ -150,7 +174,6 @@ impl WebContentFactory {
 
         return results_sbuf;
     }
-
 
     ///
     /// Formats the identity of the user, for replacement of the constants::USER_IDENTITY_TILE_TAG tag
@@ -194,16 +217,14 @@ impl WebContentFactory {
     /// Returns a hidden form, used as a technique in several of the list tiles to submit a value for another screen
     /// 
     fn get_hidden_form(&self, target_name: String, form_name: String) -> String {
-        let body = r##"<div id="hiddenSection" style="display: none; margin-top: 0px;">");
+        let body = r##"<div id="hiddenSection" style="display: none; margin-top: 0px;">
                                <form action="\{target_name}" method="post" id="{form_name}" name="{form_name}">
                                <input type="hidden" name="target_id" id="target_id" value="0">
                              </form></div>"##;
 
         body.replace("{form_name}", &form_name).replace("{target_name}", &target_name)
     }
-
-
-    
+   
     pub fn get_single_encounter_summary_tile(&self, encounter: Encounter) -> String {
         let mut results_sbuf = String::with_capacity(100);
 
@@ -288,7 +309,6 @@ impl WebContentFactory {
     pub fn get_standard_menu(&self, patient_list: Vec<Patient>) -> String {
        return self.get_standard_menu_with_patient(patient_list, constants::INVALID_PATIENT_ID);
     }
-
 
     ///
     /// Provide HTML for the main system menu; replaces tag: <!--MapleEMR::LegacyMenu-->

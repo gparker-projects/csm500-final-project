@@ -193,6 +193,7 @@ async fn route_to_home(app_session: web::Data<AppSession>, user_session: Session
   println!("-> /home Route Requested");
 
   let user_session: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+
   let wcf = &app_session.wcf; // https://actix.rs/docs/application/
   let mut content = wcf.get_home_tile(); // retrieve the page base content
 
@@ -203,9 +204,12 @@ async fn route_to_home(app_session: web::Data<AppSession>, user_session: Session
   match qry_results {
     Some (patient_list) => {
        println!("Retrieved {} patients:", patient_list.len());
-       //for p in patient_list.clone(){
-       //   println!(" > {} \n", p);
-       //}
+
+       for p in patient_list.clone(){
+          let cur_enc = dao.get_encounters(p.id, true); //get the current encounter for each patient
+
+       }
+
        let patient_list_html = wcf.get_patient_list_tile(patient_list.clone()); 
        content = content.replace(constants::BODY_TILE_CONTENT_TAG, &patient_list_html);  // replace default string
 
@@ -261,7 +265,7 @@ async fn route_to_patient_details(user_session: Session, app_session: web::Data<
   let mut current_encounter: String = "No Encounters found".to_owned();
 
   // get encounters for the patient
-  let enc_results = dao.get_encounters(patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+  let enc_results = dao.get_encounters(patient_id, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
   let enc_section = match enc_results {
       Some (encounters) => {
          //println!("Patient details obtained");
@@ -340,7 +344,13 @@ fn get_static_path_base() -> String{
 /// REF: https://docs.rs/actix-web/latest/actix_web/cookie/struct.Key.html
 /// 
 fn get_application_secret_key() -> Key {
-   Key::generate() // TODO: change this to pull from a config file instead
+    println!(">get_application_secret_key()");
+
+    actix_web::cookie::Key::from(
+    std::env::var("SESSION_KEY")
+        .unwrap_or_else(|_| "this_is_a_new_system_key_to_prevent_regeneration_of_a_key_every_time_the_app_starts".to_string())
+        .as_bytes()
+    )
 }
 
 /// # Main program

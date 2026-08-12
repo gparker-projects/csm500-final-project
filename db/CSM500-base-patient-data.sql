@@ -36,4 +36,34 @@ INSERT INTO encounter(
 	OVERRIDING SYSTEM VALUE
 	VALUES (3, '2026-08-04 15:00:00', 'Admitted', null, null, 3, 9);
 
+INSERT INTO encounter(
+	id, admit_timestamp, admit_notes, discharge_timestamp, discharge_notes, patient_id, location_id)
+	OVERRIDING SYSTEM VALUE
+	VALUES (4, '2026-08-02 15:00:00', 'Admitted', null, null, 3, 9);
+
+COMMIT;
+
+-- -------------------------------------------------------------------------------------
+-- Loads seed intervention data for the system.
+-- -------------------------------------------------------------------------------------
+INSERT INTO intervention(
+	id, description, notes, location_id, users_id, encounter_id, intervention_type_id, status_id)
+	OVERRIDING SYSTEM VALUE
+	VALUES (1, 'broken foot from tree climbing', '', 9, 2, 1, 38, 19);
+	
+INSERT INTO intervention(
+	id, description, notes, location_id, users_id, encounter_id, intervention_type_id, status_id)
+	OVERRIDING SYSTEM VALUE
+	VALUES (2, 'Feeling exhausted', '',  11, 2, 2,  38, 19);
+	
+INSERT INTO intervention(
+	id, description, notes, location_id, users_id, encounter_id, intervention_type_id, status_id)
+	OVERRIDING SYSTEM VALUE
+	VALUES (3, 'persistent cough', '',  9, 2, 3,  38, 19);
+	
+INSERT INTO intervention(
+	id, description, notes, location_id, users_id, encounter_id, intervention_type_id, status_id)
+	OVERRIDING SYSTEM VALUE
+	VALUES (4, 'persistent cough', '',  10, 2, 4,  38, 19);
+
 COMMIT;

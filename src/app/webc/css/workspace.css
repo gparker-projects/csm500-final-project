@@ -167,3 +167,8 @@ tr:nth-child(even) {
 div.tablecontainer {
   overflow-x: auto;
 }
+
+a {
+    text-decoration: none;
+    color: inherit;
+}

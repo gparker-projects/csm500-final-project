@@ -25,6 +25,8 @@ pub struct Encounter {
     pub patient_id: i64,//       PATIENT_ID BIGINT REFERENCES PATIENT (ID),
     #[serde(rename = "encounter_site_name")]
     pub encounter_site_name: String,
+    #[serde(rename = "room_identifier")]
+    pub room_identifier: String, // room_identifier
     #[serde(rename = "is_current_encounter")]
     pub is_current_encounter: String 
 } 
@@ -39,6 +41,7 @@ impl Encounter{
             discharge_timestamp: Option<NaiveDateTime>,
             patient_id: i64,
             encounter_site_name: String,
+            room_identifier: String,
             is_current_encounter: String // WARNING: This field is subjective and must be calculated in relation to other Encounters in a set.
             ) -> Self {                  //          It has been included as a datum in the DTO as that is where it is needed/relevant for user display
         Self { 
@@ -49,6 +52,7 @@ impl Encounter{
             discharge_timestamp,
             patient_id,
             encounter_site_name,
+            room_identifier,
             is_current_encounter
         }
     }

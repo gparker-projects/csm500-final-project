@@ -5,6 +5,13 @@ use chrono::NaiveDateTime;
 use crate::dto::patient::*;
 use crate::dto::intervention::*;
 use crate::dto::encounter::*;
+use crate::constants;
+
+pub struct PatientWrapper {
+    pub paient: Patient,
+    pub current_encounter: Encounter,
+    pub most_recent_intervention: Intervention,
+}
 
 #[derive(Debug, Clone)]
 pub struct PatientDAO {
@@ -34,14 +41,8 @@ impl PatientDAO {
     /// Finds and returns the data for a specific patient
     /// 
     pub async fn get_patient_details(&self, _user_id: i64, patient_id: i64) -> Result< Option<Patient>, std::io::Error> {
-        let query = format!(r##"SELECT p.id "patient_id", e.id "encounter_id", e.location_id "location_id", legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as "legal_middle_names",
-                                                COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
-                                                birthdate, admit_timestamp,
-                                                discharge_timestamp as "discharge_timestamp?",
-                                                sin, phn
-                                            FROM patient p
-                                            join encounter e on p.id = e.patient_id
-                                            where patient_id = {}"##, patient_id);
+        let tmp: String = constants::QRY_SINGLE_PATIENT_DETAILS.to_owned();
+        let query = tmp.replace("{}", &patient_id.to_string());
 
         //println!("get_patient_details Query: {}", query);
 
@@ -183,20 +184,14 @@ impl PatientDAO {
 
     /// Finds and returns all encounters based on an encounter
     /// 
-    pub async fn get_encounters(&self, patient_id: i64) -> Result< Option< Vec<Encounter> >, std::io::Error> {
-        let query = format!(r##"
-                                    select e.id "encounter_id", admit_timestamp,
-                                        discharge_timestamp as "discharge_timestamp?",
-                                        COALESCE(admit_notes, '') as "admit_notes",
-                                        COALESCE(discharge_notes, '') as "discharge_notes",
-                                        s.name "encounter_site_name",
-                                        CASE WHEN discharge_timestamp is null then 'Y' else 'N' end as "current_encounter"
-                                    from encounter e
-                                    join location l on e.location_id = l.id
-                                    join site s on s.id = l.site_id
-                                    where patient_id = {}
-                                    order by admit_timestamp desc
-                                    "##, patient_id);
+    pub async fn get_encounters(&self, patient_id: i64, current_only: bool) -> Result< Option< Vec<Encounter> >, std::io::Error> {
+        let tmp = match current_only {
+            true => constants::QRY_CURRENT_ENCOUNTER,
+            false => constants::QRY_ALL_ENCOUNTERS
+        };
+
+        let query = tmp.replace("{}", &patient_id.to_string());
+        
         //println!("get_encounters Query: {}", query);
 
         let rows: Vec<(i64, // encounter_id
@@ -204,7 +199,8 @@ impl PatientDAO {
                        Option<chrono::NaiveDateTime>, // discharge_timestamp
                        String, String, // admit and discharge notes
                        String, // encounter_site_name
-                       String  // current_encounter
+                       String,  // current_encounter
+                       String // room_identifier
                       )> = sqlx::query_as(&query)
         .fetch_all(&self.connection) 
         .await
@@ -225,6 +221,7 @@ impl PatientDAO {
                 let tmp_discharge_notes = row.4;  // discharge_notes
                 let encounter_site_name = row.5; // admission_notes
                 let is_current_encounter = row.6; // admission_notes
+                let tmp_room_identifier = row.7;
 
                 results.push(
                     Encounter {
@@ -235,6 +232,7 @@ impl PatientDAO {
                         discharge_timestamp: tmp_discharge_timestamp,
                         patient_id: patient_id,
                         encounter_site_name: encounter_site_name,
+                        room_identifier: tmp_room_identifier,
                         is_current_encounter: is_current_encounter,
                     }
                 );
@@ -242,14 +240,6 @@ impl PatientDAO {
             return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
         }
     }
-
-
-    /// Finds and returns any patients that are at a facility, regardless of if they are assigned to the user or not
-    ///
-    pub async fn get_site_patients(&self, _user_id: i64, _include_discharged: bool) -> Result< Option<Patient>, std::io::Error> {
-        todo!();
-    }
-
 
 
         /// Finds and returns the data for a specific patient
@@ -268,25 +258,18 @@ impl PatientDAO {
         todo!();
     }
 
-        pub async fn get_encounter(&self, _encounter_id: i64) -> Result< Option<Encounter>, std::io::Error> {
-            todo!();
-            /*
-            select id "intervention_id", intervention_code, description, notes, location_id, users_id, status_code
-            from intervention
-            where encounter_id = 3
-                */
-        }
 
     /// Finds and returns all interventions based on an encounter
     /// 
     pub async fn get_interventions(&self, encounter_id: i64) -> Result< Option< Vec<Intervention> >, std::io::Error> {
 
   let query = format!(r##"select id "intervention_id", encounter_id, intervention_code,
-                                  description, notes,
-                                  location_id, users_id, status_code
+                                         description, notes,
+                                         location_id, users_id, status_code
                                   from intervention
-                                  where encounter_id = {}"##, encounter_id);
-        //println!("get_user_permissions Query: {}", query);
+                                  where encounter_id = {}
+                                  order by id desc"##, encounter_id); // reverse order to put most recent first
+        println!("get_user_permissions Query: {}", query);
 
         let rows: Vec<(i64, i64, String,
                        String, String,
