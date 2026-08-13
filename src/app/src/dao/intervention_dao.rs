@@ -103,7 +103,7 @@ impl InterventionDAO {
             false => {
                 let tmp =db_query::QRY_ALL_INTERVENTION_DETAILS_FOR_TYPE;
                 let tmp2 = tmp.replace("{1}", &intervention_id.to_string());
-                tmp.replace("{2}", &type_id.to_string())
+                tmp2.replace("{2}", &type_id.to_string())
             }
         };
 

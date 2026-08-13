@@ -259,7 +259,7 @@ INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
 
 COMMIT;
 
--- group 5: standard measurements; https://canadiem.org/how-to-read-patient-monitors/
+-- group 5: standard measurements for data fields; https://canadiem.org/how-to-read-patient-monitors/
 --
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
@@ -271,28 +271,28 @@ INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
-  VALUES (32, 6, 'Y', 'HR', 'Heart Rate (HR)');
+  VALUES (32, 5, 'Y', 'HR', 'Heart Rate (HR)');
   
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
-  VALUES (33, 6, 'Y', 'BP', 'Blood Pressure (BP)');
+  VALUES (33, 5, 'Y', 'BP', 'Blood Pressure (BP)');
 
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
-  VALUES (34, 6, 'Y', 'RR', 'Respiratory Rate');
+  VALUES (34, 5, 'Y', 'RR', 'Respiratory Rate');
   
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
-  VALUES (35, 6, 'Y', 'SpO2', 'Oxygen Saturation');
+  VALUES (35, 5, 'Y', 'SpO2', 'Oxygen Saturation');
 
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
-  VALUES (36, 6, 'Y', 'Temp (C)', 'Body Temperature');
+  VALUES (36, 5, 'Y', 'Temp (C)', 'Body Temperature');
   
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
-  VALUES (37, 6, 'Y', 'PL', 'Pain Level');
-  
+  VALUES (37, 5, 'Y', 'PL', 'Pain Level');
+
 COMMIT;
 
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
@@ -300,5 +300,6 @@ INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   VALUES (38, 1, 'Y', 'Vitals', 'Vitals');
   
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
-  OVERRIDING SYSTEM VALUE
-  VALUES (39, 1, 'Y', 'xxx', 'xxx');
+    OVERRIDING SYSTEM VALUE
+ VALUES (39, 5, 'Y', 'Eye', 'Eye Colour');
+  

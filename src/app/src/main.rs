@@ -21,7 +21,7 @@ use actix_cors::Cors;
 use actix_files::*;
 use actix_session::{storage::CookieSessionStore, Session, SessionMiddleware}; //, storage::RedisSessionStore} // for user session management: https://docs.rs/actix-session/latest/actix_session/
 
-use crate::dto::{user_auth::*, encounter::*, intervention::*};
+use crate::dto::{user_auth::*, encounter::*, intervention::*, intervention_detail::*};
 use crate::dao::{encounter_dao::*, patient_dao::*, intervention_dao::*, auth_dao::*};
 
 //use crate::nlp::NLP; 
@@ -212,19 +212,19 @@ async fn route_to_home(app_session: web::Data<AppSession>, user_session: Session
        for p in patient_list.clone(){
           let cur_enc: Encounter = edao.get_current_encounter(p.id.clone()).await.clone();
           let cur_intv: Intervention = idao.get_most_recent_vitals(cur_enc.id.clone()).await.clone(); //get the current encounter for each patient
+          let cur_idtls = idao.get_all_intervention_details(cur_intv.id, constants::NOT_SPECIFIED_ID).await.expect(constants::DATABASE_ERROR_NOT_FOUND).clone(); //.clone();
 
-          let tmp_p = p.clone();
-          let tmp_e = cur_enc.clone();
-
-          let tmp_i = cur_intv.clone();
+          //let tmp_p = p.clone();
+          //let tmp_e = cur_enc.clone();
+          //let tmp_i = cur_intv.clone();
 
           pwrap.push( PatientWrapper{
-                  patient: p,
-                  current_encounter: cur_enc,
-                  most_recent_intervention: cur_intv
+                  patient: p.clone(),
+                  current_encounter: cur_enc.clone(),
+                  most_recent_intervention: cur_intv.clone(),
+                  intervention_detail: cur_idtls.clone().expect(constants::GENERAL_ERROR_NOT_FOUND)
               }
           );
-
           //print!(">> DEBUG Added pid={} e={} i={}", tmp_p, tmp_e, tmp_i);
        }
        

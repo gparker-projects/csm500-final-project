@@ -125,6 +125,30 @@ input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
   left: 2.5in;
 }
 
+/*---------------------- Clinical Data ----------------------
+*/
+.clinical-electric-blue {
+  font-size: 12px;
+  font-weight: bold;
+  color: #0018F9;
+  display: inline-block;
+}
+
+.clinical-emergency-red {
+  font-size: 12px;
+  font-weight: bold;
+  color: #FF0000;
+  display: inline-block;
+}
+
+.clinical-red {
+  font-size: 12px;
+  font-weight: bold;
+  color: #D30000;
+  display: inline-block;
+}
+
+
 /*---------------------- Table styles ----------------------
   Ref: https://www.w3schools.com/css/css_table.asp
 */

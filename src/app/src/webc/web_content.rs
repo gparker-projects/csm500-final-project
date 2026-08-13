@@ -145,27 +145,36 @@ impl WebContentFactory {
             results_sbuf.push_str("); return false;\"><table><tr><td>"); 
 
             results_sbuf.push_str(&counter.to_string());
-            results_sbuf.push_str(")&nbsp;");
+            results_sbuf.push_str(")&nbsp;<b>");
             results_sbuf.push_str( &p.legal_last_name ); 
             results_sbuf.push_str(","); 
             results_sbuf.push_str( &p.legal_first_name );
-            results_sbuf.push_str("&nbsp;<b>DOB:&nbsp;"); 
 
+            results_sbuf.push_str("</b>&nbsp;PHN:<i>&nbsp;"); 
+            results_sbuf.push_str( &p.get_phn() );
+            results_sbuf.push_str("</i>&nbsp;");
+
+            results_sbuf.push_str("&nbsp;<div class='clinical-electric-blue'>DOB:<b>&nbsp;"); 
             results_sbuf.push_str( &p.birth_date_for_display() );
 
-            results_sbuf.push_str("</b>&nbsp;[");
+            results_sbuf.push_str("</b></div>&nbsp;[");
+
             results_sbuf.push_str( &p.age() );
-            results_sbuf.push_str("yrs]&nbsp;<i>@</i>");
+            results_sbuf.push_str("yrs]&nbsp;@");
 
             results_sbuf.push_str( &e.room_identifier );
-
-            results_sbuf.push_str("&nbsp;&nbsp; Admitted: ");
-            results_sbuf.push_str(&p.admit_timestamp_for_display() );
             results_sbuf.push_str("</td></tr>");
 
             results_sbuf.push_str("<tr><td>");
-            results_sbuf.push_str("<i>FLAGS</i><br>");
-            results_sbuf.push_str("</td></tr>");
+            results_sbuf.push_str("Admitted: ");
+            results_sbuf.push_str(&p.admit_timestamp_for_display() );
+            results_sbuf.push_str("&nbsp;");
+            results_sbuf.push_str( &i.intervention_type );
+            results_sbuf.push_str("&nbsp;@&nbsp;");
+            results_sbuf.push_str( &i.scheduled_date_for_display() );
+            results_sbuf.push_str("&nbsp;(");
+            results_sbuf.push_str( &i.status_code );
+            results_sbuf.push_str(")</td></tr>");
 
             results_sbuf.push_str("<tr><td>");
             results_sbuf.push_str("<i>MEASURES</i><br>"); 
@@ -405,11 +414,11 @@ impl WebContentFactory {
             // either we include ALL patients, OR we only include the current patient
             if patient_id == constants::INVALID_PATIENT_ID || p.id == patient_id{ 
                 if ! first_entry {
-                  results_sbuf.push_str("<li><a class=\"menuNotCurrent\"href=\"javascript:selectPatient("); 
+                    results_sbuf.push_str("<li><a class=\"menuNotCurrent\"href=\"javascript:redirect_to_patient("); 
                 }
                 else{
-                  results_sbuf.push_str("<li><a class=\"menuCurrent\" href=\"javascript:selectPatient(");
-                  first_entry = false;
+                    results_sbuf.push_str("<li><a class=\"menuCurrent\" href=\"javascript:redirect_to_patient(");
+                    first_entry = false;
                 }
                 results_sbuf.push_str( &p.id.to_string() ); 
                 results_sbuf.push_str(")\">");

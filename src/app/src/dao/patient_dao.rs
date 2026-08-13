@@ -3,13 +3,14 @@ use sqlx::Row;
 use chrono::NaiveDateTime;
 
 use crate::dao::db_query;
-use crate::dto::{patient::*, encounter::*, intervention::*};
+use crate::dto::{patient::*, encounter::*, intervention::*, intervention_detail::*};
 
 #[derive(Debug, Clone)]
 pub struct PatientWrapper {
     pub patient: Patient,
     pub current_encounter: Encounter,
     pub most_recent_intervention: Intervention,
+    pub intervention_detail: Vec<InterventionDetail>
 }
 
 #[derive(Debug, Clone)]

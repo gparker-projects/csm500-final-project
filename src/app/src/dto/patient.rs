@@ -76,31 +76,38 @@ impl Patient {
     }
 
     ///
-    /// helper method to return the birth date (date portion only) in a format that can be easily displayed
+    /// accessor method to return the birth date (date portion only) in a format that can be easily displayed
     /// 
     pub fn birth_date_for_display(&self) -> String{
-        return self.birth_date.format("%Y-%b-%d").to_string();
+        self.birth_date.format("%Y-%b-%d").to_string()
     }
 
     ///
-    /// helper method to return the birth date (date portion only) in a format that can be easily displayed
+    /// accessor method to return the birth date (date portion only) in a format that can be easily displayed
+    /// 
+    pub fn get_phn(&self) -> String{
+        self.phn.to_string()
+    }
+
+    ///
+    /// accessor method to return the birth date (date and time) in a format that can be easily displayed
+    /// 
+    pub fn admit_timestamp_for_display(&self) -> String{
+        self.admit_timestamp.format("%Y-%b-%d %H:%M:%S").to_string()
+    }
+
+    ///
+    /// accessor method to return the discharge date (date and time) in a format that can be easily displayed
+    /// 
+    pub fn discharge_timestamp_for_display(&self) -> String{
+        self.discharge_timestamp.unwrap().format("%Y-%b-%d %H:%M:%S").to_string()
+    }
+
+    ///
+    /// accessor method to return the birth date (date portion only) in a format that can be easily displayed
     /// 
     pub fn age(&self) -> String{
       ((Utc::now().naive_utc() - self.birth_date).num_days() / 365).to_string()
-    }
-
-    ///
-    /// helper method to return the birth date (date and time) in a format that can be easily displayed
-    /// 
-    pub fn admit_timestamp_for_display(&self) -> String{
-        return self.admit_timestamp.format("%Y-%b-%d %H:%M:%S").to_string();
-    }
-
-    ///
-    /// helper method to return the discharge date (date and time) in a format that can be easily displayed
-    /// 
-    pub fn discharge_timestamp_for_display(&self) -> String{
-        return self.discharge_timestamp.unwrap().format("%Y-%b-%d %H:%M:%S").to_string();
     }
 
 }

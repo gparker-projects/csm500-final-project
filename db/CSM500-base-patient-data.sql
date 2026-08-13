@@ -67,3 +67,69 @@ INSERT INTO intervention(
 	VALUES (4, 'persistent cough', '',  10, 2, 4,  38, 19);
 
 COMMIT;
+
+-- -------------------------------------------------------------------------------------
+-- Loads seed intervention details data for the system.
+-- -------------------------------------------------------------------------------------
+
+INSERT INTO intervention_details(
+	id, intervention_id, type_id, value, notes, entry_timestamp)
+	OVERRIDING SYSTEM VALUE
+	VALUES (1, 1, 39, 'Blue', '', '2026-08-02 15:00:00');
+
+INSERT INTO intervention_details(
+	id, intervention_id, type_id, value, notes, entry_timestamp)
+	OVERRIDING SYSTEM VALUE
+	VALUES (2, 1, 30, '200', '', '2026-08-02 15:00:00');
+
+INSERT INTO intervention_details(
+	id, intervention_id, type_id, value, notes, entry_timestamp)
+	OVERRIDING SYSTEM VALUE
+	VALUES (3, 1, 31, '85', '', '2026-08-02 15:00:00');
+
+INSERT INTO intervention_details(
+	id, intervention_id, type_id, value, notes, entry_timestamp)
+	OVERRIDING SYSTEM VALUE
+	VALUES (4, 1, 33, '90/140', '', '2026-08-02 15:00:00');
+
+INSERT INTO intervention_details(
+	id, intervention_id, type_id, value, notes, entry_timestamp)
+	OVERRIDING SYSTEM VALUE
+	VALUES (5, 2, 33, '80/100', '', '2026-08-02 15:00:00');
+
+INSERT INTO intervention_details(
+	id, intervention_id, type_id, value, notes, entry_timestamp)
+	OVERRIDING SYSTEM VALUE
+	VALUES (6, 2, 30, '200', '', '2026-08-02 15:00:00');
+
+INSERT INTO intervention_details(
+	id, intervention_id, type_id, value, notes, entry_timestamp)
+	OVERRIDING SYSTEM VALUE
+	VALUES (7, 2, 31, '90', '', '2026-08-02 15:00:00');
+	
+INSERT INTO intervention_details(
+	id, intervention_id, type_id, value, notes, entry_timestamp)
+	OVERRIDING SYSTEM VALUE
+	VALUES (8, 2, 32, '110', '', '2026-08-02 15:00:00');
+	
+INSERT INTO intervention_details(
+	id, intervention_id, type_id, value, notes, entry_timestamp)
+	OVERRIDING SYSTEM VALUE
+	VALUES (9, 3, 35, '80%', '', '2026-08-02 15:00:00');
+	
+INSERT INTO intervention_details(
+	id, intervention_id, type_id, value, notes, entry_timestamp)
+	OVERRIDING SYSTEM VALUE
+	VALUES (10, 3, 36, '37', '', '2026-08-02 15:00:00');
+	
+INSERT INTO intervention_details(
+	id, intervention_id, type_id, value, notes, entry_timestamp)
+	OVERRIDING SYSTEM VALUE
+	VALUES (11, 3, 37, '8', '', '2026-08-02 15:00:00');
+
+INSERT INTO intervention_details(
+	id, intervention_id, type_id, value, notes, entry_timestamp)
+	OVERRIDING SYSTEM VALUE
+	VALUES (12, 3, 32, '87', '', '2026-08-02 15:00:00');
+	
+COMMIT;
