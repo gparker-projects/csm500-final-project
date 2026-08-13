@@ -52,7 +52,11 @@ impl InterventionDetail {
     /// helper method to return the entry_timestamp (date and time) in a format that can be easily displayed
     ///
     pub fn entry_timestamp_for_display(&self) -> String{
-        return self.entry_timestamp.format("%Y-%b-%d %H:%M:%S").to_string();
+        self.entry_timestamp.format("%Y-%b-%d %H:%M:%S").to_string()
+    }
+
+    pub fn type_name(&self) -> String{
+        self.intervention_type.clone()
     }
 }
 

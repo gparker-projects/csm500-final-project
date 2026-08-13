@@ -1,0 +1,44 @@
+<h1>Discharge Patient: get_admit_discharge_tile()</h1><p>
+<form action="\admdis" method="post" id="admdisForm" name="admdisForm">
+<table>
+    <tr><td>First Name <input type="text" name="first_name" id="patient_first_name" value="">
+    Last Name <input type="text" name="last_name" id="last_name" value="Meghan Markle">
+    Last Name [Meghan Markle]
+    Middle Names <input type="text" name="middle_name" id="middle_name" value="">
+    PHN <input type="text" name="phn" id="phn" value="">
+    </td></tr>
+
+    <tr><td>
+    Birth Date <input type="text" name="birthdate" id="birthdate" value="">
+    Admit Date/Time <i>label</i>
+    Location <i>location</i>
+    </td></tr>
+
+    <tr><td>
+	    Reason for Visit <textarea id="admit_notes" name="admit_notes" rows="4" cols="50" placeholder=""></textarea>
+    </td></tr>
+
+    <tr><td>
+     Discharge Date/Time <i>label</i> &nbsp;
+	 Outpatient Treatment Plan <textarea id="discharge_notes" name="discharge_notes" rows="4" cols="50" placeholder=""></textarea>
+    </td></tr>
+
+</table>
+<p>
+<h2>Baseline Vitals</h2>
+<table>
+    <tr>
+	<td>
+	Temp (C) <input type="text" name="temperature" id="temperature" value="">
+	Blood Pressure <input type="text" name="blood_pressure" id="blood_pressure" value="">
+	Weight (Kg) <input type="text" name="weight" id="weight" value="">
+	</td>
+    </tr>
+    <tr>
+	<td>
+	Additional Observations<textarea id="intervention_notes" name="intervention_notes" rows="4" cols="50" placeholder=""></textarea>
+	</td>
+    </tr>
+</table>
+<input type="hidden" name="patient_id" id="patient_id" value="-1">
+</form>

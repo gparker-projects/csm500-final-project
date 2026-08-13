@@ -107,10 +107,9 @@ impl InterventionDAO {
             }
         };
 
-        println!("get_interventions_details Query: {}", query);
+        //println!("get_interventions_details() Query: {}", query);
 
-        let rows: Vec<(i64, i64, i64,
-                       String, String, NaiveDateTime, String )> = sqlx::query_as(&query)
+        let rows: Vec<(i64, String, String, NaiveDateTime, String,i64, i64 )> = sqlx::query_as(&query)
         .fetch_all(&self.connection) 
         .await
         .unwrap_or_default();
@@ -124,14 +123,12 @@ impl InterventionDAO {
             let mut results: Vec<InterventionDetail> = Vec::with_capacity(rows.len());
             for row in rows {
                 let tmp_id: i64 = row.0; // id
-                let tmp_intv_id: i64 = row.1; // intervention_id
-                let tmp_type_id: i64 = row.2; // type_id
-                let tmp_value = row.3; // value
-
-                let tmp_notes = row.4; // notes
-                let tmp_entry_timestamp: NaiveDateTime = row.5; // entry_timestamp
-                let tmp_intervention_type: String = row.6; //intervention_type
-
+                let tmp_value = row.1; // value
+                let tmp_notes = row.2; // notes
+                let tmp_entry_timestamp: NaiveDateTime = row.3; // entry_timestamp
+                let tmp_intervention_type: String = row.4; //intervention_type
+                let tmp_intv_id: i64 = row.5; // intervention_id
+                let tmp_type_id: i64 = row.6; // type_id
 
                 results.push(
                     InterventionDetail {

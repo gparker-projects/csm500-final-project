@@ -164,7 +164,7 @@ async fn default_route(app_session: web::Data<AppSession>, user_session: Session
        println!("Ok(Some()) Validation errors present in session: {}", &validation_errors);
        // if the login form had validation errors, then we need to show them in the regenerated page.
 
-       let mut content = wcf.get_home_tile(); // retrieve the page base content
+       let mut content = wcf.get_tile(WebContentItem::WCTypeLoginTile); // retrieve the page base content
 
        // construct alternate content for the page
        let alt_content = "<label id=\"errLabel\" style=\"color: red\"><b>".to_owned() + &validation_errors + "</b>"; //.expect("User session invalid")
@@ -263,6 +263,38 @@ impl GenerialWebFormData {
       let result: i64 = self.target_id.parse().unwrap();
       return result;
   }
+}
+
+///
+/// Route for New patient admit, or existing patient discharge page
+/// 
+async fn route_to_admit_discharge(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<GenerialWebFormData>) -> impl Responder {
+  println!("-> /admit_discharge Route Requested");
+
+  let user_session: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+
+  let wcf = &app_session.wcf; 
+ // let mut content = wcf.get_admit_discharge_tile(user_session.user_display_name, req.get_uid_as_i64()); // retrieve the page base content
+
+  HttpResponse::Ok().body( "TODO : route_to_admit_discharge()" )  //content )
+}
+
+///
+/// Route for adding new, or modifying existing Interventions of a patient
+/// 
+async fn route_to_modify_intervention(app_session: web::Data<AppSession>, user_session: Session) -> impl Responder {
+  println!("-> /modify_intervention Route Requested");
+
+  let user_session: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+
+  let wcf = &app_session.wcf; 
+  //let mut content = wcf.get_modify_intervention_tile(); // retrieve the page base content
+
+  //pub fn get_modify_intervention_tile(&self, current_intervention: Intervention) -> String {
+
+
+
+  HttpResponse::Ok().body( "CONTENT TODO: route_to_modify_intervention()" )  //content )
 }
 
 ///
@@ -419,6 +451,8 @@ async fn main() -> std::io::Result<()> {
         .route("/home", web::get().to( route_to_home )) // main workspace
         .route("/patientdtls", web::post().to( route_to_patient_details ))
         .route("/nlprompt", web::post().to( natural_language_prompt ))
+        .route("/admdis", web::post().to( route_to_admit_discharge ))
+        .route("/modintv", web::post().to( route_to_modify_intervention ))
         //.route("/ml", web::get().to( machine_learn_test ))
         .route("/isItUp", web::get().to( is_it_up ))
         .service(Files::new("/webc/", "./webc"))  // ref: ttps://actix.rs/docs/static-files/

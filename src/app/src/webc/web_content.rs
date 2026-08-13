@@ -2,6 +2,7 @@
 /// module for creating web (HTML) content
 /// -------------------------------------------------------------------'
 use std::fs;
+use std::ops::Add;
 use derive_more::Display;
 use std::collections::HashMap;
 
@@ -23,10 +24,10 @@ pub enum WebContentItem {
     WCTypePatientListTile,
     #[display("Home")]
     WCTypeHomePage,
-    //#[display("Patient Summary Tile")]
-    //WCTypePatientSummaryTile,
-    //#[display("Patient Detail Tile")]
-    //WCTypePatientDetailTile,
+    #[display("Discharge Basic Tile")]
+    WCTypeDischargeTile,
+    #[display("Admit Basic Tile")]
+    WCTypeAdmitTile,
 }
 
 /// -------------------------------------------------------------------
@@ -49,17 +50,25 @@ impl WebContentFactory {
         let mut filename = content_root_path.to_owned() + "LoginTile.htl";
 
         //println!("1]WebContentFactory:new() : Attempting read of: {}", filename.clone());
-        let mut contents = fs::read_to_string(&filename).expect("Error reading tile template file");
+        let mut contents = fs::read_to_string(&filename).expect(constants::ERROR_READING_TEMPLATE); 
         tiles.insert(WebContentItem::WCTypeLoginTile, contents ); 
 
         filename = content_root_path.to_owned() + "PatientListTile.htl";        
         //println!("2]WebContentFactory:new() : Attempting read of: {}", filename.clone());
-        contents = fs::read_to_string(&filename).expect("Error reading tile template file");
+        contents = fs::read_to_string(&filename).expect(constants::ERROR_READING_TEMPLATE);
         tiles.insert(WebContentItem::WCTypePatientListTile, contents ); 
 
         filename = content_root_path.to_owned() + "Workspace.htl";        
-        contents = fs::read_to_string(&filename).expect("Error reading tile template file");
+        contents = fs::read_to_string(&filename).expect(constants::ERROR_READING_TEMPLATE);
         tiles.insert(WebContentItem::WCTypeHomePage, contents ); 
+
+        filename = content_root_path.to_owned() + "AdmitTile.htl";        
+        contents = fs::read_to_string(&filename).expect(constants::ERROR_READING_TEMPLATE);
+        tiles.insert(WebContentItem::WCTypeAdmitTile, contents ); 
+
+        filename = content_root_path.to_owned() + "DischargeTile.htl";        
+        contents = fs::read_to_string(&filename).expect(constants::ERROR_READING_TEMPLATE);
+        tiles.insert(WebContentItem::WCTypeDischargeTile, contents ); 
 
         WebContentFactory { tile_hashmap: tiles } 
     }
@@ -177,13 +186,18 @@ impl WebContentFactory {
             results_sbuf.push_str(")</td></tr>");
 
             results_sbuf.push_str("<tr><td>");
-            results_sbuf.push_str("<i>MEASURES</i><br>"); 
+
+            for m in row.intervention_detail{
+                results_sbuf.push_str(&m.type_name());
+                results_sbuf.push_str(":&nbsp;"); 
+                results_sbuf.push_str(&m.value); 
+                results_sbuf.push_str("&nbsp;"); 
+            }
             results_sbuf.push_str("</td></tr>");
             results_sbuf.push_str("</table></a><p></p>");
 
             counter = counter + 1;
         }
-
 
         return results_sbuf;
     }
@@ -299,11 +313,44 @@ impl WebContentFactory {
         return ht7.clone();
     }
 
+    ///
+    /// Provide HTML for creating a new patient admit, or completing it as a discharge for an existing patient
+    /// It is the same table (Encounter), so one route should suffice
+    /// 
+    pub fn get_admit_discharge_tile(&self, user_identity_label: String, current_patient: Option<Patient>, legacy_menu: String) -> String {
+        //let mut results_sbuf = String::with_capacity(100); 
+        println!(">get_admit_discharge_tile()");
+ 
+        let inner_content = match current_patient{ // get basic static tile loaded, make edits depending on type
+            None =>{ // new patient (Admit) path
+                println!("Admit Patient");
+                let base_tile_level_0 = self.get_tile(WebContentItem::WCTypeAdmitTile); 
+                let base_tile_level_1 = base_tile_level_0.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
+
+                base_tile_level_1
+            } // update patient (Discharge) path
+            Some (p) => {
+                println!("Discharge Patient");
+                let base_tile_level_0 = self.get_tile(WebContentItem::WCTypeDischargeTile);
+                let base_tile_level_1 = base_tile_level_0.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
+
+                base_tile_level_1
+            }
+        };
+        
+        // this first one replaces the base tile (loaded from file) with the new "layout" provided above
+        let home_tile_level_0 = &self.get_home_tile_with_user_identity(user_identity_label).replace(constants::BODY_TILE_CONTENT_TAG, &inner_content.clone()); // build the individual sections
+
+        // common content
+        let home_tile_level_1 = &home_tile_level_0.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
+
+        return home_tile_level_1.clone();
+    }
+
    
     // -----------------------------------------------------------------------------------
     // Encounter formatters
     // -----------------------------------------------------------------------------------
-
     pub fn get_single_encounter_summary_tile(&self, encounter: Encounter) -> String {
         let mut results_sbuf = String::with_capacity(100);
 
@@ -378,6 +425,42 @@ impl WebContentFactory {
             results_sbuf.push_str("  </tr>\n");
         }
         results_sbuf.push_str("</table>");
+
+        return results_sbuf;
+    }
+
+    // -----------------------------------------------------------------------------------
+    // Intervention formatters
+    // -----------------------------------------------------------------------------------
+
+    ///
+    /// Provide HTML for modifying an Intervention
+    /// 
+    pub fn get_modify_intervention_tile(&self, current_intervention: Option<Intervention>) -> String {
+        let mut results_sbuf = String::with_capacity(100); 
+        println!(">get_modify_intervention_tile()");
+
+        let inner_content = match current_intervention{
+            None =>{ // new intervention path
+                println!("No Intervention provided");
+                "No Encounters provided".to_owned()
+            } // update intervention path
+            Some (encounters) => {
+                println!("Intervention provided");
+                "Intervention provided".to_owned()
+            }
+        };
+
+        results_sbuf.push_str(&self.get_hidden_form("admdis".to_owned(), "admdis".to_owned()) );
+
+        let hidden_form = r##"<div id="hiddenSection" style="display: none; margin-top: 0px;">
+                                      <form action="\{target_name}" method="post" id="{form_name}" name="{form_name}">
+                                      <input type="hidden" name="target_id" id="target_id" value="0">
+                                     </form></div>"##;
+
+        results_sbuf.push_str(hidden_form);
+        results_sbuf.push_str( &inner_content );        
+        //results_sbuf.push_str("</table>");
 
         return results_sbuf;
     }

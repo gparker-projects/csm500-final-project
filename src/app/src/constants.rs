@@ -7,6 +7,8 @@ pub const DATABASE_ERROR_NOT_FOUND : &str = "Not Found";
 pub const GENERAL_ERROR_NOT_FOUND : &str = "Not Found";
 pub const SESSION_ERROR_INVALID : &str = "User session invalid";
 
+pub const ERROR_READING_TEMPLATE : &str = "Error reading tile template file";
+
 // todo: move this to a config file
 // application-wide database string; should come from a configurable parameter file (TODO)
 pub const DB_CONN_STR: &str = "postgres://postgres:csm500@localhost:5432/csm500";
