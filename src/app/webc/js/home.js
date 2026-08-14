@@ -91,3 +91,10 @@ async function redirect_to_patient(p_id){
     const frm = document.getElementById('patientDtlsFrm');
     frm.submit();
 }
+
+async function admit_patient(){
+	console.log('admit_patient');
+
+    const frm = document.getElementById('admitFrm');
+    frm.submit();
+}

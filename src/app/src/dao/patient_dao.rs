@@ -70,6 +70,8 @@ impl PatientDAO {
                 let tmp_sin:    i32 = row.get("sin"); // SIN
                 let tmp_phn:    i64 = row.get("phn"); // SIN
 
+                let tmp_location_short_name = row.get("location_short_name");  // location_short_name
+
                 Ok(  Some( 
                         Patient {
                             id: tmp_pat_id,
@@ -81,6 +83,7 @@ impl PatientDAO {
                             phn: tmp_phn,
                             birth_date: tmp_birthdate, //Utc::now().naive_utc(), 
                             location_id: tmp_loc_id,
+                            location_short_name: tmp_location_short_name,
                             admit_timestamp:tmp_admit_timestamp, //Utc::now().naive_utc(), 
                             admit_notes: tmp_admit_notes,//"DUMMY".to_string(), 
                             discharge_timestamp: tmp_discharge_timestamp,//Utc::now().naive_utc(), 
@@ -115,7 +118,7 @@ impl PatientDAO {
                         String, String,
                         chrono::NaiveDateTime, chrono::NaiveDateTime, 
                         Option<chrono::NaiveDateTime>,
-                        i32, i64
+                        i32, i64, String
                         )> = sqlx::query_as(&query)
         .fetch_all(&self.connection) 
         .await
@@ -147,6 +150,8 @@ impl PatientDAO {
                 let tmp_sin:    i32 = row.11; // SIN
                 let tmp_phn:    i64 = row.12; // phn
 
+                let tmp_location_short_name = row.13; // location_short_name
+
                 results.push(
                     Patient {
                         id: tmp_pat_id,
@@ -162,6 +167,7 @@ impl PatientDAO {
                         admit_notes: tmp_admit_notes,
                         discharge_timestamp: tmp_discharge_timestamp,
                         discharge_notes: tmp_discharge_notes,
+                        location_short_name: tmp_location_short_name
                     }
                 );
             }
@@ -178,10 +184,10 @@ impl PatientDAO {
 
     /// Updates the fields of a specific patient
     /// 
-    pub async fn update_patient_details(&self, _user_id: i64, _patient_id: i64) -> Result< Option<Patient>, std::io::Error> {
-        /*
+    pub async fn upsert_patient_enc_details(&self, _user_id: i64, p: Patient, e:Encounter) -> Result< Option<Patient>, std::io::Error> {
         
-            */
+        println!("  >> upsert_patient_enc_details() to add/update Patient and Encounter");
+
         todo!();
     }
 

@@ -9,6 +9,13 @@ body {
 h1 {
   color: #448DD1;
   text-align: center;
+  font-size: 16px;
+}
+
+h2 {
+  color: #448DD1;
+  text-align: center;
+  font-size: 14px;
 }
 
 p {
@@ -80,4 +87,16 @@ form {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+}
+
+
+input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
+  background-color: #448dd1;
+  border: none;
+  color: white;
+  padding: 4px 4px;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 8px;
 }

@@ -9,9 +9,10 @@ pub const QRY_ALL_PATIENTS_AT_USERS_SITE_NO_DISCHARGE: &str = r##"SELECT p.id, e
                                         COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
                                         birthdate, admit_timestamp,
                                         discharge_timestamp as "discharge_timestamp?",
-                                        sin, phn
+                                        sin, phn, l2.short_name "location_short_name"
                                     FROM patient p
                                     join encounter e on p.id = e.patient_id
+									join location l2 on l2.id = e.location_id
                                     where discharge_timestamp is null
                                       and location_id in (
                                         select l.id
@@ -118,9 +119,10 @@ pub const QRY_SINGLE_PATIENT_DETAILS: &str =  r##"SELECT p.id "patient_id", e.id
                                                 COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
                                                 birthdate, admit_timestamp,
                                                 discharge_timestamp as "discharge_timestamp?",
-                                                sin, phn
+                                                sin, phn, l2.short_name "location_short_name"
                                             FROM patient p
                                             join encounter e on p.id = e.patient_id
+											join location l2 on l2.id = e.location_id
                                             where patient_id = {}"##;
 
 pub const QRY_ALL_INTERVENTION_DETAILS: &str =  r##"

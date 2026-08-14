@@ -6,7 +6,7 @@ use std::fmt;
 /// Defines a Data Transfer Object for a Patient
 /// -------------------------------------------------------------------
 /// 
-#[derive(Deserialize, Serialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct Patient {
     // fields from the PATIENT table
     #[serde(rename = "Id")]
@@ -27,6 +27,8 @@ pub struct Patient {
     pub birth_date: NaiveDateTime, // BIRTHDATE TIMESTAMP,
     #[serde(rename = "location_id")]
     pub location_id: i64, // LOCATION_ID BIGINT REFERENCES LOCATION (ID),
+    #[serde(rename = "location_short_name")]
+    pub location_short_name: String, // SHORT_NAME VARCHAR2(16)
 
     // fields from the ENCOUNTER table
     #[serde(rename = "admit_timestamp")]
@@ -51,11 +53,12 @@ impl Patient {
                 phn: i64,
                 birth_date: NaiveDateTime,
                 location_id: i64,
+                location_short_name: String,
 
                 admit_timestamp: NaiveDateTime,
                 admit_notes: String,
                 discharge_timestamp: Option<NaiveDateTime>,
-                discharge_notes: String,
+                discharge_notes: String
             ) -> Self {
         Self { 
                 id,
@@ -67,6 +70,7 @@ impl Patient {
                 phn,
                 birth_date,
                 location_id,
+                location_short_name,
 
                 admit_timestamp,
                 admit_notes,
@@ -85,7 +89,7 @@ impl Patient {
     ///
     /// accessor method to return the birth date (date portion only) in a format that can be easily displayed
     /// 
-    pub fn get_phn(&self) -> String{
+    pub fn phn_to_string(&self) -> String{
         self.phn.to_string()
     }
 

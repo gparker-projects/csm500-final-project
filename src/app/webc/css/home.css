@@ -44,6 +44,14 @@ li a:hover {
   color: white;
 }
 
+.menuOther{
+  background-color: #ABBDD5;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: normal;
+  font-size: 14px;
+  color: white;
+}
+
 .menuNotCurrentSmall {
   background-color: #C9D5E3;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -71,17 +79,6 @@ input[type=text] {
 
 input[type=button], input[type=submit], input[type=reset] {
   background-color: #376BA4;
-  border: none;
-  color: white;
-  padding: 4px 4px;
-  text-decoration: none;
-  margin: 4px 2px;
-  cursor: pointer;
-  border-radius: 8px;
-}
-
-input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
-  background-color: #448dd1;
   border: none;
   color: white;
   padding: 4px 4px;
@@ -147,7 +144,6 @@ input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
   color: #D30000;
   display: inline-block;
 }
-
 
 /*---------------------- Table styles ----------------------
   Ref: https://www.w3schools.com/css/css_table.asp

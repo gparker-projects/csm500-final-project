@@ -6,7 +6,7 @@ use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
-#[derive(Deserialize, Serialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct InterventionDetail {
     #[serde(rename = "Id")]
     pub id: i64, // ID BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 

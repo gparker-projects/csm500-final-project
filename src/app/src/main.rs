@@ -21,7 +21,7 @@ use actix_cors::Cors;
 use actix_files::*;
 use actix_session::{storage::CookieSessionStore, Session, SessionMiddleware}; //, storage::RedisSessionStore} // for user session management: https://docs.rs/actix-session/latest/actix_session/
 
-use crate::dto::{user_auth::*, encounter::*, intervention::*, intervention_detail::*};
+use crate::dto::{user_auth::*, patient::*, encounter::*, intervention::*, intervention_detail::*};
 use crate::dao::{encounter_dao::*, patient_dao::*, intervention_dao::*, auth_dao::*};
 
 //use crate::nlp::NLP; 
@@ -247,7 +247,7 @@ async fn route_to_home(app_session: web::Data<AppSession>, user_session: Session
        content = content.replace(constants::BODY_TILE_CONTENT_TAG, &patient_list_html);  // replace default string
 
        // todo: offload this to the tile generator; should not be repeated
-       let std_menu_html = wcf.get_standard_menu(patient_list.clone()); 
+       let std_menu_html = wcf.get_legacy_menu(patient_list.clone()); 
        content = content.replace(constants::LEGACY_MENU_TILE_TAG, &std_menu_html);  // replace default string       
     }
     None => {
@@ -269,11 +269,11 @@ async fn route_to_home(app_session: web::Data<AppSession>, user_session: Session
 /// A generalized form for 80% of web form submission sitautions, so we dont have a ton of minor forms for one-off uses.
 /// 
 #[derive(serde::Deserialize)]
-pub struct GenerialWebFormData {
+pub struct GenericWebFormData {
     target_id: String,
 }
 
-impl GenerialWebFormData {
+impl GenericWebFormData {
   fn get_uid_as_i64(&self) -> i64{
       let result: i64 = self.target_id.parse().unwrap();
       return result;
@@ -281,16 +281,106 @@ impl GenerialWebFormData {
 }
 
 ///
+/// A generalized form for 80% of web form submission sitautions, so we dont have a ton of minor forms for one-off uses.
+/// 
+#[derive(Default, serde::Deserialize)]
+pub struct AdmitFormData {
+    pub patient_id: String,
+    pub patient_first_name: String,
+    pub patient_last_name: String,
+    pub patient_middle_name: String,
+    pub phn: String,
+    pub birthdate: String,
+    //admit_timestamp -> not actually taken as an input
+    pub encounter_id: String,
+    pub location: String,
+    pub admit_notes: String,
+    // intervention details
+    pub temperature: String,
+    pub blood_pressure: String,
+    pub weight: String,
+    pub intervention_notes: String,
+}
+
+impl AdmitFormData {
+
+  pub fn validate() -> String{
+      let results: String = "Valid".to_string();
+
+      //if patient_id
+
+      results // return results, whatever they may be
+  }
+
+ /*() pub fn to_admit_object_tuple(&self) -> (Option<Patient>, Option<Encounter>, Option<Intervention>){
+    let p = Patient {
+      id: &self.patient_id,
+      legal_first_name: &self.legal_first_name,
+      legal_last_name: &self.legal_last_name,
+      legal_middle_names: &self.legal_middle_names,
+      sin: &self.sin,
+      phn: &self.phn,
+      birth_date: &self.birth_date,
+    };
+
+    /*let e: Encounter = {};
+    let o: Intervention = {};
+
+
+    e.encounter_id = encounter_id;
+    e.location_id = location_id;
+    e.location_short_name = location_short_name;
+
+    e.admit_timestamp = admit_timestamp;
+    e.admit_notes = admit_notes;
+    e.discharge_timestamp = discharge_timestamp;
+    e.discharge_notes = discharge_notes;*/
+
+    ( Some(p), Some(e), Some(o) )
+  }*/
+}
+
+///
+/// Wrapper route for the menu option to admit a patient without having any web form to pass data in from
+/// 
+async fn route_to_admit_new_no_patient(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<GenericWebFormData>) -> impl Responder {
+    println!("-> /route_to_admit_new_no_patient Route Requested");
+
+    route_to_admit_discharge(app_session, user_session, web::Form(
+        AdmitFormData {
+            patient_id: req.0.target_id.clone(),
+            ..Default::default()
+        }
+    )).await
+}
+
+///
 /// Route for New patient admit, or existing patient discharge page
 /// 
-async fn route_to_admit_discharge(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<GenerialWebFormData>) -> impl Responder {
+async fn route_to_admit_discharge(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitFormData>) -> impl Responder {
   println!("-> /admit_discharge Route Requested");
 
   let user_session: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
   let wcf = &app_session.wcf;
 
-  let patient_id: i64 = req.get_uid_as_i64();
+  let patient_id: i64 = req.patient_id.parse().unwrap();
   let dao = PatientDAO::new(constants::DB_CONN_STR).await;
+
+
+  println!(">> route_to_admit_discharge() called");
+
+  let existing_patient: Option<dto::patient::Patient> = if patient_id == constants::NOT_SPECIFIED_ID {
+      println!(">> no Patient specified: create a new Patient and Encounter");
+      
+      //let results = dao.update_patient_details(user_id, p); 
+      None
+  }
+  else{
+      println!(">> Patient exists: update Patient and Encounter");
+      dao.get_patient_details( user_session.get_userid_as_i64(), patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND ) 
+  };
+
+
 
 
   // TODO: pull the legacy menu code out into a common method
@@ -299,19 +389,12 @@ async fn route_to_admit_discharge(app_session: web::Data<AppSession>, user_sessi
   let legacy_menu_results = dao.get_patients_at_users_site_no_discharge(user_session.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
   let legacy_menu = match legacy_menu_results {
       Some (patients_for_menu_lst) => {
-          wcf.get_standard_menu_with_patient(patients_for_menu_lst.clone(), patient_id)
+          wcf.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id)
       }
       None => {
           println!("No patients found for legacy menu");
           constants::LEGACY_MENU_ON_ERROR.to_string() // when no patient, return default error-expected menu
       }
-  };
-
-  let existing_patient: Option<dto::patient::Patient> = if patient_id == constants::NOT_SPECIFIED_ID {
-      None
-  }
-  else{
-      dao.get_patient_details( user_session.get_userid_as_i64(), patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND ) 
   };
 
   let content = wcf.get_admit_discharge_tile(user_session.user_display_name, existing_patient, legacy_menu); // retrieve the page base content
@@ -340,7 +423,7 @@ async fn route_to_modify_intervention(app_session: web::Data<AppSession>, user_s
 ///
 /// Route to View Patient details; expects a GenerialWebFormData to have been submitted to reach the route
 ///
-async fn route_to_patient_details(user_session: Session, app_session: web::Data<AppSession>, req: web::Form<GenerialWebFormData>) -> impl Responder {
+async fn route_to_patient_details(user_session: Session, app_session: web::Data<AppSession>, req: web::Form<GenericWebFormData>) -> impl Responder {
   println!("-> /patientdtls Route Requested");
 
   //todo: this should direct to a standard error or login screen when session is lost
@@ -407,7 +490,7 @@ async fn route_to_patient_details(user_session: Session, app_session: web::Data<
   let legacy_menu_results = dao.get_patients_at_users_site_no_discharge(user_session.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
   let legacy_menu = match legacy_menu_results {
     Some (patients_for_menu_lst) => {
-        wcf.get_standard_menu_with_patient(patients_for_menu_lst.clone(), patient_id)
+        wcf.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id)
     }
     None => {
         println!("No patients found for legacy menu");
@@ -492,6 +575,8 @@ async fn main() -> std::io::Result<()> {
         .route("/patientdtls", web::post().to( route_to_patient_details ))
         .route("/nlprompt", web::post().to( natural_language_prompt ))
         .route("/admit", web::post().to( route_to_admit_discharge ))
+        .route("/admitnew", web::post().to( route_to_admit_new_no_patient ))
+        .route("/discharge", web::post().to( route_to_admit_discharge ))
         .route("/modintv", web::post().to( route_to_modify_intervention ))
         //.route("/ml", web::get().to( machine_learn_test ))
         .route("/isItUp", web::get().to( is_it_up ))

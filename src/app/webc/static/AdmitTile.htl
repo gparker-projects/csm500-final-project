@@ -11,63 +11,65 @@
     let isValid = true;
     
     console.log("in validateForm();");
+    
+    if (! document.getElementById("disclaimerChk") ) {
+        errLabel.textContent = "Disclaimer must be accepted";
+        errLabel.style = "color: red";
+        isValid = false
+    }
 
     if (document.getElementById('patient_first_name').value.trim() == '') {
-        errLabel.textContent = "First Name is required.";
+        errLabel.textContent = "First Name is required";
         errLabel.style = "color: red";
         isValid = false;
     }
 
-    if (document.getElementById('patient_middle_name').value.trim() == '') {
-	  errLabel.textContent = "Middle Name is required.";
-	  errLabel.style = "color: red";
-	  isValid = false;
-    }
+    // middle name not required
     
     if (document.getElementById('patient_last_name').value.trim() == '') {
-	  errLabel.textContent = "Last Name is required.";
+	  errLabel.textContent = "Last Name is required";
 	  errLabel.style = "color: red";
 	  isValid = false;
     }
     
-    if (document.getElementById('PHN').value.trim() == '') {
-	  errLabel.textContent = "Personal Health Number (PHN) is required.";
+    if (document.getElementById('phn').value.trim() == '') {
+	  errLabel.textContent = "Personal Health Number (PHN) is required";
 	  errLabel.style = "color: red";
 	  isValid = false;
     }
 
     if (document.getElementById('birthdate').value.trim() == '') {
-	  errLabel.textContent = "Birthdate is required.";
+	  errLabel.textContent = "Birthdate is required";
 	  errLabel.style = "color: red";
 	  isValid = false;
     }
     
     if (document.getElementById('admit_notes').value.trim() == '') {
-	  errLabel.textContent = "Reason for Visit is required.";
+	  errLabel.textContent = "Reason for Visit is required";
 	  errLabel.style = "color: red";
 	  isValid = false;
     }
     
     if (document.getElementById('temperature').value.trim() == '') {
-	  errLabel.textContent = "Baseline vitals: Temperature, is required.";
+	  errLabel.textContent = "Baseline vitals: Temperature, is required";
 	  errLabel.style = "color: red";
 	  isValid = false;
     }
     
     if (document.getElementById('blood_pressure').value.trim() == '') {
-	  errLabel.textContent = "Baseline vitals: Blood Pressure, is required.";
+	  errLabel.textContent = "Baseline vitals: Blood Pressure, is required";
 	  errLabel.style = "color: red";
 	  isValid = false;
     }
     
     if (document.getElementById('weight').value.trim() == '') {
-	  errLabel.textContent = "Baseline vitals: Weight, is required.";
+	  errLabel.textContent = "Baseline vitals: Weight, is required";
 	  errLabel.style = "color: red";
 	  isValid = false;
     }
     
     if (document.getElementById('intervention_notes').value.trim() == '') {
-	  errLabel.textContent = "Baseline vitals: Additional Observations, is required.";
+	  errLabel.textContent = "Baseline vitals: Additional Observations, is required";
 	  errLabel.style = "color: red";
 	  isValid = false;
     }
@@ -93,7 +95,7 @@
 </HEAD>
 <BODY>
 
-<h1>Admit New Patient</h1>
+<h1>Admission Details</h1>
 	
 <form action="/admit" method="post" id="admdisForm" name="admdisForm" onSubmit="event.preventDefault(); return validateForm()">
 <table>
@@ -102,20 +104,20 @@
 	<label id="errLabel"></label>
 	<table>
 	    <tr class="data-label">
-	      <td><div>First Name</div><input type="text" name="first_name" id="patient_first_name" class="data-field-rw" value="<!--{patient_first_name}-->"></div></td>
-	      <td><div>Last Name</div><input type="text" name="first_name" id="patient_last_name" class="data-field-rw" value="<!--{patient_last_name}-->"></div></td>
-	      <td><div>Middle Names</div><input type="text" name="first_name" id="patient_middle_name" class="data-field-rw" value="<!--{middle_name}-->"></div></td>
+	      <td><div>First Name</div><input type="text" name="patient_first_name" id="patient_first_name" class="data-field-rw" value="<!--{patient_first_name}-->"></div></td>
+	      <td><div>Last Name</div><input type="text" name="patient_last_name" id="patient_last_name" class="data-field-rw" value="<!--{patient_last_name}-->"></div></td>
+	      <td><div>Middle Names</div><input type="text" name="patient_middle_name" id="patient_middle_name" class="data-field-rw" value="<!--{middle_name}-->"></div></td>
 	    </tr>
 
 	    <tr class="data-label">
-	       <td><div>PHN</div><input type="text" name="PHN" id="PHN" class="data-field-rw" value="<!--{phn}-->"></div></td>
+	       <td><div>PHN</div><input type="text" name="phn" id="phn" class="data-field-rw" value="<!--{phn}-->"></div></td>
 	       <td><div>Birth Date</div><input type="text" name="birthdate" id="birthdate" class="data-field-rw" value="<!--{birthdate}-->"></div></td>
-	       <td><div>Admit Date/Time&nbsp;<div class="data-field-ro">YYYY-MON-DD 12:12:12<!--{admit_timestamp}--></div></div></td>
+	       <td><div>Admit Date/Time&nbsp;<div class="data-field-ro"><!--{admit_timestamp}--></div></div></td>
 	    </tr>
 
 	    <tr class="data-label">
 	      <td colspan=3>
-	      <div><div class="data-field-ro"><!--{location}-->{location}</div></div>
+	      <div><div class="data-field-ro"><input type="hidden" name="location" id="location" value="<!--{location}-->"></div></div>
 	      </td>
 	    </tr>
 
@@ -147,7 +149,7 @@
 
 <tr><td>
 <p>
-<div class="disclaimer"><input type="checkbox" value=""><i>I confirm the above information is complete and accurate.</i></div>
+<div class="disclaimer"><input type="checkbox" id="disclaimerChk"><i>I confirm the above information is complete and accurate.</i></div>
 </p>
 </td></tr>
 

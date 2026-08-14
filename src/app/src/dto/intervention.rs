@@ -7,7 +7,7 @@
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
-#[derive(Deserialize, Serialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct Intervention {
     #[serde(rename = "Id")]
     pub id: i64, // D BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 

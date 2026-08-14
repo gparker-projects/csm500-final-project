@@ -81,7 +81,6 @@ impl WebContentFactory {
         return self.tile_hashmap.len();
     }
 
-
     ///
     /// Obtains a specifically enumerated tile. This method does not require use of Options because we are
     /// keeping the key (tile_type: WebContentItem) tightly controlled at this point, so there is no risk
@@ -161,7 +160,7 @@ impl WebContentFactory {
             results_sbuf.push_str( &p.legal_first_name );
 
             results_sbuf.push_str("</b>&nbsp;PHN:<i>&nbsp;"); 
-            results_sbuf.push_str( &p.get_phn() );
+            results_sbuf.push_str( &p.phn_to_string() );
             results_sbuf.push_str("</i>&nbsp;");
 
             results_sbuf.push_str("&nbsp;<div class='clinical-electric-blue'>DOB:<b>&nbsp;"); 
@@ -199,59 +198,6 @@ impl WebContentFactory {
 
             counter = counter + 1;
         }
-
-        return results_sbuf;
-    }
-
-
-    ///
-    /// Provide rendering of a list of patients, as a screen tile
-    /// 
-    pub fn get_home_route_summary_of_patients_tile(&self, patient_list: Vec<Patient>) -> String {
-        let mut results_sbuf = String::with_capacity(100); 
-
-        let mut counter: i8 = 1;
-
-        results_sbuf.push_str(&self.get_hidden_form("patientdtls".to_owned(), "patientDtlsFrm".to_owned()) );
-
-        for row in patient_list{
-            results_sbuf.push_str("<!-- get_home_route_summary_of_patients_tile() -->");
-
-            results_sbuf.push_str("<a href=\"#\" onclick=\"redirect_to_patient("  ); 
-            results_sbuf.push_str( &row.id.to_string() ); 
-            results_sbuf.push_str("); return false;\"><table><tr><td>"); 
-
-            results_sbuf.push_str(&counter.to_string());
-            results_sbuf.push_str(")&nbsp;");
-            results_sbuf.push_str( &row.legal_last_name ); 
-            results_sbuf.push_str(","); 
-            results_sbuf.push_str( &row.legal_first_name );
-            results_sbuf.push_str("&nbsp;<b>DOB:&nbsp;"); 
-
-            results_sbuf.push_str( &row.birth_date_for_display() );
-
-            results_sbuf.push_str("</b>&nbsp;[");
-            results_sbuf.push_str( &row.age() );
-            results_sbuf.push_str("yrs]&nbsp;<i>@</i>");
-
-            //results_sbuf.push_str( &row.short_location() );
-
-            results_sbuf.push_str("&nbsp;&nbsp; Admitted: ");
-            results_sbuf.push_str(&row.admit_timestamp_for_display() );
-            results_sbuf.push_str("</td></tr>");
-
-            results_sbuf.push_str("<tr><td>");
-            results_sbuf.push_str("<i>FLAGS</i><br>");
-            results_sbuf.push_str("</td></tr>");
-
-            results_sbuf.push_str("<tr><td>");
-            results_sbuf.push_str("<i>MEASURES</i><br>"); 
-            results_sbuf.push_str("</td></tr>");
-            results_sbuf.push_str("</table></a><p></p>");
-
-            counter = counter + 1;
-        }
-
 
         return results_sbuf;
     }
@@ -321,26 +267,52 @@ impl WebContentFactory {
     pub fn get_admit_discharge_tile(&self, user_identity_label: String, current_patient: Option<Patient>, legacy_menu: String) -> String {
         //let mut results_sbuf = String::with_capacity(100); 
         println!(">get_admit_discharge_tile()");
- 
+
+        let labels = ["<!--{patient_first_name}-->","<!--{patient_last_name}-->", "<!--{middle_name}-->",
+                                  "<!--{phn}-->","<!--{birthdate}-->", "<!--{location}-->", "<!--{admit_notes}-->", 
+                                  "<!--{temperature}-->","<!--{blood_pressure}-->", "<!--{weight}-->","<!--{intervention_notes}-->"];
+
+        let base_tile_level_0 = self.get_tile(WebContentItem::WCTypeAdmitTile);
+        let base_tile_level_1 = base_tile_level_0.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
+
+        // warning: match is on an Option<Patient>, NOT a tile
         let inner_content = match current_patient{ // get basic static tile loaded, make edits depending on type
+
             None =>{ // new patient (Admit) path
-                println!("Admit Patient");
-                let base_tile_level_0 = self.get_tile(WebContentItem::WCTypeAdmitTile); 
-                let base_tile_level_1 = base_tile_level_0.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
+                println!("  Admit without Patient");
 
-                base_tile_level_1
-            } // update patient (Discharge) path
+                // admitting a new patient with no data => wipe out the tags
+                let mut result = base_tile_level_1.clone();
+                for i in 0..labels.len() {
+                    result = result.replace(labels[i], &"".to_string());
+                }
+
+                // ...except for admit_timestamp which will be Now()
+                let result_2 = result.replace("<!--{admit_timestamp}-->", &chrono::Utc::now().format("%Y-%b-%d %H:%M:%S").to_string());
+
+                result_2
+            } 
             Some (p) => {
-                println!("Discharge Patient");
-                let base_tile_level_0 = self.get_tile(WebContentItem::WCTypeDischargeTile);
-                let base_tile_level_1 = base_tile_level_0.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
+                println!("  Admit with existing Patient");
+                let data_items = [&p.legal_first_name, &p.legal_last_name, &p.legal_middle_names,
+                                                 &p.phn_to_string(), &p.birth_date_for_display(), &p.location_id.to_string(), &p.admit_notes, 
+                                                 &"TODO".to_string(), &"TODO".to_string(), &"TODO".to_string(), &"TODO".to_string()];
 
-                base_tile_level_1
+                let mut result = base_tile_level_1.clone();
+                for i in 0..labels.len() {
+                    result = result.replace(labels[i], data_items[i]);
+                }
+
+                // ...except for admit_timestamp which will be Now()
+                let result_2 = result.replace("<!--{admit_timestamp}-->", &p.admit_timestamp_for_display());
+
+                result_2
             }
         };
         
         // this first one replaces the base tile (loaded from file) with the new "layout" provided above
         let home_tile_level_0 = &self.get_home_tile_with_user_identity(user_identity_label).replace(constants::BODY_TILE_CONTENT_TAG, &inner_content.clone()); // build the individual sections
+
 
         // common content
         let home_tile_level_1 = &home_tile_level_0.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
@@ -473,14 +445,14 @@ impl WebContentFactory {
     ///
     /// Provide HTML for the main system menu; replaces tag: <!--MapleEMR::LegacyMenu-->
     /// 
-    pub fn get_standard_menu(&self, patient_list: Vec<Patient>) -> String {
-       return self.get_standard_menu_with_patient(patient_list, constants::INVALID_PATIENT_ID);
+    pub fn get_legacy_menu(&self, patient_list: Vec<Patient>) -> String {
+       return self.get_legacy_menu_with_patient(patient_list, constants::INVALID_PATIENT_ID);
     }
 
     ///
     /// Provide HTML for the main system menu; replaces tag: <!--MapleEMR::LegacyMenu-->
     /// 
-    pub fn get_standard_menu_with_patient(&self, patient_list: Vec<Patient>, patient_id: i64) -> String {
+    pub fn get_legacy_menu_with_patient(&self, patient_list: Vec<Patient>, patient_id: i64) -> String {
         let mut results_sbuf = String::with_capacity(100); 
 
         let template_sub_items = r#"<li><a class="menuNotCurrentSmall" href="javascript:selectPatientSub({id},1)">&nbsp;&nbsp;&nbsp;Medications</a></li>
@@ -488,9 +460,11 @@ impl WebContentFactory {
                                     <li<a class="menuNotCurrentSmall" href="javascript:selectPatientSub({id},3)">&nbsp;&nbsp;&nbsp;Allergies</a></li>
                                     "#;
 
+        let admit_menu_item = r##"<form action="/admitnew" method="post" id="admitFrm" name="admitFrm"> <input type="hidden" id="target_id" name="target_id" value="-1"></form>"##;
+
         let mut first_entry: bool = true;
 
-        print!("> get_standard_menu_with_patient({})", patient_id);
+        //println!("> get_legacy_menu_with_patient({})", patient_id);
 
         results_sbuf.push_str("<div id=\"legacyMenu\" align=\"left\"><ul><li><a class=\"menuNotCurrent\" href=\"\\home\">My Dashboard</li>");
         for p in patient_list{
@@ -498,7 +472,7 @@ impl WebContentFactory {
             // either we include ALL patients, OR we only include the current patient
             if patient_id == constants::INVALID_PATIENT_ID || p.id == patient_id{ 
                 if ! first_entry {
-                    results_sbuf.push_str("<li><a class=\"menuNotCurrent\"href=\"javascript:redirect_to_patient("); 
+                    results_sbuf.push_str("<li><a class=\"menuNotCurrent\" href=\"javascript:redirect_to_patient("); 
                 }
                 else{
                     results_sbuf.push_str("<li><a class=\"menuCurrent\" href=\"javascript:redirect_to_patient(");
@@ -518,6 +492,8 @@ impl WebContentFactory {
                 }
             }
         }
+        results_sbuf.push_str(admit_menu_item);
+        results_sbuf.push_str("<li><a class=\"menuOther\" href=\"javascript:admit_patient()\">Admit New Patient</a></li>");
         results_sbuf.push_str("</ul></div>");
 
         return results_sbuf;
