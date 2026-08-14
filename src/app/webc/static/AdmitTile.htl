@@ -7,26 +7,21 @@
       <td><div>Middle Names</div><input type="text" name="first_name" id="patient_first_name" class="data-field-rw" value="<!--{middle_name}-->"></div></td>
     </tr>
 
-    <tr class="data-label"><td>
-       <div>PHN</div><input type="text" name="PHN" id="PHN" class="data-field-rw" value="<!--{phn}-->"></div>
-       <div>Birth Date</div><input type="text" name="first_name" id="patient_first_name" class="data-field-rw" value="<!--{birthdate}-->"></div>
-       <div class="data-label">Admit Date/Time</div>&nbsp;<div class="data-field-ro"><!--{admit_timestamp}--></div>
-    </td></tr>
-
-    <tr class="data-label"><td>
-      <div>Location</div>&nbsp;<div class="data-field-ro"><!--{location}--></div>
-    </td></tr>
+    <tr class="data-label">
+       <td><div>PHN</div><input type="text" name="PHN" id="PHN" class="data-field-rw" value="<!--{phn}-->"></div></td>
+       <td><div>Birth Date</div><input type="text" name="first_name" id="patient_first_name" class="data-field-rw" value="<!--{birthdate}-->"></div></td>
+       <td><div>Admit Date/Time</div>&nbsp;<div class="data-field-ro">YYYY-MON-DD 12:12:12<!--{admit_timestamp}--></div></td>
+    </tr>
 
     <tr class="data-label">
-      <td>
-        <div>Reason for Visit</div><textarea id="admit_notes" name="admit_notes" rows="4" cols="50" class="data-field-rw"><!--{admit_notes}--></textarea>
+      <td colspan=3>
+      <div>Location</div>&nbsp;<div class="data-field-ro"><!--{location}--></div>
       </td>
     </tr>
 
     <tr class="data-label">
-      <td>
-        <div>Discharge Date/Time</div>&nbsp;<div class="data-field-ro"><!--{discharge_timestamp}--></div>
-        <div>Outpatient Treatment Plan </div><textarea id="discharge_notes" name="discharge_notes" rows="4" cols="50" class="data-field-rw"><!--{discharge_notes}--></textarea>
+      <td colspan=3>
+        <div>Reason for Visit</div><textarea id="admit_notes" name="admit_notes" rows="4" cols="50" class="data-field-rw"><!--{admit_notes}--></textarea>
       </td>
     </tr>
 
@@ -35,18 +30,19 @@
 <h2>Baseline Vitals</h2>
 <table>
     <tr class="data-label">
-	<td>
-	  <div>Temp (C)</div><input type="text" name="temperature" id="temperature" class="data-field-rw" value="<!--{temperature}-->"></div>
-	  <div>Blood Pressure</div><input type="text" name="blood_pressure" id="blood_pressure" class="data-field-rw" value="<!--{blood_pressure}-->"></div>
-	  <div>Weight (Kg)</div><input type="text" name="weight" id="weight" class="data-field-rw" value="<!--{weight}-->"></div>
-	</td>
+	<td><div>Temp (C)</div><input type="text" name="temperature" id="temperature" class="data-field-rw" value="<!--{temperature}-->"></div></td>
+	<td><div>Blood Pressure</div><input type="text" name="blood_pressure" id="blood_pressure" class="data-field-rw" value="<!--{blood_pressure}-->"></div></td>
+	<td><div>Weight (Kg)</div><input type="text" name="weight" id="weight" class="data-field-rw" value="<!--{weight}-->"></div></td>
     </tr>
     <tr class="data-label">
-	<td>
+	<td colspan=3>
 	<div>Additional Observations </div><textarea id="intervention_notes" name="intervention_notes" rows="4" cols="50" class="data-field-rw"><!--{intervention_notes}--></textarea>
 	</td>
     </tr>
 </table>
 <input type="hidden" name="patient_id" id="patient_id" value="-1">
+
+<input type="submit" value="Save">
+<input type="submit" value="Cancel">
 </form>
 

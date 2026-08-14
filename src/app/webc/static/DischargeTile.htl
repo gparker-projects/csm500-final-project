@@ -1,49 +1,53 @@
 <h1>Discharge Patient: get_admit_discharge_tile()</h1><p>
 <form action="\admdis" method="post" id="admdisForm" name="admdisForm">
 <table>
-    <tr><td>
-      <div class="data-label">First Name</div><div class="data-field-ro"><!--{first_name}-->last_name</div>
-      <div class="data-label">Last Name</div><div class="data-field-ro"><!--{patient_first_name}--></div>
-      <div class="data-label">Middle Names</div><div class="data-field-ro"><!--{middle_name}--></div>
-    </td></tr>
+    <tr class="data-label">
+      <td><div>First Name</div><div class="data-field-ro"><!--{patient_first_name}-->{patient_first_name}</div></td>
+      <td><div>Last Name</div><div class="data-field-ro"><!--{patient_last_name}-->{patient_last_name}</div></td>
+      <td><div>Middle Names</div><div class="data-field-ro"><!--{patient_middle_names}-->{patient_middle_names}</div></td>
+    </tr>
 
-    <tr><td>
-    PHN <!--{phn}-->
-    Birth Date <!--{birthdate}-->
-    Admit Date/Time <!--{admit_timestamp}-->
-    Location <!--{location}-->
-    </td></tr>
+    <tr class="data-label">
+       <td><div>PHN</div><div class="data-field-ro"><!--{phn}-->{phn}</div></td>
+       <td><div>Birth Date</div><div class="data-field-ro"><!--{birthdate}-->{birthdate}</div></td>
+       <td><div>Admit Date/Time</div>&nbsp;<div class="data-field-ro">YYYY-MON-DD 12:12:12<!--{admit_timestamp}--></div></td>
+    </tr>
 
-    <tr><td>
-	    Reason for Visit <!--{admit_notes}-->
-    </td></tr>
+    <tr class="data-label">
+      <td colspan=3>
+      <div>Location</div>&nbsp;<div class="data-field-ro"><!--{location}--></div>
+      </td>
+    </tr>
 
-    <tr><td>
-     Discharge Date/Time <!--{discharge_timestamp}--> &nbsp;
-    </td></tr>
+    <tr class="data-label">
+      <td colspan=3>
+        <div>Reason for Visit</div>div class="data-field-ro"><!--{admit_notes}-->{admit_notes}</div>
+      </td>
+    </tr>
 
-    <tr><td>
-	 Outpatient Treatment Plan <textarea id="discharge_notes" name="discharge_notes" rows="4" cols="50" placeholder=""></textarea>
-    </td></tr>
-
+    <tr class="data-label">
+      <td colspan=3>
+        <div>Discharge Date/Time</div>&nbsp;<div class="data-field-ro">YYYY-MON-DD 12:12:12<!--{discharge_timestamp}--></div>
+        <div>Outpatient Treatment Plan </div><textarea id="discharge_notes" name="discharge_notes" rows="4" cols="50" class="data-field-rw"><!--{discharge_notes}--></textarea>
+      </td>
+    </tr>
 </table>
 <p>
 <h2>Baseline Vitals</h2>
 <table>
-    <tr>
-	<td>
-	Temp (C) <input type="text" name="temperature" id="temperature" value="">
-	Blood Pressure <input type="text" name="blood_pressure" id="blood_pressure" value="">
-	Weight (Kg) <input type="text" name="weight" id="weight" value="">
-	</td>
+    <tr class="data-label">
+	<td><div>Temp (C)</div><div class="data-field-ro"><!--{temperature}--></div></td>
+	<td><div>Blood Pressure</div><div class="data-field-ro"><!--{blood_pressure}--></div></td>
+	<td><div>Weight (Kg)</div><div class="data-field-ro"><!--{weight}-->"></div></td>
     </tr>
-    <tr>
-	<td>
-	Additional Observations<textarea id="intervention_notes" name="intervention_notes" rows="4" cols="50" placeholder=""></textarea>
+    <tr class="data-label">
+	<td colspan=3>
+	<div>Additional Observations </div><textarea id="intervention_notes" name="intervention_notes" rows="4" cols="50" class="data-field-rw"><!--{intervention_notes}--></textarea>
 	</td>
     </tr>
 </table>
 <input type="hidden" name="patient_id" id="patient_id" value="-1">
-</form>
 
-<th class="data-label">Last, First Name</th>
+<input type="submit" value="Save">
+<input type="submit" value="Cancel">
+</form>
