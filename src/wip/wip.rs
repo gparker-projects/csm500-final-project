@@ -9,3 +9,15 @@
 
 
 admit achilles pelides for foot injury
+
+
+
+<form action="/admit" method="post" id="dischargeFrm" name="dischargeFrm" align="right">
+  <input type="hidden" id="target_id" name="target_id" value="1">
+  <input type="submit" value="Discharge">
+</form>
+
+<form action="/admit" method="post" id="admitFrm" name="admitFrm" align="right">
+  <input type="hidden" id="target_id" name="target_id" value="-1">
+  <input type="submit" value="Admit">
+</form>

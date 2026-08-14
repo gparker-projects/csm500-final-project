@@ -19,18 +19,15 @@
 	<div id="MapleEMR::PatientList"></div>
 
 	<div id="MapleEMR::UserCommands"></div>
-		
+
 <form action="/admit" method="post" id="admitFrm" name="admitFrm" align="right">
   <input type="hidden" id="target_id" name="target_id" value="-1">
   <input type="submit" value="Admit">
 </form>
 
-<form action="/admit" method="post" id="dischargeFrm" name="dischargeFrm" align="right">
-  <input type="hidden" id="target_id" name="target_id" value="1">
-  <input type="submit" value="Discharge">
-</form>
 
 </div>
+
 
 <div id="nlpCommandArea" align="right" class="nlpCommandAreaCls">
   <form action="http://127.0.0.1:8000/nlprompt" method="post" id="nlpCommandForm" onSubmit="event.preventDefault(); return validateNLPrompt()" align="right" class="nlpCommandAreaCls">
