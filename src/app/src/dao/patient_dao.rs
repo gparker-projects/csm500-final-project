@@ -51,7 +51,7 @@ impl PatientDAO {
         .await
         {
             Ok( Some(row) ) => {
-                println!("Building patient {} ", patient_id);
+                //println!("Building patient {} ", patient_id);
                 
                 let tmp_pat_id: i64 = row.get("patient_id"); // patient_id
                 let tmp_enc_id: i64 = row.get("encounter_id"); // encounter_id
@@ -126,7 +126,7 @@ impl PatientDAO {
             return Ok( Some( Vec::new() ) );
         }
         else{
-            println!("Loading {} patients",  rows.len());
+            //println!("get_patients_at_users_site_no_discharge() -> Loading {} patients",  rows.len());
             let mut results: Vec<Patient> = Vec::with_capacity(rows.len());
             for row in rows {
                 let tmp_pat_id: i64 = row.0; // patient_id

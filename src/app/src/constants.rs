@@ -34,3 +34,5 @@ pub const ENCOUNTER_HISTORY_TILE_TAG : &str =r##"<div id="MapleEMR::EncounterHis
 pub const INVALID_PATIENT_ID: i64 = -1;
 
 pub const NOT_SPECIFIED_ID: i64 = -1;
+
+pub const LEGACY_MENU_ON_ERROR : &str = r##"<div id="legacyMenu" align="left"><ul><li><a class="menuNotCurrent" href="\home">My Dashboard</li></ul></div>"##;

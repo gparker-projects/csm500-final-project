@@ -153,11 +153,30 @@ input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
   Ref: https://www.w3schools.com/css/css_table.asp
 */
 
+div.tablecontainer {
+  overflow-x: auto;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
 table {
   border-collapse: collapse;
-  border: 1px solid green;
+  border: 1px #559DD8;
   padding: 10px;
   width: auto;
+}
+
+.hover-table {
+  transition: all 0.3s ease; 
+  cursor: pointer;        
+  border: 2px solid #e0e0e0;
+}
+
+.hover-table:hover {
+  background-color: #559DD8;
 }
 
 th {
@@ -167,7 +186,7 @@ th {
   font-weight: normal;
   font-size: 12px;
   padding: 10px;
-  background-color: #376BA4;
+  background-color: #559DD8;
   color: white;
 }
 
@@ -178,21 +197,4 @@ td {
   font-weight: normal;
   font-size: 12px;
   padding: 10px;
-}
-
-tr:hover {
-  background-color: #559DD8;
-}
-
-tr:nth-child(even) {
-  background-color: #C9D5E3;
-}
-
-div.tablecontainer {
-  overflow-x: auto;
-}
-
-a {
-    text-decoration: none;
-    color: inherit;
 }

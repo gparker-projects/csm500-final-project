@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
   <TITLE>Maple EMR</TITLE>
-  <link rel="stylesheet" href="/webc/css/main.css">
+  <link rel="stylesheet" href="/webc/css/login.css">
 
   <script>
   <!-- REFs: https://www.w3schools.com/js/js_validation.asp
@@ -14,15 +14,15 @@
     let isValid = true;
 
     if (document.getElementById('mplUsername').value.trim() == '') {
-      errLabel.textContent = "Username is required.";
-      errLabel.style = "color: red";
-      isValid = false;
+        errLabel.textContent = "Username is required.";
+        errLabel.style = "color: red";
+        isValid = false;
     }
 
     if (document.getElementById('mplPassword').value.trim() == '') {
-	  errLabel.textContent = "Password is required.";
-	  errLabel.style = "color: red";
-	  isValid = false;
+	errLabel.textContent = "Password is required.";
+	errLabel.style = "color: red";
+	isValid = false;
     }
 
     if (!isValid) {
@@ -46,7 +46,7 @@
 <label id="errLabel"></label><br>
 
 <div id="roundbluebox" align="center" >
-<form action="http://127.0.0.1:8000/login" method="post" id="loginForm" onSubmit="event.preventDefault(); return validateForm()">
+<form action="/login" method="post" id="loginForm" onSubmit="event.preventDefault(); return validateForm()">
 
   <label for="Username">Username</label>
   <input type="text" id="mplUsername" name="mplUsername" placeholder="Enter your user name" onClick="document.getElementById('errLabel').textContent='';">

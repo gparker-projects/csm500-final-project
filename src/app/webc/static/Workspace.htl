@@ -2,7 +2,7 @@
 <!-- https://www.w3schools.com/css/css_navbar_vertical.asp -->
 <html>
 <head>
-  <link rel="stylesheet" href="/webc/css/workspace.css">
+  <link rel="stylesheet" href="/webc/css/home.css">
   <link rel="stylesheet" href="/webc/css/dataentryform.css">
   <script src="/webc/js/home.js"></script>
 </head>
@@ -19,6 +19,16 @@
 	<div id="MapleEMR::PatientList"></div>
 
 	<div id="MapleEMR::UserCommands"></div>
+		
+<form action="/admit" method="post" id="admitFrm" name="admitFrm" align="right">
+  <input type="hidden" id="target_id" name="target_id" value="-1">
+  <input type="submit" value="Admit">
+</form>
+
+<form action="/admit" method="post" id="dischargeFrm" name="dischargeFrm" align="right">
+  <input type="hidden" id="target_id" name="target_id" value="1">
+  <input type="submit" value="Discharge">
+</form>
 
 </div>
 

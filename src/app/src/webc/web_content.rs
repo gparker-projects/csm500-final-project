@@ -2,7 +2,7 @@
 /// module for creating web (HTML) content
 /// -------------------------------------------------------------------'
 use std::fs;
-use std::ops::Add;
+//use std::ops::Add;
 use derive_more::Display;
 use std::collections::HashMap;
 
@@ -151,7 +151,8 @@ impl WebContentFactory {
 
             results_sbuf.push_str("<a href=\"#\" onclick=\"redirect_to_patient("  ); 
             results_sbuf.push_str( &p.id.to_string() ); 
-            results_sbuf.push_str("); return false;\"><table><tr><td>"); 
+            results_sbuf.push_str("); return false;\">");
+            results_sbuf.push_str("<table class=\"hover-table\"><tr><td>"); 
 
             results_sbuf.push_str(&counter.to_string());
             results_sbuf.push_str(")&nbsp;<b>");
@@ -484,7 +485,7 @@ impl WebContentFactory {
 
         let template_sub_items = r#"<li><a class="menuNotCurrentSmall" href="javascript:selectPatientSub({id},1)">&nbsp;&nbsp;&nbsp;Medications</a></li>
                                     <li><a class="menuNotCurrentSmall" href="javascript:selectPatientSub({id},2)">&nbsp;&nbsp;&nbsp;Orders</a></li>
-                                    <li><a class="menuNotCurrentSmall" href="javascript:selectPatientSub({id},3)">&nbsp;&nbsp;&nbsp;Allergies</a></li>
+                                    <li<a class="menuNotCurrentSmall" href="javascript:selectPatientSub({id},3)">&nbsp;&nbsp;&nbsp;Allergies</a></li>
                                     "#;
 
         let mut first_entry: bool = true;

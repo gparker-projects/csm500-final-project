@@ -99,7 +99,7 @@ impl AuthDAO {
             return Err(Error::new(ErrorKind::Other, errmsg));
         }
 
-        println!("Loading permissions");
+        //println!("Loading permissions");
         let mut perms: Vec<Permission> = Vec::with_capacity(rows.len());
         for row in rows {
             let tmp_dept_id: i64 = row.0;

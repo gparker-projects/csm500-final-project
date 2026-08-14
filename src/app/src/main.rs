@@ -86,17 +86,32 @@ impl UserSession {
 /// 
 /// check by going to: http://127.0.0.1:8000/db
 /// 
-async fn natural_language_prompt(req: web::Form<NLPromptFormData>) -> impl Responder {
+//async fn natural_language_prompt(req: web::Form<NLPromptFormData>) -> impl Responder {
+async fn natural_language_prompt(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<NLPromptFormData>) -> impl Responder {
+  
     println!("-> /nlprompt Requested; prompt: \"{}\"", req.prompt);
 
     let mut results_sbuf = String::with_capacity(50); // Single heap allocation
     results_sbuf.push_str("<b>PLACEHOLDER CONTENT/b>\n");
 
+    if req.prompt.contains("discharge") {
+        //actix_web::web::Redirect::to("/admdis").using_status_code(StatusCode::SEE_OTHER)
+        HttpResponse::Ok().body(format!( r##"{{"action": "discharge", "prompt": "{}",}}"##, req.prompt)) 
+    }
+    else if req.prompt.contains("admit")  {
+        HttpResponse::Ok().body(format!( r##"{{"action": "admit", "prompt": "{}",}}"##, req.prompt))
+    }
+    else {
+        HttpResponse::Ok().body(format!(r##"{{"action": "other", "prompt": "{}",}}"##, req.prompt)) 
+    }
+
+    //actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SEE_OTHER)
+   
     // these are the ACTUAL execution from the POC
       //let results = nlp::NLP{}.execute();
       //HttpResponse::Ok().body(format!("<b>machine_learn_test {}</b>", results.await.to_string())) 
 
-    HttpResponse::Ok().body(format!("{}", results_sbuf)) 
+    //HttpResponse::Ok().body(format!("{}", results_sbuf)) 
 }
 
 /// performs a connect to the database
@@ -130,7 +145,7 @@ async fn login(user_session: Session, req: web::Form<LoginFormData>, _app_sessio
         user_authorizations: user_perms,
       }).expect("User Session could not be constructed");
     
-      actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SEE_OTHER) // Box::new()
+      actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SEE_OTHER) 
     }
     None => {
       println!("Login denied for {} redirect back to /<default route>", req.username.clone()); // must use the user from the session as DB was not successful
@@ -272,11 +287,36 @@ async fn route_to_admit_discharge(app_session: web::Data<AppSession>, user_sessi
   println!("-> /admit_discharge Route Requested");
 
   let user_session: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+  let wcf = &app_session.wcf;
 
-  let wcf = &app_session.wcf; 
- // let mut content = wcf.get_admit_discharge_tile(user_session.user_display_name, req.get_uid_as_i64()); // retrieve the page base content
+  let patient_id: i64 = req.get_uid_as_i64();
+  let dao = PatientDAO::new(constants::DB_CONN_STR).await;
 
-  HttpResponse::Ok().body( "TODO : route_to_admit_discharge()" )  //content )
+
+  // TODO: pull the legacy menu code out into a common method
+  // get_legacy_menu(dao, user_id, patient_id)
+  //
+  let legacy_menu_results = dao.get_patients_at_users_site_no_discharge(user_session.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+  let legacy_menu = match legacy_menu_results {
+      Some (patients_for_menu_lst) => {
+          wcf.get_standard_menu_with_patient(patients_for_menu_lst.clone(), patient_id)
+      }
+      None => {
+          println!("No patients found for legacy menu");
+          constants::LEGACY_MENU_ON_ERROR.to_string() // when no patient, return default error-expected menu
+      }
+  };
+
+  let existing_patient: Option<dto::patient::Patient> = if patient_id == constants::NOT_SPECIFIED_ID {
+      None
+  }
+  else{
+      dao.get_patient_details( user_session.get_userid_as_i64(), patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND ) 
+  };
+
+  let content = wcf.get_admit_discharge_tile(user_session.user_display_name, existing_patient, legacy_menu); // retrieve the page base content
+
+  HttpResponse::Ok().body( content ) //"TODO : route_to_admit_discharge()" ) 
 }
 
 ///
@@ -364,14 +404,14 @@ async fn route_to_patient_details(user_session: Session, app_session: web::Data<
   };
 
   // refresh the patients in the menu (only)
-  let qry_results = dao.get_patients_at_users_site_no_discharge(user_session.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
-  let legacy_menu = match qry_results {
+  let legacy_menu_results = dao.get_patients_at_users_site_no_discharge(user_session.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+  let legacy_menu = match legacy_menu_results {
     Some (patients_for_menu_lst) => {
-      wcf.get_standard_menu_with_patient(patients_for_menu_lst.clone(), patient_id)
+        wcf.get_standard_menu_with_patient(patients_for_menu_lst.clone(), patient_id)
     }
     None => {
-      //println!("No patients found");
-      "No Patients found".to_owned()
+        println!("No patients found for legacy menu");
+        constants::LEGACY_MENU_ON_ERROR.to_string()
     }
   };
 
@@ -451,7 +491,7 @@ async fn main() -> std::io::Result<()> {
         .route("/home", web::get().to( route_to_home )) // main workspace
         .route("/patientdtls", web::post().to( route_to_patient_details ))
         .route("/nlprompt", web::post().to( natural_language_prompt ))
-        .route("/admdis", web::post().to( route_to_admit_discharge ))
+        .route("/admit", web::post().to( route_to_admit_discharge ))
         .route("/modintv", web::post().to( route_to_modify_intervention ))
         //.route("/ml", web::get().to( machine_learn_test ))
         .route("/isItUp", web::get().to( is_it_up ))

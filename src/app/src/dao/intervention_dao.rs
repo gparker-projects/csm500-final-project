@@ -55,7 +55,7 @@ impl InterventionDAO {
             return Ok( Some( Vec::new() ) );
         }
         else{
-            println!("Loading {} Interventions",  rows.len());
+            //println!("Loading {} Interventions",  rows.len());
             let mut results: Vec<Intervention> = Vec::with_capacity(rows.len());
             for row in rows {
                 let tmp_intv_id: i64 = row.0; // intervention_id
@@ -119,7 +119,7 @@ impl InterventionDAO {
             return Ok( Some( Vec::new() ) );
         }
         else{
-            println!("Loading {} Intervention Details",  rows.len());
+            //println!("get_all_intervention_details() -> Loading {} Intervention Details",  rows.len());
             let mut results: Vec<InterventionDetail> = Vec::with_capacity(rows.len());
             for row in rows {
                 let tmp_id: i64 = row.0; // id

@@ -71,7 +71,7 @@ impl EncounterDAO {
             return Ok( Some( Vec::new() ) );
         }
         else{
-            println!("Loading {} encounters",  rows.len());
+            //println!("get_encounters() -> Loading {} encounters",  rows.len());
             let mut results: Vec<Encounter> = Vec::with_capacity(rows.len());
             for row in rows {
                 let tmp_enc_id: i64 = row.0; // encounter_id
