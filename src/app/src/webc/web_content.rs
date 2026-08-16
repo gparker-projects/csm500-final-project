@@ -264,13 +264,11 @@ impl WebContentFactory {
     /// Provide HTML for creating a new patient admit, or completing it as a discharge for an existing patient
     /// It is the same table (Encounter), so one route should suffice
     /// 
-    pub fn get_admit_discharge_tile(&self, user_identity_label: String, current_patient: Option<Patient>, legacy_menu: String) -> String {
-        //let mut results_sbuf = String::with_capacity(100); 
+    pub fn get_admit_discharge_tile(&self, user_identity_label: String, current_patient: Option<Patient>, legacy_menu: String, location_menu: String) -> String {
         println!(">get_admit_discharge_tile()");
 
         let labels = ["<!--{patient_first_name}-->","<!--{patient_last_name}-->", "<!--{middle_name}-->",
-                                  "<!--{phn}-->","<!--{birthdate}-->", "<!--{location}-->", "<!--{admit_notes}-->", 
-                                  "<!--{temperature}-->","<!--{blood_pressure}-->", "<!--{weight}-->","<!--{intervention_notes}-->"];
+                                  "<!--{phn}-->","<!--{birthdate}-->", "<!--{admit_notes}-->"];
 
         let base_tile_level_0 = self.get_tile(WebContentItem::WCTypeAdmitTile);
         let base_tile_level_1 = base_tile_level_0.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
@@ -295,24 +293,23 @@ impl WebContentFactory {
             Some (p) => {
                 println!("  Admit with existing Patient");
                 let data_items = [&p.legal_first_name, &p.legal_last_name, &p.legal_middle_names,
-                                                 &p.phn_to_string(), &p.birth_date_for_display(), &p.location_id.to_string(), &p.admit_notes, 
-                                                 &"TODO".to_string(), &"TODO".to_string(), &"TODO".to_string(), &"TODO".to_string()];
+                                                 &p.phn_to_string(), &p.birth_date_for_display(),  &p.admit_notes];
 
                 let mut result = base_tile_level_1.clone();
                 for i in 0..labels.len() {
                     result = result.replace(labels[i], data_items[i]);
                 }
 
-                // ...except for admit_timestamp which will be Now()
-                let result_2 = result.replace("<!--{admit_timestamp}-->", &p.admit_timestamp_for_display());
-
+                // ...except for admit_timestamp which will always be Now()
+                let result_2 = result.replace("<!--{admit_timestamp}-->", &p.admit_timestamp_for_display());                
                 result_2
             }
         };
+
+        let inner_content_1 = inner_content.replace("<!--{location_id}-->", &location_menu); // &p.admit_timestamp_for_display());
         
         // this first one replaces the base tile (loaded from file) with the new "layout" provided above
-        let home_tile_level_0 = &self.get_home_tile_with_user_identity(user_identity_label).replace(constants::BODY_TILE_CONTENT_TAG, &inner_content.clone()); // build the individual sections
-
+        let home_tile_level_0 = &self.get_home_tile_with_user_identity(user_identity_label).replace(constants::BODY_TILE_CONTENT_TAG, &inner_content_1.clone()); // build the individual sections
 
         // common content
         let home_tile_level_1 = &home_tile_level_0.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
@@ -366,6 +363,33 @@ impl WebContentFactory {
             results_sbuf.push_str( &row.encounter_site_name );
             results_sbuf.push_str("</td>"); 
             results_sbuf.push_str("  </tr>\n");
+        }
+        results_sbuf.push_str("</table>");
+
+        return results_sbuf;
+    }
+
+
+    ///
+    /// Generates a list of locations based on what is in the system
+    /// 
+    pub fn get_location_dropdown(&self, location_list: Vec<(i64, String)>, default_location_id: i64) -> String {
+        let mut results_sbuf = String::with_capacity(100); 
+        println!("> get_location_dropdown()");
+
+        // https://www.w3schools.com/tags/tag_select.asp
+        results_sbuf.push_str("<select name='location_id' id='location_id'>");
+
+        for row in location_list{
+            results_sbuf.push_str("<option value='" );
+            results_sbuf.push_str(&row.0.to_string()); // location_id here
+            results_sbuf.push_str("'" );
+            if row.0 == default_location_id {
+                results_sbuf.push_str(" selected ");
+            }
+            results_sbuf.push_str(">");
+            results_sbuf.push_str(&row.1); // description here
+            results_sbuf.push_str("</option>");
         }
         results_sbuf.push_str("</table>");
 

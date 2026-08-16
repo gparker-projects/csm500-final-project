@@ -8,16 +8,21 @@
 //! 
 
 
-admit achilles pelides for foot injury
 
 
+<!--tr><td>
+	<h2>Baseline Vitals</h2>
+	<table>
+	    <tr class="data-label">
+		<td><div>Temp (C)</div><input type="text" name="temperature" id="temperature" class="data-field-rw" value="<!--{temperature}-->"></div></td>
+		<td><div>Blood Pressure</div><input type="text" name="blood_pressure" id="blood_pressure" class="data-field-rw" value="<!--{blood_pressure}-->"></div></td>
+		<td><div>Weight (Kg)</div><input type="text" name="weight" id="weight" class="data-field-rw" value="<!--{weight}-->"></div></td>
+	    </tr>
+	    <tr class="data-label">
+		<td colspan=3>
+		<div>Additional Observations </div><textarea id="intervention_notes" name="intervention_notes" rows="4" cols="50" class="data-field-rw"><!--{intervention_notes}--></textarea>
+		</td>
+	    </tr>
+	</table>
 
-<form action="/admit" method="post" id="dischargeFrm" name="dischargeFrm" align="right">
-  <input type="hidden" id="target_id" name="target_id" value="1">
-  <input type="submit" value="Discharge">
-</form>
-
-<form action="/admit" method="post" id="admitFrm" name="admitFrm" align="right">
-  <input type="hidden" id="target_id" name="target_id" value="-1">
-  <input type="submit" value="Admit">
-</form>
+</td></tr-->

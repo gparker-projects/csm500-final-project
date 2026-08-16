@@ -1,53 +1,169 @@
-<h1>Discharge Patient: get_admit_discharge_tile()</h1><p>
-<form action="\admdis" method="post" id="admdisForm" name="admdisForm">
+<!DOCTYPE html>
+<HTML>
+<HEAD>
+  <TITLE>Maple EMR</TITLE>
+  <link rel="stylesheet" href="/webc/css/login.css">
+  <script>
+
+  function validateForm() {
+    const errLabel = document.getElementById('errLabel');
+    errLabel.textContent = '';
+    let isValid = true;
+    
+    console.log("in validateForm();");
+    
+    if (! document.getElementById("disclaimerChk") ) {
+        errLabel.textContent = "Disclaimer must be accepted";
+        errLabel.style = "color: red";
+        isValid = false
+    }
+
+    if (document.getElementById('patient_first_name').value.trim() == '') {
+        errLabel.textContent = "First Name is required";
+        errLabel.style = "color: red";
+        isValid = false;
+    }
+
+    // middle name not required
+    
+    if (document.getElementById('patient_last_name').value.trim() == '') {
+	  errLabel.textContent = "Last Name is required";
+	  errLabel.style = "color: red";
+	  isValid = false;
+    }
+    
+    if (document.getElementById('phn').value.trim() == '') {
+	  errLabel.textContent = "Personal Health Number (PHN) is required";
+	  errLabel.style = "color: red";
+	  isValid = false;
+    }
+
+    if (document.getElementById('birthdate').value.trim() == '') {
+	  errLabel.textContent = "Birthdate is required";
+	  errLabel.style = "color: red";
+	  isValid = false;
+    }
+    
+    if (document.getElementById('admit_notes').value.trim() == '') {
+	  errLabel.textContent = "Reason for Visit is required";
+	  errLabel.style = "color: red";
+	  isValid = false;
+    }
+    
+    if (document.getElementById('temperature').value.trim() == '') {
+	  errLabel.textContent = "Baseline vitals: Temperature, is required";
+	  errLabel.style = "color: red";
+	  isValid = false;
+    }
+    
+    if (document.getElementById('blood_pressure').value.trim() == '') {
+	  errLabel.textContent = "Baseline vitals: Blood Pressure, is required";
+	  errLabel.style = "color: red";
+	  isValid = false;
+    }
+    
+    if (document.getElementById('weight').value.trim() == '') {
+	  errLabel.textContent = "Baseline vitals: Weight, is required";
+	  errLabel.style = "color: red";
+	  isValid = false;
+    }
+    
+    if (document.getElementById('intervention_notes').value.trim() == '') {
+	  errLabel.textContent = "Baseline vitals: Additional Observations, is required";
+	  errLabel.style = "color: red";
+	  isValid = false;
+    }
+    
+    if (!isValid) {
+      event.preventDefault();       // Stop the form from submitting if there are errors
+    }
+    else{
+      admdisForm.submit();
+    }
+
+    // If isValid remains true, the browser automatically proceeds to submit!
+    return isValid;
+  }
+
+  function cancelForm(){
+    if(confirm('Are you sure you want to leave this page?')){
+        window.location.href = "\home";
+    }
+    return;
+  }
+  </script>
+</HEAD>
+<BODY>
+
+<h1>Discharge Details</h1>
+	
+<form action="/admit" method="post" id="admdisForm" name="admdisForm" onSubmit="event.preventDefault(); return validateForm()">
 <table>
-    <tr class="data-label">
-      <td><div>First Name</div><div class="data-field-ro"><!--{patient_first_name}-->{patient_first_name}</div></td>
-      <td><div>Last Name</div><div class="data-field-ro"><!--{patient_last_name}-->{patient_last_name}</div></td>
-      <td><div>Middle Names</div><div class="data-field-ro"><!--{patient_middle_names}-->{patient_middle_names}</div></td>
-    </tr>
+<tr><td>
 
-    <tr class="data-label">
-       <td><div>PHN</div><div class="data-field-ro"><!--{phn}-->{phn}</div></td>
-       <td><div>Birth Date</div><div class="data-field-ro"><!--{birthdate}-->{birthdate}</div></td>
-       <td><div>Admit Date/Time</div>&nbsp;<div class="data-field-ro">YYYY-MON-DD 12:12:12<!--{admit_timestamp}--></div></td>
-    </tr>
+	<label id="errLabel"></label>
+	<table>
+	    <tr class="data-label">
+	      <td><div>First Name</div><input type="text" name="patient_first_name" id="patient_first_name" class="data-field-rw" value="<!--{patient_first_name}-->"></div></td>
+	      <td><div>Last Name</div><input type="text" name="patient_last_name" id="patient_last_name" class="data-field-rw" value="<!--{patient_last_name}-->"></div></td>
+	      <td><div>Middle Names</div><input type="text" name="patient_middle_name" id="patient_middle_name" class="data-field-rw" value="<!--{middle_name}-->"></div></td>
+	    </tr>
 
-    <tr class="data-label">
-      <td colspan=3>
-      <div>Location</div>&nbsp;<div class="data-field-ro"><!--{location}--></div>
-      </td>
-    </tr>
+	    <tr class="data-label">
+	       <td><div>PHN</div><input type="text" name="phn" id="phn" class="data-field-rw" value="<!--{phn}-->"></div></td>
+	       <td><div>Birth Date</div><input type="text" name="birthdate" id="birthdate" class="data-field-rw" value="<!--{birthdate}-->"></div></td>
+	       <td><div>Admit Date/Time&nbsp;<div class="data-field-ro"><!--{admit_timestamp}--></div></div></td>
+	    </tr>
 
-    <tr class="data-label">
-      <td colspan=3>
-        <div>Reason for Visit</div>div class="data-field-ro"><!--{admit_notes}-->{admit_notes}</div>
-      </td>
-    </tr>
+	    <tr class="data-label">
+	      <td colspan=3>
+	      <div><div class="data-field-ro"><input type="hidden" name="location" id="location" value="<!--{location}-->"></div></div>
+	      </td>
+	    </tr>
 
-    <tr class="data-label">
-      <td colspan=3>
-        <div>Discharge Date/Time</div>&nbsp;<div class="data-field-ro">YYYY-MON-DD 12:12:12<!--{discharge_timestamp}--></div>
-        <div>Outpatient Treatment Plan </div><textarea id="discharge_notes" name="discharge_notes" rows="4" cols="50" class="data-field-rw"><!--{discharge_notes}--></textarea>
-      </td>
-    </tr>
-</table>
+	    <tr class="data-label">
+	      <td colspan=3>
+		<div>Reason for Visit</div><textarea id="admit_notes" name="admit_notes" rows="4" cols="50" class="data-field-rw"><!--{admit_notes}--></textarea>
+	      </td>
+	    </tr>
+	</table>
+	<input type="hidden" name="patient_id" id="patient_id" value="-1">
+</td></tr>
+
+<!--tr><td>
+	<h2>Baseline Vitals</h2>
+	<table>
+	    <tr class="data-label">
+		<td><div>Temp (C)</div><input type="text" name="temperature" id="temperature" class="data-field-rw" value="<!--{temperature}-->"></div></td>
+		<td><div>Blood Pressure</div><input type="text" name="blood_pressure" id="blood_pressure" class="data-field-rw" value="<!--{blood_pressure}-->"></div></td>
+		<td><div>Weight (Kg)</div><input type="text" name="weight" id="weight" class="data-field-rw" value="<!--{weight}-->"></div></td>
+	    </tr>
+	    <tr class="data-label">
+		<td colspan=3>
+		<div>Additional Observations </div><textarea id="intervention_notes" name="intervention_notes" rows="4" cols="50" class="data-field-rw"><!--{intervention_notes}--></textarea>
+		</td>
+	    </tr>
+	</table>
+
+</td></tr-->
+
+<tr><td>
 <p>
-<h2>Baseline Vitals</h2>
-<table>
-    <tr class="data-label">
-	<td><div>Temp (C)</div><div class="data-field-ro"><!--{temperature}--></div></td>
-	<td><div>Blood Pressure</div><div class="data-field-ro"><!--{blood_pressure}--></div></td>
-	<td><div>Weight (Kg)</div><div class="data-field-ro"><!--{weight}-->"></div></td>
-    </tr>
-    <tr class="data-label">
-	<td colspan=3>
-	<div>Additional Observations </div><textarea id="intervention_notes" name="intervention_notes" rows="4" cols="50" class="data-field-rw"><!--{intervention_notes}--></textarea>
-	</td>
-    </tr>
-</table>
-<input type="hidden" name="patient_id" id="patient_id" value="-1">
+<div class="disclaimer"><input type="checkbox" id="disclaimerChk"><i>I confirm the above information is complete and accurate.</i></div>
+</p>
+</td></tr>
 
+<tr>
+<td>
 <input type="submit" value="Save">
-<input type="submit" value="Cancel">
+<input type="submit" value="Confirm">
+<input type="button" value="Cancel" onclick="cancelForm()">
+</td>
+</tr>
+
+</table>
 </form>
+
+
+</BODY>
+</HTML>

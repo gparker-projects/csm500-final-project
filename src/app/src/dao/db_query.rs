@@ -85,7 +85,7 @@ pub const QRY_CURRENT_VITALS_FOR_ENC_ID: &str = r##"
                                   AND i.intervention_type_id = 38
                                 ORDER BY i.id DESC LIMIT 1
                                                 "##; // VITALS ARE REF ID = 38
-
+/*
 pub const QRY_ALL_INTERVENTIONS: &str = r##"
                                  SELECT i.id "intervention_id", encounter_id, i.description, i.notes, location_id, users_id,
                                      intervention_type_id, status_id,
@@ -113,7 +113,7 @@ pub const QRY_MOST_RECENT_INTERVENTION: &str = r##"
                                 where i.id = {}
                                 ORDER BY i.id DESC
                                 limit 1
-                                    "##;
+                                    "##;*/
 
 pub const QRY_SINGLE_PATIENT_DETAILS: &str =  r##"SELECT p.id "patient_id", e.id "encounter_id", e.location_id "location_id", legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as "legal_middle_names",
                                                 COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
@@ -132,11 +132,62 @@ pub const QRY_ALL_INTERVENTION_DETAILS: &str =  r##"
                                                         WHERE intervention_id = {}
                                                 "##;
 
-pub const QRY_ALL_INTERVENTION_DETAILS_FOR_TYPE: &str =  r##"
-                                                    SELECT i.id "intervention_details_id", value, notes, entry_timestamp, ref1.name "intervention_type", intervention_id, type_id
-                                                        FROM intervention_details i
-                                                        JOIN common_reference_type ref1 on i.type_id = ref1.id 
-                                                        WHERE intervention_id = {1}
-                                                          AND type_id = {2}
-                                                "##;
-                                                
+pub const QRY_ALL_INTERVENTION_DETAILS_FOR_TYPE: &str = r##"
+    SELECT i.id "intervention_details_id", value, notes, entry_timestamp, ref1.name "intervention_type", intervention_id, type_id
+        FROM intervention_details i
+        JOIN common_reference_type ref1 on i.type_id = ref1.id 
+        WHERE intervention_id = {1}
+            AND type_id = {2}
+"##;
+
+pub const QRY_ACTIVE_LOCATIONS: &str = r##"select id, name ||' (' || short_name|| ')' from location where active_flag = 'Y'"##;
+
+pub const QRY_ACTIVE_DEPARTMENTS: &str = r##"select id, name from department where expiry_timestamp > now()"##;
+
+pub const QRY_CURRENT_USER_LOCATIONS: &str = r##"
+    select id, name ||' (' || short_name|| ')' from location
+    where active_flag = 'Y'
+    and site_id in (
+        select site_id
+        from user_permission
+        where users_id = {}
+            and active_flag = 'Y' )"##;
+
+// ------------------------------------------------------------------------------------------
+// 
+// Insert/Update statements
+// 
+// ------------------------------------------------------------------------------------------
+// 
+pub const UPSERT_PATIENT: &str = r##"
+    INSERT INTO patient (legal_last_name, legal_first_name, legal_middle_names, birthdate, phn)
+    VALUES ('{legal_last_name}', '{legal_first_name}', '{legal_middle_names}', to_timestamp('{birthdate}', 'YYYY/MM/DD'), {phn})
+    ON CONFLICT (phn)
+    DO UPDATE SET
+        legal_first_name   = EXCLUDED.legal_first_name,
+        legal_last_name    = EXCLUDED.legal_last_name,
+        legal_middle_names = EXCLUDED.legal_middle_names,
+        birthdate          = EXCLUDED.birthdate
+    RETURNING ID; "##;
+                
+                // (to_timestamp('15-08-2026 14:30:00', 'DD-MM-YYYY HH24:MI:SS'));
+
+pub const INSERT_ENCOUNTER: &str = r##"
+    INSERT INTO encounter( admit_timestamp, admit_notes, discharge_timestamp, discharge_notes, patient_id, location_id)
+        VALUES ( NOW(),
+                '{admit_notes}',
+                NULL,
+                NULL,
+                {patient_id},
+                {location_id});
+"##;
+
+pub const UPDATE_ENCOUNTER: &str = r##"
+    UPDATE encounter
+        SET admit_notes = '{admit_notes}',
+            discharge_timestamp = to_timestamp('{discharge_timestamp}', 'YYYY/MM/DD HH24:MI:SS'),
+            discharge_notes = '{discharge_notes}',
+            patient_id = {patient_id},
+            location_id = {location_id}
+        WHERE id = {encounter_id};
+"##;

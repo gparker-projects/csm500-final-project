@@ -31,7 +31,11 @@ pub const CURRENT_ENCOUNTER_TILE_TAG : &str =r##"<div id="MapleEMR::CurrentEncou
 pub const CURRENT_INTERVENTIONS_TILE_TAG : &str =r##"<div id="MapleEMR::CurrentInterventions"></div>"##;
 pub const ENCOUNTER_HISTORY_TILE_TAG : &str =r##"<div id="MapleEMR::EncounterHistory"></div>"##;
 
+pub const DEFAULT_LOCATION_REGISTRATION: i64 = 20;
+
 pub const INVALID_PATIENT_ID: i64 = -1;
+
+pub const INVALID_OTHER_ID: i64 = -1;
 
 pub const NOT_SPECIFIED_ID: i64 = -1;
 

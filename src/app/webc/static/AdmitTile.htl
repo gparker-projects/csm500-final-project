@@ -50,7 +50,7 @@
 	  isValid = false;
     }
     
-    if (document.getElementById('temperature').value.trim() == '') {
+    /*if (document.getElementById('temperature').value.trim() == '') {
 	  errLabel.textContent = "Baseline vitals: Temperature, is required";
 	  errLabel.style = "color: red";
 	  isValid = false;
@@ -72,7 +72,7 @@
 	  errLabel.textContent = "Baseline vitals: Additional Observations, is required";
 	  errLabel.style = "color: red";
 	  isValid = false;
-    }
+    }*/
     
     if (!isValid) {
       event.preventDefault();       // Stop the form from submitting if there are errors
@@ -97,10 +97,10 @@
 
 <h1>Admission Details</h1>
 	
-<form action="/admit" method="post" id="admdisForm" name="admdisForm" onSubmit="event.preventDefault(); return validateForm()">
+<form action="/admitsave" method="post" id="admdisForm" name="admdisForm" onSubmit="event.preventDefault(); return validateForm()">
+<div>
 <table>
 <tr><td>
-
 	<label id="errLabel"></label>
 	<table>
 	    <tr class="data-label">
@@ -117,34 +117,19 @@
 
 	    <tr class="data-label">
 	      <td colspan=3>
-	      <div><div class="data-field-ro"><input type="hidden" name="location" id="location" value="<!--{location}-->"></div></div>
+	      <div class="data-field-ro">Admit Location:&nbsp;<!--{location_id}--></div>
 	      </td>
 	    </tr>
 
 	    <tr class="data-label">
 	      <td colspan=3>
-		<div>Reason for Visit</div><textarea id="admit_notes" name="admit_notes" rows="4" cols="50" class="data-field-rw"><!--{admit_notes}--></textarea>
+		<div>Reason for Visit</div><textarea id="admit_notes" name="admit_notes" rows="4" cols="50" class="data-field-rw"><!--{admit_notes}--></textarea></div>
 	      </td>
 	    </tr>
 	</table>
-
-</td></tr>
-
-<tr><td>
-	<h2>Baseline Vitals</h2>
-	<table>
-	    <tr class="data-label">
-		<td><div>Temp (C)</div><input type="text" name="temperature" id="temperature" class="data-field-rw" value="<!--{temperature}-->"></div></td>
-		<td><div>Blood Pressure</div><input type="text" name="blood_pressure" id="blood_pressure" class="data-field-rw" value="<!--{blood_pressure}-->"></div></td>
-		<td><div>Weight (Kg)</div><input type="text" name="weight" id="weight" class="data-field-rw" value="<!--{weight}-->"></div></td>
-	    </tr>
-	    <tr class="data-label">
-		<td colspan=3>
-		<div>Additional Observations </div><textarea id="intervention_notes" name="intervention_notes" rows="4" cols="50" class="data-field-rw"><!--{intervention_notes}--></textarea>
-		</td>
-	    </tr>
-	</table>
 	<input type="hidden" name="patient_id" id="patient_id" value="-1">
+	<input type="hidden" name="encounter_id" id="encounter_id" value="-1">
+	<input type="hidden" name="form_errors" id="form_errors" value="">
 </td></tr>
 
 <tr><td>
@@ -162,6 +147,7 @@
 </tr>
 
 </table>
+</div>
 </form>
 
 

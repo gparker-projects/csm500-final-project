@@ -1,9 +1,11 @@
 use sqlx::postgres::{PgPoolOptions, PgPool}; 
 use sqlx::Row;
 use chrono::NaiveDateTime;
+use crate::constants;
 
 use crate::dao::db_query;
 use crate::dto::{patient::*, encounter::*, intervention::*, intervention_detail::*};
+use crate::webc::{data_forms::*};
 
 #[derive(Debug, Clone)]
 pub struct PatientWrapper {
@@ -44,7 +46,7 @@ impl PatientDAO {
         let tmp: String = db_query::QRY_SINGLE_PATIENT_DETAILS.to_owned();
         let query = tmp.replace("{}", &patient_id.to_string());
 
-        //println!("get_patient_details Query: {}", query);
+        println!("get_patient_details Query: {}", query);
 
         match sqlx::query(&query)
         .fetch_optional(&self.connection)
@@ -93,7 +95,7 @@ impl PatientDAO {
                 )
             }
             Ok(None) => {
-                println!("No patient found for: {}", patient_id);
+                println!("No patient found for patient_id = {}", patient_id);
                 Ok( None )
             }
             Err(err) => {
@@ -102,6 +104,97 @@ impl PatientDAO {
             }
         }
     }
+
+
+
+    ///
+    /// Given an AdmitFormData, create a new Patient reocrd, or update an eisting one
+    /// RETURNS: (i64, i64): the id of the Patient and the id of the Encounter record that were created 
+    /// 
+    /// REF: https://medium.com/@francis.stephan/developing-a-web-app-with-rust-part-4-sqlx-data-validation-deployment-final-remarks-303e78c2a546
+    /// 
+    pub async fn upsert_from_admit_form(&self, form: AdmitFormData, audit_user_id: i64)-> Result<(i64, i64), sqlx::Error> {
+        let patient_results = self.upsert_patient_from_admit_form(form.clone(), audit_user_id).await;
+        match patient_results {
+            Ok(p_id) => {
+                let enc_results = self.upsert_encounter_from_admit_form(form.clone(), audit_user_id).await;
+
+                match enc_results {
+                    Ok(e_id) =>  Ok((p_id, e_id)),
+                    Err(e) =>  Ok((p_id, constants::INVALID_OTHER_ID))
+                }
+            },
+            Err(e) =>  Ok((constants::INVALID_PATIENT_ID, constants::INVALID_OTHER_ID))
+        }
+    }
+
+    ///
+    /// Given an AdmitFormData, create a new Encounter reocrd, or update an existing one
+    /// RETURNS: i64: the id of the Encounter record that is created, if applicable
+    /// 
+    pub async fn upsert_encounter_from_admit_form(&self, form: AdmitFormData, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
+        println!("> upsert_encounter_from_admit_form");
+
+        let mut query_level_0 = "".to_string();
+
+        // if encounter id is not specified, we INSERT
+        if &form.encounter_id == &constants::NOT_SPECIFIED_ID.to_string() {
+            query_level_0 = db_query::INSERT_ENCOUNTER.to_string();
+        }
+        else{ // but if it is present, we UPDATE
+            query_level_0 = db_query::UPDATE_ENCOUNTER.to_string();
+        }
+
+        let query_level_1 = &query_level_0.replace("{admit_notes}", &form.admit_notes.clone().trim());
+        let query_level_2 = &query_level_1.replace("{patient_id}", &form.patient_id.clone().trim());
+        //let query_level_3 = &query_level_2.replace("{discharge_timestamp}", &form.discharge_timestamp.clone().trim());
+        //let query_level_4 = &query_level_3.replace("{discharge_notes}", &form.discharge_notes.clone().trim());
+        let query = &query_level_2.replace("{location_id}", &form.location_id.clone().trim());
+
+        println!(" >> Encounter Upsert: {}", query);
+
+        let result = sqlx::query(&query)
+                                                        .fetch_one(&self.connection)
+                                                        .await
+                                                        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
+        
+        // return the patient id that was created or updated
+        let inserted_id: i64 = result.get("id");
+
+        Ok(inserted_id)
+    }
+
+    ///
+    /// Given an AdmitFormData, create a new Patient reocrd, or update an eisting one
+    /// RETURNS: i64: the id of the Patient record that is created
+    /// 
+    /// REF: https://medium.com/@francis.stephan/developing-a-web-app-with-rust-part-4-sqlx-data-validation-deployment-final-remarks-303e78c2a546
+    /// 
+    pub async fn upsert_patient_from_admit_form(&self, form: AdmitFormData, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
+        println!("> upsert_patient_from_admit_form");
+            
+        let query_level_0 = db_query::UPSERT_PATIENT;
+        let query_level_1 = &query_level_0.replace("{legal_last_name}", &form.patient_last_name.clone().trim());
+        let query_level_2 = &query_level_1.replace("{legal_first_name}", &form.patient_first_name.clone().trim());
+        let query_level_3 = &query_level_2.replace("{legal_middle_names}", &form.patient_middle_name.clone().trim());
+        let query_level_4 = &query_level_3.replace("{birthdate}", &form.birthdate.clone());
+        let query_level_5 = &query_level_4.replace("{phn}", &form.phn.clone());
+        let query = query_level_5.clone();
+
+        println!(" >> Upsert: {}", query_level_5);
+
+        let result = sqlx::query(&query)
+                                                        .fetch_one(&self.connection)
+                                                        .await
+                                                        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
+        
+        // return the patient id that was created or updated
+        let inserted_id: i64 = result.get("id");
+
+        Ok(inserted_id)
+    }
+
+
 
     /// Finds and returns any patients that are currently assigned to the user
     /// 
@@ -175,22 +268,12 @@ impl PatientDAO {
         }
     }
 
-        /// Finds and returns the data for a specific patient
-    /// 
-    /// 
-    pub async fn get_admit_patient(&self, _user_id: i64, _patient_id: i64) -> Result< Option<Patient>, std::io::Error> {
-        todo!();
-    }
-
+/* 
     /// Updates the fields of a specific patient
-    /// 
     pub async fn upsert_patient_enc_details(&self, _user_id: i64, p: Patient, e:Encounter) -> Result< Option<Patient>, std::io::Error> {
         
         println!("  >> upsert_patient_enc_details() to add/update Patient and Encounter");
 
         todo!();
-    }
-
-
-
+    }*/
 }
