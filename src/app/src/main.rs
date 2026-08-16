@@ -21,7 +21,7 @@ use actix_cors::Cors;
 use actix_files::*;
 use actix_session::{storage::CookieSessionStore, Session, SessionMiddleware}; //, storage::RedisSessionStore} // for user session management: https://docs.rs/actix-session/latest/actix_session/
 
-use crate::dto::{user_auth::*, encounter::*, intervention::*}; //, patient::*, intervention_detail::*};
+use crate::dto::{user_auth::*, encounter::*, intervention_detail::*}; //, patient::*}; intervention::*,
 use crate::dao::{encounter_dao::*, patient_dao::*, intervention_dao::*, auth_dao::*, common_dao::*};
 use crate::webc::{data_forms::*};
 
@@ -214,15 +214,26 @@ async fn route_to_home(app_session: web::Data<AppSession>, user_session: Session
        let mut pwrap: Vec<PatientWrapper> = Vec::new();
 
        for p in patient_list.clone(){
-          let cur_enc: Encounter = edao.get_current_encounter(p.id.clone()).await.clone();
-          let cur_intv: Intervention = idao.get_most_recent_vitals(cur_enc.id.clone()).await.clone(); //get the current encounter for each patient
-          let cur_idtls = idao.get_all_intervention_details(cur_intv.id, constants::NOT_SPECIFIED_ID).await.expect(constants::DATABASE_ERROR_NOT_FOUND).clone(); //.clone();
+          let cur_enc: Encounter = edao.get_current_encounter(p.id.clone()).await.clone(); //get the current encounter for each patient
+          let cur_intv = idao.get_most_recent_vitals(cur_enc.id.clone()).await.expect(constants::DATABASE_ERROR_NOT_FOUND); 
+
+          let cur_idtls: Result< Option< Vec<InterventionDetail> >, std::io::Error> = match cur_intv.clone() {
+           Some( intv ) => {
+                Ok( Some(
+                  idao.get_all_intervention_details(intv.id, constants::NOT_SPECIFIED_ID).await.expect(constants::EMPTY_DATASET).clone().unwrap()
+                ) )
+            }
+            None => {
+                println!("No intervention found for encounter id = {}", cur_enc.id);
+                Ok( None )
+            }
+          };
 
           pwrap.push( PatientWrapper{
                   patient: p.clone(),
                   current_encounter: cur_enc.clone(),
-                  most_recent_intervention: cur_intv.clone(),
-                  intervention_detail: cur_idtls.clone().expect(constants::GENERAL_ERROR_NOT_FOUND)
+                  most_recent_intervention: cur_intv,
+                  intervention_detail: cur_idtls.expect(constants::EMPTY_DATASET)
               }
           );
           //print!(">> DEBUG Added pid={} e={} i={}", tmp_p, tmp_e, tmp_i);
@@ -277,14 +288,15 @@ async fn route_to_admit_save(app_session: web::Data<AppSession>, user_session: S
     let results = dao.upsert_patient_from_admit_form(req_clone0, user_session_details.get_userid_as_i64()).await;
     match results {
         Ok(p_id) => {
-          println!("  >(Step 1/2): Patient saved successfully, patient id {p_id} added/updated");
-          let req_clone2 = req.clone();
+          println!("  >(Step 1/2): Patient saved successfully, patient (id={p_id}) added/updated");
+          let mut req_clone2 = req.clone();
+          req_clone2.patient_id = p_id.to_string();
 
           // if patient was successful, we need the Encounter as well
           let enc_results = dao.upsert_encounter_from_admit_form(req_clone2, user_session_details.get_userid_as_i64()).await;
           match enc_results {
               Ok(e_id) => {
-                println!("  >(Step 2/2): Encounter saved successfully, patient id {p_id} and encounter id {e_id} added/updated");
+                println!("  >(Step 2/2): Encounter saved successfully, patient (id={p_id}) and encounter (id={e_id}) added/updated");
 
                 println!("<--- Redirect back to : /route_to_admit_discharge (001)");
                 let req_clone = req.clone(); // local clone to avoid borrowing issues
@@ -325,7 +337,7 @@ async fn route_to_admit_save(app_session: web::Data<AppSession>, user_session: S
                           }
                   )).await
               }
-            }
+          }
         },
         Err(e) => {
           println!("  >(Step 1/2): FAILED Admit form did not save: {e}");

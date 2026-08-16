@@ -19,8 +19,6 @@ pub struct Patient {
     pub legal_last_name: String, // LEGAL_LAST_NAME VARCHAR(100), 
     #[serde(rename = "legal_middle_names")]
     pub legal_middle_names: String, // LEGAL_MIDDLE_NAMES VARCHAR(100), 
-    #[serde(rename = "sin")]
-    pub sin: i32, // SIN INTEGER UNIQUE, 
     #[serde(rename = "phn")]
     pub phn: i64, // PHN BIGINT UNIQUE, 
     #[serde(rename = "birthdate")]
@@ -49,7 +47,6 @@ impl Patient {
                 legal_first_name: String,
                 legal_last_name: String,
                 legal_middle_names: String,
-                sin: i32,
                 phn: i64,
                 birth_date: NaiveDateTime,
                 location_id: i64,
@@ -66,7 +63,6 @@ impl Patient {
                 legal_first_name,
                 legal_last_name,
                 legal_middle_names,
-                sin,
                 phn,
                 birth_date,
                 location_id,

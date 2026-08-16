@@ -177,23 +177,32 @@ impl WebContentFactory {
             results_sbuf.push_str("<tr><td>");
             results_sbuf.push_str("Admitted: ");
             results_sbuf.push_str(&p.admit_timestamp_for_display() );
-            results_sbuf.push_str("&nbsp;");
-            results_sbuf.push_str( &i.intervention_type );
-            results_sbuf.push_str("&nbsp;@&nbsp;");
-            results_sbuf.push_str( &i.scheduled_date_for_display() );
-            results_sbuf.push_str("&nbsp;(");
-            results_sbuf.push_str( &i.status_code );
-            results_sbuf.push_str(")</td></tr>");
 
-            results_sbuf.push_str("<tr><td>");
+            if i.is_some() {
+               let tmp_intv = i.unwrap();
 
-            for m in row.intervention_detail{
-                results_sbuf.push_str(&m.type_name());
-                results_sbuf.push_str(":&nbsp;"); 
-                results_sbuf.push_str(&m.value); 
-                results_sbuf.push_str("&nbsp;"); 
+               results_sbuf.push_str("&nbsp;");
+               results_sbuf.push_str( &tmp_intv.intervention_type );
+               results_sbuf.push_str("&nbsp;@&nbsp;");
+               results_sbuf.push_str( &tmp_intv.scheduled_date_for_display() );
+
+               results_sbuf.push_str("&nbsp;(");
+               results_sbuf.push_str( &tmp_intv.status_code );
+               results_sbuf.push_str(")");
             }
             results_sbuf.push_str("</td></tr>");
+
+           /*  if i.is_some() && row.intervention_detail.is_some() {
+               results_sbuf.push_str("<tr><td>");
+
+               for m in row.intervention_detail{
+                    results_sbuf.push_str(&m.type_name());
+                    results_sbuf.push_str(":&nbsp;"); 
+                    results_sbuf.push_str(&m.value); 
+                    results_sbuf.push_str("&nbsp;"); 
+                }
+                results_sbuf.push_str("</td></tr>");
+            }*/
             results_sbuf.push_str("</table></a><p></p>");
 
             counter = counter + 1;

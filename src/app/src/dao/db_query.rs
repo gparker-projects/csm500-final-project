@@ -9,7 +9,7 @@ pub const QRY_ALL_PATIENTS_AT_USERS_SITE_NO_DISCHARGE: &str = r##"SELECT p.id, e
                                         COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
                                         birthdate, admit_timestamp,
                                         discharge_timestamp as "discharge_timestamp?",
-                                        sin, phn, l2.short_name "location_short_name"
+                                        phn, l2.short_name "location_short_name"
                                     FROM patient p
                                     join encounter e on p.id = e.patient_id
 									join location l2 on l2.id = e.location_id
@@ -170,7 +170,7 @@ pub const UPSERT_PATIENT: &str = r##"
         birthdate          = EXCLUDED.birthdate
     RETURNING ID; "##;
                 
-                // (to_timestamp('15-08-2026 14:30:00', 'DD-MM-YYYY HH24:MI:SS'));
+// (to_timestamp('15-08-2026 14:30:00', 'DD-MM-YYYY HH24:MI:SS'));
 
 pub const INSERT_ENCOUNTER: &str = r##"
     INSERT INTO encounter( admit_timestamp, admit_notes, discharge_timestamp, discharge_notes, patient_id, location_id)
@@ -179,7 +179,7 @@ pub const INSERT_ENCOUNTER: &str = r##"
                 NULL,
                 NULL,
                 {patient_id},
-                {location_id});
+                {location_id}) RETURNING ID;
 "##;
 
 pub const UPDATE_ENCOUNTER: &str = r##"
@@ -189,5 +189,5 @@ pub const UPDATE_ENCOUNTER: &str = r##"
             discharge_notes = '{discharge_notes}',
             patient_id = {patient_id},
             location_id = {location_id}
-        WHERE id = {encounter_id};
+        WHERE id = {encounter_id} RETURNING ID;
 "##;

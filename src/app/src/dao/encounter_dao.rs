@@ -52,7 +52,7 @@ impl EncounterDAO {
 
         let query = tmp.replace("{}", &patient_id.to_string());
         
-        //println!("get_encounters Query: {}", query);
+        println!(">get_encounters() Query: {}", query);
 
         let rows: Vec<(i64, // encounter_id
                        NaiveDateTime, // admit_timestamp

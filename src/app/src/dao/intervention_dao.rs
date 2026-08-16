@@ -31,6 +31,7 @@ impl InterventionDAO {
         }
     }
 
+
     /// Finds and returns all interventions based on an encounter
     /// 
     pub async fn get_interventions(&self, encounter_id: i64, current_only: bool) -> Result< Option< Vec<Intervention> >, std::io::Error> {
@@ -41,7 +42,7 @@ impl InterventionDAO {
         };
         let query = tmp.replace("{}", &encounter_id.to_string());
 
-        //println!("get_interventions Query: {}", query);
+        println!(">get_interventions() Query: {}", query);
 
         let rows: Vec<(i64, i64, String, String,
                        i64, i64, i64, i64,
@@ -51,7 +52,7 @@ impl InterventionDAO {
         .unwrap_or_default();
 
         if rows.is_empty() {
-            println!("No interventions found for encounter_id: {} [{}]", encounter_id, rows.len());
+            println!("No Interventions found for encounter_id: {} [count={}]", encounter_id, rows.len());
             return Ok( Some( Vec::new() ) );
         }
         else{
@@ -150,9 +151,31 @@ impl InterventionDAO {
     ///
     /// get the most recent intervention for the Encounter that is of a vitals type
     /// 
-    pub async fn get_most_recent_vitals(&self, encounter_id: i64) ->  Intervention {
-        let tmp : Vec<Intervention> = self.get_interventions(encounter_id, true).await.unwrap().expect(constants::DATABASE_ERROR_NOT_FOUND);
+    pub async fn get_most_recent_vitals(&self, encounter_id: i64) -> Result< Option< Intervention >, std::io::Error> {
+        let results = self.get_interventions(encounter_id, true).await.expect(constants::DATABASE_ERROR_NOT_FOUND);
 
-        return tmp.first().unwrap().clone();
+        Ok(results.expect(constants::DATABASE_ERROR_NOT_FOUND).first().cloned())
+
+        /*if results2.clone().
+            Ok( results) => {
+                println!("At least one encounter found for encounter_id = {}", encounter_id);
+                Ok( 
+                    results.expect().first()
+
+                    
+                
+                )
+            }
+            Ok(None) => {
+                println!("No encounter found for encounter_id = {}", encounter_id);
+                Ok( None )
+            }
+            Err(err) => {
+                println!("Error on encounter for: {} ({})", encounter_id, err);
+                Ok( None )
+            }
+        }*/
     }
+
+    
 }

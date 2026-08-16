@@ -11,8 +11,8 @@ use crate::webc::{data_forms::*};
 pub struct PatientWrapper {
     pub patient: Patient,
     pub current_encounter: Encounter,
-    pub most_recent_intervention: Intervention,
-    pub intervention_detail: Vec<InterventionDetail>
+    pub most_recent_intervention: Option<Intervention>,
+    pub intervention_detail: Option<Vec<InterventionDetail>>
 }
 
 #[derive(Debug, Clone)]
@@ -69,7 +69,6 @@ impl PatientDAO {
                 let tmp_birthdate: NaiveDateTime = row.get("birthdate"); //tmp_birthdate
                 let tmp_admit_timestamp: NaiveDateTime = row.get("admit_timestamp");// admit_timestamp
                 let tmp_discharge_timestamp = row.get("discharge_timestamp?");// chrono::NaiveDateTime; 
-                let tmp_sin:    i32 = row.get("sin"); // SIN
                 let tmp_phn:    i64 = row.get("phn"); // SIN
 
                 let tmp_location_short_name = row.get("location_short_name");  // location_short_name
@@ -81,7 +80,6 @@ impl PatientDAO {
                             legal_first_name:  tmp_legal_first_name, //"DUMMY".to_string(),
                             legal_last_name: tmp_legal_last_name,//"DUMMY".to_string(), 
                             legal_middle_names: tmp_legal_middle_names, //"DUMMY".to_string(),
-                            sin: tmp_sin,
                             phn: tmp_phn,
                             birth_date: tmp_birthdate, //Utc::now().naive_utc(), 
                             location_id: tmp_loc_id,
@@ -121,10 +119,10 @@ impl PatientDAO {
 
                 match enc_results {
                     Ok(e_id) =>  Ok((p_id, e_id)),
-                    Err(e) =>  Ok((p_id, constants::INVALID_OTHER_ID))
+                    Err(_e) =>  Ok((p_id, constants::INVALID_OTHER_ID))
                 }
             },
-            Err(e) =>  Ok((constants::INVALID_PATIENT_ID, constants::INVALID_OTHER_ID))
+            Err(_e) =>  Ok((constants::INVALID_PATIENT_ID, constants::INVALID_OTHER_ID))
         }
     }
 
@@ -135,15 +133,15 @@ impl PatientDAO {
     pub async fn upsert_encounter_from_admit_form(&self, form: AdmitFormData, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
         println!("> upsert_encounter_from_admit_form");
 
-        let mut query_level_0 = "".to_string();
+        let mut query_level_0 = db_query::UPDATE_ENCOUNTER.to_string();
 
         // if encounter id is not specified, we INSERT
         if &form.encounter_id == &constants::NOT_SPECIFIED_ID.to_string() {
             query_level_0 = db_query::INSERT_ENCOUNTER.to_string();
         }
-        else{ // but if it is present, we UPDATE
-            query_level_0 = db_query::UPDATE_ENCOUNTER.to_string();
-        }
+        //else{ // but if it is present, we UPDATE
+        //    query_level_0 = db_query::UPDATE_ENCOUNTER.to_string();
+        //}
 
         let query_level_1 = &query_level_0.replace("{admit_notes}", &form.admit_notes.clone().trim());
         let query_level_2 = &query_level_1.replace("{patient_id}", &form.patient_id.clone().trim());
@@ -203,15 +201,16 @@ impl PatientDAO {
     ///       https://doc.rust-lang.org/std/io/struct.Error.html - for return Error
     /// 
     pub async fn get_patients_at_users_site_no_discharge(&self, user_id: i64, _include_discharged: bool) -> Result< Option< Vec<Patient> >, std::io::Error> {
-
         let tmp: String = db_query::QRY_ALL_PATIENTS_AT_USERS_SITE_NO_DISCHARGE.to_owned();
         let query = tmp.replace("{}", &user_id.to_string());
+
+        println!(">get_patients_at_users_site_no_discharge() Query: {}", query);
 
         let rows: Vec<(i64, i64, i64, String, String, String,
                         String, String,
                         chrono::NaiveDateTime, chrono::NaiveDateTime, 
                         Option<chrono::NaiveDateTime>,
-                        i32, i64, String
+                        i64, String
                         )> = sqlx::query_as(&query)
         .fetch_all(&self.connection) 
         .await
@@ -240,10 +239,9 @@ impl PatientDAO {
                 let tmp_admit_timestamp: NaiveDateTime = row.9;// admit_timestamp
                 let tmp_discharge_timestamp = row.10;// chrono::NaiveDateTime; 
                 
-                let tmp_sin:    i32 = row.11; // SIN
-                let tmp_phn:    i64 = row.12; // phn
+                let tmp_phn:    i64 = row.11; // phn
 
-                let tmp_location_short_name = row.13; // location_short_name
+                let tmp_location_short_name = row.12; // location_short_name
 
                 results.push(
                     Patient {
@@ -252,7 +250,6 @@ impl PatientDAO {
                         legal_first_name:  tmp_legal_first_name, 
                         legal_last_name: tmp_legal_last_name,
                         legal_middle_names: tmp_legal_middle_names, 
-                        sin: tmp_sin,
                         phn: tmp_phn,
                         birth_date: tmp_birthdate,
                         location_id: tmp_loc_id,
