@@ -264,12 +264,12 @@ async fn route_to_home(app_session: web::Data<AppSession>, user_session: Session
 ///
 /// Wrapper route for the menu option to admit a patient without having any web form to pass data in from
 /// 
-async fn route_to_admit_new_no_patient(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<GenericWebFormData>) -> impl Responder {
+async fn route_to_admit_new_no_patient(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitFormBasic>) -> impl Responder {
     println!("-> Route Requested: /route_to_admit_new_no_patient");
 
     route_to_admit_discharge(app_session, user_session, web::Form(
         AdmitFormData {
-            patient_id: req.0.target_id.clone(),
+            patient_id: req.0.adm_target_id.clone(),
             ..Default::default()
         }
     )).await

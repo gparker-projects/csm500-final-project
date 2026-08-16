@@ -493,7 +493,7 @@ impl WebContentFactory {
                                     <li<a class="menuNotCurrentSmall" href="javascript:selectPatientSub({id},3)">&nbsp;&nbsp;&nbsp;Allergies</a></li>
                                     "#;
 
-        let admit_menu_item = r##"<form action="/admitnew" method="post" id="admitFrm" name="admitFrm"> <input type="hidden" id="target_id" name="target_id" value="-1"></form>"##;
+        let admit_menu_item = r##"<form action="/admitnew" method="post" id="admitFrm" name="admitFrm"> <input type="hidden" id="adm_target_id" name="adm_target_id" value="-1"></form>"##;
 
         let mut first_entry: bool = true;
 

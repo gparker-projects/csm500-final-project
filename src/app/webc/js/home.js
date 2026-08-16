@@ -82,9 +82,6 @@ function getData(userPrompt){
 }
 
 async function redirect_to_patient(p_id){
-	//alert('nav_to_patient(' + p_id + ')');
-	console.log('nav_to_patient(' + p_id + ')');
-
     const data = document.getElementById('target_id');
     data.value = p_id;
 

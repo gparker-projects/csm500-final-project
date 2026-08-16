@@ -32,6 +32,19 @@ impl GenericWebFormData {
   }
 }
 
+
+#[derive(serde::Deserialize)]
+pub struct AdmitFormBasic {
+    pub adm_target_id: String,
+}
+
+impl AdmitFormBasic {
+  pub fn get_uid_as_i64(&self) -> i64{
+      let result: i64 = self.adm_target_id.parse().unwrap();
+      return result;
+  }
+}
+
 ///
 /// A generalized form for 80% of web form submission sitautions, so we dont have a ton of minor forms for one-off uses.
 /// 
