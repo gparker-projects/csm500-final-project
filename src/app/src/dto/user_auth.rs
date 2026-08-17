@@ -17,7 +17,7 @@ impl Permission {
     /// Basic constructor
     /// 
     pub fn new(department_id: i64,
-                permission_id: i64,
+               permission_id: i64,
             ) -> Self {
         Self { 
             department_id,
@@ -69,17 +69,4 @@ impl UserAuthorization {
         }
         return false;
     }
-
-    // todo: remove?
-    // returns a list of the unique departments in an initialized UserAuthorization object
-    // pub fn get_departments(&self) => Vec<i64> {
-    //     let results = Vec<i64>;
-
-    //     for p in self.granted_permissions.iter() {
-    //         if p.permission_id == p_id && p.department_id == department_id {
-    //             return true;
-    //         } 
-    //     }
-    //      return results;
-    // }
 }

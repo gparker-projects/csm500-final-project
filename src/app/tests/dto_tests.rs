@@ -9,7 +9,9 @@
 //use MapleEMR::dto::intervention::Intervention;
 use chrono::{Utc, NaiveDateTime};
 use rand::{Rng, RngExt, rng};
-use MapleEMR::{constants, dto::{encounter::*, intervention::*, intervention_detail::*, patient::*}};
+use MapleEMR::{constants, dto::{encounter::*, intervention::*, intervention_detail::*, patient::*, user::*}};
+
+use MapleEMR::dto::user_auth::*;
 
 mod common; // set up per: https://doc.rust-lang.org/book/ch11-03-test-organization.html
 
@@ -193,3 +195,58 @@ use common::test_utils::*;
     assert_eq!(obj.discharge_notes, discharge_notes);
   }
 
+  #[test]
+  fn test_create_user_dto() {
+    let current_time: NaiveDateTime = Utc::now().naive_utc();
+    let mut rng = rng();
+
+    let user_id: i64 = rng.random();
+    let name: String = DataGenerator::get_first_name(100);
+    let user_name: String = DataGenerator::get_last_name(20);
+    let email: String = DataGenerator::get_last_name(80) + &"@maple.com";
+    let created_timestamp: NaiveDateTime = current_time;
+    let password: String = DataGenerator::get_last_name(80) + &"!abcde"; // terribly poor actual security practise; good enough for basic DAO testing, at this time
+
+    let obj = User::new (
+       user_id.clone(), // user_id
+       name.clone(),
+       user_name.clone(),
+       email.clone(),
+       created_timestamp.clone(),
+       password.clone()
+    );
+
+    assert_eq!(obj.id, user_id); 
+    assert_eq!(obj.name, name); 
+    assert_eq!(obj.user_name, user_name); 
+    assert_eq!(obj.email, email); 
+    assert_eq!(obj.created_timestamp, created_timestamp); 
+    assert_eq!(obj.password, password); 
+  }
+
+    #[test]
+  fn test_create_user_auth_and_permission_dto() {
+    let mut basic_perms= [(1, 2), (2, 1)];
+
+    let mut perms: Vec<Permission> = Vec::with_capacity( basic_perms.len() );
+    for p in basic_perms {
+        perms.push(
+            Permission {
+                department_id: p.0,
+                permission_id: p.1,
+            }
+        );
+    }
+
+    let result = UserAuthorization {
+        granted_permissions: perms
+    };
+    
+    assert!(result.has_permission(1));
+    assert!(!result.has_permission(9999));
+
+    // test department level permissions
+    assert!(result.has_permission_for_dept(1,2));    // should succeed
+    assert!(!result.has_permission_for_dept(1,999)); // should fail
+    assert!(!result.has_permission_for_dept(999,1)); // should fail
+  }
