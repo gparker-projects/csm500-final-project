@@ -111,7 +111,7 @@ impl PatientDAO {
     /// 
     /// REF: https://medium.com/@francis.stephan/developing-a-web-app-with-rust-part-4-sqlx-data-validation-deployment-final-remarks-303e78c2a546
     /// 
-    pub async fn upsert_from_admit_form(&self, form: AdmitFormData, audit_user_id: i64)-> Result<(i64, i64), sqlx::Error> {
+    pub async fn upsert_from_admit_form(&self, form: AdmitDataForm, audit_user_id: i64)-> Result<(i64, i64), sqlx::Error> {
         let patient_results = self.upsert_patient_from_admit_form(form.clone(), audit_user_id).await;
         match patient_results {
             Ok(p_id) => {
@@ -130,7 +130,7 @@ impl PatientDAO {
     /// Given an AdmitFormData, create a new Encounter reocrd, or update an existing one
     /// RETURNS: i64: the id of the Encounter record that is created, if applicable
     /// 
-    pub async fn upsert_encounter_from_admit_form(&self, form: AdmitFormData, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
+    pub async fn upsert_encounter_from_admit_form(&self, form: AdmitDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
         println!("> upsert_encounter_from_admit_form");
 
         let mut query_level_0 = db_query::UPDATE_ENCOUNTER.to_string();
@@ -139,9 +139,6 @@ impl PatientDAO {
         if &form.encounter_id == &constants::NOT_SPECIFIED_ID.to_string() {
             query_level_0 = db_query::INSERT_ENCOUNTER.to_string();
         }
-        //else{ // but if it is present, we UPDATE
-        //    query_level_0 = db_query::UPDATE_ENCOUNTER.to_string();
-        //}
 
         let query_level_1 = &query_level_0.replace("{admit_notes}", &form.admit_notes.clone().trim());
         let query_level_2 = &query_level_1.replace("{patient_id}", &form.patient_id.clone().trim());
@@ -168,7 +165,7 @@ impl PatientDAO {
     /// 
     /// REF: https://medium.com/@francis.stephan/developing-a-web-app-with-rust-part-4-sqlx-data-validation-deployment-final-remarks-303e78c2a546
     /// 
-    pub async fn upsert_patient_from_admit_form(&self, form: AdmitFormData, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
+    pub async fn upsert_patient_from_admit_form(&self, form: AdmitDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
         println!("> upsert_patient_from_admit_form");
             
         let query_level_0 = db_query::UPSERT_PATIENT;

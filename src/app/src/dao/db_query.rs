@@ -85,35 +85,6 @@ pub const QRY_CURRENT_VITALS_FOR_ENC_ID: &str = r##"
                                   AND i.intervention_type_id = 38
                                 ORDER BY i.id DESC LIMIT 1
                                                 "##; // VITALS ARE REF ID = 38
-/*
-pub const QRY_ALL_INTERVENTIONS: &str = r##"
-                                 SELECT i.id "intervention_id", encounter_id, i.description, i.notes, location_id, users_id,
-                                     intervention_type_id, status_id,
-                                    l.room_identifier,
-                                    ref1.name "intervention_type", 
-                                    ref2.name "status"
-                                FROM intervention i
-                                join location l on  l.id = i.location_id
-                                join common_reference_type ref1 on i.intervention_type_id = ref1.id
-                                join common_reference_type ref2 on i.status_id = ref2.id 
-                                where i.id = {}
-                                ORDER BY i.id DESC
-                                    "##;
-
-pub const QRY_MOST_RECENT_INTERVENTION: &str = r##"
-                                 SELECT i.id intv_id, i.description, i.notes, location_id, users_id,
-                                    encounter_id, intervention_type_id, status_id,
-                                    l.room_identifier,
-                                    ref1.name "intervention_type", 
-                                    ref2.name "status"
-                                FROM intervention i
-                                join location l on  l.id = i.location_id
-                                join common_reference_type ref1 on i.intervention_type_id = ref1.id
-                                join common_reference_type ref2 on i.status_id = ref2.id 
-                                where i.id = {}
-                                ORDER BY i.id DESC
-                                limit 1
-                                    "##;*/
 
 pub const QRY_SINGLE_PATIENT_DETAILS: &str =  r##"SELECT p.id "patient_id", e.id "encounter_id", e.location_id "location_id", legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as "legal_middle_names",
                                                 COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
@@ -143,6 +114,13 @@ pub const QRY_ALL_INTERVENTION_DETAILS_FOR_TYPE: &str = r##"
 pub const QRY_ACTIVE_LOCATIONS: &str = r##"select id, name ||' (' || short_name|| ')' from location where active_flag = 'Y'"##;
 
 pub const QRY_ACTIVE_DEPARTMENTS: &str = r##"select id, name from department where expiry_timestamp > now()"##;
+
+
+pub const QRY_COMMON_REF_TYPES_FOR_GROUP: &str = r##"select id, name, description from common_reference_type where group_id = {group_id}"##;
+
+pub const QRY_COMMON_REF_TYPES_FOR_GROUP_ACTIVE_ONLY: &str = r##"select id, name, description from common_reference_type where group_id = {group_id} and active_flag = 'Y'"##;
+
+
 
 pub const QRY_CURRENT_USER_LOCATIONS: &str = r##"
     select id, name ||' (' || short_name|| ')' from location
@@ -190,4 +168,47 @@ pub const UPDATE_ENCOUNTER: &str = r##"
             patient_id = {patient_id},
             location_id = {location_id}
         WHERE id = {encounter_id} RETURNING ID;
+"##;
+
+pub const INSERT_INTERVENTION: &str = r##"
+INSERT INTO INTERVENTION(description, notes, location_id, users_id, encounter_id, intervention_type_id, status_id)
+        VALUES ('{description}',
+        '{notes}',
+        {location_id},
+        {users_id},
+        {encounter_id},
+        {intervention_type_id},
+        {status_id}) RETURNING ID;
+"##;
+
+pub const UPDATE_INTERVENTION: &str = r##"
+    UPDATE INTERVENTION
+    SET description='{description}',
+        notes='{notes}',
+        location_id={location_id},
+        users_id={users_id},
+        encounter_id={encounter_id},
+        intervention_type_id={intervention_type_id},
+        status_id={status_id}
+    WHERE id={intervention_id} RETURNING ID;
+"##;
+
+pub const INSERT_INTERVENTION_DETAILS: &str = r##"
+    INSERT INTO INTERVENTION_DETAILS(intervention_id,
+                                     type_id, value,
+                                     notes, entry_timestamp)
+        VALUES ({intervention_id},
+                {type_id},
+                '{value}',
+                '{notes}',
+                NOW()) RETURNING ID;
+"##;
+
+pub const UPDATE_INTERVENTION_DETAILS: &str = r##"
+    UPDATE INTERVENTION_DETAILS
+        SET intervention_id={intervention_id},
+            type_id={type_id},
+            value='{value}',
+            notes='{notes}'
+        WHERE id={intervention_id} RETURNING ID;
 "##;

@@ -1,10 +1,11 @@
 use sqlx::postgres::{PgPoolOptions, PgPool}; 
-//use sqlx::Row;
-//use std::io::{Error, ErrorKind};
+use sqlx::Row;
 use chrono::NaiveDateTime;
 use crate::dto::{intervention::*, intervention_detail::*};
 use crate::constants;
 use crate::dao::db_query;
+
+use crate::webc::{data_forms::*};
 
 #[derive(Debug, Clone)]
 pub struct InterventionDAO {
@@ -154,28 +155,43 @@ impl InterventionDAO {
     pub async fn get_most_recent_vitals(&self, encounter_id: i64) -> Result< Option< Intervention >, std::io::Error> {
         let results = self.get_interventions(encounter_id, true).await.expect(constants::DATABASE_ERROR_NOT_FOUND);
 
-        Ok(results.expect(constants::DATABASE_ERROR_NOT_FOUND).first().cloned())
-
-        /*if results2.clone().
-            Ok( results) => {
-                println!("At least one encounter found for encounter_id = {}", encounter_id);
-                Ok( 
-                    results.expect().first()
-
-                    
-                
-                )
-            }
-            Ok(None) => {
-                println!("No encounter found for encounter_id = {}", encounter_id);
-                Ok( None )
-            }
-            Err(err) => {
-                println!("Error on encounter for: {} ({})", encounter_id, err);
-                Ok( None )
-            }
-        }*/
+        Ok( results.expect(constants::DATABASE_ERROR_NOT_FOUND).first().cloned() )
     }
 
-    
+
+    ///
+    /// Given an InterventionDataForm, create a new Encounter reocrd, or update an existing one
+    /// RETURNS: i64: the id of the Intervention record that is created, if applicable
+    /// 
+    pub async fn upsert_intervention_from_intv_form(&self, form: InterventionDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
+        println!("> upsert_intervention_from_intv_form");
+
+        let mut query_level_0 = db_query::UPDATE_INTERVENTION.to_string();
+
+        // if id is not specified, we INSERT
+        if &form.intervention_id == &constants::NOT_SPECIFIED_ID.to_string() {
+            query_level_0 = db_query::INSERT_INTERVENTION.to_string();
+        }
+
+        let query_level_1 = &query_level_0.replace("{description}", &form.description.clone().trim());
+        let query_level_2 = &query_level_1.replace("{notes}", &form.notes.clone().trim());
+        let query_level_3 = &query_level_2.replace("{location_id}", &form.location_id.clone().trim());
+        let query_level_4 = &query_level_3.replace("{users_id}", &form.users_id.clone().trim());
+        let query_level_5 = &query_level_4.replace("{encounter_id}", &form.encounter_id.clone().trim());
+        let query_level_6 = &query_level_5.replace("{intervention_type_id}", &form.intervention_type_id.clone().trim());
+        let query = &query_level_6.replace("{status_id}", &form.status_id.clone().trim());
+
+        println!(" >> Intervention Upsert query: {}", query);
+
+        let result = sqlx::query(&query)
+                                                        .fetch_one(&self.connection)
+                                                        .await
+                                                        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
+        
+        // return the patient id that was created or updated
+        let inserted_id: i64 = result.get("id");
+
+        Ok(inserted_id)
+    }
+
 }

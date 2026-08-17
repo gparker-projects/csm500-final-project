@@ -11,12 +11,6 @@
     let isValid = true;
     
     console.log("in validateForm();");
-    
-    if (! document.getElementById("disclaimerChk") ) {
-        errLabel.textContent = "Disclaimer must be accepted";
-        errLabel.style = "color: red";
-        isValid = false
-    }
 
     if (document.getElementById('patient_first_name').value.trim() == '') {
         errLabel.textContent = "First Name is required";
@@ -33,13 +27,13 @@
     }
     
     if (document.getElementById('phn').value.trim() == '') {
-	  errLabel.textContent = "Personal Health Number (PHN) is required";
+	  errLabel.textContent = "Personal Health Number (PHN) must be provided in the format: 9#########";
 	  errLabel.style = "color: red";
 	  isValid = false;
     }
 
     if (document.getElementById('birthdate').value.trim() == '') {
-	  errLabel.textContent = "Birthdate is required";
+	  errLabel.textContent = "Birthdate must be provided in YYYY/MM/DD format.";
 	  errLabel.style = "color: red";
 	  isValid = false;
     }
@@ -50,29 +44,13 @@
 	  isValid = false;
     }
     
-    /*if (document.getElementById('temperature').value.trim() == '') {
-	  errLabel.textContent = "Baseline vitals: Temperature, is required";
-	  errLabel.style = "color: red";
-	  isValid = false;
-    }
-    
-    if (document.getElementById('blood_pressure').value.trim() == '') {
-	  errLabel.textContent = "Baseline vitals: Blood Pressure, is required";
-	  errLabel.style = "color: red";
-	  isValid = false;
-    }
-    
-    if (document.getElementById('weight').value.trim() == '') {
-	  errLabel.textContent = "Baseline vitals: Weight, is required";
-	  errLabel.style = "color: red";
-	  isValid = false;
-    }
-    
-    if (document.getElementById('intervention_notes').value.trim() == '') {
-	  errLabel.textContent = "Baseline vitals: Additional Observations, is required";
-	  errLabel.style = "color: red";
-	  isValid = false;
-    }*/
+        
+	if (! document.getElementById("disclaimerChk").checked ) {
+	    errLabel.textContent = "Disclaimer must be checked";
+	    errLabel.style = "color: red";
+	    isValid = false
+	}
+
     
     if (!isValid) {
       event.preventDefault();       // Stop the form from submitting if there are errors
@@ -141,7 +119,6 @@
 <tr>
 <td>
 <input type="submit" value="Save">
-<input type="submit" value="Confirm">
 <input type="button" value="Cancel" onclick="cancelForm()">
 </td>
 </tr>

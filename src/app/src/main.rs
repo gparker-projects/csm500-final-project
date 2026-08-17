@@ -268,7 +268,7 @@ async fn route_to_admit_new_no_patient(app_session: web::Data<AppSession>, user_
     println!("-> Route Requested: /route_to_admit_new_no_patient");
 
     route_to_admit_discharge(app_session, user_session, web::Form(
-        AdmitFormData {
+        AdmitDataForm {
             patient_id: req.0.adm_target_id.clone(),
             ..Default::default()
         }
@@ -278,7 +278,7 @@ async fn route_to_admit_new_no_patient(app_session: web::Data<AppSession>, user_
 ///
 /// Route that will save patient data, from an Admit form submission
 /// 
-async fn route_to_admit_save(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitFormData>) -> impl Responder {
+async fn route_to_admit_save(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitDataForm>) -> impl Responder {
     println!("-> Route Requested: /route_to_admit_SAVE ");
 
     let req_clone0 = req.clone();
@@ -302,7 +302,7 @@ async fn route_to_admit_save(app_session: web::Data<AppSession>, user_session: S
                 let req_clone = req.clone(); // local clone to avoid borrowing issues
 
                 route_to_admit_discharge(app_session, user_session, web::Form(
-                        AdmitFormData {
+                        AdmitDataForm {
                             patient_id: p_id.to_string(),
                             encounter_id: e_id.to_string(),
                             patient_first_name: req_clone.patient_first_name,
@@ -322,7 +322,7 @@ async fn route_to_admit_save(app_session: web::Data<AppSession>, user_session: S
                   let req_clone = req.clone(); // local clone to avoid borrowing issues
 
                   route_to_admit_discharge(app_session, user_session, web::Form(
-                          AdmitFormData {
+                          AdmitDataForm {
                               patient_id: constants::INVALID_PATIENT_ID.to_string(), // no patient_id in this variation
                               encounter_id: req_clone.encounter_id,
                               patient_first_name: req_clone.patient_first_name,
@@ -345,7 +345,7 @@ async fn route_to_admit_save(app_session: web::Data<AppSession>, user_session: S
           let req_clone = req.clone(); // local clone to avoid borrowing issues
 
           route_to_admit_discharge(app_session, user_session, web::Form(
-                  AdmitFormData {
+                  AdmitDataForm {
                       patient_id: constants::INVALID_PATIENT_ID.to_string(), // no patient_id in this variation
                       encounter_id: req_clone.encounter_id,
                       patient_first_name: req_clone.patient_first_name,
@@ -366,7 +366,7 @@ async fn route_to_admit_save(app_session: web::Data<AppSession>, user_session: S
 ///
 /// Route for New patient admit, or existing patient discharge page
 /// 
-async fn route_to_admit_discharge(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitFormData>) -> impl Responder {
+async fn route_to_admit_discharge(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitDataForm>) -> impl Responder {
     println!("-> Route Requested: /admit_discharge");
 
     let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
