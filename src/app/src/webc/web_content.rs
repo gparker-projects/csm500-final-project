@@ -76,7 +76,6 @@ impl WebContentFactory {
     ///
     /// TEST only: returns the number of tiles that have been loaded into the factory.
     ///
-    #[cfg(test)]
     pub fn get_tile_count(&self) -> usize {
         return self.tile_hashmap.len();
     }

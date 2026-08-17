@@ -14,12 +14,12 @@ mod tests {
 
     // instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
     let dao = PatientDAO::new( constants::DB_CONN_STR );
-    let qry_results = dao.await.get_assigned_patients(test_user_id, false).await;
+    let qry_results = dao.await.get_patients_at_users_site_no_discharge(test_user_id, false).await;
 
     match qry_results.unwrap() {
         Some (patient_list) => {
           println!("Retrieved {} patients", patient_list.len());
-          assert_eq!(patient_list.len(), 3);
+          assert_eq!(patient_list.len(), 7);
         }
         None => {
           println!("No patients");

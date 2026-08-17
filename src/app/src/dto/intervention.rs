@@ -22,7 +22,7 @@ pub struct Intervention {
     #[serde(rename = "users_id")]
     pub users_id: i64, //   USERS_ID BIGINT REFERENCES USERS (ID)
     #[serde(rename = "status_code")]
-    pub status_code: String, // status_code VARCHAR(10),
+    pub status_code: String, // really the status description
     #[serde(rename = "intervention_type_id")]
     pub intervention_type_id: i64,
     #[serde(rename = "status_id")]
@@ -42,7 +42,7 @@ impl Intervention {
                notes: String,
                location_id: i64,
                users_id: i64,
-               status_code: String,
+               status_code: String, // really the status description
                intervention_type_id: i64,
                status_id: i64,
                intervention_type: String,
@@ -102,7 +102,7 @@ impl fmt::Display for Intervention {
         let mut results: String = "(intervention Id: ".to_owned() + &self.id.to_string() ;
 
         results =  results + &", intervention_type: " + &self.intervention_type;
-        results =  results + &", status_code: " + &self.status_code + &")";
+        results =  results + &", status_code: " + &self.status_code+ &")";
 
         f.write_str(&results)
     }

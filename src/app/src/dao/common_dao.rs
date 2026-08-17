@@ -92,7 +92,7 @@ impl CommonDAO {
     }
 
     ///
-    /// Accessor to retrive COMMON REFERENCE TYPE entries from the database into a tuple. 
+    /// Accessor to retrive COMMON REFERENCE TYPE entries from the database into a tuple.
     ///
     /// Returns: a tuple (i64, String, String) containing:
     ///          - id of the reference list item

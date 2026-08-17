@@ -111,7 +111,6 @@ pub const QRY_ALL_INTERVENTION_DETAILS_FOR_TYPE: &str = r##"
             AND type_id = {2}
 "##;
 
-pub const QRY_ACTIVE_LOCATIONS: &str = r##"select id, name ||' (' || short_name|| ')' from location where active_flag = 'Y'"##;
 
 pub const QRY_ACTIVE_DEPARTMENTS: &str = r##"select id, name from department where expiry_timestamp > now()"##;
 
@@ -121,6 +120,8 @@ pub const QRY_COMMON_REF_TYPES_FOR_GROUP: &str = r##"select id, name, descriptio
 pub const QRY_COMMON_REF_TYPES_FOR_GROUP_ACTIVE_ONLY: &str = r##"select id, name, description from common_reference_type where group_id = {group_id} and active_flag = 'Y'"##;
 
 
+
+pub const QRY_ACTIVE_LOCATIONS: &str = r##"select id, name ||' (' || short_name|| ')' from location where active_flag = 'Y'"##;
 
 pub const QRY_CURRENT_USER_LOCATIONS: &str = r##"
     select id, name ||' (' || short_name|| ')' from location

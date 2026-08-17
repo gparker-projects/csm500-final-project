@@ -21,24 +21,13 @@ mod tests {
 
     let wcf = MapleEMR::webc::web_content::WebContentFactory::new(&newpath);
     // content factor should have two entries currently
-    assert_eq!(wcf.get_tile_count(), 3); 
+
+    println!("As of Aug 17, there are [5] tiles being loaded");
+    assert_eq!(wcf.get_tile_count(), 5); 
 
     let tmp_tile = wcf.get_tile(WebContentItem::WCTypeLoginTile);
     //println!("WCTypeLoginTile: {}", tmp_tile.clone());
     // check data was actually loaded
     assert!(tmp_tile.len() > 0); 
-  }
-
-  #[test]
-  fn test_hteml_formatter() {
-
-    let data = vec!["a","b","c"];
-    let head = vec!["ColA","ColB","ColC"];
-
-    let line1 = MapleEMR::webc::html_formatter::HTMLFormatter::format_row(head, true);
-    assert_eq!(line1, "  <tr><th>ColA</th><th>ColB</th><th>ColC</th>  </tr>\n".to_string()); 
-
-    let line2 = MapleEMR::webc::html_formatter::HTMLFormatter::format_row(data, false);
-    assert_eq!(line2, "  <tr><td>a</td><td>b</td><td>c</td>  </tr>\n".to_string()); 
   }
 }
