@@ -136,125 +136,92 @@ impl WebContentFactory {
     /// 
     pub fn get_home_route_summary_of_patients_tile_using_wrapper(&self, patient_list: Vec<PatientWrapper>) -> String {
         let mut results_sbuf = String::with_capacity(100); 
-
         let mut counter: i8 = 1;
 
         results_sbuf.push_str(&self.get_hidden_form("patientdtls".to_owned(), "patientDtlsFrm".to_owned()) );
 
-        for row in patient_list{
-
-            let p = row.patient;
-            let e = row.current_encounter;
-            let i = row.most_recent_intervention;
-
+        for pwrap in patient_list{
             results_sbuf.push_str("<a href=\"#\" onclick=\"redirect_to_patient("  ); 
-            results_sbuf.push_str( &p.id.to_string() ); 
+            results_sbuf.push_str( &pwrap.patient.id.to_string() ); 
             results_sbuf.push_str("); return false;\">");
-            results_sbuf.push_str("<table class=\"hover-table\"><tr><td>"); 
-
-            results_sbuf.push_str(&counter.to_string());
-            results_sbuf.push_str(")&nbsp;<b>");
-            results_sbuf.push_str( &p.legal_last_name ); 
-            results_sbuf.push_str(","); 
-            results_sbuf.push_str( &p.legal_first_name );
-
-            results_sbuf.push_str("</b>&nbsp;PHN:<i>&nbsp;"); 
-            results_sbuf.push_str( &p.phn_to_string() );
-            results_sbuf.push_str("</i>&nbsp;");
-
-            results_sbuf.push_str("&nbsp;<div class='clinical-electric-blue'>DOB:<b>&nbsp;"); 
-            results_sbuf.push_str( &p.birth_date_for_display() );
-
-            results_sbuf.push_str("</b></div>&nbsp;[");
-
-            results_sbuf.push_str( &p.age() );
-            results_sbuf.push_str("yrs]&nbsp;@");
-
-            results_sbuf.push_str( &e.room_identifier );
-            results_sbuf.push_str("</td></tr>");
-
-            results_sbuf.push_str("<tr><td>");
-            results_sbuf.push_str("Admitted: ");
-            results_sbuf.push_str(&p.admit_timestamp_for_display() );
-
-            if i.is_some() {
-               let tmp_intv = i.unwrap();
-
-               results_sbuf.push_str("&nbsp;");
-               results_sbuf.push_str( &tmp_intv.intervention_type );
-               results_sbuf.push_str("&nbsp;@&nbsp;");
-               results_sbuf.push_str( &tmp_intv.scheduled_date_for_display() );
-
-               results_sbuf.push_str("&nbsp;(");
-               results_sbuf.push_str( &tmp_intv.status_code );
-               results_sbuf.push_str(")");
-            }
-            results_sbuf.push_str("</td></tr>");
-
-           /*  if i.is_some() && row.intervention_detail.is_some() {
-               results_sbuf.push_str("<tr><td>");
-
-               for m in row.intervention_detail{
-                    results_sbuf.push_str(&m.type_name());
-                    results_sbuf.push_str(":&nbsp;"); 
-                    results_sbuf.push_str(&m.value); 
-                    results_sbuf.push_str("&nbsp;"); 
-                }
-                results_sbuf.push_str("</td></tr>");
-            }*/
-            results_sbuf.push_str("</table></a><p></p>");
-
+            results_sbuf.push_str(&self.get_single_patient_summary( pwrap, counter));
+            results_sbuf.push_str("</a><p></p>");
             counter = counter + 1;
         }
 
         return results_sbuf;
     }
 
+
     // -----------------------------------------------------------------------------------
     // Patient formatters
     // -----------------------------------------------------------------------------------
 
-    ///
-    /// Provide HTML for a single Patient
-    /// 
-    pub fn get_patient_details_tile(&self, p: Patient) -> String {
+    pub fn get_single_patient_summary(&self, pwrap: PatientWrapper, index: i8) -> String {
         let mut results_sbuf = String::with_capacity(100); 
-        println!(">get_patient_details_tile()");
+	    let p = pwrap.patient;
+	    let e = pwrap.current_encounter;
+	    let i = pwrap.most_recent_intervention;
 
-        // build the header
-        results_sbuf.push_str("<table>");
+	    results_sbuf.push_str("<table class=\"hover-table\"><tr><td>"); 
 
-        results_sbuf.push_str("  <tr><th class='data-label'>Last, First Name</th><td class='data-field-ro'>");
-        results_sbuf.push_str(&p.legal_last_name );
-        results_sbuf.push_str( "</td></tr>\n");
+        if index != -1 {
+            let idx = index.to_string();
+            results_sbuf.push_str(&idx);
+            results_sbuf.push_str(")&nbsp;");
+        }
+	    results_sbuf.push_str("<b>");
+	    results_sbuf.push_str( &p.legal_last_name ); 
+	    results_sbuf.push_str(", "); 
+	    results_sbuf.push_str( &p.legal_first_name );
 
-        results_sbuf.push_str("  <tr><th class='data-label'>First Name</th><td class='data-field-ro'>");
-        results_sbuf.push_str(&p.legal_first_name );
-        results_sbuf.push_str( "</td></tr>\n");
+	    results_sbuf.push_str("</b>&nbsp;PHN:<i>&nbsp;"); 
+	    results_sbuf.push_str( &p.phn_to_string() );
+	    results_sbuf.push_str("</i>&nbsp;");
 
-        results_sbuf.push_str("</table>");
+	    results_sbuf.push_str("&nbsp;<div class='clinical-electric-blue'>DOB:<b>&nbsp;"); 
+	    results_sbuf.push_str( &p.birth_date_for_display() );
+
+	    results_sbuf.push_str("</b></div>&nbsp;[");
+
+	    results_sbuf.push_str( &p.age() );
+	    results_sbuf.push_str("yrs]&nbsp;@");
+
+	    results_sbuf.push_str( &e.room_identifier );
+	    results_sbuf.push_str("</td></tr>");
+
+	    results_sbuf.push_str("<tr><td>");
+	    results_sbuf.push_str("Admitted: ");
+	    results_sbuf.push_str(&p.admit_timestamp_for_display() );
+
+	    if i.is_some() {
+	       let tmp_intv = i.unwrap();
+
+	       results_sbuf.push_str("&nbsp;");
+	       results_sbuf.push_str( &tmp_intv.intervention_type );
+	       results_sbuf.push_str("&nbsp;@&nbsp;");
+	       results_sbuf.push_str( &tmp_intv.scheduled_date_for_display() );
+
+	       results_sbuf.push_str("&nbsp;(");
+	       results_sbuf.push_str( &tmp_intv.status_code );
+	       results_sbuf.push_str(")");
+	    }
+	    results_sbuf.push_str("</td></tr>");
+
+	    results_sbuf.push_str("</table>");
 
         return results_sbuf;
     }
 
     ///
-    /// Provide full details of a patient
-    /// 
+    /// Provide (deep) summary details of a patient
     /// 
     pub fn get_patient_details_full_tile(&self, patient_header: String, current_encounter: String, encounter_section: String,
                                                 user_identity_label: String, legacy_menu: String, intv_section: String) -> String {
-
-        let layout = r##"<h3>Patient Header</h3><p>
-                               <div id="MapleEMR::PatientHeader"></div><p></p>
-                               <h3>Current Encounter</h3>
-                               <div id="MapleEMR::CurrentEncounter"></div><p></p>
-                               <h3>Current Interventions</h3>
-                               <div id="MapleEMR::CurrentInterventions"></div><p></p>
-                               <h3>Encounter History</h3>
-                               <div id="MapleEMR::EncounterHistory"></div>"##; // this one is not a constant as it only appears in this function
+        let layout = self.get_tile(WebContentItem::WCTypePatientListTile);
 
         // base content
-        let ht2 = &self.get_home_tile_with_user_identity(user_identity_label).replace(constants::BODY_TILE_CONTENT_TAG, layout); // build the individual sections
+        let ht2 = &self.get_home_tile_with_user_identity(user_identity_label).replace(constants::BODY_TILE_CONTENT_TAG, &layout); // build the individual sections
 
         // page body content
         let ht3 = &ht2.replace(constants::PATIENT_HEADER_TILE_TAG, &patient_header);

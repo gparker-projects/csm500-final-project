@@ -4,19 +4,14 @@
 /// Ref: Unit Testing in Rust is actually easy! - Flo Woelki (https://youtu.be/6wAFdBVJbwc?si=KdJfqvRdcXi9-mqo) - LOL NOT easy
 /// 
 /// 
-
-//use MapleEMR::dto::patient::Patient;
-//use MapleEMR::dto::intervention::Intervention;
 use chrono::{Utc, NaiveDateTime};
-use rand::{Rng, RngExt, rng};
+use rand::{RngExt, rng};
 use MapleEMR::{constants, dto::{encounter::*, intervention::*, intervention_detail::*, patient::*, user::*}};
-
 use MapleEMR::dto::user_auth::*;
 
 mod common; // set up per: https://doc.rust-lang.org/book/ch11-03-test-organization.html
 
 use common::test_utils::*; 
-
 
 #[cfg(test)] 
 
@@ -76,8 +71,6 @@ use common::test_utils::*;
     let status_id: i64 = rng.random_range(13..18);
     let intervention_type = DataGenerator::get_intv_type_description();
     let room_identifier = DataGenerator::get_room_identifier(200);
-
-    //DataGenerator::get_location_short_name(16);
 
     // instantiate a DTO to prove it accepts data, but more importantly, detect unexpected changes to it that will break the application
     let obj = Intervention::new(
@@ -250,3 +243,5 @@ use common::test_utils::*;
     assert!(!result.has_permission_for_dept(1,999)); // should fail
     assert!(!result.has_permission_for_dept(999,1)); // should fail
   }
+
+  

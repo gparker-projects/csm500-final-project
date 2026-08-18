@@ -30,7 +30,7 @@ pub const QRY_ALL_ENCOUNTERS: &str = r##"
                                         COALESCE(admit_notes, '') as "admit_notes",
                                         COALESCE(discharge_notes, '') as "discharge_notes",
                                         s.name "encounter_site_name",
-                                        l.room_identifier,
+                                        l.short_name "room_identifier",
                                         CASE WHEN discharge_timestamp is null then 'Y' else 'N' end as "current_encounter"
                                     from encounter e
                                     join location l on e.location_id = l.id
@@ -46,7 +46,7 @@ pub const QRY_CURRENT_ENCOUNTER: &str = r##"
                                         COALESCE(admit_notes, '') as "admit_notes",
                                         COALESCE(discharge_notes, '') as "discharge_notes",
                                         s.name "encounter_site_name",
-                                        l.room_identifier,
+                                        l.short_name "room_identifier",
                                         'Y' as "current_encounter"
                                     from encounter e
                                     join location l on e.location_id = l.id

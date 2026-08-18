@@ -1,1 +1,7 @@
-<div><b>PatientListTile.htl</b></div>
+<div id="MapleEMR::PatientHeader"></div><p></p>
+<h3>Current Admission</h3>
+<div id="MapleEMR::CurrentEncounter"></div><p></p>
+<h3>Treatments, Procedures and Medication</h3>
+<div id="MapleEMR::CurrentInterventions"></div><p></p>
+<h3>Admission History</h3>
+<div id="MapleEMR::EncounterHistory"></div>

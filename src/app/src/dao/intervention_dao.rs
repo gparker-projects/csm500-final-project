@@ -43,8 +43,6 @@ impl InterventionDAO {
         };
         let query = tmp.replace("{}", &encounter_id.to_string());
 
-        println!(">get_interventions() Query: {}", query);
-
         let rows: Vec<(i64, i64, String, String,
                        i64, i64, i64, i64,
                        String, String, String )> = sqlx::query_as(&query)
@@ -53,6 +51,7 @@ impl InterventionDAO {
         .unwrap_or_default();
 
         if rows.is_empty() {
+            println!(">get_interventions() Query: {}", query);
             println!("No Interventions found for encounter_id: {} [count={}]", encounter_id, rows.len());
             return Ok( Some( Vec::new() ) );
         }
@@ -109,8 +108,6 @@ impl InterventionDAO {
             }
         };
 
-        //println!("get_interventions_details() Query: {}", query);
-
         let rows: Vec<(i64, String, String, NaiveDateTime, String,i64, i64 )> = sqlx::query_as(&query)
         .fetch_all(&self.connection) 
         .await
@@ -118,6 +115,8 @@ impl InterventionDAO {
 
         if rows.is_empty() {
             println!("No intervention details found for intervention_id: {} [{}]", intervention_id, rows.len());
+            
+            println!("get_interventions_details() Query: {}", query);
             return Ok( Some( Vec::new() ) );
         }
         else{

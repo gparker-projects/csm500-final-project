@@ -21,7 +21,7 @@ use actix_cors::Cors;
 use actix_files::*;
 use actix_session::{storage::CookieSessionStore, Session, SessionMiddleware}; //, storage::RedisSessionStore} // for user session management: https://docs.rs/actix-session/latest/actix_session/
 
-use crate::dto::{user_auth::*, encounter::*, intervention_detail::*}; //, patient::*}; intervention::*,
+use crate::dto::{user_auth::*, encounter::*, intervention_detail::*, intervention::*};
 use crate::dao::{encounter_dao::*, patient_dao::*, intervention_dao::*, auth_dao::*, common_dao::*};
 use crate::webc::{data_forms::*};
 
@@ -215,25 +215,12 @@ async fn route_to_home(app_session: web::Data<AppSession>, user_session: Session
 
        for p in patient_list.clone(){
           let cur_enc: Encounter = edao.get_current_encounter(p.id.clone()).await.clone(); //get the current encounter for each patient
-          let cur_intv = idao.get_most_recent_vitals(cur_enc.id.clone()).await.expect(constants::DATABASE_ERROR_NOT_FOUND); 
-
-          let cur_idtls: Result< Option< Vec<InterventionDetail> >, std::io::Error> = match cur_intv.clone() {
-           Some( intv ) => {
-                Ok( Some(
-                  idao.get_all_intervention_details(intv.id, constants::NOT_SPECIFIED_ID).await.expect(constants::EMPTY_DATASET).clone().unwrap()
-                ) )
-            }
-            None => {
-                println!("No intervention found for encounter id = {}", cur_enc.id);
-                Ok( None )
-            }
-          };
+          let cur_intv = idao.get_most_recent_vitals(cur_enc.id.clone()).await.expect(constants::DATABASE_ERROR_NOT_FOUND);
 
           pwrap.push( PatientWrapper{
                   patient: p.clone(),
                   current_encounter: cur_enc.clone(),
-                  most_recent_intervention: cur_intv,
-                  intervention_detail: cur_idtls.expect(constants::EMPTY_DATASET)
+                  most_recent_intervention: cur_intv
               }
           );
           //print!(">> DEBUG Added pid={} e={} i={}", tmp_p, tmp_e, tmp_i);
@@ -452,21 +439,23 @@ async fn route_to_patient_details(user_session: Session, app_session: web::Data<
   let idao = InterventionDAO::new(constants::DB_CONN_STR).await;
   let edao = EncounterDAO::new(constants::DB_CONN_STR).await;
 
-  let mut current_encounter: String = "No Encounters found".to_owned();
+  let mut cur_enc_section: String = "No Encounters found".to_owned();
+  let cur_encounter: Encounter; 
+  let cur_intv: Option<Intervention>; 
+
+  // pull out the current Encounter and generate summary tile for it
+  let cur_enc: Encounter = edao.get_current_encounter(patient_id).await.clone();
+  cur_enc_section = wcf.get_single_encounter_summary_tile(cur_enc.clone());
+
+  // pull out the most recent vitals (Intervention of type = "Vitals") and generate summary tile for it
+  let cur_intv = idao.get_most_recent_vitals(cur_enc.id.clone()).await.expect(constants::DATABASE_ERROR_NOT_FOUND); 
 
   // get encounters for the patient
   let enc_results = edao.get_encounters(patient_id, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
-  let enc_section = match enc_results {
+  let enc_section: String = match enc_results {
       Some (encounters) => {
          //println!("Patient details obtained");
-
-         // pull out the current Encounter and get alternate summary tile for it
-         let (current_enc, all_other_encs): (Vec<_>, Vec<_>) = encounters.into_iter().partition(|item| item.is_current_encounter == "Y");
-         if let Some(enc) = current_enc.first(){
-             current_encounter = wcf.get_single_encounter_summary_tile(enc.clone());
-         }
-
-         wcf.get_encounter_list_tile(all_other_encs)
+         wcf.get_encounter_list_tile(encounters)
       }
       None =>{
          //println!("No Encounters found");
@@ -493,7 +482,14 @@ async fn route_to_patient_details(user_session: Session, app_session: web::Data<
   let patient_header = match patient_results {
       Some (patient_details) => {
          //println!("Patient details obtained"); //: {}", &tile_content);
-         wcf.get_patient_details_tile(patient_details.clone())
+
+         let pwrap: PatientWrapper = PatientWrapper{
+            patient: patient_details,
+            current_encounter: cur_enc, 
+            most_recent_intervention: cur_intv
+         };
+
+         wcf.get_single_patient_summary( pwrap, -1)
       }
       None =>{
          //println!("No patients found");
@@ -513,7 +509,7 @@ async fn route_to_patient_details(user_session: Session, app_session: web::Data<
     }
   };
 
-  let consolidated_content = wcf.get_patient_details_full_tile(patient_header, current_encounter, enc_section,
+  let consolidated_content = wcf.get_patient_details_full_tile(patient_header, cur_enc_section, enc_section,
                                                   user_session.user_display_name, legacy_menu, intv_section); //, enc_history);
 
   HttpResponse::Ok().body( consolidated_content )

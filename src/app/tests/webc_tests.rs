@@ -26,8 +26,6 @@ mod tests {
     assert_eq!(wcf.get_tile_count(), 5); 
 
     let tmp_tile = wcf.get_tile(WebContentItem::WCTypeLoginTile);
-    //println!("WCTypeLoginTile: {}", tmp_tile.clone());
-    // check data was actually loaded
     assert!(tmp_tile.len() > 0); 
   }
 }

@@ -7,12 +7,12 @@ use crate::dao::db_query;
 use crate::dto::{patient::*, encounter::*, intervention::*, intervention_detail::*};
 use crate::webc::{data_forms::*};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct PatientWrapper {
     pub patient: Patient,
     pub current_encounter: Encounter,
-    pub most_recent_intervention: Option<Intervention>,
-    pub intervention_detail: Option<Vec<InterventionDetail>>
+    pub most_recent_intervention: Option<Intervention>//,
+    //pub intervention_detail: Option<Vec<InterventionDetail>>
 }
 
 #[derive(Debug, Clone)]
@@ -46,7 +46,7 @@ impl PatientDAO {
         let tmp: String = db_query::QRY_SINGLE_PATIENT_DETAILS.to_owned();
         let query = tmp.replace("{}", &patient_id.to_string());
 
-        println!("get_patient_details Query: {}", query);
+        //println!("get_patient_details Query: {}", query);
 
         match sqlx::query(&query)
         .fetch_optional(&self.connection)
@@ -93,10 +93,12 @@ impl PatientDAO {
                 )
             }
             Ok(None) => {
+                println!("get_patient_details() Query: {}", query);
                 println!("No patient found for patient_id = {}", patient_id);
                 Ok( None )
             }
             Err(err) => {
+                println!("get_patient_details() Query: {}", query);
                 println!("Error on patient for: {} ({})", patient_id, err);
                 Ok( None )
             }
@@ -201,7 +203,7 @@ impl PatientDAO {
         let tmp: String = db_query::QRY_ALL_PATIENTS_AT_USERS_SITE_NO_DISCHARGE.to_owned();
         let query = tmp.replace("{}", &user_id.to_string());
 
-        println!(">get_patients_at_users_site_no_discharge() Query: {}", query);
+        //println!(">get_patients_at_users_site_no_discharge() Query: {}", query);
 
         let rows: Vec<(i64, i64, i64, String, String, String,
                         String, String,
@@ -214,6 +216,7 @@ impl PatientDAO {
         .unwrap_or_default();
 
         if rows.is_empty() {
+            println!(">get_patients_at_users_site_no_discharge() Query: {}", query);
             println!("No patients found for user_id: {} [{}]", user_id, rows.len());
             return Ok( Some( Vec::new() ) );
         }

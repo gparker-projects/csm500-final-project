@@ -1,9 +1,5 @@
 use sqlx::postgres::{PgPoolOptions, PgPool}; 
-//use sqlx::Row;
-//use std::io::{Error, ErrorKind};
 use chrono::NaiveDateTime;
-//use crate::dto::patient::*;
-//use crate::dto::intervention::*;
 use crate::dto::encounter::*;
 use crate::dao::db_query;
 use crate::constants;
@@ -51,9 +47,6 @@ impl EncounterDAO {
         };
 
         let query = tmp.replace("{}", &patient_id.to_string());
-        
-        println!(">get_encounters() Query: {}", query);
-
         let rows: Vec<(i64, // encounter_id
                        NaiveDateTime, // admit_timestamp
                        Option<chrono::NaiveDateTime>, // discharge_timestamp
@@ -67,6 +60,7 @@ impl EncounterDAO {
         .unwrap_or_default();
 
         if rows.is_empty() {
+            println!(">get_encounters() Query: {}", query);
             println!("No encounters found for patient_id: {} [{}]", patient_id, rows.len());
             return Ok( Some( Vec::new() ) );
         }
