@@ -5,6 +5,7 @@
 /// -------------------------------------------------------------------
 
 use serde::{Deserialize, Serialize};
+use chrono::{NaiveDateTime}; 
 use std::fmt;
 
 #[derive(Deserialize, Serialize, Debug, Clone, Default)]
@@ -31,6 +32,10 @@ pub struct Intervention {
     pub intervention_type: String,
     #[serde(rename = "room_identifier")]
     pub room_identifier: String,
+    #[serde(rename = "scheduled_timestamp")]
+    pub scheduled_timestamp: Option<NaiveDateTime>, 
+    #[serde(rename = "performed_timestamp")]
+    pub performed_timestamp: Option<NaiveDateTime>,
 } 
 
 impl Intervention {
@@ -46,9 +51,11 @@ impl Intervention {
                intervention_type_id: i64,
                status_id: i64,
                intervention_type: String,
-               room_identifier: String,
-            ) -> Self {
-        Self { 
+               room_identifier: String, 
+               scheduled_timestamp: Option<NaiveDateTime>,
+               performed_timestamp: Option<NaiveDateTime>
+            ) -> Self {    
+        Self {
             id,
             encounter_id,
             description,
@@ -59,7 +66,9 @@ impl Intervention {
             intervention_type_id,
             status_id,
             intervention_type,
-            room_identifier
+            room_identifier,
+            scheduled_timestamp,
+            performed_timestamp
         }
     }
 
@@ -79,17 +88,17 @@ impl Intervention {
     }
 
     ///
-    /// helper method to return the date the intervention is/was scheduled to occur, in a format that can be easily displayed
+    /// helper method to return the date/time the intervention is/was scheduled to occur, in a format that can be easily displayed
     /// 
-    pub fn scheduled_date_for_display(&self) -> String{
-        return "Today()".to_owned();
+    pub fn scheduled_timestamp_for_display(&self) -> String{
+        self.scheduled_timestamp.unwrap().format("%d/%m/%Y %H:%M:%S").to_string()
     }
 
     ///
-    /// helper method to return the date the intervention was performed, in a format that can be easily displayed
+    /// helper method to return the date/time the intervention was performed, in a format that can be easily displayed
     /// 
-    pub fn performed_date_for_display(&self) -> String{
-        return "Today()".to_owned();
+    pub fn performed_timestamp_for_display(&self) -> String{
+        self.scheduled_timestamp.unwrap().format("%d/%m/%Y %H:%M:%S").to_string()
     }
 }
 

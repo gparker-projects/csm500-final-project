@@ -61,7 +61,7 @@ pub const QRY_INTERVENTIONS_FOR_ENC_ID: &str = r##"
                                      intervention_type_id, status_id,
                                     l.room_identifier,
                                     ref1.name "intervention_type", 
-                                    ref2.name "status"
+                                    ref2.name "status", i.scheduled_timestamp, i.performed_timestamp
                                 FROM intervention i
                                 join location l on  l.id = i.location_id
                                 join common_reference_type ref1 on i.intervention_type_id = ref1.id
@@ -76,7 +76,7 @@ pub const QRY_CURRENT_VITALS_FOR_ENC_ID: &str = r##"
                                     intervention_type_id, status_id,
                                     l.room_identifier,
                                     ref1.name "intervention_type", 
-                                    ref2.name "status"
+                                    ref2.name "status", i.scheduled_timestamp, i.performed_timestamp
                                 FROM intervention i
                                 join location l on  l.id = i.location_id
                                 join common_reference_type ref1 on i.intervention_type_id = ref1.id
@@ -95,6 +95,8 @@ pub const QRY_SINGLE_PATIENT_DETAILS: &str =  r##"SELECT p.id "patient_id", e.id
                                             join encounter e on p.id = e.patient_id
 											join location l2 on l2.id = e.location_id
                                             where patient_id = {}"##;
+
+
 
 pub const QRY_ALL_INTERVENTION_DETAILS: &str =  r##"
                                                     SELECT i.id "intervention_details_id", value, notes, entry_timestamp, ref1.name "intervention_type", intervention_id, type_id
@@ -172,14 +174,18 @@ pub const UPDATE_ENCOUNTER: &str = r##"
 "##;
 
 pub const INSERT_INTERVENTION: &str = r##"
-INSERT INTO INTERVENTION(description, notes, location_id, users_id, encounter_id, intervention_type_id, status_id)
+INSERT INTO INTERVENTION(description, notes, location_id, users_id, encounter_id,
+                         intervention_type_id, status_id, scheduled_timestamp, performed_timestamp)
         VALUES ('{description}',
         '{notes}',
         {location_id},
         {users_id},
         {encounter_id},
         {intervention_type_id},
-        {status_id}) RETURNING ID;
+        {status_id}, 
+        {scheduled_timestamp},
+        {performed_timestamp}
+        ) RETURNING ID;
 "##;
 
 pub const UPDATE_INTERVENTION: &str = r##"
@@ -190,7 +196,9 @@ pub const UPDATE_INTERVENTION: &str = r##"
         users_id={users_id},
         encounter_id={encounter_id},
         intervention_type_id={intervention_type_id},
-        status_id={status_id}
+        status_id={status_id}, 
+        scheduled_timestamp={scheduled_timestamp},
+        performed_timestamp=performed_timestamp}
     WHERE id={intervention_id} RETURNING ID;
 "##;
 

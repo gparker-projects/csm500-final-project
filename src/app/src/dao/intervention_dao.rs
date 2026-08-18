@@ -45,7 +45,10 @@ impl InterventionDAO {
 
         let rows: Vec<(i64, i64, String, String,
                        i64, i64, i64, i64,
-                       String, String, String )> = sqlx::query_as(&query)
+                       String, String, String,
+                       Option<chrono::NaiveDateTime>,
+                       Option<chrono::NaiveDateTime>
+                    )> = sqlx::query_as(&query)
         .fetch_all(&self.connection) 
         .await
         .unwrap_or_default();
@@ -71,6 +74,8 @@ impl InterventionDAO {
 
                 let tmp_intervention_type: String = row.9; //intervention_type_id
                 let tmp_status = row.10; //status_code
+                let tmp_scheduled_timestamp = row.11; // i.scheduled_timestamp
+                let tmp_performed_timestamp = row.12; //i.performed_Timestamp
 
                 results.push(
                     Intervention {
@@ -84,7 +89,9 @@ impl InterventionDAO {
                         status_id: tmp_status_id,
                         room_identifier: tmp_room_identifier,
                         intervention_type: tmp_intervention_type,
-                        status_code: tmp_status
+                        status_code: tmp_status,
+                        scheduled_timestamp: tmp_scheduled_timestamp,
+                        performed_timestamp: tmp_performed_timestamp
                     }
                 );
             }
@@ -178,6 +185,9 @@ impl InterventionDAO {
         let query_level_4 = &query_level_3.replace("{users_id}", &form.users_id.clone().trim());
         let query_level_5 = &query_level_4.replace("{encounter_id}", &form.encounter_id.clone().trim());
         let query_level_6 = &query_level_5.replace("{intervention_type_id}", &form.intervention_type_id.clone().trim());
+        let query_level_7 = &query_level_6.replace("{scheduled_timestamp}", &form.scheduled_timestamp.clone().trim());
+        let query_level_8 = &query_level_7.replace("{performed_timestamp}", &form.performed_timestamp.clone().trim());
+
         let query = &query_level_6.replace("{status_id}", &form.status_id.clone().trim());
 
         println!(" >> Intervention Upsert query: {}", query);

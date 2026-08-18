@@ -8,7 +8,7 @@ use std::collections::HashMap;
 
 use crate::constants;
 use crate::dto::{patient::*, encounter::*, intervention::*};
-use crate::webc::menu_tile::MenuFormatter;
+//use crate::webc::menu_tile::MenuFormatter;
 use crate::dao::patient_dao::PatientWrapper;
 
 /// Enumeration for Web Content Tiles, each representing a tile of information
@@ -127,7 +127,6 @@ impl WebContentFactory {
         return results.replace(constants::USER_IDENTITY_TILE_TAG, &user_identity_label)
     }
 
-
     // -----------------------------------------------------------------------------------
     // Route formatters
     // -----------------------------------------------------------------------------------
@@ -153,11 +152,9 @@ impl WebContentFactory {
         return results_sbuf;
     }
 
-
     // -----------------------------------------------------------------------------------
     // Patient formatters
     // -----------------------------------------------------------------------------------
-
     pub fn get_single_patient_summary(&self, pwrap: PatientWrapper, index: i8) -> String {
         let mut results_sbuf = String::with_capacity(100); 
 	    let p = pwrap.patient;
@@ -201,7 +198,7 @@ impl WebContentFactory {
 	       results_sbuf.push_str("&nbsp;");
 	       results_sbuf.push_str( &tmp_intv.intervention_type );
 	       results_sbuf.push_str("&nbsp;@&nbsp;");
-	       results_sbuf.push_str( &tmp_intv.scheduled_date_for_display() );
+	       results_sbuf.push_str( &tmp_intv.scheduled_timestamp_for_display() );
 
 	       results_sbuf.push_str("&nbsp;(");
 	       results_sbuf.push_str( &tmp_intv.status_code );
@@ -218,7 +215,8 @@ impl WebContentFactory {
     /// Provide (deep) summary details of a patient
     /// 
     pub fn get_patient_details_full_tile(&self, patient_header: String, current_encounter: String, encounter_section: String,
-                                                user_identity_label: String, legacy_menu: String, intv_section: String) -> String {
+                                                user_identity_label: String, legacy_menu: String, intv_section: String, 
+                                                location_list: Vec<(i64, String)>) -> String {
         let layout = self.get_tile(WebContentItem::WCTypePatientListTile);
 
         // base content
@@ -227,13 +225,15 @@ impl WebContentFactory {
         // page body content
         let ht3 = &ht2.replace(constants::PATIENT_HEADER_TILE_TAG, &patient_header);
         let ht4 = &ht3.replace(constants::CURRENT_ENCOUNTER_TILE_TAG, &current_encounter);
-        let ht5 = &ht4.replace(constants::CURRENT_INTERVENTIONS_TILE_TAG, &intv_section); // "CURRENT_INTERVENTIONS-REPLACED"); // 
+        let ht5 = &ht4.replace(constants::CURRENT_INTERVENTIONS_TILE_TAG, &intv_section);
         let ht6 = &ht5.replace(constants::ENCOUNTER_HISTORY_TILE_TAG, &encounter_section);
 
-        // common content
-        let ht7 = &ht6.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
+        let ht7 = &ht6.replace(constants::INTERVENTION_TYPE_DROP_DOWN_CONTROL_TAG, &self.get_location_dropdown( location_list, constants::NOT_SPECIFIED_ID));
 
-        return ht7.clone();
+        // common content
+        let ht_final = &ht7.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
+
+        return ht_final.clone();
     }
 
     ///
@@ -375,7 +375,7 @@ impl WebContentFactory {
     ///
     /// Provide HTML for all of a (Patient's) Encounter's Interventions
     /// 
-    pub fn get_intervention_list_tile(&self, intervention_list: Vec<Intervention>) -> String {
+    pub fn get_intervention_list_for_patient_details_tile(&self, intervention_list: Vec<Intervention>) -> String {
         let mut results_sbuf = String::with_capacity(100); 
         println!(">get_intervention_list_tile()");
 
@@ -385,15 +385,18 @@ impl WebContentFactory {
 
         for row in intervention_list{
             results_sbuf.push_str("  <tr>");
-            results_sbuf.push_str("<td><a href=\"#\" onclick=\"redirect_to_enc("  ); 
+            results_sbuf.push_str("<td><a href=\"#\" onclick=\"redirect_to_intv("  ); 
             results_sbuf.push_str( &row.id.to_string() ); 
             results_sbuf.push_str("); return false;\">"); 
             results_sbuf.push_str( &row.type_description_for_display()); 
             results_sbuf.push_str("</a></td><td>"); 
-            results_sbuf.push_str( &row.performed_date_for_display() );
+            results_sbuf.push_str( &row.performed_timestamp_for_display() );
             results_sbuf.push_str("</td>"); 
             results_sbuf.push_str("<td>"); 
-            results_sbuf.push_str( &row.scheduled_date_for_display() );
+            results_sbuf.push_str( &row.scheduled_timestamp_for_display() );
+            results_sbuf.push_str("</td>"); 
+            results_sbuf.push_str("<td>"); 
+            results_sbuf.push_str( &row.status_for_display() );
             results_sbuf.push_str("</td>"); 
             results_sbuf.push_str("  </tr>\n");
         }

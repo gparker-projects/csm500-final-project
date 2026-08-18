@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
-use chrono::{NaiveDateTime}; //, Local};
-
+use chrono::{NaiveDateTime}; 
 /// -------------------------------------------------------------------
 /// Defines a Data Transfer Object for a User
 /// -------------------------------------------------------------------

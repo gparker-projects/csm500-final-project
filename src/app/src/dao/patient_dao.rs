@@ -4,7 +4,7 @@ use chrono::NaiveDateTime;
 use crate::constants;
 
 use crate::dao::db_query;
-use crate::dto::{patient::*, encounter::*, intervention::*, intervention_detail::*};
+use crate::dto::{patient::*, encounter::*, intervention::*};
 use crate::webc::{data_forms::*};
 
 #[derive(Debug, Clone, Default)]

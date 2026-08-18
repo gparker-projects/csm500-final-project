@@ -12,7 +12,7 @@ use actix_session::{Session};
 //use crate::dto::patient::Patient;
 use crate::dto::encounter::Encounter;
 
-use crate::dao::{ patient_dao::*, intervention_dao::*, encounter_dao::*}; 
+use crate::dao::{common_dao::*, patient_dao::*, intervention_dao::*, encounter_dao::*}; 
 use crate::webc::{web_content::*, data_forms::*, menu_tile::*};
 
 use crate::session::{AppSession, UserSession};
@@ -35,13 +35,9 @@ impl PatientRoute{
     let patient_id: i64 = req.get_uid_as_i64();
 
     // get base patient data
-    let dao = PatientDAO::new(constants::DB_CONN_STR).await;
+    let pdao = PatientDAO::new(constants::DB_CONN_STR).await;
     let idao = InterventionDAO::new(constants::DB_CONN_STR).await;
     let edao = EncounterDAO::new(constants::DB_CONN_STR).await;
-
-    //let cur_enc_section: String; // = "No Encounters found".to_owned();
-    //let cur_encounter: Encounter; 
-    //let cur_intv: Option<Intervention>; 
 
     // pull out the current Encounter and generate summary tile for it
     let cur_enc: Encounter = edao.get_current_encounter(patient_id).await.clone();
@@ -68,7 +64,7 @@ impl PatientRoute{
     let intv_section = match intv_results {
         Some (intvs) => {
             //println!("Patient details obtained");
-            wcf.get_intervention_list_tile(intvs)
+            wcf.get_intervention_list_for_patient_details_tile(intvs)
         }
         None =>{
             //println!("No Encounters found");
@@ -77,8 +73,7 @@ impl PatientRoute{
     };
 
     // get patient encounter history
-
-    let patient_results = dao.get_patient_details( user_session.get_userid_as_i64(), patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+    let patient_results = pdao.get_patient_details( user_session.get_userid_as_i64(), patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
     let patient_header = match patient_results {
         Some (patient_details) => {
             //println!("Patient details obtained"); //: {}", &tile_content);
@@ -98,7 +93,7 @@ impl PatientRoute{
     };
 
     // refresh the patients in the menu (only)
-    let legacy_menu_results = dao.get_patients_at_users_site_no_discharge(user_session.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+    let legacy_menu_results = pdao.get_patients_at_users_site_no_discharge(user_session.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
     let legacy_menu = match legacy_menu_results {
         Some (patients_for_menu_lst) => {
             {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id)
@@ -109,8 +104,16 @@ impl PatientRoute{
         }
     };
 
-    let consolidated_content = wcf.get_patient_details_full_tile(patient_header, cur_enc_section, enc_section,
-                                                    user_session.user_display_name, legacy_menu, intv_section); //, enc_history);
+    // no user should be able to get into the system without a location assigned, so we will not worry about an exception here
+    let location_list = {CommonDAO::new(constants::DB_CONN_STR).await}.get_locations_for_user( user_session.get_userid_as_i64() ).await.unwrap(); // Result< Option< Vec<(i64, String)>
+
+    let consolidated_content = wcf.get_patient_details_full_tile(patient_header,
+                                                                         cur_enc_section,
+                                                                         enc_section,
+                                                                         user_session.user_display_name,
+                                                                         legacy_menu,
+                                                                         intv_section,
+                                                                         location_list.unwrap());
 
     HttpResponse::Ok().body( consolidated_content )
     }

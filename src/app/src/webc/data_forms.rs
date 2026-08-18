@@ -1,6 +1,6 @@
 use validator::{Validate, ValidationError};
-use chrono::NaiveDateTime;
-use crate::constants;
+//use chrono::NaiveDateTime;
+//use crate::constants;
 
 #[derive(serde::Deserialize)]
 pub struct LoginFormData {
@@ -169,6 +169,12 @@ pub struct InterventionDataForm {
     #[validate(length(min = 1, max = 1000000000, message = "Status Id must be a number"))]
     pub status_id: String, 
 
+    //#[validate(length(min = 16, max = 16, message = "Schedule date/time must be in YYYY/MM/DD HH:MM format"))]
+    pub scheduled_timestamp: String, // optional field, can not be validated this easily
+
+    //#[validate(length(min = 16, max = 16, message = "Schedule date/time must be in YYYY/MM/DD HH:MM format"))]
+    pub performed_timestamp: String, // optional field, can not be validated this easily
+
     pub form_errors: String,
 }
 
@@ -205,6 +211,14 @@ impl InterventionDataForm {
 
         if ! (self.status_id.len() > 0) || ! self.status_id.parse::<i64>().is_ok() {
             return Err(ValidationError::new("Status Id invalid"));
+        }
+
+        if ! (self.scheduled_timestamp.len() == 0) && (self.scheduled_timestamp.len() == 16)   {
+            return Err(ValidationError::new("Schedule date/time, when provided, must be in YYYY/MM/DD HH:MM format"));
+        }
+
+        if ! (self.performed_timestamp.len() == 0) && (self.performed_timestamp.len() == 16)   {
+            return Err(ValidationError::new("Performed date/time, when provided, must be in YYYY/MM/DD HH:MM format"));
         }
 
         match self.validate() {

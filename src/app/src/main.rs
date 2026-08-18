@@ -124,7 +124,8 @@ async fn main() -> std::io::Result<()> {
         .route("/admitnew", web::post().to( AdmitRoute::route_to_admit_new_no_patient ))
         .route("/admitsave", web::post().to( AdmitRoute::route_to_admit_save ))
         .route("/discharge", web::post().to( AdmitRoute::route_to_admit_discharge ))
-        .route("/modintv", web::post().to( InterventionRoute::route_to_modify_intervention ))
+        .route("/intv", web::post().to( InterventionRoute::route_to_view_or_modify_intervention ))
+        .route("/intvnew", web::post().to( InterventionRoute::route_to_add_new_intervention ))
         .route("/isItUp", web::get().to( is_it_up ))
         .service(Files::new("/webc/", "./webc"))  // ref: ttps://actix.rs/docs/static-files/
   })
