@@ -1,22 +1,19 @@
 //! # admit and related routes
 //!
 //!      CSM500 Project (April - October 2026)
-//!         Graham Parker (Student ID: 240120522)
+//!      Graham Parker (Student ID: 240120522)
 //! 
 //! REFERENCES
 //! 
 
-//!
 use actix_web::{web, HttpResponse, Responder};
 use actix_session::{Session}; 
 
+use crate::constants;
 use crate::dto::patient;
-
 use crate::dao::{ patient_dao::*, common_dao::*}; 
 use crate::webc::{data_forms::*, menu_tile::*};
 use crate::session::{AppSession, UserSession};
-
-use crate::constants;
 
 pub struct AdmitRoute{}
 
@@ -107,6 +104,20 @@ impl AdmitRoute{
             )).await
           }
       }
+  }
+
+  ///
+  /// Wrapper route for the menu option to admit a patient without having any web form to pass data in from
+  /// 
+  pub async fn route_to_admit_new_no_patient(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitFormBasic>) -> impl Responder {
+       println!("-> Route Requested: /route_to_admit_new_no_patient (REVISED)");
+
+        AdmitRoute::route_to_admit_discharge(app_session, user_session, web::Form(
+            AdmitDataForm {
+                patient_id: req.0.adm_target_id.clone(),
+                ..Default::default()
+            }
+        )).await
   }
 
   ///
