@@ -14,6 +14,7 @@
 //! [2] S. Lyu and A. Rzeznik, Practical Rust Projects: Build Serverless, AI, Machine Learning, Embedded, Game, and Web Applications. Berkeley, CA: Apress, 2023. doi: DOI:%2010.1007/978-1-4842-9331-7.
 //! https://github.com/LukeMathWalker/zero-to-production
 //!
+use MapleEMR::route::admit_route;
 use actix_web::{web, App, HttpServer, HttpResponse, Responder};
 use actix_web::http::StatusCode;
 use actix_web::cookie::Key;
@@ -23,59 +24,30 @@ use actix_session::{storage::CookieSessionStore, Session, SessionMiddleware}; //
 
 use crate::dto::{user_auth::*, encounter::*, intervention_detail::*, intervention::*};
 use crate::dao::{encounter_dao::*, patient_dao::*, intervention_dao::*, auth_dao::*, common_dao::*};
-use crate::webc::{data_forms::*};
+use crate::webc::{data_forms::*, menu_tile::*};
+use crate::webc::web_content::{WebContentFactory, WebContentItem}; 
+use crate::route::admit_route::AdmitRoute;
 
 //use crate::nlp::NLP; 
 
 // TODO: ideally we'd use an external session store, not just cookies. Until the application is largely working, we'll have to leave this for now. //storage::RedisSessionStore}; 
-use crate::webc::web_content::{WebContentFactory, WebContentItem}; 
-
 mod constants;
 mod dto;
 mod webc;
 mod dao;
 mod nlp;
-//mod data_forms;
+mod route;
+mod session;
 
 //use std::sync::Mutex; // needed for thread safety per https://actix.rs/docs/application/
 
-///
-/// Stores application-wide state/variables
-/// REF: https://actix.rs/docs/application/
-/// 
-struct AppSession {
-    app_version: String,
-    wcf: WebContentFactory,    //wcf: Mutex<WebContentFactory>,
-    app_key: Key,
-    //todo: add database pool
-}
 
-///
-/// Stores user session variables
-/// REF: https://docs.rs/actix-session/latest/actix_session/struct.SessionMiddleware.html
-/// 
-#[derive(serde::Serialize, serde::Deserialize)]
-pub struct UserSession {
-    pub user_id: String,
-    pub user_display_name: String,
-    pub email: String,
-    pub user_authorizations: UserAuthorization,   // for permissions and departments
-    // current patients
-    // preferences
-}
-
-impl UserSession {
-  fn get_userid_as_i64(&self) -> i64{
-      let result: i64 = self.user_id.parse().unwrap();
-      return result;
-  }
-}
 /// performs a natural language prompt using the built in engine
 /// 
 /// check by going to: http://127.0.0.1:8000/db
 /// 
 //async fn natural_language_prompt(req: web::Form<NLPromptFormData>) -> impl Responder {
-async fn natural_language_prompt(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<NLPromptFormData>) -> impl Responder {
+/*async fn natural_language_prompt(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<NLPromptFormData>) -> impl Responder {
   
     println!("-> /nlprompt Requested; prompt: \"{}\"", req.prompt);
 
@@ -101,7 +73,7 @@ async fn natural_language_prompt(app_session: web::Data<AppSession>, user_sessio
 
     //HttpResponse::Ok().body(format!("{}", results_sbuf)) 
 }
-
+*/
 
 /// performs a connect to the database
 /// 
@@ -110,7 +82,7 @@ async fn natural_language_prompt(app_session: web::Data<AppSession>, user_sessio
 ///      
 /// check by going to: http://127.0.0.1:8000/db
 /// 
-async fn login(user_session: Session, req: web::Form<LoginFormData>, _app_session: web::Data<AppSession>, ) -> impl Responder { // Box<dyn Responder<>> { //
+async fn login(user_session: Session, req: web::Form<LoginFormData>, _app_session: web::Data<session::AppSession>, ) -> impl Responder { // Box<dyn Responder<>> { //
   println!("-> /login Requested");
 
   let cur_db_conn = AuthDAO::new(constants::DB_CONN_STR).await;
@@ -127,7 +99,7 @@ async fn login(user_session: Session, req: web::Form<LoginFormData>, _app_sessio
       // initialize user session (this is the only location it can occur), for an authenticated user
       //  ref: https://docs.rs/actix-admin/latest/actix_admin/prelude/struct.Session.html
       // copy values from the db into the session; will use a different type of object than the DTO.user
-      user_session.insert(constants::USER_SESSION, UserSession {
+      user_session.insert(constants::USER_SESSION, session::UserSession {
         user_id: current_user.id.to_string(), 
         user_display_name: current_user.name + " (" + &current_user.user_name + ")",
         email: current_user.email,
@@ -157,10 +129,10 @@ async fn is_it_up() -> impl Responder {
 ///
 /// default route when nothing else is specified by the user
 ///
-async fn default_route(app_session: web::Data<AppSession>, user_session: Session) -> impl Responder {
+async fn default_route(app_session: web::Data<session::AppSession>, user_session: Session) -> impl Responder {
   println!("-> /default_route Requested");
  
-  let wcf = &app_session.wcf; 
+  let wcf = &app_session.get_web_content_factory(); 
   println!("Checking session for Validation errors");
   
   match user_session.get::<String>(constants::VALIDATION_ERRORS){
@@ -194,12 +166,12 @@ async fn default_route(app_session: web::Data<AppSession>, user_session: Session
 ///
 /// Main workspace page of the application, to be supplemented with lots of Javascript, CSS and API calls
 /// 
-async fn route_to_home(app_session: web::Data<AppSession>, user_session: Session) -> impl Responder {
+async fn route_to_home(app_session: web::Data<session::AppSession>, user_session: Session) -> impl Responder {
   println!("-> /home Route Requested");
 
-  let user_session: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+  let user_session: session::UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
 
-  let wcf = &app_session.wcf; // https://actix.rs/docs/application/
+  let wcf = &app_session.get_web_content_factory(); // https://actix.rs/docs/application/
   let mut content = wcf.get_home_tile(); // retrieve the page base content
 
   // get patients at the user's facility, for display
@@ -229,8 +201,7 @@ async fn route_to_home(app_session: web::Data<AppSession>, user_session: Session
        let patient_list_html = wcf.get_home_route_summary_of_patients_tile_using_wrapper(pwrap.clone()); 
        content = content.replace(constants::BODY_TILE_CONTENT_TAG, &patient_list_html);  // replace default string
 
-       // todo: offload this to the tile generator; should not be repeated
-       let std_menu_html = wcf.get_legacy_menu(patient_list.clone()); 
+       let std_menu_html = {MenuFormatter{}}.get_legacy_menu(patient_list.clone()); 
        content = content.replace(constants::LEGACY_MENU_TILE_TAG, &std_menu_html);  // replace default string       
     }
     None => {
@@ -251,10 +222,10 @@ async fn route_to_home(app_session: web::Data<AppSession>, user_session: Session
 ///
 /// Wrapper route for the menu option to admit a patient without having any web form to pass data in from
 /// 
-async fn route_to_admit_new_no_patient(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitFormBasic>) -> impl Responder {
-    println!("-> Route Requested: /route_to_admit_new_no_patient");
+async fn route_to_admit_new_no_patient(app_session: web::Data<session::AppSession>, user_session: Session, req: web::Form<AdmitFormBasic>) -> impl Responder {
+    println!("-> Route Requested: /route_to_admit_new_no_patient (REVISED)");
 
-    route_to_admit_discharge(app_session, user_session, web::Form(
+    AdmitRoute::route_to_admit_discharge(app_session, user_session, web::Form(
         AdmitDataForm {
             patient_id: req.0.adm_target_id.clone(),
             ..Default::default()
@@ -265,7 +236,26 @@ async fn route_to_admit_new_no_patient(app_session: web::Data<AppSession>, user_
 ///
 /// Route that will save patient data, from an Admit form submission
 /// 
-async fn route_to_admit_save(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitDataForm>) -> impl Responder {
+async fn route_to_admit_save(app_session: web::Data<session::AppSession>, user_session: Session, req: web::Form<AdmitDataForm>) -> impl Responder {
+    println!("****** Route Requested: /route_to_admit_SAVE (REVISED)");
+
+    AdmitRoute::route_to_admit_save(app_session, user_session, req ).await
+}
+
+
+  ///
+  /// Route for New patient admit, or existing patient discharge page
+  /// 
+  pub async fn route_to_admit_discharge(app_session: web::Data<session::AppSession>, user_session: Session, req: web::Form<AdmitDataForm>) -> impl Responder {
+      println!("-> Route Requested: /admit_discharge (REVISED)");
+
+      AdmitRoute::route_to_admit_discharge(app_session, user_session, req ).await
+  }
+
+///
+/// Route that will save patient data, from an Admit form submission
+/// 
+/*async fn route_to_admit_save(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitDataForm>) -> impl Responder {
     println!("-> Route Requested: /route_to_admit_SAVE ");
 
     let req_clone0 = req.clone();
@@ -348,8 +338,9 @@ async fn route_to_admit_save(app_session: web::Data<AppSession>, user_session: S
           )).await
         }
     }
-}
+}*/
 
+/*
 ///
 /// Route for New patient admit, or existing patient discharge page
 /// 
@@ -379,7 +370,7 @@ async fn route_to_admit_discharge(app_session: web::Data<AppSession>, user_sessi
     let legacy_menu_results = dao.get_patients_at_users_site_no_discharge(user_session_details.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
     let legacy_menu = match legacy_menu_results {
         Some (patients_for_menu_lst) => {
-            wcf.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id)
+           {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id)
         }
         None => {
             println!("No patients found for legacy menu. [Userid:{}]", user_session_details.get_userid_as_i64());
@@ -404,15 +395,15 @@ async fn route_to_admit_discharge(app_session: web::Data<AppSession>, user_sessi
 
     HttpResponse::Ok().body( content ) //"TODO : route_to_admit_discharge()" ) 
 }
-
+*/
 ///
 /// Route for adding new, or modifying existing Interventions of a patient
 /// 
-async fn route_to_modify_intervention(app_session: web::Data<AppSession>, user_session: Session) -> impl Responder {
+async fn route_to_modify_intervention(app_session: web::Data<session::AppSession>, user_session: Session) -> impl Responder {
   println!("-> /modify_intervention Route Requested");
 
-  let user_session: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
-  let wcf = &app_session.wcf; 
+  let user_session: session::UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+  let wcf = &app_session.get_web_content_factory(); 
   //let mut content = wcf.get_modify_intervention_tile(); // retrieve the page base content
 
   //pub fn get_modify_intervention_tile(&self, current_intervention: Intervention) -> String {
@@ -425,12 +416,12 @@ async fn route_to_modify_intervention(app_session: web::Data<AppSession>, user_s
 ///
 /// Route to View Patient details; expects a GenerialWebFormData to have been submitted to reach the route
 ///
-async fn route_to_patient_details(user_session: Session, app_session: web::Data<AppSession>, req: web::Form<GenericWebFormData>) -> impl Responder {
+async fn route_to_patient_details(user_session: Session, app_session: web::Data<session::AppSession>, req: web::Form<GenericWebFormData>) -> impl Responder {
   println!("-> /patientdtls Route Requested");
 
   //todo: this should direct to a standard error or login screen when session is lost
-  let user_session: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
-  let wcf: &WebContentFactory = &app_session.wcf; 
+  let user_session: session::UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+  let wcf: &WebContentFactory = &app_session.get_web_content_factory(); 
 
   let patient_id: i64 = req.get_uid_as_i64();
 
@@ -439,13 +430,13 @@ async fn route_to_patient_details(user_session: Session, app_session: web::Data<
   let idao = InterventionDAO::new(constants::DB_CONN_STR).await;
   let edao = EncounterDAO::new(constants::DB_CONN_STR).await;
 
-  let mut cur_enc_section: String = "No Encounters found".to_owned();
-  let cur_encounter: Encounter; 
-  let cur_intv: Option<Intervention>; 
+  //let cur_enc_section: String; // = "No Encounters found".to_owned();
+  //let cur_encounter: Encounter; 
+  //let cur_intv: Option<Intervention>; 
 
   // pull out the current Encounter and generate summary tile for it
   let cur_enc: Encounter = edao.get_current_encounter(patient_id).await.clone();
-  cur_enc_section = wcf.get_single_encounter_summary_tile(cur_enc.clone());
+  let cur_enc_section = wcf.get_single_encounter_summary_tile(cur_enc.clone());
 
   // pull out the most recent vitals (Intervention of type = "Vitals") and generate summary tile for it
   let cur_intv = idao.get_most_recent_vitals(cur_enc.id.clone()).await.expect(constants::DATABASE_ERROR_NOT_FOUND); 
@@ -501,7 +492,7 @@ async fn route_to_patient_details(user_session: Session, app_session: web::Data<
   let legacy_menu_results = dao.get_patients_at_users_site_no_discharge(user_session.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
   let legacy_menu = match legacy_menu_results {
     Some (patients_for_menu_lst) => {
-        wcf.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id)
+        {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id)
     }
     None => {
         println!("No patients found for legacy menu");
@@ -571,7 +562,7 @@ async fn main() -> std::io::Result<()> {
                 .max_age(3600),
         )
         .app_data(  // this enclosure allows the session state to be created and made available to all routes. actix_web magic.
-            web::Data::new( AppSession {
+            web::Data::new( session::AppSession {
                 app_version: "v1.0".to_string(),
                 //wcf: Mutex::new( WebContentFactory::new(&get_static_path_base()) )
                 wcf: WebContentFactory::new(&get_static_path_base()),
@@ -584,7 +575,7 @@ async fn main() -> std::io::Result<()> {
         .route("/login", web::post().to( login ))
         .route("/home", web::get().to( route_to_home )) // main workspace
         .route("/patientdtls", web::post().to( route_to_patient_details ))
-        .route("/nlprompt", web::post().to( natural_language_prompt ))
+        //.route("/nlprompt", web::post().to( natural_language_prompt ))
         .route("/admit", web::post().to( route_to_admit_discharge ))
         .route("/admitnew", web::post().to( route_to_admit_new_no_patient ))
         .route("/admitsave", web::post().to( route_to_admit_save ))

@@ -26,3 +26,33 @@
 	</table>
 
 </td></tr-->
+
+
+//println!("Retrieved {} patients:", patient_list.len());
+       let mut pwrap: Vec<PatientWrapper> = Vec::new();
+
+       for p in patient_list.clone(){
+          let cur_enc: Encounter = edao.get_current_encounter(p.id.clone()).await.clone(); //get the current encounter for each patient
+          let cur_intv = idao.get_most_recent_vitals(cur_enc.id.clone()).await.expect(constants::DATABASE_ERROR_NOT_FOUND); 
+
+          let cur_idtls: Result< Option< Vec<InterventionDetail> >, std::io::Error> = match cur_intv.clone() {
+           Some( intv ) => {
+                Ok( Some(
+                  idao.get_all_intervention_details(intv.id, constants::NOT_SPECIFIED_ID).await.expect(constants::EMPTY_DATASET).clone().unwrap()
+                ) )
+            }
+            None => {
+                println!("No intervention found for encounter id = {}", cur_enc.id);
+                Ok( None )
+            }
+          };
+
+          pwrap.push( PatientWrapper{
+                  patient: p.clone(),
+                  current_encounter: cur_enc.clone(),
+                  most_recent_intervention: cur_intv,
+                  intervention_detail: cur_idtls.expect(constants::EMPTY_DATASET)
+              }
+          );
+          //print!(">> DEBUG Added pid={} e={} i={}", tmp_p, tmp_e, tmp_i);
+       }
