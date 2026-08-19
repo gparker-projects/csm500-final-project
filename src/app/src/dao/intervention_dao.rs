@@ -54,7 +54,7 @@ impl InterventionDAO {
         .unwrap_or_default();
 
         if rows.is_empty() {
-            println!(">get_interventions() Query: {}", query);
+            //println!(">get_interventions() Query: {}", query);
             println!("No Interventions found for encounter_id: {} [count={}]", encounter_id, rows.len());
             return Ok( Some( Vec::new() ) );
         }

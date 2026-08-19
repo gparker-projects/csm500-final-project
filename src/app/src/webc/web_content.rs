@@ -216,7 +216,7 @@ impl WebContentFactory {
     /// 
     pub fn get_patient_details_full_tile(&self, patient_header: String, current_encounter: String, encounter_section: String,
                                                 user_identity_label: String, legacy_menu: String, intv_section: String, 
-                                                location_list: Vec<(i64, String)>) -> String {
+                                                location_list: Vec<(i64, String, String)>) -> String {
         let layout = self.get_tile(WebContentItem::WCTypePatientListTile);
 
         // base content
@@ -228,9 +228,9 @@ impl WebContentFactory {
         let ht5 = &ht4.replace(constants::CURRENT_INTERVENTIONS_TILE_TAG, &intv_section);
         let ht6 = &ht5.replace(constants::ENCOUNTER_HISTORY_TILE_TAG, &encounter_section);
 
-        let ht7 = &ht6.replace(constants::INTERVENTION_TYPE_DROP_DOWN_CONTROL_TAG, &self.get_location_dropdown( location_list, constants::NOT_SPECIFIED_ID));
-
-        // common content
+        let ht7 = &ht6.replace(constants::INTERVENTION_TYPE_DROP_DOWN_CONTROL_TAG, &&self.get_dropdown_generic( location_list,
+                                                                                                                                  "location_id".to_string(),
+                                                                                                                                  constants::NOT_SPECIFIED_ID));
         let ht_final = &ht7.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
 
         return ht_final.clone();
@@ -339,6 +339,37 @@ impl WebContentFactory {
             results_sbuf.push_str( &row.encounter_site_name );
             results_sbuf.push_str("</td>"); 
             results_sbuf.push_str("  </tr>\n");
+        }
+        results_sbuf.push_str("</table>");
+
+        return results_sbuf;
+    }
+
+
+    ///
+    /// Generates a list of locations based on what is in the system
+    /// 
+    pub fn get_dropdown_generic(&self, item_list: Vec<(i64, String, String)>, list_name_and_id: String, default_item_id: i64) -> String {
+        let mut results_sbuf = String::with_capacity(100); 
+        println!("> get_location_dropdown()");
+
+        // https://www.w3schools.com/tags/tag_select.asp
+        results_sbuf.push_str("<select name='");
+        results_sbuf.push_str(&list_name_and_id.to_string());
+        results_sbuf.push_str("' id='");
+        results_sbuf.push_str(&list_name_and_id.to_string());
+        results_sbuf.push_str("'>");
+
+        for row in item_list{
+            results_sbuf.push_str("<option value='" );
+            results_sbuf.push_str(&row.0.to_string()); // location_id here
+            results_sbuf.push_str("'" );
+            if row.0 == default_item_id {
+                results_sbuf.push_str(" selected ");
+            }
+            results_sbuf.push_str(">");
+            results_sbuf.push_str(&row.1); // description here
+            results_sbuf.push_str("</option>");
         }
         results_sbuf.push_str("</table>");
 

@@ -4,6 +4,12 @@ use sqlx::postgres::{PgPoolOptions, PgPool};
 //use sqlx::Row;
 //use std::io::{Error, ErrorKind};
 
+pub const REF_TYPE_GROUP_1_INTERVENTION_TYPES: i64 = 1;
+pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
+pub const REF_TYPE_GROUP_3_CARE_TYPES: i64 = 3;
+pub const REF_TYPE_GROUP_4_INTERVENTION_META_DATA: i64 = 4;
+pub const REF_TYPE_GROUP_5_STANDARD_MEASURES: i64 = 5;
+
 #[derive(Debug, Clone)]
 pub struct CommonDAO {
     pub connection: PgPool,

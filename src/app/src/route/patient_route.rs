@@ -12,7 +12,7 @@ use actix_session::{Session};
 //use crate::dto::patient::Patient;
 use crate::dto::encounter::Encounter;
 
-use crate::dao::{common_dao::*, patient_dao::*, intervention_dao::*, encounter_dao::*}; 
+use crate::dao::{common_dao::{self, *}, encounter_dao::*, intervention_dao::*, patient_dao::*}; 
 use crate::webc::{web_content::*, data_forms::*, menu_tile::*};
 
 use crate::session::{AppSession, UserSession};
@@ -105,7 +105,7 @@ impl PatientRoute{
     };
 
     // no user should be able to get into the system without a location assigned, so we will not worry about an exception here
-    let location_list = {CommonDAO::new(constants::DB_CONN_STR).await}.get_locations_for_user( user_session.get_userid_as_i64() ).await.unwrap(); // Result< Option< Vec<(i64, String)>
+    let item_list = {CommonDAO::new(constants::DB_CONN_STR).await}.get_common_references(common_dao::REF_TYPE_GROUP_1_INTERVENTION_TYPES, true ).await.unwrap();
 
     let consolidated_content = wcf.get_patient_details_full_tile(patient_header,
                                                                          cur_enc_section,
@@ -113,7 +113,7 @@ impl PatientRoute{
                                                                          user_session.user_display_name,
                                                                          legacy_menu,
                                                                          intv_section,
-                                                                         location_list.unwrap());
+                                                                         item_list.unwrap());
 
     HttpResponse::Ok().body( consolidated_content )
     }

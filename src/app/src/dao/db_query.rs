@@ -114,7 +114,7 @@ pub const QRY_ALL_INTERVENTION_DETAILS_FOR_TYPE: &str = r##"
 "##;
 
 
-pub const QRY_ACTIVE_DEPARTMENTS: &str = r##"select id, name from department where expiry_timestamp > now()"##;
+pub const QRY_ACTIVE_DEPARTMENTS: &str = r##"select id, name, name "description" from department where expiry_timestamp > now()"##;
 
 
 pub const QRY_COMMON_REF_TYPES_FOR_GROUP: &str = r##"select id, name, description from common_reference_type where group_id = {group_id}"##;
