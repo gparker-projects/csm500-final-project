@@ -8,6 +8,7 @@
 //! 
 
 
+ let ht7 = &ht6.replace(constants::INTERVENTION_TYPE_DROP_DOWN_CONTROL_TAG, &self.get_location_dropdown( location_list, constants::NOT_SPECIFIED_ID));
 
 
 <!--tr><td>

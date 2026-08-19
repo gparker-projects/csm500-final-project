@@ -18,10 +18,8 @@
 </form>
 </div>
 
-<h3>Admission History</h3>
+<!-- h3>Admission History</h3 -->
 <div id="MapleEMR::EncounterHistory"></div>
-
-<label id="errLabel"></label><br>
 
 <div id="MapleEMR::UserCommands"></div>
 

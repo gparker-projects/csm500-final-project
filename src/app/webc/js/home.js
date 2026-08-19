@@ -95,3 +95,11 @@ async function admit_patient(){
     const frm = document.getElementById('admitFrm');
     frm.submit();
 }
+
+/*async function redirect_to_enc(enc_id){
+    const data = document.getElementById('target_id');
+    data.value = enc_id;
+
+    const frm = document.getElementById('encHistoryFrm');
+    frm.submit();
+}*/
