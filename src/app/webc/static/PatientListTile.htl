@@ -8,7 +8,7 @@
 <div align="center" >
 <form action="/discharge" method="post" id="dischargeForm" onSubmit="event.preventDefault(); return submitDischargeForm()">
   <input type="submit" value="Discharge Patient">
-  <input type="hidden" value="{patient_id}">
+  <input type="hidden" id="patient_id" name="patient_id" value="{patient_id}">
 </form>
 </div>
 
@@ -21,6 +21,7 @@
       <input type="submit" value="Add">
       <div id="MapleEMR::InterventionTypeDropDownControl"></div>
   </div>
-  <input type="hidden" value="{encounter_id}">
+  <input type="hidden" id="encounter_id" name="encounter_id" value="{encounter_id}">
+  <input type="hidden" id="intervention_id" name="intervention_id" value="-1">
 </form>
 </div>

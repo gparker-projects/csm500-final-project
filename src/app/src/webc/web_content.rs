@@ -222,7 +222,8 @@ impl WebContentFactory {
     /// 
     pub fn get_patient_details_full_tile(&self, patient_header: String, current_encounter: String, encounter_section: String,
                                                 user_identity_label: String, legacy_menu: String, intv_section: String, 
-                                                intervention_type_list: Vec<(i64, String, String)>) -> String {
+                                                intervention_type_list: Vec<(i64, String, String)>,
+                                                patient_id: String, encounter_id: String) -> String {
         let layout = self.get_tile(WebContentItem::WCTypePatientListTile);
 
         // base content
@@ -234,10 +235,13 @@ impl WebContentFactory {
         let ht5 = &ht4.replace(constants::CURRENT_INTERVENTIONS_TILE_TAG, &intv_section);
         let ht6 = &ht5.replace(constants::ENCOUNTER_HISTORY_TILE_TAG, &encounter_section);
 
-        let ht7 = &ht6.replace(constants::INTERVENTION_TYPE_DROP_DOWN_CONTROL_TAG, &&self.get_dropdown_generic( intervention_type_list,
+        let ht7 = &ht6.replace("{patient_id}",  &patient_id);
+        let ht8 = &ht7.replace("{encounter_id}",  &encounter_id);
+
+        let ht9 = &ht8.replace(constants::INTERVENTION_TYPE_DROP_DOWN_CONTROL_TAG, &&self.get_dropdown_generic( intervention_type_list,
                                                                                                                                   "intervention_type_id".to_string(),
                                                                                                                                   constants::NOT_SPECIFIED_ID));
-        let ht_final = &ht7.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
+        let ht_final = &ht9.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
 
         return ht_final.clone();
     }

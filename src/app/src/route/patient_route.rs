@@ -43,6 +43,8 @@ impl PatientRoute{
     let cur_enc: Encounter = edao.get_current_encounter(patient_id).await.clone();
     let cur_enc_section = wcf.get_single_encounter_summary_tile(cur_enc.clone());
 
+    let cur_enc_id = cur_enc.clone().id.to_string();
+
     // pull out the most recent vitals (Intervention of type = "Vitals") and generate summary tile for it
     let cur_intv = idao.get_most_recent_vitals(cur_enc.id.clone()).await.expect(constants::DATABASE_ERROR_NOT_FOUND); 
 
@@ -60,7 +62,7 @@ impl PatientRoute{
     };
 
     // get all interventions for the patient
-    let intv_results = idao.get_interventions(patient_id, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+    let intv_results = idao.get_interventions(cur_enc.id, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
     let intv_section = match intv_results {
         Some (intvs) => {
             //println!("Patient details obtained");
@@ -113,7 +115,9 @@ impl PatientRoute{
                                                                          user_session.user_display_name,
                                                                          legacy_menu,
                                                                          intv_section,
-                                                                         item_list.unwrap());
+                                                                         item_list.unwrap(), 
+                                                                         patient_id.to_string(),
+                                                                         cur_enc_id);
 
     HttpResponse::Ok().body( consolidated_content )
     }
