@@ -169,6 +169,9 @@ pub struct InterventionDataForm {
     #[validate(length(min = 1, max = 1000000000, message = "Status Id must be a number"))]
     pub status_id: String, 
 
+    #[validate(length(min = 1, max = 1000000000, message = "Patient Id must be a number"))]
+    pub patient_id: String, 
+
     //#[validate(length(min = 16, max = 16, message = "Schedule date/time must be in YYYY/MM/DD HH:MM format"))]
     pub scheduled_timestamp: String, // optional field, can not be validated this easily
 
@@ -179,6 +182,11 @@ pub struct InterventionDataForm {
 }
 
 impl InterventionDataForm {
+
+    pub fn get_patient_id_as_i64(&self) -> i64{
+        let result: i64 = self.patient_id.parse().unwrap();
+        return result;
+    }
 
     pub fn validate_fields(&self) -> Result<(), ValidationError> {
         if ! (self.intervention_id.len() > 0) || ! self.intervention_id.parse::<i64>().is_ok() {
@@ -211,6 +219,10 @@ impl InterventionDataForm {
 
         if ! (self.status_id.len() > 0) || ! self.status_id.parse::<i64>().is_ok() {
             return Err(ValidationError::new("Status Id invalid"));
+        }
+
+        if ! (self.patient_id.len() > 0) || ! self.patient_id.parse::<i64>().is_ok() {
+            return Err(ValidationError::new("Patient Id invalid"));
         }
 
         if ! (self.scheduled_timestamp.len() == 0) && (self.scheduled_timestamp.len() == 16)   {

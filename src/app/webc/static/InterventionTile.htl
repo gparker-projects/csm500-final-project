@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<HTML>
+<HEAD>
+  <TITLE>Maple EMR</TITLE>
+  <link rel="stylesheet" href="/webc/css/login.css">
+  <script>
+
+  function validateForm() {
+    const errLabel = document.getElementById('errLabel');
+    errLabel.textContent = '';
+    let isValid = true;
+    
+    console.log("in validateForm();");
+
+   /* if (document.getElementById('patient_first_name').value.trim() == '') {
+        errLabel.textContent = "First Name is required";
+        errLabel.style = "color: red";
+        isValid = false;
+    }
+
+
+    if (document.getElementById('birthdate').value.trim() == '') {
+	  errLabel.textContent = "Birthdate must be provided in YYYY/MM/DD format.";
+	  errLabel.style = "color: red";
+	  isValid = false;
+    }
+    
+    if (document.getElementById('admit_notes').value.trim() == '') {
+	  errLabel.textContent = "Reason for Visit is required";
+	  errLabel.style = "color: red";
+	  isValid = false;
+    }
+*/
+
+    
+    if (!isValid) {
+      event.preventDefault();       // Stop the form from submitting if there are errors
+    }
+    else{
+      admdisForm.submit();
+    }
+
+    // If isValid remains true, the browser automatically proceeds to submit!
+    return isValid;
+  }
+
+  function cancelForm(){
+    if(confirm('Are you sure you want to leave this page?')){
+        window.location.href = "\home";
+    }
+    return;
+  }
+  </script>
+</HEAD>
+<BODY>
+
+<h1>{intv_type_desc}&nbsp;Details</h1>
+	
+<form action="/intvnew" method="post" id="intvForm" name="intvForm" onSubmit="event.preventDefault(); return validateForm()">
+<input type="hidden" name="encounter_id" id="encounter_id" value="{encounter_id}">
+<input type="hidden" name="intervention_id" id="intervention_id" value="{intervention_id}">
+<input type="hidden" name="intervention_type_id" id="intervention_type_id" value="{intervention_type_id}">
+<input type="hidden" name="patient_id" id="patient_id" value="{patient_id}">
+<div>
+
+<input type="hidden" name="form_errors" id="form_errors" value="">
+<table>
+<tr><td>
+	<label id="errLabel"></label>
+	<table>
+
+	    <tr class="data-label">
+	       <td><div>Type</div><div class="data-field-ro">{intervention_type}</div></td>
+	       <td><div>Scheduled Date/Time</div><input type="text" name="scheduled_timestamp" id="scheduled_timestamp" class="data-field-rw" value="<!--{scheduled_timestamp}-->"></div></td>
+	       <td><div>Performed Date/Time</div><input type="text" name="performed_timestamp" id="performed_timestamp" class="data-field-rw" value="<!--{performed_timestamp}-->"></div></td>
+	    </tr>
+
+	    <tr class="data-label">
+	      <td>
+	    	  <div class="data-field-ro">Location:&nbsp;<!--{location_id}--></div>
+	      </td>
+	      <td>
+	          <div class="data-field-ro">Assigned to:&nbsp;<div id="MapleEMR::UserIdDropDownControl"></div></div>
+	      </td>
+	      <td>
+	          <div class="data-field-ro">Status:&nbsp;<div id="MapleEMR::StatusIdDropDownControl"></div></div>
+	      </td>
+	    </tr>
+
+	    <tr class="data-label">
+	      <td colspan=3>
+		<div>Description</div><textarea id="description" name="description" rows="4" cols="50" class="data-field-rw"><!--{description}--></textarea></div>
+	      </td>
+	    </tr>
+	    
+	    <tr class="data-label">
+	      <td colspan=3>
+		<div>Notes</div><textarea id="notes" name="notes" rows="4" cols="50" class="data-field-rw"><!--{notes}--></textarea></div>
+	      </td>
+	    </tr>
+	</table>
+</td></tr>
+
+<tr>
+<td>
+<input type="submit" value="Save">
+<input type="button" value="Cancel" onclick="cancelForm()">
+</td>
+</tr>
+
+</table>
+</div>
+</form>
+
+
+</BODY>
+</HTML>

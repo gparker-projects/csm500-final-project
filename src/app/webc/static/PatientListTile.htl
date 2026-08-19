@@ -1,10 +1,14 @@
+<link rel="stylesheet" href="/webc/css/login.css">
+<script src="/webc/js/patientListTile.js" defer></script>
+
 <div id="MapleEMR::PatientHeader"></div><p></p>
 <h3>Current Admission</h3>
 <div id="MapleEMR::CurrentEncounter"></div><p></p>
 
 <div align="center" >
-<form action="/discharge" method="post" id="dischargeForm" onSubmit="event.preventDefault(); return validateForm()">
-  <input type="submit" value="Discharge">
+<form action="/discharge" method="post" id="dischargeForm" onSubmit="event.preventDefault(); return submitDischargeForm()">
+  <input type="submit" value="Discharge Patient">
+  <input type="hidden" value="{patient_id}">
 </form>
 </div>
 
@@ -12,14 +16,11 @@
 <div id="MapleEMR::CurrentInterventions"></div><p></p>
 
 <div align="center" >
-<form action="/addIntv" method="post" id="addIntvForm" onSubmit="event.preventDefault(); return validateForm()">
-  <input type="submit" value="Add">
-  <div id="MapleEMR::InterventionTypeDropDownControl"></div>
+<form action="/intvnew" method="post" id="addIntvForm" onSubmit="event.preventDefault(); return submitAddIntvForm()">
+  <div align="left" >
+      <input type="submit" value="Add">
+      <div id="MapleEMR::InterventionTypeDropDownControl"></div>
+  </div>
+  <input type="hidden" value="{encounter_id}">
 </form>
 </div>
-
-<!-- h3>Admission History</h3 -->
-<div id="MapleEMR::EncounterHistory"></div>
-
-<div id="MapleEMR::UserCommands"></div>
-

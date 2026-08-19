@@ -86,6 +86,29 @@ pub const QRY_CURRENT_VITALS_FOR_ENC_ID: &str = r##"
                                 ORDER BY i.id DESC LIMIT 1
                                                 "##; // VITALS ARE REF ID = 38
 
+pub const QRY_INTERVENTION_FOR_ID: &str = r##"SELECT i.id intervention_id,
+                                                encounter_id,
+                                                i.description,
+                                                i.notes,
+                                                i.location_id,
+                                                users_id,
+                                                intervention_type_id,
+                                                status_id,
+                                                l.room_identifier,
+                                                ref1.name "intervention_type", 
+                                                ref2.name "status",
+                                                i.scheduled_timestamp,
+                                                i.performed_timestamp,
+                                                e.patient_id
+                                            FROM intervention i
+                                            join encounter e ON e.id = i.encounter_id
+                                            join location l on  l.id = i.location_id
+                                            join common_reference_type ref1 on i.intervention_type_id = ref1.id
+                                            join common_reference_type ref2 on i.status_id = ref2.id 
+                                            where i.id = {}
+                                              "##;
+
+
 pub const QRY_SINGLE_PATIENT_DETAILS: &str =  r##"SELECT p.id "patient_id", e.id "encounter_id", e.location_id "location_id", legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as "legal_middle_names",
                                                 COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
                                                 birthdate, admit_timestamp,
@@ -106,33 +129,46 @@ pub const QRY_ALL_INTERVENTION_DETAILS: &str =  r##"
                                                 "##;
 
 pub const QRY_ALL_INTERVENTION_DETAILS_FOR_TYPE: &str = r##"
-    SELECT i.id "intervention_details_id", value, notes, entry_timestamp, ref1.name "intervention_type", intervention_id, type_id
-        FROM intervention_details i
-        JOIN common_reference_type ref1 on i.type_id = ref1.id 
-        WHERE intervention_id = {1}
-            AND type_id = {2}
-"##;
+                                                    SELECT i.id "intervention_details_id", value, notes,
+                                                        entry_timestamp,
+                                                        ref1.name "intervention_type", intervention_id, type_id
+                                                        FROM intervention_details i
+                                                        JOIN common_reference_type ref1 on i.type_id = ref1.id 
+                                                        WHERE intervention_id = {1}
+                                                            AND type_id = {2}
+                                                "##;
 
 
 pub const QRY_ACTIVE_DEPARTMENTS: &str = r##"select id, name, name "description" from department where expiry_timestamp > now()"##;
-
 
 pub const QRY_COMMON_REF_TYPES_FOR_GROUP: &str = r##"select id, name, description from common_reference_type where group_id = {group_id}"##;
 
 pub const QRY_COMMON_REF_TYPES_FOR_GROUP_ACTIVE_ONLY: &str = r##"select id, name, description from common_reference_type where group_id = {group_id} and active_flag = 'Y'"##;
 
 
-
 pub const QRY_ACTIVE_LOCATIONS: &str = r##"select id, name ||' (' || short_name|| ')' from location where active_flag = 'Y'"##;
 
 pub const QRY_CURRENT_USER_LOCATIONS: &str = r##"
-    select id, name ||' (' || short_name|| ')' from location
-    where active_flag = 'Y'
-    and site_id in (
-        select site_id
-        from user_permission
-        where users_id = {}
-            and active_flag = 'Y' )"##;
+                                        select id, name ||' (' || short_name|| ')' from location
+                                        where active_flag = 'Y'
+                                        and site_id in (
+                                            select site_id
+                                            from user_permission
+                                            where users_id = {}
+                                                and active_flag = 'Y' )"##;
+
+
+pub const QRY_ALL_USERS_AND_DEPARTMENT_NAME: &str = r##"
+                                                select distinct u.id user_id, 
+                                                    u.name,
+                                                    d.name "department_name"
+                                                from user_permission up
+                                                join users u on up.users_id = u.id
+                                                join department d on up.department_id = d.id
+                                                where up.active_flag = 'Y'
+                                                and users_id = {user_id}
+                                                and site_id is not null
+                                                "##;                                    
 
 // ------------------------------------------------------------------------------------------
 // 

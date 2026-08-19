@@ -1,6 +1,7 @@
 use sqlx::postgres::{PgPoolOptions, PgPool}; //, PgRow};
 use sqlx::Row;
 use std::io::{Error, ErrorKind};
+use crate::dao::db_query;
 use crate::dto::user::User;
 use crate::dto::user_auth::*;
 
@@ -119,6 +120,36 @@ impl AuthDAO {
         };
         Ok(Some(result))
         
-    }    
+    }  
+
+    ///
+    /// Accessor to retrive User and Description entries from the database into a tuple.
+    ///
+    /// Returns: a tuple (i64, String) containing the id of the location and an aggregated string
+    ///          describing the location.
+    ///
+    pub async fn get_user_and_departments_at_current_user_sites(&self, user_id: i64)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
+        let query_level_0: String = db_query::QRY_ALL_USERS_AND_DEPARTMENT_NAME.to_owned();
+        let query = query_level_0.replace("{user_id}", &user_id.to_string());
+
+        println!("get_user_and_departments_at_current_user_sites()");
+
+        let rows: Vec<( i64, String, String )> = sqlx::query_as(&query)
+                                                .fetch_all(&self.connection) 
+                                                .await
+                                                .unwrap_or_default();
+        if rows.is_empty() {
+            println!("Users and departments not found for user_id={}", user_id);
+            return Ok( Some( Vec::new() ) );
+        }
+        else{
+            let mut results: Vec<(i64, String, String)> = Vec::with_capacity(rows.len());
+            for row in rows {
+                let tmp_id: i64 = row.0; // user_id
+                results.push( (tmp_id, row.1, row.2) ); // user_id, name, department_name
+            }
+            return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
+        }
+    }
     
 }

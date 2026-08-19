@@ -32,6 +32,68 @@ impl InterventionDAO {
         }
     }
 
+    ///
+    /// Finds and returns an intervention based on an intervention/id => should never be more than one. 
+    /// For simplicity with the code, we'll still use fetch_all.
+    /// 
+    pub async fn get_intervention(&self, intervention_id: i64) -> Result< Option< Intervention >, std::io::Error> {
+        let query = db_query::QRY_INTERVENTION_FOR_ID.replace("{}", &intervention_id.to_string());
+
+        let rows: Vec<(i64, i64, String, String,
+                       i64, i64, i64, i64,
+                       String, String, String,
+                       Option<chrono::NaiveDateTime>,
+                       Option<chrono::NaiveDateTime>
+                    )> = sqlx::query_as(&query)
+        .fetch_all(&self.connection) 
+        .await
+        .unwrap_or_default();
+
+        if rows.is_empty() {
+            //println!(">get_interventions() Query: {}", query);
+            println!("No Interventions found for encounter_id: {} [count={}]", intervention_id, rows.len());
+            return Ok( None );
+        }
+        else{
+            //println!("Loading {} Interventions",  rows.len());
+            let mut results: Vec<Intervention> = Vec::with_capacity(rows.len());
+            for row in rows { // should only ever iterate once
+                let tmp_intv_id: i64 = row.0; // intervention_id
+                let tmp_enc_id: i64 = row.1; // encounter_id
+                let tmp_description = row.2; // description
+                let tmp_notes = row.3; // notes
+                let tmp_location_id: i64 = row.4; // location_id
+                let tmp_users_id: i64 = row.5; // users_id
+                let tmp_intervention_type_id: i64 = row.6; //intervention_type_id
+                let tmp_status_id: i64 = row.7; // users_id
+                let tmp_room_identifier = row.8; // tmp_room_identifier
+
+                let tmp_intervention_type: String = row.9; //intervention_type_id
+                let tmp_status = row.10; //status_code
+                let tmp_scheduled_timestamp = row.11; // i.scheduled_timestamp
+                let tmp_performed_timestamp = row.12; //i.performed_Timestamp
+
+                results.push(
+                    Intervention {
+                        id: tmp_intv_id,
+                        encounter_id: tmp_enc_id,
+                        description: tmp_description,
+                        notes: tmp_notes,
+                        location_id: tmp_location_id,
+                        users_id: tmp_users_id,
+                        intervention_type_id: tmp_intervention_type_id,
+                        status_id: tmp_status_id,
+                        room_identifier: tmp_room_identifier,
+                        intervention_type: tmp_intervention_type,
+                        status_code: tmp_status,
+                        scheduled_timestamp: tmp_scheduled_timestamp,
+                        performed_timestamp: tmp_performed_timestamp
+                    }
+                );
+            }
+            return Ok( results.first().cloned() ); // because this is in an enclosure we MUST add the return keyword for it to compile
+        }
+    }
 
     /// Finds and returns all interventions based on an encounter
     /// 
@@ -154,7 +216,6 @@ impl InterventionDAO {
         }
     }
 
-
     ///
     /// get the most recent intervention for the Encounter that is of a vitals type
     /// 
@@ -163,7 +224,6 @@ impl InterventionDAO {
 
         Ok( results.expect(constants::DATABASE_ERROR_NOT_FOUND).first().cloned() )
     }
-
 
     ///
     /// Given an InterventionDataForm, create a new Encounter reocrd, or update an existing one

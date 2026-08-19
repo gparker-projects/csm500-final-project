@@ -18,16 +18,18 @@ use crate::dao::patient_dao::PatientWrapper;
 /// 
 #[derive(Clone, Display, Eq, Hash, PartialEq)]
 pub enum WebContentItem {
-    #[display("Login Tile")]
+    #[display("Login Full Page Tile")]
     WCTypeLoginTile,
-    #[display("Patient List Tile")]
+    #[display("Patient Full Page Tile")]
     WCTypePatientListTile,
-    #[display("Home")]
+    #[display("Home Full Page Tile")]
     WCTypeHomePage,
-    #[display("Discharge Basic Tile")]
+    #[display("Discharge Full Page Tile")]
     WCTypeDischargeTile,
-    #[display("Admit Basic Tile")]
+    #[display("Admit Full Page Tile")]
     WCTypeAdmitTile,
+    #[display("Intervention Full Page Tile")]
+    WCTypeInterventionFullPageTile,
 }
 
 /// -------------------------------------------------------------------
@@ -71,6 +73,10 @@ impl WebContentFactory {
         contents = fs::read_to_string(&filename).expect(constants::ERROR_READING_TEMPLATE);
         tiles.insert(WebContentItem::WCTypeDischargeTile, contents ); 
 
+        filename = content_root_path.to_owned() + "InterventionTile.htl";        
+        contents = fs::read_to_string(&filename).expect(constants::ERROR_READING_TEMPLATE);
+        tiles.insert(WebContentItem::WCTypeInterventionFullPageTile, contents ); 
+        
         WebContentFactory { tile_hashmap: tiles } 
     }
 
@@ -156,7 +162,7 @@ impl WebContentFactory {
     // Patient formatters
     // -----------------------------------------------------------------------------------
     pub fn get_single_patient_summary(&self, pwrap: PatientWrapper, index: i8) -> String {
-        let mut results_sbuf = String::with_capacity(100); 
+        let mut results_sbuf = String::with_capacity(500); 
 	    let p = pwrap.patient;
 	    let e = pwrap.current_encounter;
 	    let i = pwrap.most_recent_intervention;
@@ -216,7 +222,7 @@ impl WebContentFactory {
     /// 
     pub fn get_patient_details_full_tile(&self, patient_header: String, current_encounter: String, encounter_section: String,
                                                 user_identity_label: String, legacy_menu: String, intv_section: String, 
-                                                location_list: Vec<(i64, String, String)>) -> String {
+                                                intervention_type_list: Vec<(i64, String, String)>) -> String {
         let layout = self.get_tile(WebContentItem::WCTypePatientListTile);
 
         // base content
@@ -228,8 +234,8 @@ impl WebContentFactory {
         let ht5 = &ht4.replace(constants::CURRENT_INTERVENTIONS_TILE_TAG, &intv_section);
         let ht6 = &ht5.replace(constants::ENCOUNTER_HISTORY_TILE_TAG, &encounter_section);
 
-        let ht7 = &ht6.replace(constants::INTERVENTION_TYPE_DROP_DOWN_CONTROL_TAG, &&self.get_dropdown_generic( location_list,
-                                                                                                                                  "location_id".to_string(),
+        let ht7 = &ht6.replace(constants::INTERVENTION_TYPE_DROP_DOWN_CONTROL_TAG, &&self.get_dropdown_generic( intervention_type_list,
+                                                                                                                                  "intervention_type_id".to_string(),
                                                                                                                                   constants::NOT_SPECIFIED_ID));
         let ht_final = &ht7.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
 
@@ -371,11 +377,22 @@ impl WebContentFactory {
             results_sbuf.push_str(&row.1); // description here
             results_sbuf.push_str("</option>");
         }
-        results_sbuf.push_str("</table>");
+        results_sbuf.push_str("</select>");
 
         return results_sbuf;
     }
 
+
+    ///
+    /// Generates a dropdown for users
+    /// 
+    pub fn get_dropdown_user_with_department(&self, item_list: Vec<(i64, String, String)>, default_item_id: i64) -> String {
+        self.get_dropdown_generic(item_list, "user_id".to_string(), default_item_id)
+    }
+
+    pub fn get_dropdown_intervention_status(&self, item_list: Vec<(i64, String, String)>, default_item_id: i64) -> String {
+        return self.get_dropdown_generic(item_list, "intervention_id".to_string(), default_item_id);
+    }
 
     ///
     /// Generates a list of locations based on what is in the system
@@ -443,32 +460,106 @@ impl WebContentFactory {
     ///
     /// Provide HTML for modifying an Intervention
     /// 
-    pub fn get_modify_intervention_tile(&self, current_intervention: Option<Intervention>) -> String {
-        let mut results_sbuf = String::with_capacity(100); 
+    pub fn get_modify_intervention_full_page_tile(&self, user_identity_label: String, current_intervention: Option<Intervention>,
+                                                  legacy_menu: String,
+                                                  user_dropdown_list: Vec<(i64, String, String)>,
+                                                  status_dropdown_list: Vec<(i64, String, String)>
+                                                  ) -> String {
         println!(">get_modify_intervention_tile()");
 
-        let inner_content = match current_intervention{
-            None =>{ // new intervention path
-                println!("No Intervention provided");
-                "No Encounters provided".to_owned()
-            } // update intervention path
-            Some (encounters) => {
-                println!("Intervention provided");
-                "Intervention provided".to_owned()
+        let tags = ["{intervention_id}",
+                                "{intervention_type}",
+                                "{intervention_type_id}",
+                                "{scheduled_timestamp}",
+                                "{performed_timestamp}",
+                                "{location_id}",
+                                "<div id=\"MapleEMR::UserIdDropDownControl\">",
+                                "<div id=\"MapleEMR::StatusIdDropDownControl\">",
+                                "{description}",
+                                "{notes}",
+                                "{encounter_id}",
+                                "{form_errors}"];
+
+        let scheduled_time = chrono::Utc::now().format("%Y-%b-%d %H:%M:%S").to_string();
+        let performed_time = chrono::Utc::now().format("%Y-%b-%d %H:%M:%S").to_string();
+
+        let id: String; // this entire block is required in order to address partial moves that occur below when we copy over the String values
+        let intervention_type: String;             // this must all occur before the copy and outside of the match block below
+        let intervention_type_id: String;          // as the selection of Some()/None does not allow the move
+        let scheduled_timestamp: String;
+        let performed_timestamp: String;
+        let dd_user: String;
+        let dd_intv_status: String;
+        let location_id: String;
+        let description: String;
+        let notes: String;
+        let encounter_id: String;
+
+        let data_items = match current_intervention{
+            None =>{ // new patient (Admit) path
+                println!("  Create new Intervention");
+                dd_user = self.get_dropdown_user_with_department(user_dropdown_list,constants::NOT_SPECIFIED_ID); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
+                dd_intv_status =  self.get_dropdown_intervention_status(status_dropdown_list, constants::NOT_SPECIFIED_ID); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
+
+                let tmp_data_items: [String; 12] = ["".to_string(), //"{intervention_id}",
+                                                  "".to_string(), //"{intervention_type}",
+                                                  "".to_string(), //"{intervention_type_id}",
+                                                  scheduled_time, //"{scheduled_timestamp}",
+                                                  performed_time, // "{performed_timestamp}",
+                                                  "".to_string(), //"{location_id}",
+                                                  dd_user, // "<div id=\"MapleEMR::UserIdDropDownControl\">",
+                                                  dd_intv_status, // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
+                                                  "".to_string(), // "{description}",
+                                                  "".to_string(), // "{notes}",
+                                                  "".to_string(), // "{encounter_id}",
+                                                  "".to_string() // "{form_errors}"];
+                                                  ];
+                tmp_data_items
+            } 
+            Some (intv) => {
+                println!("  Update existing Intervention");
+                dd_user = self.get_dropdown_user_with_department(user_dropdown_list,intv.users_id); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
+                dd_intv_status =  self.get_dropdown_intervention_status(status_dropdown_list, intv.status_id); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
+
+                id = intv.id.to_string();
+                intervention_type = intv.clone().intervention_type;
+                intervention_type_id = intv.intervention_type_id.clone().to_string();
+                scheduled_timestamp = intv.clone().scheduled_timestamp_for_display();
+                performed_timestamp = intv.clone().performed_timestamp_for_display();
+                location_id = intv.location_id.to_string();
+                description = intv.intervention_type_id.to_string();
+                notes = intv.intervention_type_id.to_string();
+                encounter_id = intv.intervention_type_id.to_string();
+
+                let tmp_data_items = [id,
+                                                    intervention_type,
+                                                    intervention_type_id,
+                                                    scheduled_timestamp,
+                                                    performed_timestamp,
+                                                    location_id,
+                                                    dd_user, // "<div id=\"MapleEMR::UserIdDropDownControl\">",
+                                                    dd_intv_status, // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
+                                                    description,
+                                                    notes,
+                                                    encounter_id,
+                                                    "{form_errors}".to_string()
+                                                ];
+                tmp_data_items
             }
         };
 
-        results_sbuf.push_str(&self.get_hidden_form("admdis".to_owned(), "admdis".to_owned()) );
+        // replace all of the body tile contents
+        let body_tile_level_0 = self.get_tile(WebContentItem::WCTypeAdmitTile);
+        let mut body_tile_level_1 = body_tile_level_0.clone();
+        for i in 0..tags.len() {
+            body_tile_level_1 = body_tile_level_1.replace(tags[i], &data_items[i]);
+        }
+        
+        let body_tile_level_2 = body_tile_level_1.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
+        
+        let home_tile_level_0 = &self.get_home_tile_with_user_identity(user_identity_label).replace(constants::BODY_TILE_CONTENT_TAG, &body_tile_level_2.clone()); // build the individual sections
+        let home_tile_level_final = &home_tile_level_0.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
 
-        let hidden_form = r##"<div id="hiddenSection" style="display: none; margin-top: 0px;">
-                                      <form action="\{target_name}" method="post" id="{form_name}" name="{form_name}">
-                                      <input type="hidden" name="target_id" id="target_id" value="0">
-                                     </form></div>"##;
-
-        results_sbuf.push_str(hidden_form);
-        results_sbuf.push_str( &inner_content );        
-        //results_sbuf.push_str("</table>");
-
-        return results_sbuf;
+        return home_tile_level_final.clone();
     }
 }

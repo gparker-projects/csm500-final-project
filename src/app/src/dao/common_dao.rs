@@ -135,4 +135,40 @@ impl CommonDAO {
             return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
         }
     }
+
+    ///
+    /// Shortcut method to obtain Intervention Status group (id=2) entries from the COMMON REFERENCE TYPE table
+    ///
+    /// Returns: a tuple (i64, String, String) containing:
+    ///          - id of the reference list item
+    ///          - short name of the reference list item
+    ///          - long name of the reference list item
+    /// 
+    pub async fn get_intervention_statuses(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
+        self.get_common_references(REF_TYPE_GROUP_2_INTERVENTION_STATUS, true).await
+    }
+
+    ///
+    /// Shortcut method to obtain Intervention Type group (id=3) entries from the COMMON REFERENCE TYPE table
+    ///
+    /// Returns: a tuple (i64, String, String) containing:
+    ///          - id of the reference list item
+    ///          - short name of the reference list item
+    ///          - long name of the reference list item
+    /// 
+    pub async fn get_intervention_types(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
+        self.get_common_references(REF_TYPE_GROUP_1_INTERVENTION_TYPES, true).await
+    }
+
+    ///
+    /// Shortcut method to obtain Standard Measure group (id=5) entries from the COMMON REFERENCE TYPE table
+    ///
+    /// Returns: a tuple (i64, String, String) containing:
+    ///          - id of the reference list item
+    ///          - short name of the reference list item
+    ///          - long name of the reference list item
+    /// 
+    pub async fn get_standard_measure_types(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
+        self.get_common_references(REF_TYPE_GROUP_5_STANDARD_MEASURES, true).await
+    }
 }
