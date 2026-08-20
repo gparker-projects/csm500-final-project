@@ -131,47 +131,47 @@ COMMIT;
 --
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
-  VALUES (1, 1, 'Y', 'Bandage', 'Bandage');
+  VALUES (1, 1, 'Y', 'Procedure: Bandage', 'Procedure: Bandage');
 
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
-  VALUES (2, 1, 'Y', 'Bloodwork', 'Bloodwork');
+  VALUES (2, 1, 'Y', 'Collect Specimen: Bloodwork', 'Collect Specimen: Bloodwork');
 
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
-  VALUES (3, 1, 'Y', 'CT Scan', 'CT Scan');
+  VALUES (3, 1, 'Y', 'Procedure: CT Scan', 'Procedure: CT Scan');
 
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
-  VALUES (4, 1, 'Y', 'MRI', 'MRI');
+  VALUES (4, 1, 'Y', 'Procedure: Magnetic Resonance Imaging (MRI)', 'Procedure: Magnetic Resonance Imaging (MRI)');
 
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
-  VALUES (5, 1, 'Y', 'Medication', 'Medication');
+  VALUES (5, 1, 'Y', 'Procedure: Administer Medication', 'Procedure: Administer Medication');
 
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
-  VALUES (6, 1, 'Y', 'Port', 'Patient Transfer');
+  VALUES (6, 1, 'Y', 'Support Request: Patient Transfer', 'Support Request: Patient Transfer');
 
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
-  VALUES (7, 1, 'Y', 'Referral', 'Referral');
+  VALUES (7, 1, 'Y', 'Support Request: Physician Referral', 'Support Request: Physician Referral');
 
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
-  VALUES (8, 1, 'Y', 'Surgery', 'Surgery');
+  VALUES (8, 1, 'Y', 'Procedure: (Cardiovascular) Open Heart Surgery', 'Procedure: (Cardiovascular) Open Heart Surgery');
 
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
-  VALUES (9, 1, 'Y', 'Suture', 'Suture');
+  VALUES (9, 1, 'Y', 'Procedure: General Suture', 'Procedure: General Suture');
 
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
-  VALUES (10, 1, 'Y', 'Transfusion', 'Transfusion');
+  VALUES (10, 1, 'Y', 'Procedure: Blood Transfusion', 'Procedure: Blood Transfusion');
 
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
-  VALUES (11, 1, 'Y', 'X-Ray', 'X-Ray');
+  VALUES (11, 1, 'Y', 'Procedure: X-Ray', 'Procedure: X-Ray');
 
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
@@ -297,7 +297,7 @@ COMMIT;
 
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
-  VALUES (38, 1, 'Y', 'Vitals', 'Vitals');
+  VALUES (38, 1, 'Y', 'Procedure: Collect Vitals', 'Procedure: Collect Vitals');
   
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
     OVERRIDING SYSTEM VALUE

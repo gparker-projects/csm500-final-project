@@ -4,7 +4,7 @@
 /// ---------------------------------------------------------------------------------
 /// 
 pub const DATABASE_ERROR_NOT_FOUND : &str = "Not Found";
-//pub const GENERAL_ERROR_NOT_FOUND : &str = "Not Found";
+pub const GENERAL_ERROR_NOT_FOUND : &str = "Not Found";
 pub const SESSION_ERROR_INVALID : &str = "User session invalid";
 
 //pub const EMPTY_DATASET : &str = "No data was returned";

@@ -52,6 +52,7 @@ impl InterventionRoute{
         let cur_intv: Option<Intervention>
           = if intervention_id == constants::NOT_SPECIFIED_ID {
             println!("   No Intervention specified: create a new Intervention");
+            //println!("   Intervention.intervention_type_id {}", req.clone().intervention_type_id.to_string());
             None
         }
         else{
@@ -76,6 +77,9 @@ impl InterventionRoute{
         let user_dropdown_list = {AuthDAO::new(constants::DB_CONN_STR).await}.get_user_and_departments_at_current_user_sites(user_session_details.get_userid_as_i64() ).await.unwrap();
 
         let cdao = CommonDAO::new(constants::DB_CONN_STR).await;
+        let intervention_type_id: i64 = req.clone().intervention_type_id.parse().unwrap(); //.expect("Invalid Parameter: intervention_type_id")
+        let intv_type=  cdao.get_intervention_type( intervention_type_id ).await.unwrap();
+
         let status_dropdown_list=  cdao.get_intervention_statuses().await.unwrap();
         let location_results = cdao.get_locations_for_user(user_session_details.get_userid_as_i64()).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
         let location_menu = match location_results {
@@ -99,7 +103,8 @@ impl InterventionRoute{
                                                                          legacy_menu,
                                                                          user_dropdown_list.unwrap(),
                                                                          status_dropdown_list.unwrap(),
-                                                                         location_menu );
+                                                                         location_menu,
+                                                                         intv_type.unwrap() );
 
         HttpResponse::Ok().body(  content )
     }

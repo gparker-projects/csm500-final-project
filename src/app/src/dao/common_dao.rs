@@ -1,4 +1,4 @@
-use crate::dao::db_query;
+use crate::{constants, dao::db_query};
 
 use sqlx::postgres::{PgPoolOptions, PgPool}; 
 //use sqlx::Row;
@@ -136,6 +136,45 @@ impl CommonDAO {
         }
     }
 
+        ///
+    /// Accessor to retreive a single COMMON REFERENCE TYPE entries from the database into a tuple.
+    ///
+    /// Returns: a tuple (i64, String, String) containing:
+    ///          - id of the reference list item
+    ///          - short name of the reference list item
+    ///          - long name of the reference list item
+    /// 
+    pub async fn get_common_reference(&self, ref_type_id: i64)-> Result< Option< (i64, String, String) > , std::io::Error> {
+        let query_level_0 = db_query::QRY_COMMON_REF_TYPES_SINGLE_FOR_A_GROUP_AND_TYPE;
+
+        let query = query_level_0.replace("{common_ref_id}", &ref_type_id.to_string());
+
+        println!("get_common_reference()");
+
+        let rows: Vec<( i64, String, String )> = sqlx::query_as(&query)
+                                                .fetch_all(&self.connection) 
+                                                .await
+                                                .unwrap_or_default();
+
+        let mut results: (i64, String, String) = (constants::INVALID_OTHER_ID, constants::GENERAL_ERROR_NOT_FOUND.to_string(), constants::GENERAL_ERROR_NOT_FOUND.to_string());
+        if rows.is_empty() {
+            println!("Reference entry not found for ref_type_id={}", ref_type_id);
+            return Ok( Some(  results  ) );
+        }
+        else{
+             // as the query only has one row, there will only ever be one result
+           
+            for row in rows {
+                let tmp_id: i64 = row.0; // id
+                let tmp_name = row.1; //  name
+                let tmp_description = row.2; // description
+
+                results = (tmp_id, tmp_name, tmp_description) ; // (id, name, description
+            }
+            return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
+        }
+    }
+
     ///
     /// Shortcut method to obtain Intervention Status group (id=2) entries from the COMMON REFERENCE TYPE table
     ///
@@ -149,7 +188,7 @@ impl CommonDAO {
     }
 
     ///
-    /// Shortcut method to obtain Intervention Type group (id=3) entries from the COMMON REFERENCE TYPE table
+    /// Shortcut method to obtain Intervention Type group (id=1) entries from the COMMON REFERENCE TYPE table
     ///
     /// Returns: a tuple (i64, String, String) containing:
     ///          - id of the reference list item
@@ -170,5 +209,17 @@ impl CommonDAO {
     /// 
     pub async fn get_standard_measure_types(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
         self.get_common_references(REF_TYPE_GROUP_5_STANDARD_MEASURES, true).await
+    }
+
+    ///
+    /// Shortcut method to obtain the details for a single Intervention Type group (id=1), from the COMMON REFERENCE TYPE table
+    ///
+    /// Returns: a tuple (i64, String, String) containing:
+    ///          - id of the reference list item
+    ///          - short name of the reference list item
+    ///          - long name of the reference list item
+    /// 
+    pub async fn get_intervention_type(&self, type_id: i64)-> Result< Option< (i64, String, String) >, std::io::Error> {
+        self.get_common_reference(type_id).await
     }
 }

@@ -19,7 +19,7 @@
 <div align="center" >
 <form action="/intvnew" method="post" id="addIntvForm" onSubmit="event.preventDefault(); return submitAddIntvForm()">
   <div align="left" >
-      <input type="submit" value="Add">
+      <input type="submit" value="Add/Request">
       <div id="MapleEMR::InterventionTypeDropDownControl"></div>
   </div>
   <input type="hidden" id="encounter_id" name="encounter_id" value="{encounter_id}">

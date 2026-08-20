@@ -483,7 +483,8 @@ impl WebContentFactory {
                                                   legacy_menu: String,
                                                   user_dropdown_list: Vec<(i64, String, String)>,
                                                   status_dropdown_list: Vec<(i64, String, String)>,
-                                                  location_menu: String
+                                                  location_menu: String,
+                                                  intv_type: (i64, String, String)
                                                   ) -> String {
         println!(">get_modify_intervention_full_page_tile()");
 
@@ -522,7 +523,7 @@ impl WebContentFactory {
                 dd_intv_status =  self.get_dropdown_intervention_status(status_dropdown_list, constants::NOT_SPECIFIED_ID); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
 
                 let tmp_data_items: [String; 12] = ["".to_string(), //"{intervention_id}",
-                                                  "".to_string(), //"{intervention_type}",
+                                                  intv_type.1, //"{intervention_type}",
                                                   "".to_string(), //"{intervention_type_id}",
                                                   scheduled_time, //"{scheduled_timestamp}",
                                                   performed_time, // "{performed_timestamp}",
@@ -542,7 +543,7 @@ impl WebContentFactory {
                 dd_intv_status =  self.get_dropdown_intervention_status(status_dropdown_list, intv.status_id); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
 
                 id = intv.id.to_string();
-                intervention_type = intv.clone().intervention_type;
+                intervention_type = intv.clone().intervention_type; // intv_type.1
                 intervention_type_id = intv.intervention_type_id.clone().to_string();
                 scheduled_timestamp = intv.clone().scheduled_timestamp_for_display();
                 performed_timestamp = intv.clone().performed_timestamp_for_display();
