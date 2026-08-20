@@ -45,11 +45,11 @@
     }
     
         
-	if (! document.getElementById("disclaimerChk").checked ) {
-	    errLabel.textContent = "Disclaimer must be checked";
-	    errLabel.style = "color: red";
-	    isValid = false
-	}
+    if (! document.getElementById("disclaimerChk").checked ) {
+        errLabel.textContent = "Disclaimer must be checked";
+        errLabel.style = "color: red";
+        isValid = false
+    }
 
     
     if (!isValid) {
@@ -108,6 +108,7 @@
 	<input type="hidden" name="patient_id" id="patient_id" value="-1">
 	<input type="hidden" name="encounter_id" id="encounter_id" value="-1">
 	<input type="hidden" name="form_errors" id="form_errors" value="">
+	<input type="hidden" name="action_flag" id="action_flag" value="{action_flag}">
 </td></tr>
 
 <tr><td>

@@ -25,7 +25,7 @@ impl MenuFormatter {
                                     <li<a class="menuNotCurrentSmall" href="javascript:selectPatientSub({id},3)">&nbsp;&nbsp;&nbsp;Allergies</a></li>
                                     "#;
 
-        let admit_menu_item = r##"<form action="/admitnew" method="post" id="admitFrm" name="admitFrm"> <input type="hidden" id="adm_target_id" name="adm_target_id" value="-1"></form>"##;
+        let admit_menu_item = r##"<form action="/admitnew" method="post" id="admitFrm" name="admitFrm"><input type="hidden" id="patient_id" name="patient_id" value="-1"><input type="hidden" id="action_flag" name="action_flag" value="admit"></form>"##;
 
         let mut first_entry: bool = true;
 

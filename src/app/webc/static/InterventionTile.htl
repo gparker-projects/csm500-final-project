@@ -54,7 +54,7 @@
 </HEAD>
 <BODY>
 
-<h1>{intv_type_desc}&nbsp;Details</h1>
+<h1>{intervention_type}&nbsp;Details</h1>
 	
 <form action="/intvnew" method="post" id="intvForm" name="intvForm" onSubmit="event.preventDefault(); return validateForm()">
 <input type="hidden" name="encounter_id" id="encounter_id" value="{encounter_id}">
@@ -71,15 +71,18 @@
 
 	    <tr class="data-label">
 	       <td><div>Type</div><div class="data-field-ro">{intervention_type}</div></td>
-	       <td><div>Scheduled Date/Time</div><input type="text" name="scheduled_timestamp" id="scheduled_timestamp" class="data-field-rw" value="<!--{scheduled_timestamp}-->"></div></td>
-	       <td><div>Performed Date/Time</div><input type="text" name="performed_timestamp" id="performed_timestamp" class="data-field-rw" value="<!--{performed_timestamp}-->"></div></td>
+	       <td><div>Scheduled Date/Time</div><input type="text" name="scheduled_timestamp" id="scheduled_timestamp" class="data-field-rw" value="{scheduled_timestamp}"></div></td>
+	       <td><div>Performed Date/Time</div><input type="text" name="performed_timestamp" id="performed_timestamp" class="data-field-rw" value="{performed_timestamp}"></div></td>
 	    </tr>
+	    
+	    <tr class="data-label">
+	      <td colspan=3>
+	    	  <div class="data-field-ro">Location:&nbsp;{location_id}</div>
+	      </td>
+            </tr>
 
 	    <tr class="data-label">
-	      <td>
-	    	  <div class="data-field-ro">Location:&nbsp;<!--{location_id}--></div>
-	      </td>
-	      <td>
+	      <td colspan=2>
 	          <div class="data-field-ro">Assigned to:&nbsp;<div id="MapleEMR::UserIdDropDownControl"></div></div>
 	      </td>
 	      <td>
@@ -89,13 +92,13 @@
 
 	    <tr class="data-label">
 	      <td colspan=3>
-		<div>Description</div><textarea id="description" name="description" rows="4" cols="50" class="data-field-rw"><!--{description}--></textarea></div>
+		<div>Description</div><textarea id="description" name="description" rows="4" cols="50" class="data-field-rw">{description}</textarea></div>
 	      </td>
 	    </tr>
 	    
 	    <tr class="data-label">
 	      <td colspan=3>
-		<div>Notes</div><textarea id="notes" name="notes" rows="4" cols="50" class="data-field-rw"><!--{notes}--></textarea></div>
+		<div>Notes</div><textarea id="notes" name="notes" rows="4" cols="50" class="data-field-rw">{notes}</textarea></div>
 	      </td>
 	    </tr>
 	</table>

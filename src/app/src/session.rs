@@ -6,6 +6,7 @@ use crate::dto::{user_auth::*};
 /// Stores application-wide state/variables
 /// REF: https://actix.rs/docs/application/
 /// 
+#[allow(dead_code)] // low priority warning; tired of seeing it
 pub struct AppSession {
     pub app_version: String,
     pub wcf: WebContentFactory,    //wcf: Mutex<WebContentFactory>,

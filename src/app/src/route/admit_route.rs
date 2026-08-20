@@ -55,6 +55,7 @@ impl AdmitRoute{
                               birthdate: req_clone.birthdate,
                               location_id: req_clone.location_id,
                               admit_notes: req_clone.admit_notes,
+                              action_flag: req_clone.action_flag,
                               ..Default::default() // no form errors in this variation
                           }
                   )).await
@@ -75,6 +76,7 @@ impl AdmitRoute{
                                 birthdate: req_clone.birthdate,
                                 location_id: req_clone.location_id,
                                 admit_notes: req_clone.admit_notes,
+                                action_flag: req_clone.action_flag,
                                 form_errors: "An error occurred, please try again".to_string()
                               // ..Default::default() 
                             }
@@ -98,6 +100,7 @@ impl AdmitRoute{
                         birthdate: req_clone.birthdate,
                         location_id: req_clone.location_id,
                         admit_notes: req_clone.admit_notes,
+                        action_flag: req_clone.action_flag,
                         form_errors: "An error occurred, please try again".to_string()
                       // ..Default::default() 
                     }
@@ -110,11 +113,27 @@ impl AdmitRoute{
   /// Wrapper route for the menu option to admit a patient without having any web form to pass data in from
   /// 
   pub async fn route_to_admit_new_no_patient(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitFormBasic>) -> impl Responder {
-       println!("-> Route Requested: /route_to_admit_new_no_patient (REVISED)");
+       println!("-> Route Requested: /route_to_admit_new_no_patient");
 
         AdmitRoute::route_to_admit_discharge(app_session, user_session, web::Form(
             AdmitDataForm {
-                patient_id: req.0.adm_target_id.clone(),
+                patient_id: req.patient_id.clone(),
+                action_flag: "admit".to_string(),
+                ..Default::default()
+            }
+        )).await
+  }
+
+    ///
+  /// Wrapper route for the menu option to admit a patient without having any web form to pass data in from
+  /// 
+  pub async fn route_to_discharge_patient(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitFormBasic>) -> impl Responder {
+       println!("-> Route Requested: /route_to_discharge_patient");
+
+        AdmitRoute::route_to_admit_discharge(app_session, user_session, web::Form(
+            AdmitDataForm {
+                patient_id: req.patient_id.clone(),
+                action_flag: "discharge".to_string(),
                 ..Default::default()
             }
         )).await
@@ -131,6 +150,8 @@ impl AdmitRoute{
 
       let patient_id: i64 = req.patient_id.parse().unwrap(); // get the patient id from the form that was passed in; includes for server-side validation errors
       let dao = PatientDAO::new(constants::DB_CONN_STR).await;
+
+      let discharge: bool = req.action_flag.eq("discharge");
 
       println!(">> route_to_admit_discharge() called");
 
@@ -170,7 +191,7 @@ impl AdmitRoute{
       };
 
       // construct the tile based on session, patient data and the legacy menu
-      let content = wcf.get_admit_discharge_tile(user_session_details.user_display_name, existing_patient, legacy_menu, location_menu); // retrieve the page base content
+      let content = wcf.get_admit_discharge_tile(user_session_details.user_display_name, existing_patient, legacy_menu, location_menu, discharge); // retrieve the page base content
 
       HttpResponse::Ok().body( content ) //"TODO : route_to_admit_discharge()" ) 
   }

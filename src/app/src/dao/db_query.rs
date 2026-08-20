@@ -149,7 +149,7 @@ pub const QRY_COMMON_REF_TYPES_FOR_GROUP_ACTIVE_ONLY: &str = r##"select id, name
 pub const QRY_ACTIVE_LOCATIONS: &str = r##"select id, name ||' (' || short_name|| ')' from location where active_flag = 'Y'"##;
 
 pub const QRY_CURRENT_USER_LOCATIONS: &str = r##"
-                                        select id, name ||' (' || short_name|| ')' from location
+                                        select id, name || ' (' || short_name|| ')' from location
                                         where active_flag = 'Y'
                                         and site_id in (
                                             select site_id
@@ -159,9 +159,9 @@ pub const QRY_CURRENT_USER_LOCATIONS: &str = r##"
 
 
 pub const QRY_ALL_USERS_AND_DEPARTMENT_NAME: &str = r##"
-                                                select distinct u.id user_id, 
-                                                    u.name,
-                                                    d.name "department_name"
+                                                select distinct u.id user_id,
+                                                    u.name || ' ('|| d.name||')' "name",
+                                                    u.name "user_name"
                                                 from user_permission up
                                                 join users u on up.users_id = u.id
                                                 join department d on up.department_id = d.id

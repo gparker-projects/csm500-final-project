@@ -38,18 +38,34 @@ impl GenericWebFormData {
         Ok(())
     }
 */
+#[derive(serde::Deserialize)]
+pub struct InterventionDataFormBasic {
+    pub intervention_id: String,
+    pub intervention_type_id: String,
+    pub encounter_id: String,
+    pub patient_id: String,
+}
+
+//impl InterventionDataFormBasic {
+//  pub fn get_patient_id_as_i64(&self) -> i64{
+//      let result: i64 = self.patient_id.parse().unwrap();
+//      return result;
+//  }
+//}
+
 
 #[derive(serde::Deserialize)]
 pub struct AdmitFormBasic {
-    pub adm_target_id: String,
+    pub patient_id: String,
+    pub action_flag: String,
 }
 
-impl AdmitFormBasic {
-  pub fn get_uid_as_i64(&self) -> i64{
-      let result: i64 = self.adm_target_id.parse().unwrap();
-      return result;
-  }
-}
+//impl AdmitFormBasic {
+//  pub fn get_uid_as_i64(&self) -> i64{
+//      let result: i64 = self.adm_target_id.parse().unwrap();
+//      return result;
+//  }
+//}
 
 ///
 /// A generalized form for 80% of web form submission sitautions, so we dont have a ton of minor forms for one-off uses.
@@ -80,6 +96,7 @@ pub struct AdmitDataForm {
 
     #[validate(length(min = 1, max = 100))]
     pub location_id: String,
+    pub action_flag: String,
 
     #[validate(length(min = 1, max = 2000))]
     pub admit_notes: String,

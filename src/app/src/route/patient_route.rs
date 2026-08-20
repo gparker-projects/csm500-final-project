@@ -42,8 +42,7 @@ impl PatientRoute{
     // pull out the current Encounter and generate summary tile for it
     let cur_enc: Encounter = edao.get_current_encounter(patient_id).await.clone();
     let cur_enc_section = wcf.get_single_encounter_summary_tile(cur_enc.clone());
-
-    let cur_enc_id = cur_enc.clone().id.to_string();
+    let cur_enc_id = cur_enc.clone().id.to_string(); // must be copied here before it moves below
 
     // pull out the most recent vitals (Intervention of type = "Vitals") and generate summary tile for it
     let cur_intv = idao.get_most_recent_vitals(cur_enc.id.clone()).await.expect(constants::DATABASE_ERROR_NOT_FOUND); 

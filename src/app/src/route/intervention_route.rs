@@ -22,30 +22,47 @@ pub struct InterventionRoute{}
 
 impl InterventionRoute{
     ///
+    /// Wrapper route for the adding new, or modifying existing Interventions of a patient, without having any web form to pass data in from
+    /// 
+    pub async fn route_to_add_new_intervention(app_session: web::Data<session::AppSession>, user_session: Session, req: web::Form<InterventionDataFormBasic>)  -> impl Responder {
+        println!("-> Route Requested: /intvnew");
+
+        InterventionRoute::route_to_view_or_modify_intervention(app_session, user_session,web::Form(
+            InterventionDataForm {
+                intervention_id: constants::INVALID_OTHER_ID.to_string(),
+                intervention_type_id: req.0.intervention_type_id.clone(),
+                encounter_id: req.0.encounter_id.clone(),
+                patient_id: req.0.patient_id.clone(),
+                ..Default::default()
+            }
+        )).await
+    }
+
+    ///
     /// Route for adding a new Intervention for a Patient-Encounter
     /// 
-    pub async fn route_to_add_new_intervention(app_session: web::Data<session::AppSession>, user_session: Session, req: web::Form<InterventionDataForm>)  -> impl Responder {
-        println!("-> /intvnew Route Requested");
-        let user_session: session::UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+    pub async fn route_to_view_or_modify_intervention(app_session: web::Data<session::AppSession>, user_session: Session, req: web::Form<InterventionDataForm>)  -> impl Responder {
+        println!("-> Route Requested: /intv  (add/modify)");
+        let user_session_details: session::UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
         let wcf = &app_session.get_web_content_factory(); 
 
         let intervention_id: i64 = req.intervention_id.parse().unwrap(); // get the intervention id from the form that was passed in; includes for server-side validation errors
         let idao = InterventionDAO::new(constants::DB_CONN_STR).await;
-        
 
         let cur_intv: Option<Intervention>
           = if intervention_id == constants::NOT_SPECIFIED_ID {
-              println!("   No Intervention specified: create a new Intervention");
-              None
-          }
-          else{
-              println!("   Intervention exists: view existing Intervention");
-              idao.get_intervention(intervention_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND ) 
-         };
+            println!("   No Intervention specified: create a new Intervention");
+            None
+        }
+        else{
+            println!("   Intervention exists: view existing Intervention");
+            idao.get_intervention(intervention_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND ) 
+        };
+        let cur_intv2= cur_intv.clone(); // clone of above object to avoid move below
 
         // refresh the patients in the menu (only)
         let pdao = PatientDAO::new(constants::DB_CONN_STR).await;
-        let legacy_menu_results = pdao.get_patients_at_users_site_no_discharge(user_session.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+        let legacy_menu_results = pdao.get_patients_at_users_site_no_discharge(user_session_details.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
         let legacy_menu = match legacy_menu_results {
             Some (patients_for_menu_lst) => {
                 {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), req.get_patient_id_as_i64())
@@ -56,35 +73,34 @@ impl InterventionRoute{
             }
         };
 
-        let user_dropdown_list = {AuthDAO::new(constants::DB_CONN_STR).await}.get_user_and_departments_at_current_user_sites(user_session.get_userid_as_i64() ).await.unwrap();
+        let user_dropdown_list = {AuthDAO::new(constants::DB_CONN_STR).await}.get_user_and_departments_at_current_user_sites(user_session_details.get_userid_as_i64() ).await.unwrap();
 
-        let status_dropdown_list=  {CommonDAO::new(constants::DB_CONN_STR).await}.get_intervention_statuses().await.unwrap();
+        let cdao = CommonDAO::new(constants::DB_CONN_STR).await;
+        let status_dropdown_list=  cdao.get_intervention_statuses().await.unwrap();
+        let location_results = cdao.get_locations_for_user(user_session_details.get_userid_as_i64()).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+        let location_menu = match location_results {
+          Some (loc_list) => {
+              
+              wcf.get_location_dropdown(loc_list.clone(), 
+                    match intervention_id == constants::NOT_SPECIFIED_ID {
+                      true => constants::DEFAULT_LOCATION_REGISTRATION,
+                      false => cur_intv.unwrap().location_id,
+                    }
+              )
+          }
+          None => {
+              println!("No locations found for user. [Userid:{}]", user_session_details.get_userid_as_i64());
+              constants::LEGACY_MENU_ON_ERROR.to_string() // when no patient, return default error-expected menu
+          }
+        };
 
-
-        let content = wcf.get_modify_intervention_full_page_tile(user_session.user_display_name,
-                                                                         cur_intv,
+        let content = wcf.get_modify_intervention_full_page_tile(user_session_details.user_display_name,
+                                                                         cur_intv2,
                                                                          legacy_menu,
                                                                          user_dropdown_list.unwrap(),
-                                                                         status_dropdown_list.unwrap() );
+                                                                         status_dropdown_list.unwrap(),
+                                                                         location_menu );
 
         HttpResponse::Ok().body(  content )
     }
-
-    ///
-    /// Route for adding new, or modifying existing Interventions of a patient
-    /// 
-    pub async fn route_to_view_or_modify_intervention(app_session: web::Data<session::AppSession>, user_session: Session) -> impl Responder {
-        println!("-> /intv Route Requested");
-
-        let user_session: session::UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
-        let wcf = &app_session.get_web_content_factory(); 
-        //let mut content = wcf.get_modify_intervention_tile(); // retrieve the page base content
-
-        //pub fn get_modify_intervention_tile(&self, current_intervention: Intervention) -> String {
-
-
-
-        HttpResponse::Ok().body( "route_to_view_or_modify_intervention()" )  //content )
-    }
-
 }

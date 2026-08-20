@@ -250,20 +250,29 @@ impl WebContentFactory {
     /// Provide HTML for creating a new patient admit, or completing it as a discharge for an existing patient
     /// It is the same table (Encounter), so one route should suffice
     /// 
-    pub fn get_admit_discharge_tile(&self, user_identity_label: String, current_patient: Option<Patient>, legacy_menu: String, location_menu: String) -> String {
+    pub fn get_admit_discharge_tile(&self, user_identity_label: String, current_patient: Option<Patient>, legacy_menu: String, location_menu: String, is_discharge_flag: bool) -> String {
         println!(">get_admit_discharge_tile()");
 
         let labels = ["<!--{patient_first_name}-->","<!--{patient_last_name}-->", "<!--{middle_name}-->",
                                   "<!--{phn}-->","<!--{birthdate}-->", "<!--{admit_notes}-->"];
 
-        let base_tile_level_0 = self.get_tile(WebContentItem::WCTypeAdmitTile);
+        let base_tile_level_0 = match is_discharge_flag{
+            true => self.get_tile(WebContentItem::WCTypeDischargeTile),
+            false => self.get_tile(WebContentItem::WCTypeAdmitTile),
+        };
+
         let base_tile_level_1 = base_tile_level_0.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
 
         // warning: match is on an Option<Patient>, NOT a tile
         let inner_content = match current_patient{ // get basic static tile loaded, make edits depending on type
 
-            None =>{ // new patient (Admit) path
-                println!("  Admit without Patient");
+            None =>{ // new patient (Admit) patH
+                if is_discharge_flag {
+                    println!("  Discharge without Patient => INVALID");
+                }
+                else{
+                    println!("  Admit New Patient");
+                }                
 
                 // admitting a new patient with no data => wipe out the tags
                 let mut result = base_tile_level_1.clone();
@@ -277,7 +286,12 @@ impl WebContentFactory {
                 result_2
             } 
             Some (p) => {
-                println!("  Admit with existing Patient");
+                if is_discharge_flag {
+                    println!("  Discharge existing Patient");
+                }
+                else{
+                    println!("  Admit update: existing Patient");
+                }         
                 let data_items = [&p.legal_first_name, &p.legal_last_name, &p.legal_middle_names,
                                                  &p.phn_to_string(), &p.birth_date_for_display(),  &p.admit_notes];
 
@@ -361,7 +375,7 @@ impl WebContentFactory {
     /// 
     pub fn get_dropdown_generic(&self, item_list: Vec<(i64, String, String)>, list_name_and_id: String, default_item_id: i64) -> String {
         let mut results_sbuf = String::with_capacity(100); 
-        println!("> get_location_dropdown()");
+        println!("> get_dropdown_generic({})", list_name_and_id);
 
         // https://www.w3schools.com/tags/tag_select.asp
         results_sbuf.push_str("<select name='");
@@ -395,7 +409,7 @@ impl WebContentFactory {
     }
 
     pub fn get_dropdown_intervention_status(&self, item_list: Vec<(i64, String, String)>, default_item_id: i64) -> String {
-        return self.get_dropdown_generic(item_list, "intervention_id".to_string(), default_item_id);
+        self.get_dropdown_generic(item_list, "intervention_id".to_string(), default_item_id)
     }
 
     ///
@@ -464,12 +478,14 @@ impl WebContentFactory {
     ///
     /// Provide HTML for modifying an Intervention
     /// 
-    pub fn get_modify_intervention_full_page_tile(&self, user_identity_label: String, current_intervention: Option<Intervention>,
+    pub fn get_modify_intervention_full_page_tile(&self, user_identity_label: String,
+                                                  current_intervention: Option<Intervention>,
                                                   legacy_menu: String,
                                                   user_dropdown_list: Vec<(i64, String, String)>,
-                                                  status_dropdown_list: Vec<(i64, String, String)>
+                                                  status_dropdown_list: Vec<(i64, String, String)>,
+                                                  location_menu: String
                                                   ) -> String {
-        println!(">get_modify_intervention_tile()");
+        println!(">get_modify_intervention_full_page_tile()");
 
         let tags = ["{intervention_id}",
                                 "{intervention_type}",
@@ -510,7 +526,7 @@ impl WebContentFactory {
                                                   "".to_string(), //"{intervention_type_id}",
                                                   scheduled_time, //"{scheduled_timestamp}",
                                                   performed_time, // "{performed_timestamp}",
-                                                  "".to_string(), //"{location_id}",
+                                                  location_menu, //"{location_id}",
                                                   dd_user, // "<div id=\"MapleEMR::UserIdDropDownControl\">",
                                                   dd_intv_status, // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
                                                   "".to_string(), // "{description}",
@@ -540,7 +556,7 @@ impl WebContentFactory {
                                                     intervention_type_id,
                                                     scheduled_timestamp,
                                                     performed_timestamp,
-                                                    location_id,
+                                                    location_menu,
                                                     dd_user, // "<div id=\"MapleEMR::UserIdDropDownControl\">",
                                                     dd_intv_status, // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
                                                     description,
@@ -553,7 +569,7 @@ impl WebContentFactory {
         };
 
         // replace all of the body tile contents
-        let body_tile_level_0 = self.get_tile(WebContentItem::WCTypeAdmitTile);
+        let body_tile_level_0 = self.get_tile(WebContentItem::WCTypeInterventionFullPageTile);
         let mut body_tile_level_1 = body_tile_level_0.clone();
         for i in 0..tags.len() {
             body_tile_level_1 = body_tile_level_1.replace(tags[i], &data_items[i]);
