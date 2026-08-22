@@ -37,7 +37,7 @@
       event.preventDefault();       // Stop the form from submitting if there are errors
     }
     else{
-      admdisForm.submit();
+      intvForm.submit();
     }
 
     // If isValid remains true, the browser automatically proceeds to submit!
@@ -46,7 +46,8 @@
 
   function cancelForm(){
     if(confirm('Are you sure you want to leave this page?')){
-        window.location.href = "\home";
+        document.getElementById('intvForm').action = "\patientdtls";
+        intvForm.submit();
     }
     return;
   }
@@ -61,6 +62,7 @@
 <input type="hidden" name="intervention_id" id="intervention_id" value="{intervention_id}">
 <input type="hidden" name="intervention_type_id" id="intervention_type_id" value="{intervention_type_id}">
 <input type="hidden" name="patient_id" id="patient_id" value="{patient_id}">
+<input type="hidden" name="target_id" id="target_id" value="{patient_id}">
 <div>
 
 <input type="hidden" name="form_errors" id="form_errors" value="">

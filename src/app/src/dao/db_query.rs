@@ -213,6 +213,13 @@ pub const UPDATE_ENCOUNTER: &str = r##"
         WHERE id = {encounter_id} RETURNING ID;
 "##;
 
+pub const UPDATE_ENCOUNTER_FOR_DISCHARGE: &str = r##"
+    UPDATE encounter
+        SET discharge_timestamp = NOW(),
+            discharge_notes = '{discharge_notes}'
+        WHERE id = {encounter_id} RETURNING ID;
+"##;
+
 pub const INSERT_INTERVENTION: &str = r##"
 INSERT INTO INTERVENTION(description, notes, location_id, users_id, encounter_id,
                          intervention_type_id, status_id, scheduled_timestamp, performed_timestamp)

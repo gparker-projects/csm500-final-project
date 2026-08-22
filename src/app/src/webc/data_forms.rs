@@ -67,6 +67,13 @@ pub struct AdmitFormBasic {
 //  }
 //}
 
+#[derive(Default, serde::Deserialize, Validate, Clone)]
+pub struct DischargeDataForm {
+    pub patient_id: String,
+    pub encounter_id: String,
+    pub discharge_notes: String
+}
+
 ///
 /// A generalized form for 80% of web form submission sitautions, so we dont have a ton of minor forms for one-off uses.
 /// 

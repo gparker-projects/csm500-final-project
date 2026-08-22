@@ -3,6 +3,7 @@
 <HEAD>
   <TITLE>Maple EMR</TITLE>
   <link rel="stylesheet" href="/webc/css/login.css">
+  <link rel="stylesheet" href="/webc/css/dataentryform.css">
   <script>
 
   function validateForm() {
@@ -64,7 +65,7 @@
   }
 
   function cancelForm(){
-    if(confirm('Are you sure you want to leave this page?')){
+    if(confirm('Are you sure you want to cancel admitting this patient?')){
         window.location.href = "\home";
     }
     return;
@@ -80,33 +81,35 @@
 <table>
 <tr><td>
 	<label id="errLabel"></label>
+</td></tr>
+<tr><td>
 	<table>
 	    <tr class="data-label">
-	      <td><div>First Name</div><input type="text" name="patient_first_name" id="patient_first_name" class="data-field-rw" value="<!--{patient_first_name}-->"></div></td>
-	      <td><div>Last Name</div><input type="text" name="patient_last_name" id="patient_last_name" class="data-field-rw" value="<!--{patient_last_name}-->"></div></td>
-	      <td><div>Middle Names</div><input type="text" name="patient_middle_name" id="patient_middle_name" class="data-field-rw" value="<!--{middle_name}-->"></div></td>
+	      <td><div>First Name</div><input type="text" name="patient_first_name" id="patient_first_name" class="data-field-rw" value="{patient_first_name}"></div></td>
+	      <td><div>Last Name</div><input type="text" name="patient_last_name" id="patient_last_name" class="data-field-rw" value="{patient_last_name}"></div></td>
+	      <td><div>Middle Names</div><input type="text" name="patient_middle_name" id="patient_middle_name" class="data-field-rw" value="{middle_name}"></div></td>
 	    </tr>
 
 	    <tr class="data-label">
-	       <td><div>PHN</div><input type="text" name="phn" id="phn" class="data-field-rw" value="<!--{phn}-->"></div></td>
-	       <td><div>Birth Date</div><input type="text" name="birthdate" id="birthdate" class="data-field-rw" value="<!--{birthdate}-->"></div></td>
-	       <td><div>Admit Date/Time&nbsp;<div class="data-field-ro"><!--{admit_timestamp}--></div></div></td>
+	       <td><div>PHN</div><input type="text" name="phn" id="phn" class="data-field-rw" value="{phn}"></div></td>
+	       <td><div>Birth Date</div><input type="text" name="birthdate" id="birthdate" class="data-field-rw" value="{birthdate}"></div></td>
+	       <td><div>Admit Date/Time&nbsp;<div class="data-field-ro">{admit_timestamp}</div></div></td>
 	    </tr>
 
 	    <tr class="data-label">
 	      <td colspan=3>
-	      <div class="data-field-ro">Admit Location:&nbsp;<!--{location_id}--></div>
+	      <div class="data-field-ro">Admit Location:&nbsp;{location_id}</div>
 	      </td>
 	    </tr>
 
 	    <tr class="data-label">
 	      <td colspan=3>
-		<div>Reason for Visit</div><textarea id="admit_notes" name="admit_notes" rows="4" cols="50" class="data-field-rw"><!--{admit_notes}--></textarea></div>
+		<div>Reason for Visit</div><textarea id="admit_notes" name="admit_notes" rows="4" cols="50" class="data-field-rw">{admit_notes}</textarea></div>
 	      </td>
 	    </tr>
 	</table>
-	<input type="hidden" name="patient_id" id="patient_id" value="-1">
-	<input type="hidden" name="encounter_id" id="encounter_id" value="-1">
+	<input type="hidden" name="patient_id" id="patient_id" value="{patient_id}">
+	<input type="hidden" name="encounter_id" id="encounter_id" value="{encounter_id}">
 	<input type="hidden" name="form_errors" id="form_errors" value="">
 	<input type="hidden" name="action_flag" id="action_flag" value="{action_flag}">
 </td></tr>

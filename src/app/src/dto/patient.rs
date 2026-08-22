@@ -100,7 +100,10 @@ impl Patient {
     /// accessor method to return the discharge date (date and time) in a format that can be easily displayed
     /// 
     pub fn discharge_timestamp_for_display(&self) -> String{
-        self.discharge_timestamp.unwrap().format("%Y-%b-%d %H:%M:%S").to_string()
+        match self.discharge_timestamp {
+            Some(_t) => _t.format("%Y-%b-%d %H:%M:%S").to_string(),
+            None => "".to_string()
+        }        
     }
 
     ///

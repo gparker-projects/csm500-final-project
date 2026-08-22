@@ -104,7 +104,8 @@ impl InterventionRoute{
                                                                          user_dropdown_list.unwrap(),
                                                                          status_dropdown_list.unwrap(),
                                                                          location_menu,
-                                                                         intv_type.unwrap() );
+                                                                         intv_type.unwrap(),
+                                                                         req.patient_id.clone() );
 
         HttpResponse::Ok().body(  content )
     }

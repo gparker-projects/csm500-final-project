@@ -253,8 +253,8 @@ impl WebContentFactory {
     pub fn get_admit_discharge_tile(&self, user_identity_label: String, current_patient: Option<Patient>, legacy_menu: String, location_menu: String, is_discharge_flag: bool) -> String {
         println!(">get_admit_discharge_tile()");
 
-        let labels = ["<!--{patient_first_name}-->","<!--{patient_last_name}-->", "<!--{middle_name}-->",
-                                  "<!--{phn}-->","<!--{birthdate}-->", "<!--{admit_notes}-->"];
+        let labels = ["{patient_first_name}","{patient_last_name}", "{middle_name}",
+                                  "{phn}","{birthdate}", "{admit_notes}", "{encounter_id}", "{patient_id}"];
 
         let base_tile_level_0 = match is_discharge_flag{
             true => self.get_tile(WebContentItem::WCTypeDischargeTile),
@@ -281,7 +281,7 @@ impl WebContentFactory {
                 }
 
                 // ...except for admit_timestamp which will be Now()
-                let result_2 = result.replace("<!--{admit_timestamp}-->", &chrono::Utc::now().format("%Y-%b-%d %H:%M:%S").to_string());
+                let result_2 = result.replace("{admit_timestamp}", &chrono::Utc::now().format("%Y-%b-%d %H:%M:%S").to_string());
 
                 result_2
             } 
@@ -293,7 +293,9 @@ impl WebContentFactory {
                     println!("  Admit update: existing Patient");
                 }         
                 let data_items = [&p.legal_first_name, &p.legal_last_name, &p.legal_middle_names,
-                                                 &p.phn_to_string(), &p.birth_date_for_display(),  &p.admit_notes];
+                                                &p.phn_to_string(), &p.birth_date_for_display(),  &p.admit_notes,
+                                                &p.encounter_id.to_string(),
+                                                &p.id.to_string()];
 
                 let mut result = base_tile_level_1.clone();
                 for i in 0..labels.len() {
@@ -301,15 +303,31 @@ impl WebContentFactory {
                 }
 
                 // ...except for admit_timestamp which will always be Now()
-                let result_2 = result.replace("<!--{admit_timestamp}-->", &p.admit_timestamp_for_display());                
-                result_2
+                let result_2 = result.replace("{admit_timestamp}", &p.admit_timestamp_for_display());               
+
+                if is_discharge_flag {
+                    let result_3 = result_2.replace("{discharge_timestamp}", &chrono::Utc::now().format("%Y-%b-%d %H:%M:%S").to_string());
+                    let result_4 = result_3.replace("{discharge_notes}", &p.discharge_notes);
+                    let result_5 = result_4.replace("{location_short_name}", &p.location_short_name);
+                    let result_6 = result_5.replace("{location_id}", &location_menu);
+
+                    //println!("location_short_name='{}'", &p.location_short_name);
+
+                    result_6
+                }
+                else{
+                    let result_3 = result_2.replace("{discharge_notes}", &p.discharge_notes);
+                    let result_4 = result_3.replace("{location_id}", &p.location_id.to_string());
+
+                    result_4
+                }
             }
         };
 
-        let inner_content_1 = inner_content.replace("<!--{location_id}-->", &location_menu); // &p.admit_timestamp_for_display());
+       // let inner_content_1 = inner_content.replace("{location_id}", &location_menu); 
         
         // this first one replaces the base tile (loaded from file) with the new "layout" provided above
-        let home_tile_level_0 = &self.get_home_tile_with_user_identity(user_identity_label).replace(constants::BODY_TILE_CONTENT_TAG, &inner_content_1.clone()); // build the individual sections
+        let home_tile_level_0 = &self.get_home_tile_with_user_identity(user_identity_label).replace(constants::BODY_TILE_CONTENT_TAG, &inner_content.clone()); // build the individual sections
 
         // common content
         let home_tile_level_1 = &home_tile_level_0.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
@@ -484,7 +502,8 @@ impl WebContentFactory {
                                                   user_dropdown_list: Vec<(i64, String, String)>,
                                                   status_dropdown_list: Vec<(i64, String, String)>,
                                                   location_menu: String,
-                                                  intv_type: (i64, String, String)
+                                                  intv_type: (i64, String, String),
+                                                  patient_id: String
                                                   ) -> String {
         println!(">get_modify_intervention_full_page_tile()");
 
@@ -499,6 +518,7 @@ impl WebContentFactory {
                                 "{description}",
                                 "{notes}",
                                 "{encounter_id}",
+                                "{patient_id}",
                                 "{form_errors}"];
 
         let scheduled_time = chrono::Utc::now().format("%Y-%b-%d %H:%M:%S").to_string();
@@ -511,7 +531,7 @@ impl WebContentFactory {
         let performed_timestamp: String;
         let dd_user: String;
         let dd_intv_status: String;
-        let location_id: String;
+        //let location_id: String;
         let description: String;
         let notes: String;
         let encounter_id: String;
@@ -520,9 +540,9 @@ impl WebContentFactory {
             None =>{ // new patient (Admit) path
                 println!("  Create new Intervention");
                 dd_user = self.get_dropdown_user_with_department(user_dropdown_list,constants::NOT_SPECIFIED_ID); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
-                dd_intv_status =  self.get_dropdown_intervention_status(status_dropdown_list, constants::NOT_SPECIFIED_ID); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
+                dd_intv_status =  self.get_dropdown_intervention_status(status_dropdown_list, constants::DEFAULT_INTERVENTION_STATUS_NEW); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
 
-                let tmp_data_items: [String; 12] = ["".to_string(), //"{intervention_id}",
+                let tmp_data_items: [String; 13] = ["".to_string(), //"{intervention_id}",
                                                   intv_type.1, //"{intervention_type}",
                                                   "".to_string(), //"{intervention_type_id}",
                                                   scheduled_time, //"{scheduled_timestamp}",
@@ -533,6 +553,7 @@ impl WebContentFactory {
                                                   "".to_string(), // "{description}",
                                                   "".to_string(), // "{notes}",
                                                   "".to_string(), // "{encounter_id}",
+                                                  patient_id.clone(),
                                                   "".to_string() // "{form_errors}"];
                                                   ];
                 tmp_data_items
@@ -547,7 +568,7 @@ impl WebContentFactory {
                 intervention_type_id = intv.intervention_type_id.clone().to_string();
                 scheduled_timestamp = intv.clone().scheduled_timestamp_for_display();
                 performed_timestamp = intv.clone().performed_timestamp_for_display();
-                location_id = intv.location_id.to_string();
+                //location_id = intv.location_id.to_string();
                 description = intv.intervention_type_id.to_string();
                 notes = intv.intervention_type_id.to_string();
                 encounter_id = intv.intervention_type_id.to_string();
@@ -563,6 +584,7 @@ impl WebContentFactory {
                                                     description,
                                                     notes,
                                                     encounter_id,
+                                                    patient_id.clone(),
                                                     "{form_errors}".to_string()
                                                 ];
                 tmp_data_items

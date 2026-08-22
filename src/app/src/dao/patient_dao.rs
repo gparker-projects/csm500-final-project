@@ -132,6 +132,30 @@ impl PatientDAO {
     /// Given an AdmitFormData, create a new Encounter reocrd, or update an existing one
     /// RETURNS: i64: the id of the Encounter record that is created, if applicable
     /// 
+    pub async fn update_encounter_from_discharge_form(&self, form: DischargeDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
+        println!("> update_encounter_from_discharge_form");
+
+        let mut query_level_0 = db_query::UPDATE_ENCOUNTER_FOR_DISCHARGE.to_string();
+        let query_level_1 = &query_level_0.replace("{discharge_notes}", &form.discharge_notes.clone().trim());
+        let query_level_2 = &query_level_1.replace("{encounter_id}", &form.encounter_id.clone().trim());
+
+        println!(" >> Encounter Update from discharge: {}", query_level_2);
+
+        let result = sqlx::query(&query_level_2)
+                                                        .fetch_one(&self.connection)
+                                                        .await
+                                                        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
+        
+        // return the patient id that was created or updated
+        let inserted_id: i64 = result.get("id");
+
+        Ok(inserted_id)
+    }
+
+    ///
+    /// Given an AdmitFormData, create a new Encounter reocrd, or update an existing one
+    /// RETURNS: i64: the id of the Encounter record that is created, if applicable
+    /// 
     pub async fn upsert_encounter_from_admit_form(&self, form: AdmitDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
         println!("> upsert_encounter_from_admit_form");
 

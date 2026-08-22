@@ -3,60 +3,44 @@
 <HEAD>
   <TITLE>Maple EMR</TITLE>
   <link rel="stylesheet" href="/webc/css/login.css">
+  <link rel="stylesheet" href="/webc/css/dataentryform.css">
   <script>
 
   function validateForm() {
     const errLabel = document.getElementById('errLabel');
     errLabel.textContent = '';
     let isValid = true;
-    
-    console.log("in validateForm();");
 
-    if (document.getElementById('patient_first_name').value.trim() == '') {
-        errLabel.textContent = "First Name is required";
+    console.log("in validateForm();");
+    
+    if (document.getElementById('discharge_notes').value.trim() == '') {
+        errLabel.textContent = "Discharge notes are required";
         errLabel.style = "color: red";
         isValid = false;
-    }
-
-    // middle name not required
-    
-    if (document.getElementById('patient_last_name').value.trim() == '') {
-	  errLabel.textContent = "Last Name is required";
-	  errLabel.style = "color: red";
-	  isValid = false;
+        return false;
     }
     
-    if (document.getElementById('phn').value.trim() == '') {
-	  errLabel.textContent = "Personal Health Number (PHN) must be provided in the format: 9#########";
-	  errLabel.style = "color: red";
-	  isValid = false;
-    }
-
-    if (document.getElementById('birthdate').value.trim() == '') {
-	  errLabel.textContent = "Birthdate must be provided in YYYY/MM/DD format.";
-	  errLabel.style = "color: red";
-	  isValid = false;
-    }
-    
-    if (document.getElementById('admit_notes').value.trim() == '') {
-	  errLabel.textContent = "Reason for Visit is required";
-	  errLabel.style = "color: red";
-	  isValid = false;
-    }
-    
-        
+    console.log("got here1");
     if (! document.getElementById("disclaimerChk").checked ) {
         errLabel.textContent = "Disclaimer must be checked";
         errLabel.style = "color: red";
-        isValid = false
+        isValid = false;
+        return false;
+    }
+    
+    console.log("got here2");
+    if( ! confirm('Are you sure you want to discharge this patient? This action can not be undone.') ){
+        return false;
     }
 
-    
+    console.log("got here3");
     if (!isValid) {
+      console.log("dischargeForm not valid");
       event.preventDefault();       // Stop the form from submitting if there are errors
     }
     else{
-      admdisForm.submit();
+      console.log("submitting dischargeForm...");
+      dischargeForm.submit();
     }
 
     // If isValid remains true, the browser automatically proceeds to submit!
@@ -74,51 +58,51 @@
 <BODY>
 
 <h1>Discharge Details</h1>
-<input type="hidden" name="form_errors" id="form_errors" value="">
-	
-<form action="/admitsave" method="post" id="admdisForm" name="admdisForm" onSubmit="event.preventDefault(); return validateForm()">
+
+<form action="/dischargesave" method="post" id="dischargeForm" name="dischargeForm" onSubmit="event.preventDefault(); return validateForm()">
 <div>
 <table>
 <tr><td>
 	<label id="errLabel"></label>
+</td></tr>
+<tr><td>
 	<table>
 	    <tr class="data-label">
-	      <td><div>First Name</div><input type="text" name="patient_first_name" id="patient_first_name" class="data-field-rw" value="<!--{patient_first_name}-->"></div></td>
-	      <td><div>Last Name</div><input type="text" name="patient_last_name" id="patient_last_name" class="data-field-rw" value="<!--{patient_last_name}-->"></div></td>
-	      <td><div>Middle Names</div><input type="text" name="patient_middle_name" id="patient_middle_name" class="data-field-rw" value="<!--{middle_name}-->"></div></td>
+	      <td><div>First Name</div><div class="data-field-ro"><input type="hidden" name="patient_first_name" id="patient_first_name" class="data-field-ro" value="{patient_first_name}">{patient_first_name}</div></td>
+	      <td><div>Last Name</div><div class="data-field-ro"><input type="hidden" name="patient_last_name" id="patient_last_name" class="data-field-ro" value="{patient_last_name}">{patient_last_name}</div></td>
+	      <td><div>Middle Names</div><div class="data-field-ro"><input type="hidden" name="patient_middle_name" id="patient_middle_name" class="data-field-ro" value="{middle_name}">{middle_name}</div></td>
 	    </tr>
 
 	    <tr class="data-label">
-	       <td><div>PHN</div><input type="text" name="phn" id="phn" class="data-field-rw" value="<!--{phn}-->"></div></td>
-	       <td><div>Birth Date</div><input type="text" name="birthdate" id="birthdate" class="data-field-rw" value="<!--{birthdate}-->"></div></td>
-	       <td><div>Admit Date/Time&nbsp;<div class="data-field-ro"><!--{admit_timestamp}--></div></div></td>
+	       <td><div>PHN</div><div class="data-field-ro"><input type="hidden" name="phn" id="phn" class="data-field-ro" value="{phn}">{phn}</div></td>
+	       <td><div>Birth Date</div><div class="data-field-ro"><input type="hidden" name="birthdate" id="birthdate" class="data-field-ro" value="{birthdate}">{birthdate}</div></td>
+	       <td><div>Admit Date/Time&nbsp;</div><div class="data-field-ro"><input type="hidden" name="admit_timestamp" id="admit_timestamp" class="data-field-ro" value="{admit_timestamp}">{admit_timestamp}</div></td>
 	    </tr>
 
 	    <tr class="data-label">
 	      <td colspan=3>
-	      <div class="data-field-ro">Admit Location:&nbsp;<!--{location_id}--></div>
+	        <div><div>Admit Location:&nbsp;</div><div class="data-field-ro">{location_short_name}<input type="hidden" name="location_id" id="location_id" value="{location_id}"></div></div>
 	      </td>
 	    </tr>
 
 	    <tr class="data-label">
 	      <td colspan=3>
-		<div>Reason for Visit</div><textarea id="admit_notes" name="admit_notes" rows="4" cols="50" class="data-field-rw"><!--{admit_notes}--></textarea></div>
+		<div><div>Reason for Visit</div><div class="data-field-ro"><input type="hidden" id="admit_notes" name="admit_notes" value="{admit_notes}"><div class="data-field-ro">{admit_notes}</div></div>
 	      </td>
+	    </tr>
+
+	    <tr class="data-label">
+	      <td colspan=2>
+		<div><div>Administrative Discharge Notes</div><textarea id="discharge_notes" name="discharge_notes" rows="4" cols="50" class="data-field-rw">{discharge_notes}</textarea></div></div>
+	      </td>
+	      <td><div><div>Discharge Date/Time&nbsp;</div><div class="data-field-ro">{discharge_timestamp}</div></div></td>
 	    </tr>
 	</table>
 	
-	<table>
-	    <tr class="data-label">
-	      <td colspan=3>
-		<div>Discharge Notes</div><textarea id="discharge_notes" name="discharge_notes" rows="4" cols="50" class="data-field-rw"><!--{discharge_notes}--></textarea></div>
-	      </td>
-	    </tr>
-	</table>
-	
-	<input type="hidden" name="patient_id" id="patient_id" value="-1">
-	<input type="hidden" name="encounter_id" id="encounter_id" value="-1">
-
-	<input type="hidden" name="action_flag" id="action_flag" value="{action_flag}">
+	<input type="hidden" name="patient_id" id="patient_id" value="{patient_id}">
+	<input type="hidden" name="encounter_id" id="encounter_id" value="{encounter_id}">
+        <input type="hidden" name="form_errors" id="form_errors" value="">
+	<input type="hidden" name="action_flag" id="action_flag" value="discharge">
 </td></tr>
 
 <tr><td>
@@ -129,8 +113,8 @@
 
 <tr>
 <td>
-<input type="submit" value="Discharge" onclick="cancelForm()">
-<input type="button" value="Cancel">
+<input type="submit" value="Discharge">
+<input type="button" value="Cancel" onclick="cancelForm()">
 </td>
 </tr>
 

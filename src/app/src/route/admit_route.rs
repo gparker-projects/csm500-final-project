@@ -8,6 +8,7 @@
 
 use actix_web::{web, HttpResponse, Responder};
 use actix_session::{Session}; 
+use actix_web::http::StatusCode;
 
 use crate::constants;
 use crate::dto::patient;
@@ -18,6 +19,33 @@ use crate::session::{AppSession, UserSession};
 pub struct AdmitRoute{}
 
 impl AdmitRoute{
+
+  ///
+  /// Route that will update the encounter to a discharged status
+  /// 
+  pub async fn route_to_discharge_patient_save(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<DischargeDataForm>) -> impl Responder {
+      println!("-> Route Requested: /route_to_discharge_patient_save ");
+
+      let req_clone0 = req.clone();
+      let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+      let dao = PatientDAO::new(constants::DB_CONN_STR).await;
+
+      let enc_results = dao.update_encounter_from_discharge_form(req_clone0, user_session_details.get_userid_as_i64()).await;
+      match enc_results {
+            Ok(e_id) => {
+                let p_id = req.patient_id.to_string();
+                println!("  >Patient (id={p_id}) discharged, [encounter (id={e_id})] updated");
+                
+            },
+            Err(e) => {
+                println!("  >Patient not discharged: {e}");
+            }
+      }
+
+      // route back to home after discharge, as the patient record can not be read again.
+      actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SEE_OTHER)
+  }
+
   ///
   /// Route that will save patient data, from an Admit form submission
   /// 
@@ -193,7 +221,7 @@ impl AdmitRoute{
       // construct the tile based on session, patient data and the legacy menu
       let content = wcf.get_admit_discharge_tile(user_session_details.user_display_name, existing_patient, legacy_menu, location_menu, discharge); // retrieve the page base content
 
-      HttpResponse::Ok().body( content ) //"TODO : route_to_admit_discharge()" ) 
+      HttpResponse::Ok().body( content )
   }
 
 }

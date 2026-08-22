@@ -29,6 +29,9 @@ pub const INVALID_OTHER_ID: i64 = -1;
 
 pub const NOT_SPECIFIED_ID: i64 = -1;
 
+
+pub const DEFAULT_INTERVENTION_STATUS_NEW: i64 = 13;
+
 /// ------------------   ------------------   ------------------   ------------------
 //  Externalized HTML tags that will be present in the static tile files (*.htl)
 /// ------------------   ------------------   ------------------   ------------------
