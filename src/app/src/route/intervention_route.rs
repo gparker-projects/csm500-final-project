@@ -15,16 +15,44 @@ use crate::dao::{ patient_dao::*, intervention_dao::*, common_dao::*, auth_dao::
 use crate::webc::{web_content::*, data_forms::*, menu_tile::*};
 use crate::webc::data_forms::InterventionDataForm;
 
-use crate::session;
+use crate::session::{AppSession, UserSession};
+
 use crate::constants;
 
 pub struct InterventionRoute{}
 
 impl InterventionRoute{
+
+
+  ///
+  /// Route that will update the intervention and then redirect back to the modify screen
+  /// 
+  pub async fn route_to_intervention_save(app_session: web::Data<AppSession>, user_session: Session, mut req: web::Form<InterventionDataForm>) -> impl Responder {
+      println!("-> Route Requested: /route_to_discharge_patient_save ");
+
+      let req_clone0 = req.clone();
+      let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+      let idao = InterventionDAO::new(constants::DB_CONN_STR).await;
+
+      let results = idao.upsert_intervention_from_intv_form(req_clone0, user_session_details.get_userid_as_i64()).await;
+      match results {
+            Ok(intv_id) => {
+                println!("  >Intervention (id={intv_id})] created/updated");
+                req.0.intervention_id = intv_id.to_string();
+            },
+            Err(e) => {
+                println!("  >Intervention not created/updated: {e}");
+            }
+      }
+
+      // route back to main form again
+      InterventionRoute::route_to_view_or_modify_intervention( app_session, user_session, req ).await
+  }
+
     ///
     /// Wrapper route for the adding new, or modifying existing Interventions of a patient, without having any web form to pass data in from
     /// 
-    pub async fn route_to_add_new_intervention(app_session: web::Data<session::AppSession>, user_session: Session, req: web::Form<InterventionDataFormBasic>)  -> impl Responder {
+    pub async fn route_to_add_new_intervention(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<InterventionDataFormBasic>)  -> impl Responder {
         println!("-> Route Requested: /intvnew");
 
         InterventionRoute::route_to_view_or_modify_intervention(app_session, user_session,web::Form(
@@ -33,6 +61,7 @@ impl InterventionRoute{
                 intervention_type_id: req.0.intervention_type_id.clone(),
                 encounter_id: req.0.encounter_id.clone(),
                 patient_id: req.0.patient_id.clone(),
+                //users_id: req.0.users_id.clone(),
                 ..Default::default()
             }
         )).await
@@ -41,9 +70,9 @@ impl InterventionRoute{
     ///
     /// Route for adding a new Intervention for a Patient-Encounter
     /// 
-    pub async fn route_to_view_or_modify_intervention(app_session: web::Data<session::AppSession>, user_session: Session, req: web::Form<InterventionDataForm>)  -> impl Responder {
+    pub async fn route_to_view_or_modify_intervention(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<InterventionDataForm>)  -> impl Responder {
         println!("-> Route Requested: /intv  (add/modify)");
-        let user_session_details: session::UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+        let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
         let wcf = &app_session.get_web_content_factory(); 
 
         let intervention_id: i64 = req.intervention_id.parse().unwrap(); // get the intervention id from the form that was passed in; includes for server-side validation errors
@@ -59,7 +88,7 @@ impl InterventionRoute{
             println!("   Intervention exists: view existing Intervention");
             idao.get_intervention(intervention_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND ) 
         };
-        let cur_intv2= cur_intv.clone(); // clone of above object to avoid move below
+        let mut cur_intv2= cur_intv.clone(); // clone of above object to avoid move below
 
         // refresh the patients in the menu (only)
         let pdao = PatientDAO::new(constants::DB_CONN_STR).await;
@@ -105,7 +134,9 @@ impl InterventionRoute{
                                                                          status_dropdown_list.unwrap(),
                                                                          location_menu,
                                                                          intv_type.unwrap(),
-                                                                         req.patient_id.clone() );
+                                                                         req.patient_id.clone(),
+                                                                         req.intervention_type_id.clone() ,
+                                                                         req.encounter_id.clone() );
 
         HttpResponse::Ok().body(  content )
     }

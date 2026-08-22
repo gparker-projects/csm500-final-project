@@ -230,7 +230,7 @@ impl InterventionDAO {
     /// RETURNS: i64: the id of the Intervention record that is created, if applicable
     /// 
     pub async fn upsert_intervention_from_intv_form(&self, form: InterventionDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
-        println!("> upsert_intervention_from_intv_form");
+        println!("  > upsert_intervention_from_intv_form (Intervention id={})", &form.intervention_id);
 
         let mut query_level_0 = db_query::UPDATE_INTERVENTION.to_string();
 
@@ -239,16 +239,17 @@ impl InterventionDAO {
             query_level_0 = db_query::INSERT_INTERVENTION.to_string();
         }
 
-        let query_level_1 = &query_level_0.replace("{description}", &form.description.clone().trim());
-        let query_level_2 = &query_level_1.replace("{notes}", &form.notes.clone().trim());
-        let query_level_3 = &query_level_2.replace("{location_id}", &form.location_id.clone().trim());
-        let query_level_4 = &query_level_3.replace("{users_id}", &form.users_id.clone().trim());
-        let query_level_5 = &query_level_4.replace("{encounter_id}", &form.encounter_id.clone().trim());
-        let query_level_6 = &query_level_5.replace("{intervention_type_id}", &form.intervention_type_id.clone().trim());
-        let query_level_7 = &query_level_6.replace("{scheduled_timestamp}", &form.scheduled_timestamp.clone().trim());
-        let query_level_8 = &query_level_7.replace("{performed_timestamp}", &form.performed_timestamp.clone().trim());
+        let query_level_1 = &query_level_0.replace("{description}", &form.description.trim());
+        let query_level_2 = &query_level_1.replace("{notes}", &form.notes.trim());
+        let query_level_3 = &query_level_2.replace("{location_id}", &form.location_id);
+        let query_level_4 = &query_level_3.replace("{users_id}", &form.users_id);
+        let query_level_5 = &query_level_4.replace("{encounter_id}", &form.encounter_id);
+        let query_level_6 = &query_level_5.replace("{intervention_type_id}", &form.intervention_type_id);
+        let query_level_7 = &query_level_6.replace("{scheduled_timestamp}", &form.scheduled_timestamp);
+        let query_level_8 = &query_level_7.replace("{performed_timestamp}", &form.performed_timestamp);
+        let query_level_9 = &query_level_8.replace("{intervention_id}", &form.intervention_id); // INSERT does not include this field, only the UPDATE
 
-        let query = &query_level_6.replace("{status_id}", &form.status_id.clone().trim());
+        let query = &query_level_9.replace("{status_id}", &form.status_id);
 
         println!(" >> Intervention Upsert query: {}", query);
 

@@ -230,8 +230,8 @@ INSERT INTO INTERVENTION(description, notes, location_id, users_id, encounter_id
         {encounter_id},
         {intervention_type_id},
         {status_id}, 
-        {scheduled_timestamp},
-        {performed_timestamp}
+        to_timestamp('{scheduled_timestamp}', 'YYYY-Mon-DD HH24:MI:SS'),
+        to_timestamp('{performed_timestamp}', 'YYYY-Mon-DD HH24:MI:SS')
         ) RETURNING ID;
 "##;
 
@@ -244,8 +244,8 @@ pub const UPDATE_INTERVENTION: &str = r##"
         encounter_id={encounter_id},
         intervention_type_id={intervention_type_id},
         status_id={status_id}, 
-        scheduled_timestamp={scheduled_timestamp},
-        performed_timestamp=performed_timestamp}
+        scheduled_timestamp=to_timestamp('{scheduled_timestamp}', 'YYYY-Mon-DD HH24:MI:SS'),
+        performed_timestamp=to_timestamp('{performed_timestamp}', 'YYYY-Mon-DD HH24:MI:SS')
     WHERE id={intervention_id} RETURNING ID;
 "##;
 

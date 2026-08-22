@@ -12,26 +12,11 @@
     
     console.log("in validateForm();");
 
-   /* if (document.getElementById('patient_first_name').value.trim() == '') {
-        errLabel.textContent = "First Name is required";
+    if (document.getElementById('description').value.trim() == '') {
+        errLabel.textContent = "Description must be provided";
         errLabel.style = "color: red";
         isValid = false;
     }
-
-
-    if (document.getElementById('birthdate').value.trim() == '') {
-	  errLabel.textContent = "Birthdate must be provided in YYYY/MM/DD format.";
-	  errLabel.style = "color: red";
-	  isValid = false;
-    }
-    
-    if (document.getElementById('admit_notes').value.trim() == '') {
-	  errLabel.textContent = "Reason for Visit is required";
-	  errLabel.style = "color: red";
-	  isValid = false;
-    }
-*/
-
     
     if (!isValid) {
       event.preventDefault();       // Stop the form from submitting if there are errors
@@ -57,7 +42,7 @@
 
 <h1>{intervention_type}&nbsp;Details</h1>
 	
-<form action="/intvnew" method="post" id="intvForm" name="intvForm" onSubmit="event.preventDefault(); return validateForm()">
+<form action="/intvsave" method="post" id="intvForm" name="intvForm" onSubmit="event.preventDefault(); return validateForm()">
 <input type="hidden" name="encounter_id" id="encounter_id" value="{encounter_id}">
 <input type="hidden" name="intervention_id" id="intervention_id" value="{intervention_id}">
 <input type="hidden" name="intervention_type_id" id="intervention_type_id" value="{intervention_type_id}">

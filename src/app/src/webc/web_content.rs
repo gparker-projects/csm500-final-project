@@ -282,8 +282,9 @@ impl WebContentFactory {
 
                 // ...except for admit_timestamp which will be Now()
                 let result_2 = result.replace("{admit_timestamp}", &chrono::Utc::now().format("%Y-%b-%d %H:%M:%S").to_string());
+                let result_3 = result_2.replace("{location_id}", &location_menu);
 
-                result_2
+                result_3
             } 
             Some (p) => {
                 if is_discharge_flag {
@@ -309,7 +310,7 @@ impl WebContentFactory {
                     let result_3 = result_2.replace("{discharge_timestamp}", &chrono::Utc::now().format("%Y-%b-%d %H:%M:%S").to_string());
                     let result_4 = result_3.replace("{discharge_notes}", &p.discharge_notes);
                     let result_5 = result_4.replace("{location_short_name}", &p.location_short_name);
-                    let result_6 = result_5.replace("{location_id}", &location_menu);
+                    let result_6 = result_5.replace("{location_id}", &p.location_id.to_string());
 
                     //println!("location_short_name='{}'", &p.location_short_name);
 
@@ -317,7 +318,7 @@ impl WebContentFactory {
                 }
                 else{
                     let result_3 = result_2.replace("{discharge_notes}", &p.discharge_notes);
-                    let result_4 = result_3.replace("{location_id}", &p.location_id.to_string());
+                    let result_4 = result_3.replace("{location_id}", &location_menu);
 
                     result_4
                 }
@@ -423,11 +424,11 @@ impl WebContentFactory {
     /// Generates a dropdown for users
     /// 
     pub fn get_dropdown_user_with_department(&self, item_list: Vec<(i64, String, String)>, default_item_id: i64) -> String {
-        self.get_dropdown_generic(item_list, "user_id".to_string(), default_item_id)
+        self.get_dropdown_generic(item_list, "users_id".to_string(), default_item_id)
     }
 
     pub fn get_dropdown_intervention_status(&self, item_list: Vec<(i64, String, String)>, default_item_id: i64) -> String {
-        self.get_dropdown_generic(item_list, "intervention_id".to_string(), default_item_id)
+        self.get_dropdown_generic(item_list, "status_id".to_string(), default_item_id)
     }
 
     ///
@@ -503,7 +504,9 @@ impl WebContentFactory {
                                                   status_dropdown_list: Vec<(i64, String, String)>,
                                                   location_menu: String,
                                                   intv_type: (i64, String, String),
-                                                  patient_id: String
+                                                  patient_id: String,
+                                                  intervention_type_id: String,
+                                                  encounter_id: String
                                                   ) -> String {
         println!(">get_modify_intervention_full_page_tile()");
 
@@ -521,12 +524,12 @@ impl WebContentFactory {
                                 "{patient_id}",
                                 "{form_errors}"];
 
-        let scheduled_time = chrono::Utc::now().format("%Y-%b-%d %H:%M:%S").to_string();
-        let performed_time = chrono::Utc::now().format("%Y-%b-%d %H:%M:%S").to_string();
+        let scheduled_time = chrono::Utc::now().format(constants::SYSTEM_DATETIME_FORMAT ).to_string();
+        let performed_time = chrono::Utc::now().format(constants::SYSTEM_DATETIME_FORMAT ).to_string();
 
         let id: String; // this entire block is required in order to address partial moves that occur below when we copy over the String values
         let intervention_type: String;             // this must all occur before the copy and outside of the match block below
-        let intervention_type_id: String;          // as the selection of Some()/None does not allow the move
+        let tmp_intervention_type_id: String;          // as the selection of Some()/None does not allow the move
         let scheduled_timestamp: String;
         let performed_timestamp: String;
         let dd_user: String;
@@ -534,7 +537,7 @@ impl WebContentFactory {
         //let location_id: String;
         let description: String;
         let notes: String;
-        let encounter_id: String;
+        let tmp_encounter_id: String;
 
         let data_items = match current_intervention{
             None =>{ // new patient (Admit) path
@@ -542,9 +545,9 @@ impl WebContentFactory {
                 dd_user = self.get_dropdown_user_with_department(user_dropdown_list,constants::NOT_SPECIFIED_ID); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
                 dd_intv_status =  self.get_dropdown_intervention_status(status_dropdown_list, constants::DEFAULT_INTERVENTION_STATUS_NEW); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
 
-                let tmp_data_items: [String; 13] = ["".to_string(), //"{intervention_id}",
+                let tmp_data_items: [String; 13] = [constants::NOT_SPECIFIED_ID.to_string(), //"{intervention_id}",
                                                   intv_type.1, //"{intervention_type}",
-                                                  "".to_string(), //"{intervention_type_id}",
+                                                  intervention_type_id.to_string(), //"{intervention_type_id}",  //TODO
                                                   scheduled_time, //"{scheduled_timestamp}",
                                                   performed_time, // "{performed_timestamp}",
                                                   location_menu, //"{location_id}",
@@ -552,7 +555,7 @@ impl WebContentFactory {
                                                   dd_intv_status, // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
                                                   "".to_string(), // "{description}",
                                                   "".to_string(), // "{notes}",
-                                                  "".to_string(), // "{encounter_id}",
+                                                  encounter_id.to_string(), // "{encounter_id}",  //TODO
                                                   patient_id.clone(),
                                                   "".to_string() // "{form_errors}"];
                                                   ];
@@ -565,17 +568,17 @@ impl WebContentFactory {
 
                 id = intv.id.to_string();
                 intervention_type = intv.clone().intervention_type; // intv_type.1
-                intervention_type_id = intv.intervention_type_id.clone().to_string();
+                tmp_intervention_type_id = intv.intervention_type_id.clone().to_string();
                 scheduled_timestamp = intv.clone().scheduled_timestamp_for_display();
                 performed_timestamp = intv.clone().performed_timestamp_for_display();
                 //location_id = intv.location_id.to_string();
                 description = intv.intervention_type_id.to_string();
                 notes = intv.intervention_type_id.to_string();
-                encounter_id = intv.intervention_type_id.to_string();
+                tmp_encounter_id = intv.intervention_type_id.to_string();
 
                 let tmp_data_items = [id,
                                                     intervention_type,
-                                                    intervention_type_id,
+                                                    tmp_intervention_type_id,
                                                     scheduled_timestamp,
                                                     performed_timestamp,
                                                     location_menu,
@@ -583,7 +586,7 @@ impl WebContentFactory {
                                                     dd_intv_status, // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
                                                     description,
                                                     notes,
-                                                    encounter_id,
+                                                    tmp_encounter_id,
                                                     patient_id.clone(),
                                                     "{form_errors}".to_string()
                                                 ];

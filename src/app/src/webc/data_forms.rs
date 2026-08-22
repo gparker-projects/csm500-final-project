@@ -40,10 +40,11 @@ impl GenericWebFormData {
 */
 #[derive(serde::Deserialize)]
 pub struct InterventionDataFormBasic {
-    pub intervention_id: String,
+    //pub intervention_id: String,
     pub intervention_type_id: String,
     pub encounter_id: String,
     pub patient_id: String,
+    //pub users_id: String,
 }
 
 //impl InterventionDataFormBasic {

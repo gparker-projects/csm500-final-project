@@ -8,6 +8,8 @@ use serde::{Deserialize, Serialize};
 use chrono::{NaiveDateTime}; 
 use std::fmt;
 
+use crate::constants;
+
 #[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct Intervention {
     #[serde(rename = "Id")]
@@ -91,14 +93,14 @@ impl Intervention {
     /// helper method to return the date/time the intervention is/was scheduled to occur, in a format that can be easily displayed
     /// 
     pub fn scheduled_timestamp_for_display(&self) -> String{
-        self.scheduled_timestamp.unwrap().format("%d/%m/%Y %H:%M:%S").to_string()
+        self.scheduled_timestamp.unwrap().format(constants::SYSTEM_DATETIME_FORMAT ).to_string()
     }
 
     ///
     /// helper method to return the date/time the intervention was performed, in a format that can be easily displayed
     /// 
     pub fn performed_timestamp_for_display(&self) -> String{
-        self.scheduled_timestamp.unwrap().format("%d/%m/%Y %H:%M:%S").to_string()
+        self.scheduled_timestamp.unwrap().format(constants::SYSTEM_DATETIME_FORMAT ).to_string()
     }
 }
 

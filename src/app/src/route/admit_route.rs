@@ -219,7 +219,11 @@ impl AdmitRoute{
       };
 
       // construct the tile based on session, patient data and the legacy menu
-      let content = wcf.get_admit_discharge_tile(user_session_details.user_display_name, existing_patient, legacy_menu, location_menu, discharge); // retrieve the page base content
+      let content = wcf.get_admit_discharge_tile(user_session_details.user_display_name,
+                                         existing_patient,
+                                         legacy_menu,
+                                         location_menu,
+                                         discharge); // retrieve the page base content
 
       HttpResponse::Ok().body( content )
   }
