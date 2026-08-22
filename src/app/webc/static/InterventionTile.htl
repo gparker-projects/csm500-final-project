@@ -94,7 +94,7 @@
 <tr>
 <td>
 <input type="submit" value="Save">
-<input type="button" value="Cancel" onclick="cancelForm()">
+<input type="button" value="Close" onclick="cancelForm()">
 </td>
 </tr>
 

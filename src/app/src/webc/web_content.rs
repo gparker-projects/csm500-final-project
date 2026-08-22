@@ -524,14 +524,14 @@ impl WebContentFactory {
                                 "{patient_id}",
                                 "{form_errors}"];
 
-        let scheduled_time = chrono::Utc::now().format(constants::SYSTEM_DATETIME_FORMAT ).to_string();
-        let performed_time = chrono::Utc::now().format(constants::SYSTEM_DATETIME_FORMAT ).to_string();
+       // let scheduled_time = chrono::Utc::now().format(constants::SYSTEM_DATETIME_FORMAT ).to_string();
+       // let performed_time = chrono::Utc::now().format(constants::SYSTEM_DATETIME_FORMAT ).to_string();
 
         let id: String; // this entire block is required in order to address partial moves that occur below when we copy over the String values
         let intervention_type: String;             // this must all occur before the copy and outside of the match block below
         let tmp_intervention_type_id: String;          // as the selection of Some()/None does not allow the move
-        let scheduled_timestamp: String;
-        let performed_timestamp: String;
+        let mut scheduled_timestamp: String = chrono::Utc::now().format(constants::SYSTEM_DATETIME_FORMAT ).to_string();
+        let mut performed_timestamp: String = chrono::Utc::now().format(constants::SYSTEM_DATETIME_FORMAT ).to_string();
         let dd_user: String;
         let dd_intv_status: String;
         //let location_id: String;
@@ -548,9 +548,9 @@ impl WebContentFactory {
                 let tmp_data_items: [String; 13] = [constants::NOT_SPECIFIED_ID.to_string(), //"{intervention_id}",
                                                   intv_type.1, //"{intervention_type}",
                                                   intervention_type_id.to_string(), //"{intervention_type_id}",  //TODO
-                                                  scheduled_time, //"{scheduled_timestamp}",
-                                                  performed_time, // "{performed_timestamp}",
-                                                  location_menu, //"{location_id}",
+                                                  scheduled_timestamp, //"{scheduled_timestamp}",
+                                                  performed_timestamp, // "{performed_timestamp}",
+                                                  location_menu, //"{location_id}", 
                                                   dd_user, // "<div id=\"MapleEMR::UserIdDropDownControl\">",
                                                   dd_intv_status, // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
                                                   "".to_string(), // "{description}",
@@ -571,17 +571,17 @@ impl WebContentFactory {
                 tmp_intervention_type_id = intv.intervention_type_id.clone().to_string();
                 scheduled_timestamp = intv.clone().scheduled_timestamp_for_display();
                 performed_timestamp = intv.clone().performed_timestamp_for_display();
-                //location_id = intv.location_id.to_string();
-                description = intv.intervention_type_id.to_string();
-                notes = intv.intervention_type_id.to_string();
-                tmp_encounter_id = intv.intervention_type_id.to_string();
+                //location_id = intv.location_id.to_string(); // location_menu below
+                description = intv.description.to_string();
+                notes = intv.notes.to_string();
+                tmp_encounter_id = intv.encounter_id.to_string();
 
                 let tmp_data_items = [id,
                                                     intervention_type,
                                                     tmp_intervention_type_id,
                                                     scheduled_timestamp,
                                                     performed_timestamp,
-                                                    location_menu,
+                                                    location_menu, //location_id 
                                                     dd_user, // "<div id=\"MapleEMR::UserIdDropDownControl\">",
                                                     dd_intv_status, // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
                                                     description,

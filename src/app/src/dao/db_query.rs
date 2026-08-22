@@ -139,14 +139,14 @@ pub const QRY_ALL_INTERVENTION_DETAILS_FOR_TYPE: &str = r##"
                                                 "##;
 
 
-pub const QRY_ACTIVE_DEPARTMENTS: &str = r##"select id, name, name "description" from department where expiry_timestamp > now()"##;
-
 pub const QRY_COMMON_REF_TYPES_FOR_GROUP: &str = r##"select id, name, description from common_reference_type where group_id = {group_id} ORDER BY NAME"##;
 
 pub const QRY_COMMON_REF_TYPES_FOR_GROUP_ACTIVE_ONLY: &str = r##"select id, name, description from common_reference_type where group_id = {group_id} and active_flag = 'Y' ORDER BY NAME"##;
 
 
 pub const QRY_ACTIVE_LOCATIONS: &str = r##"select id, name ||' (' || short_name|| ')' from location where active_flag = 'Y'"##;
+
+pub const QRY_ACTIVE_DEPARTMENTS: &str = r##"select id, name, name "description" from department where expiry_timestamp > now()"##;
 
 
 pub const QRY_COMMON_REF_TYPES_SINGLE_FOR_A_GROUP_AND_TYPE: &str = r##"SELECT id, name, description FROM common_reference_type WHERE ID = {common_ref_id} LIMIT 1"##;
@@ -164,7 +164,7 @@ pub const QRY_CURRENT_USER_LOCATIONS: &str = r##"
 
 pub const QRY_ALL_USERS_AND_DEPARTMENT_NAME: &str = r##"
                                                 select distinct u.id user_id,
-                                                    u.name || ' ('|| d.name||')' "name",
+                                                    d.name || ' ('|| u.name||')' "name",
                                                     u.name "user_name"
                                                 from user_permission up
                                                 join users u on up.users_id = u.id
@@ -172,6 +172,7 @@ pub const QRY_ALL_USERS_AND_DEPARTMENT_NAME: &str = r##"
                                                 where up.active_flag = 'Y'
                                                 and users_id = {user_id}
                                                 and site_id is not null
+												order by  d.name || ' ('|| u.name||')'
                                                 "##;                                    
 
 // ------------------------------------------------------------------------------------------

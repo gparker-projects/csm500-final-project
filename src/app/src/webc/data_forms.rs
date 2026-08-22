@@ -31,42 +31,25 @@ impl GenericWebFormData {
   }
 }
 
-/*
-    fn valid_date(value: &str) -> Result<(), ValidationError> {
-        NaiveDateTime::parse_from_str(value, "%Y-%m-%d")
-          .map_err(|_| ValidationError::new("invalid_date_format"))?;
-        Ok(())
-    }
-*/
 #[derive(serde::Deserialize)]
 pub struct InterventionDataFormBasic {
-    //pub intervention_id: String,
     pub intervention_type_id: String,
     pub encounter_id: String,
     pub patient_id: String,
-    //pub users_id: String,
 }
 
-//impl InterventionDataFormBasic {
-//  pub fn get_patient_id_as_i64(&self) -> i64{
-//      let result: i64 = self.patient_id.parse().unwrap();
-//      return result;
-//  }
-//}
-
+#[derive(serde::Deserialize)]
+pub struct InterventionDataFormLink {
+    pub intervention_id: String,
+    pub encounter_id: String,
+    pub patient_id: String,
+}
 
 #[derive(serde::Deserialize)]
 pub struct AdmitFormBasic {
     pub patient_id: String,
     pub action_flag: String,
 }
-
-//impl AdmitFormBasic {
-//  pub fn get_uid_as_i64(&self) -> i64{
-//      let result: i64 = self.adm_target_id.parse().unwrap();
-//      return result;
-//  }
-//}
 
 #[derive(Default, serde::Deserialize, Validate, Clone)]
 pub struct DischargeDataForm {
@@ -213,6 +196,13 @@ impl InterventionDataForm {
         return result;
     }
 
+    /*
+    fn valid_date(value: &str) -> Result<(), ValidationError> {
+        NaiveDateTime::parse_from_str(value, "%Y-%m-%d")
+          .map_err(|_| ValidationError::new("invalid_date_format"))?;
+        Ok(())
+    }
+*/
     pub fn validate_fields(&self) -> Result<(), ValidationError> {
         if ! (self.intervention_id.len() > 0) || ! self.intervention_id.parse::<i64>().is_ok() {
             return Err(ValidationError::new("Intervention Id invalid"));

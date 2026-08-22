@@ -103,3 +103,4 @@ async function admit_patient(){
     const frm = document.getElementById('encHistoryFrm');
     frm.submit();
 }*/
+
