@@ -6,8 +6,6 @@
 //! This module provides struts and classes that will work with data and the Natural Language Model (NLM) for the application.
 //! This not only handles user-provided prompts, but also the work of initiating and calling the Machine Learning/NLM engine.
 //! 
-use std::path::Path;
-
 use ndarray::{Ix2, Axis}; 
 use ort::{
 	Error,
@@ -32,32 +30,29 @@ impl NaturalLanguageEngine {
     //
     // cargo_manifest_dir should be: env!("CARGO_MANIFEST_DIR")
     //
-    pub async fn new(base_model_dir: &str) -> Self {
+    pub async fn new(model_file_path: &str, tokenizer_file_path: &str) -> Self {
         println!("NaturalLanguageEngine::new()");
-        println!("..load MiniLM and tokenizer");
+        println!("..load model for session: {}", model_file_path.clone());
+        println!("..load tokenizer: {}", tokenizer_file_path.clone());
         
         NaturalLanguageEngine {
             session: {
                 Session::builder().expect("Session could not be established")
                   .with_optimization_level(GraphOptimizationLevel::Level1).expect("No Session")
                   .with_intra_threads(1).expect("Insufficient threads")
-                  .commit_from_file(Path::new( base_model_dir )
-                                                      .join("data")
-                                                      .join("all-MiniLM-L6-v2.onnx")  ).expect("File could not be accessed")
+                  .commit_from_file(model_file_path ).expect("File could not be accessed")
             },
             tokenizer: {
-                Tokenizer::from_file(  Path::new( base_model_dir )
-                                             .join("data")
-                                             .join("tokenizer.json")  ).unwrap()
+                Tokenizer::from_file(  tokenizer_file_path  ).unwrap()
             },
         }
     }
 
-    pub async fn get_classification_rankings(&mut self, inputs: Vec<String> ) -> Vec< (String, f32) > {
+    pub async fn get_classifier_rankings(&mut self, inputs: Vec<String> ) -> Vec< (String, f32) > {
       // println!("cwd: {:?}", std::env::current_dir().expect("Current dir could not be accessed"));
       // let canonical = std::fs::canonicalize("all-MiniLM-L6-v2.onnx").expect("File could not be accessed"); // errors if it doesn't exist
       // println!("resolved: {:?}", canonical);
-      println!("NaturalLanguageEngine::get_classification_rankings()");
+      println!("NaturalLanguageEngine::get_classifier_rankings()");
 
       let mut results: Vec< (String, f32) > = vec![]; // assemble all results into vector to return
 

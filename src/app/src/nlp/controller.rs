@@ -3,63 +3,38 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 
-//use crate::constants;
+use crate::constants;
 
-pub const COMMAND_MAPPING_FILE_NAME: &str = "command_mapping.csv";
 
-// Commands that can be executed via the NLE
+// Commands that can be executed via the NL model
 pub const COMMAND_ADMIT_NEW_PATIENT: i64 = 1;
 pub const COMMAND_ADD_NEW_INTERVENTION: i64 = 2;
 pub const COMMAND_DISCHARGE_PATIENT: i64 = 3;
 
 ///
-/// Provides logic and constraints around commands being elecuted by the NLP module
+/// Provides logic and constraints around commands being executed by the NL model
 /// 
 pub struct CommandController{
-    command_hashset: Vec<(String, String)>, // first 
+    command_hashset: Vec<(String, i64)>, // first item is a phrase for matching; second item is the index of a permission it would enable for the user, if matched
 }
 
 impl CommandController{
-
-    pub fn get_all_operations_and_add_prompt (&self, prompt: String) -> Vec<String> {
-        //let mut results = Vec::<String>::with_capacity(10);
-
-        println!("CommandController::get_all_operations_and_add_prompt()");
-
-        // take the list we loaded, cut it into separate vectors by the columns
-        // https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.unzip
-        //
-        let  (mut sentences, _command_id): (Vec::<String>, Vec::<String>) = self.command_hashset.clone().into_iter().unzip();
-        sentences.insert(0, prompt.clone() );
-
-        return sentences;
-    }
-
-    pub fn get_permission_for_operation (&self, prmpt_id: String) -> i64 {
-    
-      //https://doc.rust-lang.org/rust-by-example/fn/closures/closure_examples/iter_find.html
-         let idx = self.command_hashset.iter().find(|(p2, _) | *p2 == prmpt_id) ;
-         match idx {
-            Some(item) => item.1.parse::<i64>().unwrap_or(-1),
-            None => -1
-         }
-    }
-
-
-    pub fn new(content_root_path: &str) -> Self {
-        let mut tmp_command_hashset = Vec::<(String, String)>::with_capacity(10);
-        let filename = Path::new( content_root_path )
-                                              .join("data")
-                                              .join(COMMAND_MAPPING_FILE_NAME).to_string_lossy().to_string();
-
-        println!( "CommandController::New() {}", filename );
+    ///
+    /// Public constructor for the CommandController
+    /// 
+    pub fn new(mapping_file_path: &str) -> Self {
+        //println!( "CommandController::New() {}", mapping_file_path );
+        let mut tmp_command_hashset = Vec::<(String, i64)>::with_capacity(10);
 
         // read in the command mapping config .CSV
-        if let Ok(lines) = CommandController::read_lines( filename ) {
+        if let Ok(lines) = CommandController::read_lines( mapping_file_path ) {
             for line in lines.map_while(Result::ok) {
                 let parts: Vec<&str> = line.split(',').collect();
-                tmp_command_hashset.push( (parts[0].to_string(), parts[1].to_string()) ); // only first two items are actually used
-                //println!( "..Loaded: {}, {}", parts[0].to_string(), parts[1].to_string() );
+
+                // convert to an i64, matching all other system data structures
+                // be sure to trim() first, otherwise the parse fails!
+                let tmp_index: i64 = parts[1].trim().parse::<i64>().unwrap_or(constants::INVALID_OTHER_ID); 
+                tmp_command_hashset.push( ( parts[0].to_string(), tmp_index ) ); // only first two items are actually used
             }
         }
 
@@ -67,9 +42,42 @@ impl CommandController{
             command_hashset: tmp_command_hashset,
         }
     }
+    
+    ///
+    /// Constructs a list of strings ( Vec<String> ) from the previously loaded command mapping file, and adds the user's prompt as the first element
+    /// This required by the NL model we are using ATM, for its comparison routine.
+    /// 
+    pub fn get_all_operations_and_add_prompt (&self, prompt: String) -> Vec<String> {
+        // take the list we loaded, cut it into separate vectors by the columns
+        // https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.unzip
+        //
+        let  (mut sentences, _command_id): (Vec::<String>, Vec::<i64>) = self.command_hashset.clone().into_iter().unzip();
+        sentences.insert(0, prompt.clone() );
 
+        return sentences;
+    }
 
-    // https://doc.rust-lang.org/rust-by-example/std_misc/file/read_lines.html
+    ///
+    /// Retrieves the id of the permission associated with the operation (column 0 from the command mapping)
+    ///  that matches the prompt_string.
+    /// 
+    pub fn get_permission_for_operation (&self, prompt_string: String) -> i64 {
+        //println!("get_permission_for_operation(): Compare to prompt: '{}'", prompt_string);
+        let mut results: i64 = constants::INVALID_OTHER_ID;
+        for item in self.command_hashset.clone().iter(){
+           //println!("item.0='{}' item.1={}", item.0, item.1);
+           if item.0 == prompt_string{
+                results = item.1;
+                break; // terminate early if we find a match
+           }
+        }
+        results
+    }
+
+    ///
+    /// Helper method to load the file lines into a BufReader, to better control flow
+    /// REF: https://doc.rust-lang.org/rust-by-example/std_misc/file/read_lines.html
+    ///
     pub fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
         where P: AsRef<Path>, {
             let file = File::open(filename)?;
