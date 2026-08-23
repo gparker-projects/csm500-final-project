@@ -9,45 +9,49 @@
 use actix_web::{web, HttpResponse, Responder};
 use actix_session::{Session}; 
 
-//use crate::dao::{patient_dao::*, intervention_dao::*, encounter_dao::*}; 
+use crate::constants;
 use crate::webc::data_forms::*;//, menu_tile::*};
 use crate::session::AppSession;//, UserSession};
-
-//use crate::constants;
+use crate::nlp::nlp::*;
 
 pub struct NLPRoute{}
 
 impl NLPRoute{
 
-    /// performs a natural language prompt using the built in engine
+    /// accepts a natural language prompt and processes it using the built in engine
     /// 
-    /// check by going to: http://127.0.0.1:8000/db
-    /// 
-    //async fn natural_language_prompt(req: web::Form<NLPromptFormData>) -> impl Responder {
     pub async fn natural_language_prompt(_app_session: web::Data<AppSession>, _user_session: Session, req: web::Form<NLPromptFormData>) -> impl Responder {
-    
         println!("-> /nlprompt Requested; prompt: \"{}\"", req.prompt);
 
         let mut results_sbuf = String::with_capacity(50); // Single heap allocation
-        results_sbuf.push_str("<b>PLACEHOLDER CONTENT/b>\n");
-
-        if req.prompt.contains("discharge") {
-            //actix_web::web::Redirect::to("/admdis").using_status_code(StatusCode::SEE_OTHER)
-            HttpResponse::Ok().body(format!( r##"{{"action": "discharge", "prompt": "{}",}}"##, req.prompt)) 
-        }
-        else if req.prompt.contains("admit")  {
-            HttpResponse::Ok().body(format!( r##"{{"action": "admit", "prompt": "{}",}}"##, req.prompt))
-        }
-        else {
-            HttpResponse::Ok().body(format!(r##"{{"action": "other", "prompt": "{}",}}"##, req.prompt)) 
-        }
-
-        //actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SEE_OTHER)
+        results_sbuf.push_str("<H1>NL Prompt test</H1>\n");
     
-        // these are the ACTUAL execution from the POC
-        //let results = nlp::NLP{}.execute();
-        //HttpResponse::Ok().body(format!("<b>machine_learn_test {}</b>", results.await.to_string())) 
+        let prompt = req.prompt.clone();
+       // let patient_id = req.patient_id.clone();
 
-        //HttpResponse::Ok().body(format!("{}", results_sbuf)) 
+        let inputs: Vec<String> = vec![prompt.clone(), // first index is the item we're matching against. All the others are matched against it
+                                       "admit patient".to_string(),
+                                       "discharge patient".to_string(),
+                                       "add information".to_string(),
+                                       "add medication".to_string(),
+                                       "prescribe medication".to_string(),
+                                       "move patient".to_string(),
+                                       "update contact information".to_string(),
+                                       ];
+
+        let base_model_dir = env!("CARGO_MANIFEST_DIR");
+        let mut nlp = NaturalLanguageEngine::new( base_model_dir ).await;
+
+        results_sbuf.push_str(&format!( "<b>Prompt</b>:\n {}", prompt )  );
+
+        let results: Vec< (String, f32)> = nlp.get_classification_rankings( inputs ).await;
+
+        results_sbuf.push_str("<ul>");
+        for item in results{
+            results_sbuf.push_str( &format!("<li>\t'{}': {:.1}% </li>", item.0, item.1 * 100.) );
+        }
+        results_sbuf.push_str("</ul>");
+        
+        HttpResponse::Ok().body( results_sbuf )
     }
 }

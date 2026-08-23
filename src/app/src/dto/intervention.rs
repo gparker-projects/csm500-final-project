@@ -93,14 +93,20 @@ impl Intervention {
     /// helper method to return the date/time the intervention is/was scheduled to occur, in a format that can be easily displayed
     /// 
     pub fn scheduled_timestamp_for_display(&self) -> String{
-        self.scheduled_timestamp.unwrap().format(constants::SYSTEM_DATETIME_FORMAT ).to_string()
+        match self.scheduled_timestamp{
+            Some(ts) => ts.format(constants::SYSTEM_DATETIME_FORMAT ).to_string(),
+            None => "".to_string()
+        }       
     }
 
     ///
     /// helper method to return the date/time the intervention was performed, in a format that can be easily displayed
     /// 
     pub fn performed_timestamp_for_display(&self) -> String{
-        self.performed_timestamp.unwrap().format(constants::SYSTEM_DATETIME_FORMAT ).to_string()
+        match self.performed_timestamp{
+            Some(ts) => ts.format(constants::SYSTEM_DATETIME_FORMAT ).to_string(),
+            None => "".to_string()
+        }        
     }
 }
 

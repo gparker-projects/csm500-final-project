@@ -135,7 +135,7 @@ impl PatientDAO {
     pub async fn update_encounter_from_discharge_form(&self, form: DischargeDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
         println!("> update_encounter_from_discharge_form");
 
-        let mut query_level_0 = db_query::UPDATE_ENCOUNTER_FOR_DISCHARGE.to_string();
+        let query_level_0 = db_query::UPDATE_ENCOUNTER_FOR_DISCHARGE.to_string();
         let query_level_1 = &query_level_0.replace("{discharge_notes}", &form.discharge_notes.clone().trim());
         let query_level_2 = &query_level_1.replace("{encounter_id}", &form.encounter_id.clone().trim());
 

@@ -13,7 +13,8 @@ pub struct LoginFormData {
 #[derive(serde::Deserialize)]
 pub struct NLPromptFormData {
     #[serde(rename = "prompt")]
-    pub prompt: String,
+    pub prompt: String//,
+    //pub patient_id: String,
 }
 
 ///

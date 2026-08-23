@@ -12,7 +12,7 @@ use actix_session::{Session};
 use crate::dto::intervention::Intervention;
 
 use crate::dao::{ patient_dao::*, intervention_dao::*, common_dao::*, auth_dao::*}; 
-use crate::webc::{web_content::*, data_forms::*, menu_tile::*};
+use crate::webc::{data_forms::*, menu_tile::*};
 use crate::webc::data_forms::InterventionDataForm;
 
 use crate::session::{AppSession, UserSession};

@@ -1,0 +1,8 @@
+admit patient, 1, {ADMIT_NEW_PATIENT}
+add patient, 1, {ADMIT_NEW_PATIENT}
+add information, 2, {ADD_NEW_INTERVENTION}
+add medication, 2, {ADD_NEW_INTERVENTION}
+prescribe medication, 2, {ADD_NEW_INTERVENTION}
+move patient, 2, {ADD_NEW_INTERVENTION}
+update contact information, 2, {ADD_NEW_INTERVENTION}
+discharge patient, 3, {DISCHARGE_PATIENT}

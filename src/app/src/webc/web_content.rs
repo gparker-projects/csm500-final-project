@@ -343,7 +343,7 @@ impl WebContentFactory {
     pub fn get_single_encounter_summary_tile(&self, encounter: Encounter) -> String {
         let mut results_sbuf = String::with_capacity(100);
 
-        results_sbuf.push_str("<table <tr><th>Admit Date</th><th>Site/Facility</th></tr>"); 
+        results_sbuf.push_str("<table <tr><th>Admit Reason</th><th>Site/Facility</th></tr>"); 
 
         results_sbuf.push_str("  <tr>");
         results_sbuf.push_str("<td><a href=\"#\" onclick=\"redirect_to_enc("  ); 
@@ -354,8 +354,13 @@ impl WebContentFactory {
         results_sbuf.push_str( &encounter.encounter_site_name );
         results_sbuf.push_str("</td>"); 
         results_sbuf.push_str("  </tr>\n");
+
+        results_sbuf.push_str("  <tr><td><b>Admit Reason:<\\b>&nbsp;");
+        results_sbuf.push_str( &encounter.admit_notes );
+        results_sbuf.push_str("<\\td>\n  </tr>");
         
         results_sbuf.push_str("</table>");
+
 
         return results_sbuf;
     }
@@ -523,9 +528,6 @@ impl WebContentFactory {
                                 "{encounter_id}",
                                 "{patient_id}",
                                 "{form_errors}"];
-
-       // let scheduled_time = chrono::Utc::now().format(constants::SYSTEM_DATETIME_FORMAT ).to_string();
-       // let performed_time = chrono::Utc::now().format(constants::SYSTEM_DATETIME_FORMAT ).to_string();
 
         let id: String; // this entire block is required in order to address partial moves that occur below when we copy over the String values
         let intervention_type: String;             // this must all occur before the copy and outside of the match block below

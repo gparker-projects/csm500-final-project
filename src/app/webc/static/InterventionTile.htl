@@ -30,10 +30,10 @@
   }
 
   function cancelForm(){
-    if(confirm('Are you sure you want to leave this page?')){
+    //if(confirm('Are you sure you want to leave this page?')){
         document.getElementById('intvForm').action = "\patientdtls";
         intvForm.submit();
-    }
+    //}
     return;
   }
   </script>
