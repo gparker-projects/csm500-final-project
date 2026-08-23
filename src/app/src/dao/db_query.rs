@@ -148,7 +148,6 @@ pub const QRY_ACTIVE_LOCATIONS: &str = r##"select id, name ||' (' || short_name|
 
 pub const QRY_ACTIVE_DEPARTMENTS: &str = r##"select id, name, name "description" from department where expiry_timestamp > now()"##;
 
-
 pub const QRY_COMMON_REF_TYPES_SINGLE_FOR_A_GROUP_AND_TYPE: &str = r##"SELECT id, name, description FROM common_reference_type WHERE ID = {common_ref_id} LIMIT 1"##;
 
 
@@ -250,6 +249,7 @@ pub const UPDATE_INTERVENTION: &str = r##"
     WHERE id={intervention_id} RETURNING ID;
 "##;
 
+/*
 pub const INSERT_INTERVENTION_DETAILS: &str = r##"
     INSERT INTO INTERVENTION_DETAILS(intervention_id,
                                      type_id, value,
@@ -269,3 +269,4 @@ pub const UPDATE_INTERVENTION_DETAILS: &str = r##"
             notes='{notes}'
         WHERE id={intervention_id} RETURNING ID;
 "##;
+ */

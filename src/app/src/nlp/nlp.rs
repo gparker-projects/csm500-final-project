@@ -1,3 +1,11 @@
+//! # nlp (Natural Language Processing)
+//! 
+//! Structs and functions within the nlp module
+//!
+//! ## Overview
+//! This module provides struts and classes that will work with data and the Natural Language Model (NLM) for the application.
+//! This not only handles user-provided prompts, but also the work of initiating and calling the Machine Learning/NLM engine.
+//! 
 use std::path::Path;
 
 use ndarray::{Ix2, Axis}; 
@@ -25,7 +33,9 @@ impl NaturalLanguageEngine {
     // cargo_manifest_dir should be: env!("CARGO_MANIFEST_DIR")
     //
     pub async fn new(base_model_dir: &str) -> Self {
-        println!("load MiniLM and tokenizer");
+        println!("NaturalLanguageEngine::new()");
+        println!("..load MiniLM and tokenizer");
+        
         NaturalLanguageEngine {
             session: {
                 Session::builder().expect("Session could not be established")
@@ -47,6 +57,7 @@ impl NaturalLanguageEngine {
       // println!("cwd: {:?}", std::env::current_dir().expect("Current dir could not be accessed"));
       // let canonical = std::fs::canonicalize("all-MiniLM-L6-v2.onnx").expect("File could not be accessed"); // errors if it doesn't exist
       // println!("resolved: {:?}", canonical);
+      println!("NaturalLanguageEngine::get_classification_rankings()");
 
       let mut results: Vec< (String, f32) > = vec![]; // assemble all results into vector to return
 

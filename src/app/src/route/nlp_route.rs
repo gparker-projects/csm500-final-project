@@ -10,6 +10,7 @@ use actix_web::{web, HttpResponse, Responder};
 use actix_session::{Session}; 
 
 use crate::constants;
+use crate::nlp::controller::CommandController;
 use crate::webc::data_forms::*;//, menu_tile::*};
 use crate::session::AppSession;//, UserSession};
 use crate::nlp::nlp::*;
@@ -29,7 +30,9 @@ impl NLPRoute{
         let prompt = req.prompt.clone();
        // let patient_id = req.patient_id.clone();
 
-        let inputs: Vec<String> = vec![prompt.clone(), // first index is the item we're matching against. All the others are matched against it
+       
+
+        /*let inputs: Vec<String> = vec![prompt.clone(), // first index is the item we're matching against. All the others are matched against it
                                        "admit patient".to_string(),
                                        "discharge patient".to_string(),
                                        "add information".to_string(),
@@ -37,14 +40,26 @@ impl NLPRoute{
                                        "prescribe medication".to_string(),
                                        "move patient".to_string(),
                                        "update contact information".to_string(),
-                                       ];
+                                       ];*/
 
         let base_model_dir = env!("CARGO_MANIFEST_DIR");
+
+        let cmd: CommandController = CommandController::new(&base_model_dir);
+        let inputs: Vec<String> = cmd.get_all_operations_and_add_prompt( prompt.clone() );
+
+        println!("# Inputs loaded: {}",inputs.clone().len());
+
+        for item in inputs.clone(){
+            println!("Input loaded: '{}'",item);
+        }
+        
+        
         let mut nlp = NaturalLanguageEngine::new( base_model_dir ).await;
 
         results_sbuf.push_str(&format!( "<b>Prompt</b>:\n {}", prompt )  );
 
-        let results: Vec< (String, f32)> = nlp.get_classification_rankings( inputs ).await;
+        println!("NaturalLanguageEngine::get_classification_rankings()");
+        let results: Vec< (String, f32)> = nlp.get_classification_rankings( inputs.clone() ).await;
 
         results_sbuf.push_str("<ul>");
         for item in results{

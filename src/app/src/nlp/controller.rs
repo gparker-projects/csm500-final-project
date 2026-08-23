@@ -2,9 +2,8 @@
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
-use std::collections::HashMap;
 
-use crate::constants;
+//use crate::constants;
 
 pub const COMMAND_MAPPING_FILE_NAME: &str = "command_mapping.csv";
 
@@ -22,37 +21,45 @@ pub struct CommandController{
 
 impl CommandController{
 
-    pub fn get_allowable_operations (&self, prompt: String) -> Vec<String> {
+    pub fn get_all_operations_and_add_prompt (&self, prompt: String) -> Vec<String> {
+        //let mut results = Vec::<String>::with_capacity(10);
 
-        let mut results = Vec::<String>::with_capacity(10);
+        println!("CommandController::get_all_operations_and_add_prompt()");
 
+        // take the list we loaded, cut it into separate vectors by the columns
         // https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.unzip
+        //
+        let  (mut sentences, _command_id): (Vec::<String>, Vec::<String>) = self.command_hashset.clone().into_iter().unzip();
+        sentences.insert(0, prompt.clone() );
 
-        let  (mut sentence, _command_id): (Vec::<String>, Vec::<String>) = self.command_hashset.clone().into_iter().unzip();
-
-        sentence.insert(0, prompt.clone() );
-        //results.push(prompt.clone() );
-        //results.push("admit patient".to_string());
-        //results.push("discharge patient".to_string());
-        //results.push("add information".to_string());
-        //results.push("add medication".to_string());
-        //results.push("prescribe medication".to_string());
-        //results.push("move patient".to_string());
-        //results.push("update contact information".to_string());
-
-        return results;
+        return sentences;
     }
 
-    pub fn new(&self, content_root_path: &str) -> Self {
+    pub fn get_permission_for_operation (&self, prmpt_id: String) -> i64 {
+    
+      //https://doc.rust-lang.org/rust-by-example/fn/closures/closure_examples/iter_find.html
+         let idx = self.command_hashset.iter().find(|(p2, _) | *p2 == prmpt_id) ;
+         match idx {
+            Some(item) => item.1.parse::<i64>().unwrap_or(-1),
+            None => -1
+         }
+    }
+
+
+    pub fn new(content_root_path: &str) -> Self {
         let mut tmp_command_hashset = Vec::<(String, String)>::with_capacity(10);
-        let mut filename = content_root_path.to_owned() + COMMAND_MAPPING_FILE_NAME;
+        let filename = Path::new( content_root_path )
+                                              .join("data")
+                                              .join(COMMAND_MAPPING_FILE_NAME).to_string_lossy().to_string();
+
+        println!( "CommandController::New() {}", filename );
 
         // read in the command mapping config .CSV
         if let Ok(lines) = CommandController::read_lines( filename ) {
             for line in lines.map_while(Result::ok) {
                 let parts: Vec<&str> = line.split(',').collect();
                 tmp_command_hashset.push( (parts[0].to_string(), parts[1].to_string()) ); // only first two items are actually used
-                println!( "Loaded: {}, {}", parts[0].to_string(), parts[1].to_string() );
+                //println!( "..Loaded: {}, {}", parts[0].to_string(), parts[1].to_string() );
             }
         }
 
@@ -60,7 +67,6 @@ impl CommandController{
             command_hashset: tmp_command_hashset,
         }
     }
-
 
 
     // https://doc.rust-lang.org/rust-by-example/std_misc/file/read_lines.html
