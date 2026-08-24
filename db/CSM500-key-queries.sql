@@ -29,40 +29,16 @@ where location_id in (
 
 ------------------------------------------------------------------------------------------------------------------
 
-intervention_code - group 1
--------------------
-Bandage
-Bloodwork
-CT Scan
-MRI
-Medication
-Port
-Referral
-Surgery
-Suture
-Transfusion
-X-Ray
-Other
-
-
-status_code - group 2
--------------------
-New (Unassigned)
-Pending (Assigned)
-In Progress
-On Hold
-Complete
-Archived
-
-
-care_type_code - group 3
--------------------
-Admit
-Triage
-Discharge
-Consult
-Direct Care
-Examination
-Surgery
-Treatment
-Other
+-- permissions of all users, with proper labels
+--
+select up.*,
+       u.name "user name",
+	   p.name "permission",
+	   r.name "role name",
+	   d.name "department name"
+from user_permission up
+join permission p on up.permission_id = p.id
+join users u on u.id = up.users_id
+join role r on r.id = up.role_id
+join department d on d.id = up.department_id
+ORDER BY users_id, site_id, department_id, role_id, permission_id

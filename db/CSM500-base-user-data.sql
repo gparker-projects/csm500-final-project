@@ -6,12 +6,12 @@
 -- -------------------------------------------------------------------------------------
 INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (1, 'ghouse',   'Dr. Gregory House', 'ghouse@google.com',   '2026-06-06 12:00:00', 'doctor');
 INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (2, 'chath',    'Carol Hathaway',    'chath@google.com',    '2026-06-06 12:00:00', 'nurse1');
-INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (3, 'sspants',  'Spongebob Squarepants',       'spants@google@google.com',  '2026-06-06 12:00:00', 'csm500');
-INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (4, 'jwilson',  'James Wilson',      'jwilson@google.com',  '2026-06-06 12:00:00', 'labtech');
-INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (5, 'lcuddy',   'Lisa Cuddy',        'lcuddy@google.com',   '2026-06-06 12:00:00', 'pharm');
-INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (6, 'rchase',   'Robert Chase',      'rchase@google.com',   '2026-06-06 12:00:00', 'housek');
-INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (7, 'eforeman', 'Eric Foreman',      'eforeman@google.com', '2026-06-06 12:00:00', 'admin');
-INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (8, 'mcrabs',   'Mister Crabs',      'mcrabs@google.ca', '2026-06-06 12:00:00', 'csm500');
+INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (3, 'mma1',     'Mary Medical AssistantOne',       'mma1@google@google.com',  '2026-06-06 12:00:00', 'csm500');
+INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (4, 'mma2',     'Mattie Medical AssistantTwo',      'mma2@google.com',  '2026-06-06 12:00:00', 'csm500');
+INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (5, 'lcuddy',   'Lisa Cuddy',        'lcuddy@google.com',   '2026-06-06 12:00:00', 'admin');
+INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (6, 'rchase',   'Dr. Robert Chase',      'rchase@google.com',   '2026-06-06 12:00:00', 'csm500');
+INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (7, 'dramoray', 'Dr. Drake Ramoray',      'dramoray@google.com', '2026-06-06 12:00:00', 'joey');
+INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (8, 'pporter',  'Peter Porter',      'pporter@google.ca', '2026-06-06 12:00:00', 'csm500');
 COMMIT;
 
 -- -------------------------------------------------------------------------------------
@@ -20,51 +20,124 @@ COMMIT;
 -- view using: SELECT id, name, expiry_datetime FROM permission;
 -- -------------------------------------------------------------------------------------
 
--- User 3 will have full permissions to everything, for the initial draft implementation
+-- Dr. Gregory House will have the Physician role, with access to clinical data mostly
 --
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 1);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 2);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 3);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 4);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 5);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 6);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 7);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 8);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 9);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 10);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 11);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 12);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 13);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 14);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 15);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 16);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 17);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 19);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 20);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 21);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 22);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 23);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 24);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 25);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 26);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 27);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 28);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 29);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 30);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 31);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 32);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 33);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 34);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 35);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 36);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 4, 2, 37);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 1, 4, 3, 1, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 1, 4, 3, 2, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 1, 4, 3, 6, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 1, 4, 3, 8, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 1, 4, 3, 9, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 1, 4, 3, 10, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 1, 4, 3, 11, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 1, 4, 3, 12, 1);
+
+COMMIT;
+
+-- Carol Hathaway is a nurse, now with partial permissions
+--
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 2, 4, 2, 1, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 2, 4, 2, 2, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 2, 4, 2, 3, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 2, 4, 2, 6, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 2, 4, 2, 7, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 2, 4, 2, 8, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 2, 4, 2, 9, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 2, 4, 2, 10, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 2, 4, 2, 11, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 2, 4, 2, 12, 1);
 
 -- user 3 will also have a few permissions for another department: should not show as a duplicate
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 1, 2, 1);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('Y', 3, 1, 2, 2);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 2, 1, 2, 1, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 2, 1, 2, 2, 1);
 
 -- user 3 will also have a few permissions that are not active, in the other department; should not show at all
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('N', 3, 1, 2, 3);
-INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id) VALUES ('N', 3, 1, 2, 4);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('N', 2, 1, 2, 3, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('N', 2, 1, 2, 4, 1);
+
+COMMIT;
+
+-- Mary Medical AssistantOne will have the Medical Assistant role, with access to non-clinical data only 
+--
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 3, 4, 1, 1, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 3, 4, 1, 3, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 3, 4, 1, 4, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 3, 4, 1, 5, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 3, 4, 1, 7, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 3, 4, 1, 8, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 3, 4, 1, 11, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 3, 4, 1, 12, 1);
+
+COMMIT;
+
+-- Mary Medical AssistantTwo will have the Medical Assistant role, with access to non-clinical data only
+--
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 4, 4, 1, 1, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 4, 4, 1, 3, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 4, 4, 1, 4, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 4, 4, 1, 5, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 4, 4, 1, 7, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 4, 4, 1, 8, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 4, 4, 1, 11, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 4, 4, 1, 12, 1);
+
+COMMIT;
+
+-- Lisa Cuddy will have the Admin role, with access to everything
+--
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 5, 4, 6, 1, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 5, 4, 6, 2, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 5, 4, 6, 3, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 5, 4, 6, 4, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 5, 4, 6, 5, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 5, 4, 6, 6, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 5, 4, 6, 7, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 5, 4, 6, 8, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 5, 4, 6, 9, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 5, 4, 6, 10, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 5, 4, 6, 11, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 5, 4, 6, 12, 1);
+
+-- user 3 will also have a few permissions for another department: should not show as a duplicate
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 5, 1, 6, 1, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 5, 1, 6, 2, 1);
+
+-- user 3 will also have a few permissions that are not active, in the other department; should not show at all
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('N', 5, 1, 6, 3, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('N', 5, 1, 6, 4, 1);
+
+COMMIT;
+
+-- Dr. Robert Chase will have the Physician role, with access to clinical data mostly
+--
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 6, 4, 3, 1, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 6, 4, 3, 2, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 6, 4, 3, 6, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 6, 4, 3, 8, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 6, 4, 3, 9, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 6, 4, 3, 10, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 6, 4, 3, 11, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 6, 4, 3, 12, 1);
+
+COMMIT;
+
+-- Dr. Drake Ramoray will have the Physician role, with access to clinical data mostly
+--
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 7, 4, 3, 1, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 7, 4, 3, 2, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 7, 4, 3, 6, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 7, 4, 3, 8, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 7, 4, 3, 9, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 7, 4, 3, 10, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 7, 4, 3, 11, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 7, 4, 3, 12, 1);
+
+COMMIT;
+
+-- Peter Porter will have the Porter role, with very limited access to non-clinical data only
+--
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 8, 4, 1, 1, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 8, 4, 1, 3, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 8, 4, 1, 7, 1);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 8, 4, 1, 12, 1);
 
 COMMIT;

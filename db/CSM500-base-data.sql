@@ -76,55 +76,30 @@ COMMIT;
 BEGIN;
 INSERT INTO ROLE (NAME, EXPIRY_DATETIME)
 VALUES
-('Physician', '2050-01-01 23:59:59-00'),
+('Medical Office Assistant (MOA)', '2050-01-01 23:59:59-00'),
 ('Nurse', '2050-01-01 23:59:59-00'),
+('Physician', '2050-01-01 23:59:59-00'),
 ('Lab Technician', '2050-01-01 23:59:59-00'),
-('Pharmacist', '2050-01-01 23:59:59-00'),
-('Housekeeping', '2050-01-01 23:59:59-00'),
+('Porter', '2050-01-01 23:59:59-00'),
 ('Admin', '2050-01-01 23:59:59-00');
 COMMIT;
 
-
 BEGIN;
-INSERT INTO PERMISSION  (NAME, EXPIRY_DATETIME)
+INSERT INTO PERMISSION (NAME, EXPIRY_DATETIME)
 VALUES
-('perform-admit', '2050-01-01 23:59:59-00'),
+('login', '2050-01-01 23:59:59-00'),
+('create-clinical-intervention', '2050-01-01 23:59:59-00'),
+('create-non-clinical-intervention', '2050-01-01 23:59:59-00'),
+('create-update-admit', '2050-01-01 23:59:59-00'),
+('create-update-discharge', '2050-01-01 23:59:59-00'),
+('update-clinical-intervention', '2050-01-01 23:59:59-00'),
+('update-non-clinical-intervention', '2050-01-01 23:59:59-00'),
 ('view-admit', '2050-01-01 23:59:59-00'),
-('perform-discharge', '2050-01-01 23:59:59-00'),
-('request-discharge', '2050-01-01 23:59:59-00'),
+('view-any-clinical-data', '2050-01-01 23:59:59-00'),
+('view-clinical-intervention', '2050-01-01 23:59:59-00'),
 ('view-discharge', '2050-01-01 23:59:59-00'),
-('perform-chart', '2050-01-01 23:59:59-00'),
-('view-chart', '2050-01-01 23:59:59-00'),
-('perform-treatment', '2050-01-01 23:59:59-00'),
-('request-treatment', '2050-01-01 23:59:59-00'),
-('view-treatment', '2050-01-01 23:59:59-00'),
-('perform-prescription', '2050-01-01 23:59:59-00'),
-('request-prescription', '2050-01-01 23:59:59-00'),
-('view-prescription', '2050-01-01 23:59:59-00'),
-('perform-order', '2050-01-01 23:59:59-00'),
-('request-order', '2050-01-01 23:59:59-00'),
-('view-order', '2050-01-01 23:59:59-00'),
-('perform-move', '2050-01-01 23:59:59-00'),
-('request-move', '2050-01-01 23:59:59-00'),
-('view-move', '2050-01-01 23:59:59-00'),
-('perform-operation', '2050-01-01 23:59:59-00'),
-('request-operation', '2050-01-01 23:59:59-00'),
-('view-operation', '2050-01-01 23:59:59-00'),
-('perform-clean', '2050-01-01 23:59:59-00'),
-('request-clean', '2050-01-01 23:59:59-00'),
-('view-clean', '2050-01-01 23:59:59-00'),
-('perform-restock', '2050-01-01 23:59:59-00'),
-('request-restock', '2050-01-01 23:59:59-00'),
-('view-restock', '2050-01-01 23:59:59-00'),
-('perform-carestart', '2050-01-01 23:59:59-00'),
-('request-carestart', '2050-01-01 23:59:59-00'),
-('view-carestart', '2050-01-01 23:59:59-00'),
-('perform-careend', '2050-01-01 23:59:59-00'),
-('request-careend', '2050-01-01 23:59:59-00'),
-('view-careend', '2050-01-01 23:59:59-00'),
-('find-patient', '2050-01-01 23:59:59-00'),
-('find-allpatients', '2050-01-01 23:59:59-00'),
-('find-all-dept-patients', '2050-01-01 23:59:59-00');
+('view-non-clinical-intervention', '2050-01-01 23:59:59-00');
+
 COMMIT;
 
 -- group 1: Intervention Types

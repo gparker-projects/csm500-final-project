@@ -1,11 +1,16 @@
-//! # nlp (Natural Language Processing)
-//! 
-//! Structs and functions within the nlp module
-//!
-//! ## Overview
-//! This module provides struts and classes that will work with data and the Natural Language Model (NLM) for the application.
-//! This not only handles user-provided prompts, but also the work of initiating and calling the Machine Learning/NLM engine.
-//! 
+
+
+
+admit Keenan Waynes for broken foot and blood loss. age 25, 6ft 10, 125kg
+
+Mary Medical AssistantOne
+Mattie Medical AssistantTwo
+
+Peter Porter
+
+Drake Ramoray, neurosurgeon
+
+
 
 
  let ht7 = &ht6.replace(constants::INTERVENTION_TYPE_DROP_DOWN_CONTROL_TAG, &self.get_location_dropdown( location_list, constants::NOT_SPECIFIED_ID));
