@@ -12,24 +12,34 @@ use std::env;
 use std::path::Path;
 
 use crate::constants;
-use crate::nlp::controller::CommandController;
+use crate::nle::controller::CommandController;
 use crate::webc::data_forms::*;//, menu_tile::*};
 use crate::session::AppSession;//, UserSession};
-use crate::nlp::nle::*;
+use crate::nle::nle::*;
 
 pub const COMMAND_MAPPING_FILE_NAME: &str = "command_mapping.csv";
 pub const DATA_SUB_DIRECTORY: &str = "data";
 pub const LANGUAGE_MODEL_FILE_NAME: &str = "all-MiniLM-L6-v2.onnx";
 pub const TOKENIZER_FILE_NAME: &str = "tokenizer.json";
 
-pub struct NLPRoute{}
+pub struct NLERoute{}
 
-impl NLPRoute{
+impl NLERoute{
+
+
+     pub async fn natural_language_prompt_test2(_app_session: web::Data<AppSession>, _user_session: Session, req: web::Form<NLPromptFormData>) -> impl Responder {
+        println!("-> /nlprompt Requested;  natural_language_prompt_test2();  prompt: \"{}\"", req.prompt);
+
+
+        
+        
+        HttpResponse::Ok().body( "SUCCESS" )
+    }
 
     /// accepts a natural language prompt and processes it using the built in engine
     /// 
     pub async fn natural_language_prompt(_app_session: web::Data<AppSession>, _user_session: Session, req: web::Form<NLPromptFormData>) -> impl Responder {
-        println!("-> /nlprompt Requested; prompt: \"{}\"", req.prompt);
+        println!("-> /nlprompt Requested;  natural_language_prompt();  prompt: \"{}\"", req.prompt);
 
         let mut results_sbuf = String::with_capacity(50); // Single heap allocation
         results_sbuf.push_str("<H1>natural language prompt</H1>\n");

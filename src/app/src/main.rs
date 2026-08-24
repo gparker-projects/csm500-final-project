@@ -29,7 +29,7 @@ use crate::route::home_route::HomeRoute;
 use crate::route::intervention_route::InterventionRoute;
 use crate::route::login_route::LoginRoute;
 use crate::route::patient_route::PatientRoute;
-use crate::route::nlp_route::*;
+use crate::route::nle_route::*;
 
 
 use std::sync::Arc;
@@ -44,7 +44,7 @@ mod constants;
 mod dto;
 mod webc;
 mod dao;
-mod nlp;
+mod nle;
 mod route;
 mod session;
 
@@ -123,7 +123,7 @@ async fn main() -> std::io::Result<()> {
                   .with_intra_threads(1).expect("Insufficient threads")
                   .commit_from_file(&(base_model_dir.clone() + LANGUAGE_MODEL_FILE_NAME) ).expect("File could not be accessed");
   let shared_session = Arc::new(nle_session);
-        
+
   // use the Builder pattern to add one route at a time
   HttpServer::new( move || {
 
@@ -155,7 +155,7 @@ async fn main() -> std::io::Result<()> {
       .route("/login", web::post().to( LoginRoute::login ))
       .route("/home", web::get().to( HomeRoute::route_to_home )) // main workspace
       .route("/patientdtls", web::post().to( PatientRoute::route_to_patient_details ))
-      .route("/nlprompt", web::post().to( NLPRoute::natural_language_prompt ))
+      .route("/nlprompt", web::post().to( NLERoute::natural_language_prompt ))
       .route("/admit", web::post().to( AdmitRoute::route_to_admit_discharge ))
       .route("/admitnew", web::post().to( AdmitRoute::route_to_admit_new_no_patient ))
       .route("/admitsave", web::post().to( AdmitRoute::route_to_admit_save ))

@@ -71,6 +71,7 @@ use common::test_utils::*;
     let status_id: i64 = rng.random_range(13..18);
     let intervention_type = DataGenerator::get_intv_type_description();
     let room_identifier = DataGenerator::get_room_identifier(200);
+    let current_time: NaiveDateTime = Utc::now().naive_utc();
 
     // instantiate a DTO to prove it accepts data, but more importantly, detect unexpected changes to it that will break the application
     let obj = Intervention::new(
@@ -84,7 +85,9 @@ use common::test_utils::*;
             intervention_type_id.clone(),
             status_id.clone(),
             intervention_type.clone(),
-            room_identifier.clone()
+            room_identifier.clone(),
+            Some(current_time), // scheduled_timestamp: Option<NaiveDateTime>,
+            Some(current_time)//performed_timestamp: Option<NaiveDateTime>
         );
 
     assert_eq!(obj.id, intervention_id);
@@ -93,11 +96,14 @@ use common::test_utils::*;
     assert_eq!(obj.notes, notes);
     assert_eq!(obj.location_id, location_id);
 
-    assert_eq!(users_id, users_id);
-    assert_eq!(intervention_type_id, intervention_type_id);
-    assert_eq!(status_id, status_id);
-    assert_eq!(intervention_type, intervention_type);
-    assert_eq!(room_identifier, room_identifier);
+    assert_eq!(obj.users_id, users_id);
+    assert_eq!(obj.intervention_type_id, intervention_type_id);
+    assert_eq!(obj.status_id, status_id);
+    assert_eq!(obj.intervention_type, intervention_type);
+    assert_eq!(obj.room_identifier, room_identifier);
+
+    assert_eq!(obj.scheduled_timestamp, Some(current_time));
+    assert_eq!(obj.performed_timestamp, Some(current_time));
   }
 
   #[test]
