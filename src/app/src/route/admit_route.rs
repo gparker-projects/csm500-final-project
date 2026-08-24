@@ -28,7 +28,7 @@ impl AdmitRoute{
 
       let req_clone0 = req.clone();
       let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
-      let dao = PatientDAO::new(constants::DB_CONN_STR).await;
+      let dao = PatientDAO::new( app_session.get_db_connection() ).await;
 
       let enc_results = dao.update_encounter_from_discharge_form(req_clone0, user_session_details.get_userid_as_i64()).await;
       match enc_results {
@@ -54,7 +54,7 @@ impl AdmitRoute{
 
       let req_clone0 = req.clone();
       let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
-      let dao = PatientDAO::new(constants::DB_CONN_STR).await;
+      let dao = PatientDAO::new( app_session.get_db_connection() ).await;
 
       let results = dao.upsert_patient_from_admit_form(req_clone0, user_session_details.get_userid_as_i64()).await;
       match results {
@@ -177,7 +177,7 @@ impl AdmitRoute{
       let wcf = &app_session.get_web_content_factory();
 
       let patient_id: i64 = req.patient_id.parse().unwrap(); // get the patient id from the form that was passed in; includes for server-side validation errors
-      let dao = PatientDAO::new(constants::DB_CONN_STR).await;
+      let dao = PatientDAO::new( app_session.get_db_connection() ).await;
 
       let discharge: bool = req.action_flag.eq("discharge");
 
@@ -206,7 +206,7 @@ impl AdmitRoute{
           }
       };
 
-      let cdao = CommonDAO::new(constants::DB_CONN_STR).await;
+      let cdao = CommonDAO::new( app_session.get_db_connection() ).await;
       let location_results = cdao.get_locations_for_user(user_session_details.get_userid_as_i64()).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
       let location_menu = match location_results {
           Some (loc_list) => {

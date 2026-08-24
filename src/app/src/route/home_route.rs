@@ -31,9 +31,9 @@ impl HomeRoute{
         let mut content = wcf.get_home_tile(); // retrieve the page base content
 
         // get patients at the user's facility, for display
-        let dao = PatientDAO::new(constants::DB_CONN_STR).await;
-        let idao = InterventionDAO::new(constants::DB_CONN_STR).await;
-        let edao = EncounterDAO::new(constants::DB_CONN_STR).await;
+        let dao = PatientDAO::new( app_session.get_db_connection() ).await;
+        let idao = InterventionDAO::new( app_session.get_db_connection() ).await;
+        let edao = EncounterDAO::new( app_session.get_db_connection() ).await;
 
         let qry_results = dao.get_patients_at_users_site_no_discharge(user_session.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
         match qry_results {

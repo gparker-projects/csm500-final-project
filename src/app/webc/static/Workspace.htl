@@ -24,6 +24,7 @@
 
 
 <div id="nlpCommandArea" align="right" class="nlpCommandAreaCls">
+  <div id="MapleEMR::NLPCanvas"></div>
   <form action="/nlprompt" method="post" id="nlpCommandForm" onSubmit="event.preventDefault(); return validateNLPrompt()" align="right" class="nlpCommandAreaCls">
 	
 	<div><textarea id="prompt" name="prompt" rows="2" cols="50" class="data-field-rw" placeholder="How can I help?"></textarea>

@@ -69,6 +69,8 @@ impl NLPRoute{
         //
         let results: Vec< (String, f32)> = nlp.get_classifier_rankings( cmd.get_all_operations_and_add_prompt( prompt.clone() ) ).await;
 
+//        _user_session
+
         results_sbuf.push_str(&format!( "<b>Prompt</b>:\n {}<br>", prompt )  );
         //results_sbuf.push_str("* ");
         for item in results.into_iter().take(3){

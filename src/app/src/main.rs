@@ -15,6 +15,7 @@
 //! https://github.com/LukeMathWalker/zero-to-production
 //!
 
+use sqlx::postgres::{PgPoolOptions, PgPool};
 use actix_web::{web, App, HttpServer, HttpResponse, Responder};
 //use actix_web::http::StatusCode;
 use actix_web::cookie::Key;
@@ -90,47 +91,59 @@ async fn main() -> std::io::Result<()> {
 
   println!("MapleEMR is running! Access via: http://127.0.0.1:8000");
 
+  //establish database connection for entire application here, add to the application session
+  let db_url = constants::DB_CONN_STR;
+  let db_pool = match PgPoolOptions::new()
+      .max_connections(5)
+      .connect(db_url)
+      .await
+  {
+      Ok(pool) => pool,
+      Err(e) => panic!("{}", e),
+  };
+        
   // use the Builder pattern to add one route at a time
-  HttpServer::new(|| {
+  HttpServer::new(move || {
 
-      let tmp_app_key = get_application_secret_key(); // create within the enclosure to make sure it is available and consistent for the two uses below
+    let tmp_app_key = get_application_secret_key(); // create within the enclosure to make sure it is available and consistent for the two uses below
 
-      App::new()
-          .wrap(
-            Cors::default()
-                //.allowed_origin("http://localhost:8000") // Restrict to specific origin
-                .allow_any_origin() // not great... will have to do for now
-                .allowed_methods(vec!["GET", "POST"])
-                .allowed_headers(vec![actix_web::http::header::AUTHORIZATION, actix_web::http::header::ACCEPT])
-                .allow_any_header()
-                .max_age(3600),
-        )
-        .app_data(  // this enclosure allows the session state to be created and made available to all routes. actix_web magic.
-            web::Data::new( session::AppSession {
-                app_version: "v1.0".to_string(),
-                //wcf: Mutex::new( WebContentFactory::new(&get_static_path_base()) )
-                wcf: WebContentFactory::new(&get_static_path_base()),
-                app_key: tmp_app_key.clone()
-              }
-            ) 
-        )
-        .wrap(SessionMiddleware::new(CookieSessionStore::default(), tmp_app_key.clone())) // for user session
-        .route("/", web::get().to( DefaultRoute::default_route ))
-        .route("/login", web::post().to( LoginRoute::login ))
-        .route("/home", web::get().to( HomeRoute::route_to_home )) // main workspace
-        .route("/patientdtls", web::post().to( PatientRoute::route_to_patient_details ))
-        .route("/nlprompt", web::post().to( NLPRoute::natural_language_prompt ))
-        .route("/admit", web::post().to( AdmitRoute::route_to_admit_discharge ))
-        .route("/admitnew", web::post().to( AdmitRoute::route_to_admit_new_no_patient ))
-        .route("/admitsave", web::post().to( AdmitRoute::route_to_admit_save ))
-        .route("/discharge", web::post().to( AdmitRoute::route_to_discharge_patient ))
-        .route("/dischargesave", web::post().to( AdmitRoute::route_to_discharge_patient_save ))
-        .route("/intvlink", web::post().to( InterventionRoute::route_to_modify_intervention_basic ))
-        .route("/intvnew", web::post().to( InterventionRoute::route_to_add_new_intervention ))
-        .route("/intv", web::post().to( InterventionRoute::route_to_view_or_modify_intervention ))
-        .route("/intvsave", web::post().to( InterventionRoute::route_to_intervention_save ))
-        .route("/isItUp", web::get().to( is_it_up ))
-        .service(Files::new("/webc/", "./webc"))  // ref: ttps://actix.rs/docs/static-files/
+    App::new()
+        .wrap(
+          Cors::default()
+              //.allowed_origin("http://localhost:8000") // Restrict to specific origin
+              .allow_any_origin() // not great... will have to do for now
+              .allowed_methods(vec!["GET", "POST"])
+              .allowed_headers(vec![actix_web::http::header::AUTHORIZATION, actix_web::http::header::ACCEPT])
+              .allow_any_header()
+              .max_age(3600),
+      )
+      .app_data(  // this enclosure allows the session state to be created and made available to all routes. actix_web magic.
+          web::Data::new( session::AppSession {
+              app_version: "v1.0".to_string(),
+              //wcf: Mutex::new( WebContentFactory::new(&get_static_path_base()) )
+              wcf: WebContentFactory::new(&get_static_path_base()),
+              app_key: tmp_app_key.clone(),
+              connection: db_pool.clone()
+            }
+          ) 
+      )
+      .wrap(SessionMiddleware::new(CookieSessionStore::default(), tmp_app_key.clone())) // for user session
+      .route("/", web::get().to( DefaultRoute::default_route ))
+      .route("/login", web::post().to( LoginRoute::login ))
+      .route("/home", web::get().to( HomeRoute::route_to_home )) // main workspace
+      .route("/patientdtls", web::post().to( PatientRoute::route_to_patient_details ))
+      .route("/nlprompt", web::post().to( NLPRoute::natural_language_prompt ))
+      .route("/admit", web::post().to( AdmitRoute::route_to_admit_discharge ))
+      .route("/admitnew", web::post().to( AdmitRoute::route_to_admit_new_no_patient ))
+      .route("/admitsave", web::post().to( AdmitRoute::route_to_admit_save ))
+      .route("/discharge", web::post().to( AdmitRoute::route_to_discharge_patient ))
+      .route("/dischargesave", web::post().to( AdmitRoute::route_to_discharge_patient_save ))
+      .route("/intvlink", web::post().to( InterventionRoute::route_to_modify_intervention_basic ))
+      .route("/intvnew", web::post().to( InterventionRoute::route_to_add_new_intervention ))
+      .route("/intv", web::post().to( InterventionRoute::route_to_view_or_modify_intervention ))
+      .route("/intvsave", web::post().to( InterventionRoute::route_to_intervention_save ))
+      .route("/isItUp", web::get().to( is_it_up ))
+      .service(Files::new("/webc/", "./webc"))  // ref: ttps://actix.rs/docs/static-files/
   })
   .bind("127.0.0.1:8000")?
   .run()

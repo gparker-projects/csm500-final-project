@@ -35,9 +35,9 @@ impl PatientRoute{
     let patient_id: i64 = req.get_uid_as_i64();
 
     // get base patient data
-    let pdao = PatientDAO::new(constants::DB_CONN_STR).await;
-    let idao = InterventionDAO::new(constants::DB_CONN_STR).await;
-    let edao = EncounterDAO::new(constants::DB_CONN_STR).await;
+    let pdao = PatientDAO::new( app_session.get_db_connection() ).await;
+    let idao = InterventionDAO::new( app_session.get_db_connection() ).await;
+    let edao = EncounterDAO::new( app_session.get_db_connection() ).await;
 
     // pull out the current Encounter and generate summary tile for it
     let cur_enc: Encounter = edao.get_current_encounter(patient_id).await.clone();
@@ -106,7 +106,7 @@ impl PatientRoute{
     };
 
     // no user should be able to get into the system without a location assigned, so we will not worry about an exception here
-    let item_list = {CommonDAO::new(constants::DB_CONN_STR).await}.get_common_references(common_dao::REF_TYPE_GROUP_1_INTERVENTION_TYPES, true ).await.unwrap();
+    let item_list = {CommonDAO::new( app_session.get_db_connection() ).await}.get_common_references(common_dao::REF_TYPE_GROUP_1_INTERVENTION_TYPES, true ).await.unwrap();
 
     let consolidated_content = wcf.get_patient_details_full_tile(patient_header,
                                                                          cur_enc_section,

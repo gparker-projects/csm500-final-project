@@ -32,7 +32,7 @@ impl InterventionRoute{
 
       let req_clone0 = req.clone();
       let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
-      let idao = InterventionDAO::new(constants::DB_CONN_STR).await;
+      let idao = InterventionDAO::new( app_session.get_db_connection() ).await;
 
       let results = idao.upsert_intervention_from_intv_form(req_clone0, user_session_details.get_userid_as_i64()).await;
       match results {
@@ -92,7 +92,7 @@ impl InterventionRoute{
 
         let intervention_type_id: i64;
         let intervention_id: i64 = req.intervention_id.parse().unwrap(); // get the intervention id from the form that was passed in; includes for server-side validation errors
-        let idao = InterventionDAO::new(constants::DB_CONN_STR).await;
+        let idao = InterventionDAO::new( app_session.get_db_connection() ).await;
 
         let cur_intv: Option<Intervention>
           = if intervention_id == constants::NOT_SPECIFIED_ID {
@@ -112,7 +112,7 @@ impl InterventionRoute{
         let cur_intv2= cur_intv.clone(); // clone of above object to avoid move below
 
         // refresh the patients in the menu (only)
-        let pdao = PatientDAO::new(constants::DB_CONN_STR).await;
+        let pdao = PatientDAO::new( app_session.get_db_connection() ).await;
         let legacy_menu_results = pdao.get_patients_at_users_site_no_discharge(user_session_details.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
         let legacy_menu = match legacy_menu_results {
             Some (patients_for_menu_lst) => {
@@ -124,9 +124,9 @@ impl InterventionRoute{
             }
         };
 
-        let user_dropdown_list = {AuthDAO::new(constants::DB_CONN_STR).await}.get_user_and_departments_at_current_user_sites(user_session_details.get_userid_as_i64() ).await.unwrap();
+        let user_dropdown_list = {AuthDAO::new( app_session.get_db_connection() ).await}.get_user_and_departments_at_current_user_sites(user_session_details.get_userid_as_i64() ).await.unwrap();
 
-        let cdao = CommonDAO::new(constants::DB_CONN_STR).await;
+        let cdao = CommonDAO::new( app_session.get_db_connection() ).await;
         
         let intv_type=  cdao.get_intervention_type( intervention_type_id ).await.unwrap();
 

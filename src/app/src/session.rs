@@ -1,7 +1,8 @@
-use crate::webc::web_content::{WebContentFactory}; 
 use actix_web::cookie::Key;
-use crate::dto::{user_auth::*};
+use sqlx::postgres::{PgPoolOptions, PgPool};
 
+use crate::webc::web_content::{WebContentFactory}; 
+use crate::dto::{user_auth::*};
 ///
 /// Stores application-wide state/variables
 /// REF: https://actix.rs/docs/application/
@@ -11,13 +12,16 @@ pub struct AppSession {
     pub app_version: String,
     pub wcf: WebContentFactory,    //wcf: Mutex<WebContentFactory>,
     pub app_key: Key,
-    //todo: add database pool
+    pub connection: PgPool
 }
 
 impl AppSession {
   pub fn get_web_content_factory(&self) -> WebContentFactory{
-      let result: WebContentFactory = self.wcf.clone();
-      return result;
+      return self.wcf.clone();
+  }
+
+   pub fn get_db_connection(&self) -> PgPool{
+      return self.connection.clone();
   }
 }
 

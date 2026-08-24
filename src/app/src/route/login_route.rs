@@ -28,10 +28,10 @@ impl LoginRoute{
     ///      
     /// check by going to: http://127.0.0.1:8000/db
     /// 
-    pub async fn login(user_session: Session, req: web::Form<LoginFormData>, _app_session: web::Data<session::AppSession>, ) -> impl Responder { // Box<dyn Responder<>> { //
+    pub async fn login(user_session: Session, req: web::Form<LoginFormData>, app_session: web::Data<session::AppSession>, ) -> impl Responder { // Box<dyn Responder<>> { //
         println!("-> /login Requested");
 
-        let cur_db_conn = AuthDAO::new(constants::DB_CONN_STR).await;
+        let cur_db_conn = AuthDAO::new( app_session.get_db_connection() ).await;
         let user_can_login = cur_db_conn.can_user_login(req.username.clone(), req.password.clone()).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
 
         match user_can_login {

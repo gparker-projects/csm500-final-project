@@ -3,13 +3,6 @@
 
 admit Keenan Waynes for broken foot and blood loss. age 25, 6ft 10, 125kg
 
-Mary Medical AssistantOne
-Mattie Medical AssistantTwo
-
-Peter Porter
-
-Drake Ramoray, neurosurgeon
-
 
 
 

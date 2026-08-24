@@ -13,19 +13,9 @@ impl EncounterDAO {
     /// Creates a new Encounter Data Access Object, with a database pool for use by other calls
     /// todo: centralize the db pool connection instead of creating it here
     /// 
-    pub async fn new(db_url: &str) -> Self {
-
-        let db_pool = match PgPoolOptions::new()
-            .max_connections(5)
-            .connect(db_url)
-            .await
-        {
-            Ok(pool) => pool,
-            Err(e) => panic!("{}", e),
-        };
-
+    pub async fn new(db_connection: PgPool) -> Self {
         EncounterDAO {
-            connection: db_pool,
+            connection: db_connection,
         }
     }
 
