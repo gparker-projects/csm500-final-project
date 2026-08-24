@@ -15,7 +15,7 @@ use crate::constants;
 use crate::nlp::controller::CommandController;
 use crate::webc::data_forms::*;//, menu_tile::*};
 use crate::session::AppSession;//, UserSession};
-use crate::nlp::nlp::*;
+use crate::nlp::nle::*;
 
 pub const COMMAND_MAPPING_FILE_NAME: &str = "command_mapping.csv";
 pub const DATA_SUB_DIRECTORY: &str = "data";

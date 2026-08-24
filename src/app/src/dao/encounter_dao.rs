@@ -1,4 +1,4 @@
-use sqlx::postgres::{PgPoolOptions, PgPool}; 
+use sqlx::postgres::{PgPool}; 
 use chrono::NaiveDateTime;
 use crate::dto::encounter::*;
 use crate::dao::db_query;

@@ -5,5 +5,5 @@
 //! ## Overview
 //! This module provides natural language processing abilities to the application, as a localized internal service.
 //! 
-pub mod nlp;
+pub mod nle;
 pub mod controller;

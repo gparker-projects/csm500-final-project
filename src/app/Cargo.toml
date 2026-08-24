@@ -21,6 +21,8 @@ actix-session = { version = "0.11.0", features = ["cookie-session", "redis-sessi
 validator = { version = "0.21.0", features = ["derive"] }
 rand = "0.10.2"
 thread-rng = "0.0.0"
+arc = "0.0.1"
+mutex = "1.0.2"
 
 [features]
 load-dynamic = [ "ort/load-dynamic" ]

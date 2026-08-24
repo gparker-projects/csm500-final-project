@@ -14,10 +14,9 @@
 //! [2] S. Lyu and A. Rzeznik, Practical Rust Projects: Build Serverless, AI, Machine Learning, Embedded, Game, and Web Applications. Berkeley, CA: Apress, 2023. doi: DOI:%2010.1007/978-1-4842-9331-7.
 //! https://github.com/LukeMathWalker/zero-to-production
 //!
-
+use std::env;
 use sqlx::postgres::{PgPoolOptions, PgPool};
 use actix_web::{web, App, HttpServer, HttpResponse, Responder};
-//use actix_web::http::StatusCode;
 use actix_web::cookie::Key;
 use actix_cors::Cors;
 use actix_files::*;
@@ -30,7 +29,15 @@ use crate::route::home_route::HomeRoute;
 use crate::route::intervention_route::InterventionRoute;
 use crate::route::login_route::LoginRoute;
 use crate::route::patient_route::PatientRoute;
-use crate::route::nlp_route::NLPRoute;
+use crate::route::nlp_route::*;
+
+
+use std::sync::Arc;
+use ort::{
+	Error,
+	session::{Session, builder::GraphOptimizationLevel},
+	value::TensorRef
+};
 
 // TODO: ideally we'd use an external session store, not just cookies. Until the application is largely working, we'll have to leave this for now. //storage::RedisSessionStore}; 
 mod constants;
@@ -85,14 +92,11 @@ fn get_application_secret_key() -> Key {
 /// Returns std::io::Result<()> for 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
-
-//  //nlp::NLP{}.execute();
-// https://docs.rs/actix-cors/latest/actix_cors/struct.Cors.html 
-
   println!("MapleEMR is running! Access via: http://127.0.0.1:8000");
 
   //establish database connection for entire application here, add to the application session
   let db_url = constants::DB_CONN_STR;
+
   let db_pool = match PgPoolOptions::new()
       .max_connections(5)
       .connect(db_url)
@@ -101,9 +105,27 @@ async fn main() -> std::io::Result<()> {
       Ok(pool) => pool,
       Err(e) => panic!("{}", e),
   };
+
+  // collect the cargo manifest directory at runtime, which means it might not be present
+  let base_model_dir = match env::var(constants::CARGO_MANIFEST_DIR) {
+      Ok(tmp_path) => {
+          println!("CARGO_MANIFEST_DIR = {}", tmp_path);
+          tmp_path
+      }
+      Err(e) => {
+          println!("CARGO_MANIFEST_DIR not set: {}", e);
+          "INVALID_PATH".to_string()
+      }
+  } + constants::DATA_SUB_DIRECTORY;
+
+  let nle_session: ort::session::Session = Session::builder().expect("Session could not be established")
+                  .with_optimization_level(GraphOptimizationLevel::Level1).expect("No Session")
+                  .with_intra_threads(1).expect("Insufficient threads")
+                  .commit_from_file(&(base_model_dir.clone() + LANGUAGE_MODEL_FILE_NAME) ).expect("File could not be accessed");
+  let shared_session = Arc::new(nle_session);
         
   // use the Builder pattern to add one route at a time
-  HttpServer::new(move || {
+  HttpServer::new( move || {
 
     let tmp_app_key = get_application_secret_key(); // create within the enclosure to make sure it is available and consistent for the two uses below
 
@@ -119,12 +141,13 @@ async fn main() -> std::io::Result<()> {
       )
       .app_data(  // this enclosure allows the session state to be created and made available to all routes. actix_web magic.
           web::Data::new( session::AppSession {
-              app_version: "v1.0".to_string(),
-              //wcf: Mutex::new( WebContentFactory::new(&get_static_path_base()) )
-              wcf: WebContentFactory::new(&get_static_path_base()),
-              app_key: tmp_app_key.clone(),
-              connection: db_pool.clone()
-            }
+                  app_version: "v1.0".to_string(),
+                  //wcf: Mutex::new( WebContentFactory::new(&get_static_path_base()) )
+                  wcf: WebContentFactory::new(&get_static_path_base()),
+                  app_key: tmp_app_key.clone(),
+                  connection: db_pool.clone(),
+                  nle_session: Arc::clone(&shared_session), 
+              }
           ) 
       )
       .wrap(SessionMiddleware::new(CookieSessionStore::default(), tmp_app_key.clone())) // for user session

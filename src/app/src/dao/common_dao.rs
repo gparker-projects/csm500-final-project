@@ -1,6 +1,6 @@
 use crate::{constants, dao::db_query};
 
-use sqlx::postgres::{PgPoolOptions, PgPool}; 
+use sqlx::postgres::{PgPool}; 
 //use sqlx::Row;
 //use std::io::{Error, ErrorKind};
 

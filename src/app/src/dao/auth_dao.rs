@@ -1,4 +1,4 @@
-use sqlx::postgres::{PgPoolOptions, PgPool}; //, PgRow};
+use sqlx::postgres::{PgPool}; //, PgRow};
 use sqlx::Row;
 use std::io::{Error, ErrorKind};
 use crate::dao::db_query;

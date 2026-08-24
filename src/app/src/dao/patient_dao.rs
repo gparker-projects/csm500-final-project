@@ -1,4 +1,4 @@
-use sqlx::postgres::{PgPoolOptions, PgPool}; 
+use sqlx::postgres::{PgPool}; 
 use sqlx::Row;
 use chrono::NaiveDateTime;
 use crate::constants;

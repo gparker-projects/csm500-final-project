@@ -1,27 +1,47 @@
 use actix_web::cookie::Key;
-use sqlx::postgres::{PgPoolOptions, PgPool};
+use ort::session::builder::SessionBuilder;
+use sqlx::postgres::{PgPool};
 
+use crate::nlp::nle::NaturalLanguageEngine;
 use crate::webc::web_content::{WebContentFactory}; 
 use crate::dto::{user_auth::*};
+use std::sync::Arc;
+use ort::session::Session;
+
 ///
 /// Stores application-wide state/variables
 /// REF: https://actix.rs/docs/application/
 /// 
-#[allow(dead_code)] // low priority warning; tired of seeing it
+#[allow(dead_code)] // low priority warning; tired of seeing messages
 pub struct AppSession {
     pub app_version: String,
-    pub wcf: WebContentFactory,    //wcf: Mutex<WebContentFactory>,
+    pub wcf: WebContentFactory,
     pub app_key: Key,
-    pub connection: PgPool
+    pub connection: PgPool,
+    pub nle_session: Arc<ort::session::Session>
 }
 
 impl AppSession {
+
+  ///
+  /// Returns a clone of the current web content factory
+  /// 
   pub fn get_web_content_factory(&self) -> WebContentFactory{
       return self.wcf.clone();
   }
 
-   pub fn get_db_connection(&self) -> PgPool{
+  ///
+  /// Returns a clone of the current connection to the datbase
+  /// 
+  pub fn get_db_connection(&self) -> PgPool{
       return self.connection.clone();
+  }
+
+  ///
+  /// Returns a cloned Arc thread of the NL engine session (from ort)
+  /// 
+  pub fn get_nle_session(&self) -> Arc<ort::session::Session>{
+      return Arc::clone(&self.nle_session);
   }
 }
 

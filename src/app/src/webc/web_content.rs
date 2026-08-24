@@ -2,13 +2,11 @@
 /// module for creating web (HTML) content
 /// -------------------------------------------------------------------'
 use std::fs;
-//use std::ops::Add;
 use derive_more::Display;
 use std::collections::HashMap;
 
 use crate::constants;
 use crate::dto::{patient::*, encounter::*, intervention::*};
-//use crate::webc::menu_tile::MenuFormatter;
 use crate::dao::patient_dao::PatientWrapper;
 
 /// Enumeration for Web Content Tiles, each representing a tile of information
