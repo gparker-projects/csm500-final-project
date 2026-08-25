@@ -4,6 +4,8 @@ use std::io::{self, BufRead};
 use std::path::Path;
 
 use crate::constants;
+use crate::dto::user_auth::*;
+use crate::nle::nle::*;
 
 
 // Commands that can be executed via the NL model
@@ -16,13 +18,14 @@ pub const COMMAND_DISCHARGE_PATIENT: i64 = 3;
 /// 
 pub struct CommandController{
     command_hashset: Vec<(String, i64)>, // first item is a phrase for matching; second item is the index of a permission it would enable for the user, if matched
+    nl_engine: NaturalLanguageEngine
 }
 
 impl CommandController{
     ///
     /// Public constructor for the CommandController
     /// 
-    pub fn new(mapping_file_path: &str) -> Self {
+    pub fn new(mapping_file_path: &str, nle: NaturalLanguageEngine) -> Self {
         //println!( "CommandController::New() {}", mapping_file_path );
         let mut tmp_command_hashset = Vec::<(String, i64)>::with_capacity(10);
 
@@ -40,9 +43,44 @@ impl CommandController{
 
         CommandController{
             command_hashset: tmp_command_hashset,
+            nl_engine: nle
         }
     }
     
+
+    ///
+    /// Obtains classifier rankings, only inlcuding items that the user has a permission for
+    /// 
+    pub async fn get_classifier_rankings_filtered_for_permissions(&mut self, prompt: String, user_auths: UserAuthorization ) -> Vec< (String, f32)>{
+        println!("get_classifier_rankings_filtered_for_permissions()");
+        let ops_add_prompt: Vec<String> = self.get_all_operations_and_add_prompt( prompt.clone() );
+        let mut results: Vec<(String, f32)> = vec![]; 
+        let classifer_results: Vec<(String, f32)> = self.nl_engine.get_classifier_rankings(ops_add_prompt ).await;
+
+        for c_result in classifer_results{
+
+            let pid: i64 = self.get_permission_for_operation (c_result.clone().0);
+
+            if user_auths.has_permission(pid){
+                results.push( c_result );
+            }
+        }
+        results
+    }
+
+
+    ///
+    /// Obtains basic classifier rankings, without limits or security concerns applied
+    /// 
+    pub async fn get_classifier_rankings(&mut self, prompt: String ) -> Vec< (String, f32)>{
+        println!("get_classifier_rankings()");
+        let ops_add_prompt: Vec<String> = self.get_all_operations_and_add_prompt( prompt.clone() );
+
+        let classifer_results: Vec< (String, f32)> = self.nl_engine.get_classifier_rankings(ops_add_prompt ).await;
+
+        classifer_results 
+    }
+
     ///
     /// Constructs a list of strings ( Vec<String> ) from the previously loaded command mapping file, and adds the user's prompt as the first element
     /// This required by the NL model we are using ATM, for its comparison routine.
@@ -65,7 +103,6 @@ impl CommandController{
         //println!("get_permission_for_operation(): Compare to prompt: '{}'", prompt_string);
         let mut results: i64 = constants::INVALID_OTHER_ID;
         for item in self.command_hashset.clone().iter(){
-           //println!("item.0='{}' item.1={}", item.0, item.1);
            if item.0 == prompt_string{
                 results = item.1;
                 break; // terminate early if we find a match
@@ -83,6 +120,8 @@ impl CommandController{
             let file = File::open(filename)?;
             Ok(io::BufReader::new(file).lines())
     }
+
+
 
     // get patients
 

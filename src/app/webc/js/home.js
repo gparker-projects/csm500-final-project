@@ -39,7 +39,9 @@ async function validateNLPrompt() {
 	  newBody = "Error occurred: " + error;
 	}
 
-	document.getElementById("mainContentArea").innerHTML = (newBody);
+	//document.getElementById("mainContentArea").innerHTML = (newBody);
+
+	document.getElementById("MapleEMR::NLPCanvas").innerHTML = (newBody);
   }
 
   // If isValid remains true, the browser automatically proceeds to submit!

@@ -41,7 +41,7 @@ impl InterventionDAO {
 
         if rows.is_empty() {
             //println!(">get_interventions() Query: {}", query);
-            println!("No Interventions found for encounter_id: {} [count={}]", intervention_id, rows.len());
+            //println!("No Interventions found for encounter_id: {} [count={}]", intervention_id, rows.len());
             return Ok( None );
         }
         else{

@@ -1,9 +1,10 @@
-//placeholder for CSS
+/*placeholder for CSS
 
 <!-- https://www.w3schools.com/css/default.asp -->
+*/
 
 body {
-  background-color: lightblue;
+  background-color: #FFFFFF;
 }
 
 h1 {
@@ -23,7 +24,7 @@ p {
   font-size: 20px;
 }
 
-<!-- https://www.w3schools.com/css/css_navbar.asp -->
+/* https://www.w3schools.com/css/css_navbar.asp */
 ul {
   list-style-type: none;
   margin: 0;
@@ -73,14 +74,25 @@ input[type=password] {
 }
 
 input[type=button], input[type=submit], input[type=reset] {
-  background-color: #376BA4;
+  background-color: #448DD1;
   border: none;
   color: white;
-  padding: 16px 32px;
+  padding: 8px 10px;
   text-decoration: none;
   margin: 4px 2px;
   cursor: pointer;
-  //border-radius: 8px;
+  border-radius: 8px;
+}
+
+input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
+  background-color: #376BA4;
+  border: none;
+  color: white;
+  padding: 8px 10px;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 8px;
 }
 
 form {
