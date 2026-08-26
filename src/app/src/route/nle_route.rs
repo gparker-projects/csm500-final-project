@@ -99,13 +99,22 @@ impl NLERoute{
         
         results_sbuf.push_str("<div class='data'>Here are some options, based on your prompt:<p>");
 
-        results_sbuf.push_str("<form action=\"/nlprompt\" method=\"post\" id=\"nlpCommandForm\" onSubmit=\"event.preventDefault(); return validateNLPrompt()\" align=\"right\" class=\"nlpCommandAreaCls\">");
+        results_sbuf.push_str("<form action=\"/nlprompt\" method=\"post\" id=\"nlpCommandForm\" onSubmit=\"event.preventDefault(); return performNLPrompt(0)\" align=\"right\" class=\"nlpCommandAreaCls\">");
         for item in items.into_iter().take(3){
             let permission_id = cmd.get_permission_for_operation(item.clone().0);
 
-            //results_sbuf.push_str( &format!("<br>'{}': {:.1}% => Command id={}", item.0, item.1 * 100., permission_id) );
-            results_sbuf.push_str( "<input type='button' id='action_do' name='action_do' value='" );
-            results_sbuf.push_str( &format!("{}: {:.1}% => id={}' \\><p>", item.0, item.1 * 100., permission_id) );
+            results_sbuf.push_str( "<input type='button' id='nlp_action_");
+            results_sbuf.push_str( &permission_id.to_string() ); 
+            results_sbuf.push_str( "' name='nlp_action_" );
+            results_sbuf.push_str( &permission_id.to_string() ); 
+            results_sbuf.push_str( "' value='" );
+            results_sbuf.push_str( &item.clone().0 );
+            //results_sbuf.push_str( &format!("{}: {:.1}% => id={}' \\><p>", item.0, item.1 * 100., permission_id) );
+
+            results_sbuf.push_str( "'\\>" );
+            results_sbuf.push_str("<td><a href=\"#\" onclick=\"performNLPrompt("  ); 
+            results_sbuf.push_str( &permission_id.to_string() ); 
+            results_sbuf.push_str("); return false;\">Click</a>"); 
         }
         results_sbuf.push_str("</div></div></form>");
 

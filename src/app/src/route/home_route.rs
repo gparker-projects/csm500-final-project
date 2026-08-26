@@ -11,7 +11,7 @@ use actix_session::{Session};
 
 use crate::dto::encounter::Encounter;
 use crate::dao::{patient_dao::*, intervention_dao::*, encounter_dao::*}; 
-use crate::webc::menu_tile::*;
+use crate::webc::menu_fmt::*;
 use crate::session;
 use crate::constants;
 

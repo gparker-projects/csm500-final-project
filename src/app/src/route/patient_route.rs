@@ -13,7 +13,9 @@ use actix_session::{Session};
 use crate::dto::encounter::Encounter;
 
 use crate::dao::{common_dao::{self, *}, encounter_dao::*, intervention_dao::*, patient_dao::*}; 
-use crate::webc::{web_content::*, data_forms::*, menu_tile::*};
+use crate::webc::intervention_fmt::InterventionFormatter;
+use crate::webc::{web_content::*, data_forms::*, menu_fmt::*};
+
 
 use crate::session::{AppSession, UserSession};
 
@@ -65,7 +67,8 @@ impl PatientRoute{
     let intv_section = match intv_results {
         Some (intvs) => {
             //println!("Patient details obtained");
-            wcf.get_intervention_list_for_patient_details_tile(intvs)
+            //wcf.get_intervention_list_for_patient_details_tile(intvs)
+            InterventionFormatter::get_intervention_list_for_patient_details_tile(intvs)
         }
         None =>{
             //println!("No Encounters found");

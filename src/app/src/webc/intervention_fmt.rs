@@ -37,7 +37,7 @@ impl InterventionFormatter {
      ///
     /// Provide HTML for all of a (Patient's) Encounter's Interventions
     /// 
-    pub fn get_intervention_list_for_patient_details_tile(&self, intervention_list: Vec<Intervention>) -> String {
+    pub fn get_intervention_list_for_patient_details_tile(intervention_list: Vec<Intervention>) -> String {
         let mut results_sbuf = String::with_capacity(100); 
         println!(">get_intervention_list_tile()");
 

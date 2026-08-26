@@ -9,7 +9,8 @@ use crate::constants;
 use crate::dto::{patient::*, encounter::*, intervention::*, intervention_detail::*};
 use crate::dao::patient_dao::PatientWrapper;
 
-use crate::webc::intervention_formatter::InterventionFormatter;
+use crate::webc::common::CommonFormatter;
+use crate::webc::intervention_fmt::InterventionFormatter;
 
 /// Enumeration for Web Content Tiles, each representing a tile of information
 /// to be presented by the application
@@ -97,22 +98,6 @@ impl WebContentFactory {
     }
 
     // -----------------------------------------------------------------------------------
-    // Common formatters
-    // -----------------------------------------------------------------------------------
-
-    ///
-    /// Returns a hidden form, used as a technique in several of the list tiles to submit a value for another screen
-    /// 
-    fn get_hidden_form(&self, target_name: String, form_name: String) -> String {
-        let body = r##"<div id="hiddenSection" style="display: none; margin-top: 0px;">
-                               <form action="\{target_name}" method="post" id="{form_name}" name="{form_name}">
-                               <input type="hidden" name="target_id" id="target_id" value="0">
-                             </form></div>"##;
-
-        body.replace("{form_name}", &form_name).replace("{target_name}", &target_name)
-    }
-
-    // -----------------------------------------------------------------------------------
     // Home tile formatters
     // -----------------------------------------------------------------------------------
 
@@ -144,7 +129,7 @@ impl WebContentFactory {
         let mut results_sbuf = String::with_capacity(100); 
         let mut counter: i8 = 1;
 
-        results_sbuf.push_str(&self.get_hidden_form("patientdtls".to_owned(), "patientDtlsFrm".to_owned()) );
+        results_sbuf.push_str(&CommonFormatter::get_hidden_form("patientdtls".to_owned(), "patientDtlsFrm".to_owned()) );
 
         for pwrap in patient_list{
             results_sbuf.push_str("<a href=\"#\" onclick=\"redirect_to_patient("  ); 
@@ -238,7 +223,7 @@ impl WebContentFactory {
         let ht7 = &ht6.replace("{patient_id}",  &patient_id);
         let ht8 = &ht7.replace("{encounter_id}",  &encounter_id);
 
-        let ht9 = &ht8.replace(constants::INTERVENTION_TYPE_DROP_DOWN_CONTROL_TAG, &&self.get_dropdown_generic( intervention_type_list,
+        let ht9 = &ht8.replace(constants::INTERVENTION_TYPE_DROP_DOWN_CONTROL_TAG, &&CommonFormatter::get_dropdown_generic( intervention_type_list,
                                                                                                                                   "intervention_type_id".to_string(),
                                                                                                                                   constants::NOT_SPECIFIED_ID));
         let ht_final = &ht9.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
@@ -256,12 +241,10 @@ impl WebContentFactory {
         let labels = ["{patient_first_name}","{patient_last_name}", "{middle_name}",
                                   "{phn}","{birthdate}", "{admit_notes}", "{encounter_id}", "{patient_id}"];
 
-        let base_tile_level_0 = match is_discharge_flag{
+        let base_tile_level_1 = match is_discharge_flag{
             true => self.get_tile(WebContentItem::WCTypeDischargeTile),
             false => self.get_tile(WebContentItem::WCTypeAdmitTile),
         };
-
-        let base_tile_level_1 = base_tile_level_0.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
 
         // warning: match is on an Option<Patient>, NOT a tile
         let inner_content = match current_patient{ // get basic static tile loaded, make edits depending on type
@@ -302,40 +285,30 @@ impl WebContentFactory {
                 for i in 0..labels.len() {
                     result = result.replace(labels[i], data_items[i]);
                 }
-
-                // ...except for admit_timestamp which will always be Now()
-                let result_2 = result.replace("{admit_timestamp}", &p.admit_timestamp_for_display());               
+               
+                let result_2 = result.replace("{admit_timestamp}", &p.admit_timestamp_for_display());      
 
                 if is_discharge_flag {
                     let result_3 = result_2.replace("{discharge_timestamp}", &chrono::Utc::now().format("%Y-%b-%d %H:%M:%S").to_string());
                     let result_4 = result_3.replace("{discharge_notes}", &p.discharge_notes);
                     let result_5 = result_4.replace("{location_short_name}", &p.location_short_name);
                     let result_6 = result_5.replace("{location_id}", &p.location_id.to_string());
-
-                    //println!("location_short_name='{}'", &p.location_short_name);
-
                     result_6
                 }
                 else{
                     let result_3 = result_2.replace("{discharge_notes}", &p.discharge_notes);
                     let result_4 = result_3.replace("{location_id}", &location_menu);
-
                     result_4
                 }
             }
         };
-
-       // let inner_content_1 = inner_content.replace("{location_id}", &location_menu); 
         
         // this first one replaces the base tile (loaded from file) with the new "layout" provided above
         let home_tile_level_0 = &self.get_home_tile_with_user_identity(user_identity_label).replace(constants::BODY_TILE_CONTENT_TAG, &inner_content.clone()); // build the individual sections
-
-        // common content
         let home_tile_level_1 = &home_tile_level_0.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
 
         return home_tile_level_1.clone();
     }
-
    
     // -----------------------------------------------------------------------------------
     // Encounter formatters
@@ -373,7 +346,7 @@ impl WebContentFactory {
 
         //println!(">get_encounter_list_tile()");
 
-        results_sbuf.push_str(&self.get_hidden_form("encounterDtls".to_owned(), "encounterDtlsFrm".to_owned()) );
+        results_sbuf.push_str(&CommonFormatter::get_hidden_form("encounterDtls".to_owned(), "encounterDtlsFrm".to_owned()) );
 
         results_sbuf.push_str("<table <tr><th>Admit Date</th><th>Site/Facility</th></tr>"); 
 
@@ -392,113 +365,7 @@ impl WebContentFactory {
 
         return results_sbuf;
     }
-
-
-    ///
-    /// Generates a list of locations based on what is in the system
-    /// 
-    pub fn get_dropdown_generic(&self, item_list: Vec<(i64, String, String)>, list_name_and_id: String, default_item_id: i64) -> String {
-        let mut results_sbuf = String::with_capacity(100); 
-        println!("> get_dropdown_generic({})", list_name_and_id);
-
-        // https://www.w3schools.com/tags/tag_select.asp
-        results_sbuf.push_str("<select name='");
-        results_sbuf.push_str(&list_name_and_id.to_string());
-        results_sbuf.push_str("' id='");
-        results_sbuf.push_str(&list_name_and_id.to_string());
-        results_sbuf.push_str("'>");
-
-        for row in item_list{
-            results_sbuf.push_str("<option value='" );
-            results_sbuf.push_str(&row.0.to_string()); // location_id here
-            results_sbuf.push_str("'" );
-            if row.0 == default_item_id {
-                results_sbuf.push_str(" selected ");
-            }
-            results_sbuf.push_str(">");
-            results_sbuf.push_str(&row.1); // description here
-            results_sbuf.push_str("</option>");
-        }
-        results_sbuf.push_str("</select>");
-
-        return results_sbuf;
-    }
-
-
-    ///
-    /// Generates a dropdown for users
-    /// 
-    pub fn get_dropdown_user_with_department(&self, item_list: Vec<(i64, String, String)>, default_item_id: i64) -> String {
-        self.get_dropdown_generic(item_list, "users_id".to_string(), default_item_id)
-    }
-
-    pub fn get_dropdown_intervention_status(&self, item_list: Vec<(i64, String, String)>, default_item_id: i64) -> String {
-        self.get_dropdown_generic(item_list, "status_id".to_string(), default_item_id)
-    }
-
-    ///
-    /// Generates a list of locations based on what is in the system
-    /// 
-    pub fn get_location_dropdown(&self, location_list: Vec<(i64, String)>, default_location_id: i64) -> String {
-        let mut results_sbuf = String::with_capacity(100); 
-        println!("> get_location_dropdown()");
-
-        // https://www.w3schools.com/tags/tag_select.asp
-        results_sbuf.push_str("<select name='location_id' id='location_id'>");
-
-        for row in location_list{
-            results_sbuf.push_str("<option value='" );
-            results_sbuf.push_str(&row.0.to_string()); // location_id here
-            results_sbuf.push_str("'" );
-            if row.0 == default_location_id {
-                results_sbuf.push_str(" selected ");
-            }
-            results_sbuf.push_str(">");
-            results_sbuf.push_str(&row.1); // description here
-            results_sbuf.push_str("</option>");
-        }
-        results_sbuf.push_str("</table>");
-
-        return results_sbuf;
-    }
-
-    ///
-    /// Provide HTML for all of a (Patient's) Encounter's Interventions
-    /// 
-    pub fn get_intervention_list_for_patient_details_tile(&self, intervention_list: Vec<Intervention>) -> String {
-        let mut results_sbuf = String::with_capacity(100); 
-        println!(">get_intervention_list_tile()");
-
-        results_sbuf.push_str(&self.get_hidden_form("intvDtls".to_owned(), "intvDtlsFrm".to_owned()) );
-
-        results_sbuf.push_str("<table <tr><th>Description</th><th>Date Performed</th><th>Date Scheduled</th><th>State</th></tr>"); 
-
-        for row in intervention_list{
-            results_sbuf.push_str("  <tr>");
-            results_sbuf.push_str("<td><a href=\"#\" onclick=\"redirect_to_intv("  ); 
-            results_sbuf.push_str( &row.id.to_string() ); 
-            results_sbuf.push_str("); return false;\">"); 
-            results_sbuf.push_str( &row.type_description_for_display()); 
-            results_sbuf.push_str("</a></td><td>"); 
-            results_sbuf.push_str( &row.performed_timestamp_for_display() );
-            results_sbuf.push_str("</td>"); 
-            results_sbuf.push_str("<td>"); 
-            results_sbuf.push_str( &row.scheduled_timestamp_for_display() );
-            results_sbuf.push_str("</td>"); 
-            results_sbuf.push_str("<td>"); 
-            results_sbuf.push_str( &row.status_for_display() );
-            results_sbuf.push_str("</td>"); 
-            results_sbuf.push_str("  </tr>\n");
-        }
-        results_sbuf.push_str("</table>");
-
-        return results_sbuf;
-    }
-
-    // -----------------------------------------------------------------------------------
-    // Intervention formatters
-    // -----------------------------------------------------------------------------------
-
+   
     ///
     /// Provide HTML for modifying an Intervention
     /// 
@@ -546,8 +413,8 @@ impl WebContentFactory {
         let data_items = match current_intervention{
             None =>{ // new patient (Admit) path
                 println!("  Create new Intervention");
-                dd_user = self.get_dropdown_user_with_department(user_dropdown_list,constants::NOT_SPECIFIED_ID); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
-                dd_intv_status =  self.get_dropdown_intervention_status(status_dropdown_list, constants::DEFAULT_INTERVENTION_STATUS_NEW); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
+                dd_user = CommonFormatter::get_dropdown_user_with_department(user_dropdown_list,constants::NOT_SPECIFIED_ID); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
+                dd_intv_status =  CommonFormatter::get_dropdown_intervention_status(status_dropdown_list, constants::DEFAULT_INTERVENTION_STATUS_NEW); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
 
                 let tmp_data_items = [constants::NOT_SPECIFIED_ID.to_string(), //"{intervention_id}",
                                                   intv_type.1, //"{intervention_type}",
@@ -568,8 +435,8 @@ impl WebContentFactory {
             } 
             Some (intv) => {
                 println!("  Update existing Intervention");
-                dd_user = self.get_dropdown_user_with_department(user_dropdown_list,intv.users_id); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
-                dd_intv_status =  self.get_dropdown_intervention_status(status_dropdown_list, intv.status_id); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
+                dd_user = CommonFormatter::get_dropdown_user_with_department(user_dropdown_list,intv.users_id); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
+                dd_intv_status =  CommonFormatter::get_dropdown_intervention_status(status_dropdown_list, intv.status_id); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
 
                 let intv_details_html = match intv_details_list {
                     Some(list) => InterventionFormatter::get_view_only_intervention_details_list( list ),

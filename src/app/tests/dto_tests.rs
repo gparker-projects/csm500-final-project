@@ -225,7 +225,7 @@ use common::test_utils::*;
 
     #[test]
   fn test_create_user_auth_and_permission_dto() {
-    let mut basic_perms= [(1, 2), (2, 1)];
+    let basic_perms= [(1, 2), (2, 1)];
 
     let mut perms: Vec<Permission> = Vec::with_capacity( basic_perms.len() );
     for p in basic_perms {

@@ -12,8 +12,9 @@ use actix_session::{Session};
 use crate::dto::intervention::Intervention;
 
 use crate::dao::{ patient_dao::*, intervention_dao::*, common_dao::*, auth_dao::*}; 
-use crate::webc::{data_forms::*, menu_tile::*};
+use crate::webc::{data_forms::*, menu_fmt::*};
 use crate::webc::data_forms::InterventionDataForm;
+use crate::webc::common::CommonFormatter;
 
 use crate::session::{AppSession, UserSession};
 
@@ -137,7 +138,7 @@ impl InterventionRoute{
         let location_menu = match location_results {
           Some (loc_list) => {
               
-              wcf.get_location_dropdown(loc_list.clone(), 
+              CommonFormatter::get_location_dropdown(loc_list.clone(), 
                     match intervention_id == constants::NOT_SPECIFIED_ID {
                       true => constants::DEFAULT_LOCATION_REGISTRATION,
                       false => cur_intv.unwrap().location_id,

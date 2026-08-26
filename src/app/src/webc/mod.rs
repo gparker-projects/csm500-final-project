@@ -8,6 +8,6 @@
 //!
 pub mod common;
 pub mod data_forms;
-pub mod menu_tile;
+pub mod menu_fmt;
 pub mod web_content;
-pub mod intervention_formatter;
+pub mod intervention_fmt;

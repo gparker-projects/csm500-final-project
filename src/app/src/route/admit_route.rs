@@ -13,8 +13,9 @@ use actix_web::http::StatusCode;
 use crate::constants;
 use crate::dto::patient;
 use crate::dao::{ patient_dao::*, common_dao::*}; 
-use crate::webc::{data_forms::*, menu_tile::*};
+use crate::webc::{data_forms::*, menu_fmt::*};
 use crate::session::{AppSession, UserSession};
+use crate::webc::common::CommonFormatter;
 
 pub struct AdmitRoute{}
 
@@ -210,7 +211,7 @@ impl AdmitRoute{
       let location_results = cdao.get_locations_for_user(user_session_details.get_userid_as_i64()).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
       let location_menu = match location_results {
           Some (loc_list) => {
-              wcf.get_location_dropdown(loc_list.clone(), constants::DEFAULT_LOCATION_REGISTRATION)
+              CommonFormatter::get_location_dropdown(loc_list.clone(), constants::DEFAULT_LOCATION_REGISTRATION)
           }
           None => {
               println!("No locations found for user. [Userid:{}]", user_session_details.get_userid_as_i64());

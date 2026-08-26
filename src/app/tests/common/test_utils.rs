@@ -3,7 +3,7 @@
 /// ---------------------------------------------------------------------------------
 /// 
 
-use rand::{Rng, RngExt, rng};
+use rand::{RngExt, rng};
  use chrono::{NaiveDate, NaiveDateTime, TimeDelta};
  
  const LOREUM_IPSUM: &str = r##"
@@ -120,7 +120,7 @@ impl DataGenerator{
     ///
     /// Returns random room short name, selected from a predefined list
     /// 
-    pub fn get_location_short_name(length: usize) -> String {
+    /*pub fn get_location_short_name(length: usize) -> String {
         let mut rng = rng();
         let name_list: Vec<&str> = vec!["ERH HLTHR R00-1B", "ERH FMO R00-20", "ERH ED-A1-RM2", "ERH SRGD-01", "ERH MED W2B", "ERH PHM C2", "ERH PATU C2A", "ERH MDR R00-10", "ERH ED-A1-RM1", "ERH ED-A1-RM3", "ERH ED-A1-RM4", "ERH ED-A1-RM5"]; 
         let result = name_list.get(rng.random_range(0..name_list.len()-1 ) ).unwrap(); // return a item from the prior list
@@ -129,7 +129,7 @@ impl DataGenerator{
             true => result.to_string(),
             false => result[0..length].to_string()
         }
-    }
+    }*/
 
     pub fn get_intv_status_description() -> String{
         let mut rng = rng();

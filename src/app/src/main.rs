@@ -15,7 +15,7 @@
 //! https://github.com/LukeMathWalker/zero-to-production
 //!
 use std::env;
-use sqlx::postgres::{PgPoolOptions, PgPool};
+use sqlx::postgres::{PgPoolOptions};
 use actix_web::{web, App, HttpServer, HttpResponse, Responder};
 use actix_web::cookie::Key;
 use actix_cors::Cors;
@@ -33,11 +33,7 @@ use crate::route::nle_route::*;
 
 
 use std::sync::Arc;
-use ort::{
-	Error,
-	session::{Session, builder::GraphOptimizationLevel},
-	value::TensorRef
-};
+use ort::{	session::{Session, builder::GraphOptimizationLevel} };
 
 // TODO: ideally we'd use an external session store, not just cookies. Until the application is largely working, we'll have to leave this for now. //storage::RedisSessionStore}; 
 mod constants;
