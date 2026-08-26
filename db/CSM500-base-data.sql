@@ -278,3 +278,28 @@ INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
     OVERRIDING SYSTEM VALUE
  VALUES (39, 5, 'Y', 'Eye', 'Eye Colour');
   
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+    OVERRIDING SYSTEM VALUE
+ VALUES (40, 2, 'Y', 'Alerts/CCI/SPI', 'Alerts/CCI/SPI');
+ 
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+    OVERRIDING SYSTEM VALUE
+ VALUES (41, 2, 'Y', 'Appointments', 'Appointments');
+ 
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+     OVERRIDING SYSTEM VALUE
+  VALUES (42, 2, 'Y', 'Diagnoses', 'Diagnoses');
+  
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+     OVERRIDING SYSTEM VALUE
+ VALUES (43, 2, 'Y', 'Allergies', 'Allergies');
+  
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+     OVERRIDING SYSTEM VALUE
+ VALUES (43, 2, 'Y', 'Immunizations', 'Immunizations');
+ 
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+     OVERRIDING SYSTEM VALUE
+ VALUES (44, 2, 'Y', 'Documents', 'Documents');
+ 
+COMMIT;

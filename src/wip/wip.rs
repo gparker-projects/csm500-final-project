@@ -1,4 +1,13 @@
-
+Encounters
+Appointments
+Alerts/CCI/SPI
+Diagnoses (No data within last 12 weeks)
+Allergies
+Labs
+Immunizations
+Imaging
+Labs - Public & Private
+Documents
 
 
 admit Keenan Waynes for broken foot and blood loss. age 25, 6ft 10, 125kg
