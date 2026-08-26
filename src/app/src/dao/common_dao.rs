@@ -1,8 +1,7 @@
-use crate::{constants, dao::db_query};
-
 use sqlx::postgres::{PgPool}; 
-//use sqlx::Row;
-//use std::io::{Error, ErrorKind};
+use tracing;
+
+use crate::{constants, dao::db_query};
 
 pub const REF_TYPE_GROUP_1_INTERVENTION_TYPES: i64 = 1;
 pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
@@ -32,15 +31,14 @@ impl CommonDAO {
     /// 
     pub async fn get_locations(&self)-> Result< Option< Vec<(i64, String)> >, std::io::Error> {
         let query: String = db_query::QRY_ACTIVE_LOCATIONS.to_owned();
-
-        println!("get_locations()");
+        tracing::debug!("get_locations()");
 
         let rows: Vec<( i64, String )> = sqlx::query_as(&query)
                                                 .fetch_all(&self.connection) 
                                                 .await
                                                 .unwrap_or_default();
         if rows.is_empty() {
-            println!("No Locations defined in system");
+            tracing::error!("No Locations defined in system");
             return Ok( Some( Vec::new() ) );
         }
         else{
@@ -64,15 +62,14 @@ impl CommonDAO {
     pub async fn get_locations_for_user(&self, user_id: i64)-> Result< Option< Vec<(i64, String)> >, std::io::Error> {
         let query_level_0: String = db_query::QRY_CURRENT_USER_LOCATIONS.to_owned();
         let query = query_level_0.replace("{}", &user_id.to_string());
-
-        println!("get_locations_for_user()");
+        tracing::debug!("get_locations_for_user()");
 
         let rows: Vec<( i64, String )> = sqlx::query_as(&query)
                                                 .fetch_all(&self.connection) 
                                                 .await
                                                 .unwrap_or_default();
         if rows.is_empty() {
-            println!("No Locations defined in system");
+            tracing::error!("No Locations defined in system");
             return Ok( Some( Vec::new() ) );
         }
         else{
@@ -96,6 +93,8 @@ impl CommonDAO {
     ///          - long name of the reference list item
     /// 
     pub async fn get_common_references(&self, group_id: i64, active_only: bool)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
+        tracing::debug!("get_common_references()");
+
         let query_level_0: String = match active_only {
 		    true => db_query::QRY_COMMON_REF_TYPES_FOR_GROUP.to_owned(),
 		    false => db_query::QRY_COMMON_REF_TYPES_FOR_GROUP_ACTIVE_ONLY.to_owned(),
@@ -103,14 +102,12 @@ impl CommonDAO {
         
         let query = query_level_0.replace("{group_id}", &group_id.to_string());
 
-        println!("get_common_references()");
-
         let rows: Vec<( i64, String, String )> = sqlx::query_as(&query)
                                                 .fetch_all(&self.connection) 
                                                 .await
                                                 .unwrap_or_default();
         if rows.is_empty() {
-            println!("Reference entries not found for group_id={}", group_id);
+            tracing::error!("Reference entries not found for group_id={}", group_id);
             return Ok( Some( Vec::new() ) );
         }
         else{
@@ -135,11 +132,9 @@ impl CommonDAO {
     ///          - long name of the reference list item
     /// 
     pub async fn get_common_reference(&self, ref_type_id: i64)-> Result< Option< (i64, String, String) > , std::io::Error> {
+        tracing::debug!("get_common_reference()");
         let query_level_0 = db_query::QRY_COMMON_REF_TYPES_SINGLE_FOR_A_GROUP_AND_TYPE;
-
         let query = query_level_0.replace("{common_ref_id}", &ref_type_id.to_string());
-
-        println!("get_common_reference()");
 
         let rows: Vec<( i64, String, String )> = sqlx::query_as(&query)
                                                 .fetch_all(&self.connection) 
@@ -148,7 +143,7 @@ impl CommonDAO {
 
         let mut results: (i64, String, String) = (constants::INVALID_OTHER_ID, constants::GENERAL_ERROR_NOT_FOUND.to_string(), constants::GENERAL_ERROR_NOT_FOUND.to_string());
         if rows.is_empty() {
-            println!("Reference entry not found for ref_type_id={}", ref_type_id);
+            tracing::debug!("Reference entry not found for ref_type_id={}", ref_type_id);
             return Ok( Some(  results  ) );
         }
         else{

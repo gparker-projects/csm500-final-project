@@ -24,7 +24,7 @@ impl CommonFormatter {
     /// 
     pub fn get_dropdown_generic(item_list: Vec<(i64, String, String)>, list_name_and_id: String, default_item_id: i64) -> String {
         let mut results_sbuf = String::with_capacity(100); 
-        println!("> get_dropdown_generic({})", list_name_and_id);
+        tracing::debug!("> get_dropdown_generic({})", list_name_and_id);
 
         // https://www.w3schools.com/tags/tag_select.asp
         results_sbuf.push_str("<select name='");
@@ -66,7 +66,7 @@ impl CommonFormatter {
     /// 
     pub fn get_location_dropdown(location_list: Vec<(i64, String)>, default_location_id: i64) -> String {
         let mut results_sbuf = String::with_capacity(100); 
-        println!("> get_location_dropdown()");
+        tracing::debug!("> get_location_dropdown()");
 
         // https://www.w3schools.com/tags/tag_select.asp
         results_sbuf.push_str("<select name='location_id' id='location_id'>");

@@ -2,6 +2,7 @@
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
+use tracing;
 
 use crate::constants;
 use crate::dto::user_auth::*;
@@ -27,7 +28,7 @@ impl CommandController{
     /// Public constructor for the CommandController
     /// 
     pub fn new(mapping_file_path: &str, nle: NaturalLanguageEngine) -> Self {
-        //println!( "CommandController::New() {}", mapping_file_path );
+        tracing::debug!( "CommandController::New() {}", mapping_file_path );
         let mut tmp_command_hashset = Vec::<(String, i64)>::with_capacity(10);
         let mut tmp_full_command_hashset = Vec::<(String, String, i64)>::with_capacity(10);
 
@@ -56,7 +57,7 @@ impl CommandController{
     /// Obtains classifier rankings, only inlcuding items that the user has a permission for
     /// 
     pub async fn get_classifier_rankings_filtered_for_permissions(&mut self, prompt: String, user_auths: UserAuthorization ) -> Vec<(String, f32)>{
-        println!("get_classifier_rankings_filtered_for_permissions()");
+        tracing::debug!("get_classifier_rankings_filtered_for_permissions()");
         let ops_add_prompt: Vec<String> = self.get_all_operations_and_add_prompt( prompt.clone() );
         let mut results: Vec<(String, f32)> = vec![]; 
         let classifer_results: Vec<(String, f32)> = self.nl_engine.get_classifier_rankings(ops_add_prompt ).await;
@@ -76,7 +77,7 @@ impl CommandController{
     /// Obtains basic classifier rankings, without limits or security concerns applied
     /// 
     pub async fn get_classifier_rankings(&mut self, prompt: String ) -> Vec< (String, f32)>{
-        println!("get_classifier_rankings()");
+        tracing::debug!("get_classifier_rankings()");
         let ops_add_prompt: Vec<String> = self.get_all_operations_and_add_prompt( prompt.clone() );
 
         let classifer_results: Vec< (String, f32)> = self.nl_engine.get_classifier_rankings(ops_add_prompt ).await;
@@ -103,7 +104,7 @@ impl CommandController{
     ///  that matches the prompt_string.
     /// 
     pub fn get_permission_for_operation (&self, prompt_string: String) -> i64 {
-        //println!("get_permission_for_operation(): Compare to prompt: '{}'", prompt_string);
+        tracing::debug!("get_permission_for_operation(): Compare to prompt: '{}'", prompt_string);
         let mut results: i64 = constants::INVALID_OTHER_ID;
         for item in self.command_hashset.clone().iter(){
            if item.0 == prompt_string{

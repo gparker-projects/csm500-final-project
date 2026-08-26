@@ -8,6 +8,7 @@
 
 use actix_web::{web, HttpResponse, Responder};
 use actix_session::{Session}; 
+use tracing;
 
 use crate::dto::intervention::Intervention;
 
@@ -29,7 +30,7 @@ impl InterventionRoute{
   /// Route that will update the intervention and then redirect back to the modify screen
   /// 
   pub async fn route_to_intervention_save(app_session: web::Data<AppSession>, user_session: Session, mut req: web::Form<InterventionDataForm>) -> impl Responder {
-      println!("-> Route Requested: /route_to_discharge_patient_save ");
+      tracing::debug!("-> Route Requested: /route_to_discharge_patient_save ");
 
       let req_clone0 = req.clone();
       let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
@@ -38,11 +39,11 @@ impl InterventionRoute{
       let results = idao.upsert_intervention_from_intv_form(req_clone0, user_session_details.get_userid_as_i64()).await;
       match results {
             Ok(intv_id) => {
-                println!("  >Intervention (id={intv_id})] created/updated");
+                tracing::debug!("  >Intervention (id={intv_id})] created/updated");
                 req.0.intervention_id = intv_id.to_string();
             },
             Err(e) => {
-                println!("  >Intervention not created/updated: {e}");
+                tracing::debug!("  >Intervention not created/updated: {e}");
             }
       }
 
@@ -54,7 +55,7 @@ impl InterventionRoute{
     /// Wrapper route for the adding new, or modifying existing Interventions of a patient, without having any web form to pass data in from
     /// 
     pub async fn route_to_add_new_intervention(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<InterventionDataFormBasic>)  -> impl Responder {
-        println!("-> Route Requested: /intvnew  route_to_add_new_intervention()");
+        tracing::debug!("-> Route Requested: /intvnew  route_to_add_new_intervention()");
 
         InterventionRoute::route_to_view_or_modify_intervention(app_session, user_session,web::Form(
             InterventionDataForm {
@@ -71,7 +72,7 @@ impl InterventionRoute{
     /// Wrapper route for hyperlink to view/modify an Intervention without having any web form to pass data in from
     /// 
     pub async fn route_to_modify_intervention_basic(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<InterventionDataFormLink>) -> impl Responder {
-        println!("-> Route Requested: /intvlink  route_to_modify_intervention_basic()");
+        tracing::debug!("-> Route Requested: /intvlink  route_to_modify_intervention_basic()");
 
             InterventionRoute::route_to_view_or_modify_intervention(app_session, user_session, web::Form(
                 InterventionDataForm {
@@ -87,7 +88,7 @@ impl InterventionRoute{
     /// Route for adding a new Intervention for a Patient-Encounter
     /// 
     pub async fn route_to_view_or_modify_intervention(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<InterventionDataForm>)  -> impl Responder {
-        println!("-> Route Requested: /intv  (add/modify)");
+        tracing::debug!("-> Route Requested: /intv  (add/modify)");
         let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
         let wcf = &app_session.get_web_content_factory();
 
@@ -97,13 +98,13 @@ impl InterventionRoute{
 
         let cur_intv: Option<Intervention>
           = if intervention_id == constants::NOT_SPECIFIED_ID {
-            println!("   No Intervention specified: create a new Intervention");
+            tracing::debug!("   No Intervention specified: create a new Intervention");
             //println!("   Intervention.intervention_type_id {}", req.clone().intervention_type_id.to_string());
             intervention_type_id = req.clone().intervention_type_id.parse().unwrap(); 
             None
         }
         else{
-            println!("   Intervention exists: view existing Intervention");
+            tracing::debug!("   Intervention exists: view existing Intervention");
             let tmp_intv = idao.get_intervention(intervention_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
             let tmp_intv2 = tmp_intv.clone().unwrap();
             intervention_type_id = tmp_intv2.intervention_type_id;
@@ -122,7 +123,7 @@ impl InterventionRoute{
                 {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), req.get_patient_id_as_i64())
             }
             None => {
-                println!("No patients found for legacy menu");
+                tracing::debug!("No patients found for legacy menu");
                 constants::LEGACY_MENU_ON_ERROR.to_string()
             }
         };
@@ -146,12 +147,12 @@ impl InterventionRoute{
               )
           }
           None => {
-              println!("No locations found for user. [Userid:{}]", user_session_details.get_userid_as_i64());
+              tracing::debug!("No locations found for user. [Userid:{}]", user_session_details.get_userid_as_i64());
               constants::LEGACY_MENU_ON_ERROR.to_string() // when no patient, return default error-expected menu
           }
         };
 
-        let content = wcf.get_modify_intervention_full_page_tile(user_session_details.user_display_name,
+        let content = wcf.get_modify_intervention_full_tile(user_session_details.user_display_name,
                                                                          cur_intv2,
                                                                          legacy_menu,
                                                                          user_dropdown_list.unwrap(),

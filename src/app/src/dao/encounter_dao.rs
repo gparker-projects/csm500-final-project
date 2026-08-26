@@ -1,5 +1,7 @@
 use sqlx::postgres::{PgPool}; 
 use chrono::NaiveDateTime;
+use tracing;
+
 use crate::dto::encounter::*;
 use crate::dao::db_query;
 use crate::constants;
@@ -50,8 +52,8 @@ impl EncounterDAO {
         .unwrap_or_default();
 
         if rows.is_empty() {
-            println!(">get_encounters() Query: {}", query);
-            println!("No encounters found for patient_id: {} [{}]", patient_id, rows.len());
+            tracing::debug!(">get_encounters() Query: {}", query);
+            tracing::debug!("No encounters found for patient_id: {} [{}]", patient_id, rows.len());
             return Ok( Some( Vec::new() ) );
         }
         else{

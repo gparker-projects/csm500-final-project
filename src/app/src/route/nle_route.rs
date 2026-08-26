@@ -10,6 +10,7 @@ use actix_web::{web, HttpResponse, Responder};
 use actix_session::{Session}; 
 use std::env;
 use std::path::Path;
+use tracing;
 
 use crate::constants;
 use crate::nle::controller::CommandController;
@@ -22,7 +23,6 @@ pub const COMMAND_MAPPING_FILE_NAME: &str = "command_mapping.csv";
 pub const DATA_SUB_DIRECTORY: &str = "data";
 pub const LANGUAGE_MODEL_FILE_NAME: &str = "all-MiniLM-L6-v2.onnx";
 pub const TOKENIZER_FILE_NAME: &str = "tokenizer.json";
-
 
 pub struct NLERoute{}
 
@@ -41,7 +41,7 @@ impl NLERoute{
     /// accepts a natural language prompt and processes it using the built in engine
     /// 
     pub async fn natural_language_prompt(_app_session: web::Data<AppSession>, user_session: Session, req: web::Form<NLPromptFormData>) -> impl Responder {
-        println!("-> /nlprompt Requested;  natural_language_prompt();  prompt: \"{}\"", req.prompt);
+        tracing::info!("-> /nlprompt Requested;  natural_language_prompt();  prompt: \"{}\"", req.prompt);
 
         let mut results_sbuf = String::with_capacity(500); // Single heap allocation
         
@@ -51,11 +51,11 @@ impl NLERoute{
         // collect the cargo manifest directory at runtime, which means it might not be present
         let base_model_dir = match env::var(constants::CARGO_MANIFEST_DIR) {
             Ok(tmp_path) => {
-                println!("CARGO_MANIFEST_DIR = {}", tmp_path);
+                tracing::info!("CARGO_MANIFEST_DIR = {}", tmp_path);
                 tmp_path
             }
             Err(e) => {
-                println!("CARGO_MANIFEST_DIR not set: {}", e);
+                tracing::info!("CARGO_MANIFEST_DIR not set: {}", e);
                 "INVALID_PATH".to_string()
             }
         };

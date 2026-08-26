@@ -8,8 +8,9 @@
 
 use actix_web::{web, HttpResponse, Responder};
 use actix_session::{Session}; 
+use tracing;
 
-use crate::webc::web_content::*;
+use crate::webc::tile_factory::*;
 use crate::session;
 use crate::constants;
 
@@ -21,14 +22,14 @@ impl DefaultRoute{
     /// default route when nothing else is specified by the user
     ///
     pub async fn default_route(app_session: web::Data<session::AppSession>, user_session: Session) -> impl Responder {
-        println!("-> /default_route Requested");
+        tracing::debug!("-> /default_route Requested");
         
         let wcf = &app_session.get_web_content_factory(); 
-        println!("Checking session for Validation errors");
+        tracing::debug!("Checking session for Validation errors");
         
         match user_session.get::<String>(constants::VALIDATION_ERRORS){
             Ok(Some(validation_errors))=> {
-            println!("Ok(Some()) Validation errors present in session: {}", &validation_errors);
+            tracing::debug!("Ok(Some()) Validation errors present in session: {}", &validation_errors);
             // if the login form had validation errors, then we need to show them in the regenerated page.
 
             let mut content = wcf.get_tile(WebContentItem::WCTypeLoginTile); // retrieve the page base content
@@ -42,14 +43,12 @@ impl DefaultRoute{
             HttpResponse::Ok().body( content )
             },
             Ok( None )=> {
-            //println!("Ok( None ) No errors present in session");
-            println!("Ok( None ) No active session");
-            HttpResponse::Ok().body( wcf.get_tile(WebContentItem::WCTypeLoginTile) )
+                tracing::debug!("Ok( None ) No active session");
+                HttpResponse::Ok().body( wcf.get_tile(WebContentItem::WCTypeLoginTile) )
             },
-            Err(_)=> {
-            //println!("Ok( None ) No errors present in session");
-            println!("User session does not exist");
-            HttpResponse::Ok().body( wcf.get_tile(WebContentItem::WCTypeLoginTile) )
+            Err(e)=> {
+                tracing::error!("User session does not exist: {}", e);
+                HttpResponse::Ok().body( wcf.get_tile(WebContentItem::WCTypeLoginTile) )
             },
         }
     }

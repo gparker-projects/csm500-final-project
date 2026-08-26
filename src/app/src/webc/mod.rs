@@ -9,5 +9,5 @@
 pub mod common;
 pub mod data_forms;
 pub mod menu_fmt;
-pub mod web_content;
-pub mod intervention_fmt;
+pub mod tile_factory;
+pub mod simple_fmt;

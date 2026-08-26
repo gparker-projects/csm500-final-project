@@ -1,0 +1,457 @@
+2026-08-26T16:31:30.447100Z  INFO MapleEMR: MapleEMR is running! Access via: http://127.0.0.1:8000
+2026-08-26T16:31:30.555104Z  INFO MapleEMR: Database connection established to: postgres://postgres:csm500@localhost:5432/csm500
+2026-08-26T16:31:30.555196Z  INFO MapleEMR: CARGO_MANIFEST_DIR = C:\uol\csm500-final-project\src\app
+2026-08-26T16:31:30.601332Z  INFO ort::logging: Discovered OrtHardwareDevice {vendor_id:0x8086, device_id:0x1912, vendor:Intel Corporation, type:1, metadata: [Description=Intel(R) HD Graphics 530, Discrete=0, DxgiAdapterNumber=0, DxgiHighPerformanceIndex=0, DxgiVideoMemory=128 MB, LUID=49304, ]}
+2026-08-26T16:31:30.605135Z  INFO ort::logging: Discovered OrtHardwareDevice {vendor_id:0x8086, device_id:0x0, vendor:Intel, type:0, metadata: [Description=Intel(R) Core(TM) i5-6600 CPU @ 3.30GHz, ]}
+2026-08-26T16:31:30.605767Z  INFO ort::logging: Session Options {  execution_mode:0 execution_order:DEFAULT enable_profiling:0 optimized_model_filepath: enable_mem_pattern:1 enable_mem_reuse:1 enable_cpu_mem_arena:1 profile_file_prefix:onnxruntime_profile_ session_logid: session_log_severity_level:-1 session_log_verbosity_level:0 max_num_graph_transformation_steps:10 graph_optimization_level:1 intra_op_param:OrtThreadPoolParams { thread_pool_size: 1 auto_set_affinity: 0 allow_spinning: 0 dynamic_block_base_: 0 stack_size: 0 affinity_str:  set_denormal_as_zero: 0 } inter_op_param:OrtThreadPoolParams { thread_pool_size: 0 auto_set_affinity: 0 allow_spinning: 0 dynamic_block_base_: 0 stack_size: 0 affinity_str:  set_denormal_as_zero: 0 } use_per_session_threads:1 thread_pool_allow_spinning:1 use_deterministic_compute:0 ep_selection_policy:5 config_options: {  } }
+2026-08-26T16:31:30.605829Z  INFO ort::logging: Flush-to-zero and denormal-as-zero are off
+2026-08-26T16:31:30.605846Z  INFO ort::logging: Creating and using per session threadpools since use_per_session_threads_ is true
+2026-08-26T16:31:30.605898Z  INFO ort::logging: Dynamic block base set to 0
+2026-08-26T16:31:30.659931Z  INFO ort::logging: Initializing session.
+2026-08-26T16:31:30.660017Z  INFO ort::logging: Creating BFCArena for Cpu with following configs: initial_chunk_size_bytes: 1048576 max_dead_bytes_per_chunk: 134217728 initial_growth_chunk_size_bytes: 2097152 max_power_of_two_extend_bytes: 1073741824 memory limit: 18446744073709551615 arena_extend_strategy: 0
+2026-08-26T16:31:30.664092Z  INFO ort::logging: This model does not have any local functions defined. AOT Inlining is not performed
+2026-08-26T16:31:30.685413Z  INFO ort::logging: GraphTransformer EnsureUniqueDQForNodeUnit modified: 0 with status: OK
+2026-08-26T16:31:30.685867Z  INFO ort::logging: GraphTransformer Level1_RuleBasedTransformer modified: 0 with status: OK
+2026-08-26T16:31:30.686015Z  INFO ort::logging: GraphTransformer DoubleQDQPairsRemover modified: 0 with status: OK
+2026-08-26T16:31:30.687943Z  INFO ort::logging: Total shared scalar initializer count: 199
+2026-08-26T16:31:30.688017Z  INFO ort::logging: GraphTransformer ConstantSharing modified: 1 with status: OK
+2026-08-26T16:31:30.694721Z  INFO ort::logging: GraphTransformer CommonSubexpressionElimination modified: 1 with status: OK
+2026-08-26T16:31:30.701876Z  INFO ort::logging: GraphTransformer ConstantFolding modified: 1 with status: OK
+2026-08-26T16:31:30.705839Z  INFO ort::logging: Removing initializer '/1/Constant_8_output_0'. It is no longer used by any node.
+2026-08-26T16:31:30.705878Z  INFO ort::logging: Removing initializer '/0/auto_model/Shape_2_output_0'. It is no longer used by any node.
+2026-08-26T16:31:30.705895Z  INFO ort::logging: Removing initializer '/1/Shape_3_output_0'. It is no longer used by any node.
+2026-08-26T16:31:30.706119Z  INFO ort::logging: GraphTransformer MatMulAddFusion modified: 0 with status: OK
+2026-08-26T16:31:30.706311Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.0/attention/self/Reshape_output_0
+2026-08-26T16:31:30.706353Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.0/attention/self/Reshape_2_output_0
+2026-08-26T16:31:30.706391Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.0/attention/self/Reshape_1_output_0
+2026-08-26T16:31:30.706490Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.0/attention/self/Reshape_3_output_0
+2026-08-26T16:31:30.706533Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.1/attention/self/Reshape_output_0
+2026-08-26T16:31:30.706571Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.1/attention/self/Reshape_2_output_0
+2026-08-26T16:31:30.706608Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.1/attention/self/Reshape_1_output_0
+2026-08-26T16:31:30.706656Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.1/attention/self/Reshape_3_output_0
+2026-08-26T16:31:30.706694Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.2/attention/self/Reshape_output_0
+2026-08-26T16:31:30.706731Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.2/attention/self/Reshape_2_output_0
+2026-08-26T16:31:30.706768Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.2/attention/self/Reshape_1_output_0
+2026-08-26T16:31:30.706809Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.2/attention/self/Reshape_3_output_0
+2026-08-26T16:31:30.706846Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.3/attention/self/Reshape_output_0
+2026-08-26T16:31:30.706883Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.3/attention/self/Reshape_2_output_0
+2026-08-26T16:31:30.706920Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.3/attention/self/Reshape_1_output_0
+2026-08-26T16:31:30.706959Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.3/attention/self/Reshape_3_output_0
+2026-08-26T16:31:30.706997Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.4/attention/self/Reshape_output_0
+2026-08-26T16:31:30.707034Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.4/attention/self/Reshape_2_output_0
+2026-08-26T16:31:30.707071Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.4/attention/self/Reshape_1_output_0
+2026-08-26T16:31:30.707122Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.4/attention/self/Reshape_3_output_0
+2026-08-26T16:31:30.707160Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.5/attention/self/Reshape_output_0
+2026-08-26T16:31:30.707197Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.5/attention/self/Reshape_2_output_0
+2026-08-26T16:31:30.707234Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.5/attention/self/Reshape_1_output_0
+2026-08-26T16:31:30.707273Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.5/attention/self/Reshape_3_output_0
+2026-08-26T16:31:30.707292Z  INFO ort::logging: Total fused reshape node count: 24
+2026-08-26T16:31:30.707317Z  INFO ort::logging: GraphTransformer ReshapeFusion modified: 1 with status: OK
+2026-08-26T16:31:30.710183Z  INFO ort::logging: Removing initializer '/0/auto_model/encoder/layer.4/attention/self/Constant_11_output_0'. It is no longer used by any node.
+2026-08-26T16:31:30.710209Z  INFO ort::logging: Removing initializer '/0/auto_model/encoder/layer.4/attention/self/Constant_6_output_0'. It is no longer used by any node.
+2026-08-26T16:31:30.710233Z  INFO ort::logging: Removing initializer '/0/auto_model/encoder/layer.0/attention/self/Constant_15_output_0'. It is no longer used by any node.
+2026-08-26T16:31:30.710308Z  INFO ort::logging: GraphTransformer FreeDimensionOverrideTransformer modified: 0 with status: OK
+2026-08-26T16:31:30.710336Z  INFO ort::logging: GraphTransformer GeluFusionL1 modified: 0 with status: OK
+2026-08-26T16:31:30.710361Z  INFO ort::logging: GraphTransformer LayerNormFusionL1 modified: 0 with status: OK
+2026-08-26T16:31:30.710473Z  INFO ort::logging: GraphTransformer QDQPropagationTransformer modified: 0 with status: OK
+2026-08-26T16:31:30.710572Z  INFO ort::logging: GraphTransformer WeightBiasQuantization modified: 0 with status: OK
+2026-08-26T16:31:30.710700Z  INFO ort::logging: GraphTransformer EnsureUniqueDQForNodeUnit modified: 0 with status: OK
+2026-08-26T16:31:30.710803Z  INFO ort::logging: GraphTransformer WhereDummyDq modified: 0 with status: OK
+2026-08-26T16:31:30.711335Z  INFO ort::logging: GraphTransformer TransposeOptimizer modified: 0 with status: OK
+2026-08-26T16:31:30.711534Z  INFO ort::logging: GraphTransformer Level1_RuleBasedTransformer modified: 0 with status: OK
+2026-08-26T16:31:30.711624Z  INFO ort::logging: GraphTransformer DoubleQDQPairsRemover modified: 0 with status: OK
+2026-08-26T16:31:30.711954Z  INFO ort::logging: GraphTransformer CommonSubexpressionElimination modified: 0 with status: OK
+2026-08-26T16:31:30.712100Z  INFO ort::logging: GraphTransformer ConstantFolding modified: 0 with status: OK
+2026-08-26T16:31:30.712203Z  INFO ort::logging: GraphTransformer MatMulAddFusion modified: 0 with status: OK
+2026-08-26T16:31:30.712291Z  INFO ort::logging: GraphTransformer ReshapeFusion modified: 0 with status: OK
+2026-08-26T16:31:30.712310Z  INFO ort::logging: GraphTransformer FreeDimensionOverrideTransformer modified: 0 with status: OK
+2026-08-26T16:31:30.712326Z  INFO ort::logging: GraphTransformer GeluFusionL1 modified: 0 with status: OK
+2026-08-26T16:31:30.712341Z  INFO ort::logging: GraphTransformer LayerNormFusionL1 modified: 0 with status: OK
+2026-08-26T16:31:30.712430Z  INFO ort::logging: GraphTransformer QDQPropagationTransformer modified: 0 with status: OK
+2026-08-26T16:31:30.712513Z  INFO ort::logging: GraphTransformer WeightBiasQuantization modified: 0 with status: OK
+2026-08-26T16:31:30.712602Z  INFO ort::logging: GraphTransformer EnsureUniqueDQForNodeUnit modified: 0 with status: OK
+2026-08-26T16:31:30.712685Z  INFO ort::logging: GraphTransformer WhereDummyDq modified: 0 with status: OK
+2026-08-26T16:31:30.717630Z  INFO ort::logging: Running graph optimizations in loop 1 time/s (Graph Optimizations Loop Level : 1)
+2026-08-26T16:31:30.717950Z  INFO ort::logging: GraphTransformer RemoveDuplicateCastTransformer modified: 0 with status: OK
+2026-08-26T16:31:30.717971Z  INFO ort::logging: GraphTransformer CastFloat16Transformer modified: 0 with status: OK
+2026-08-26T16:31:30.718007Z  INFO ort::logging: GraphTransformer MemcpyTransformer modified: 0 with status: OK
+2026-08-26T16:31:30.723316Z  INFO ort::logging: Use DeviceBasedPartition as default
+2026-08-26T16:31:30.761462Z  INFO ort::logging: Saving initialized tensors.
+2026-08-26T16:31:30.761566Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-26T16:31:30.761612Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-26T16:31:30.761637Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-26T16:31:30.761671Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:31:30.761691Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-26T16:31:30.761717Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-26T16:31:30.761737Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:31:30.761760Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-26T16:31:30.761780Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:31:30.761814Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-26T16:31:30.761834Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:31:30.761857Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:31:30.761880Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-26T16:31:30.761908Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:31:30.761929Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-26T16:31:30.761950Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-26T16:31:30.761969Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:31:30.761995Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:31:30.762016Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 16
+2026-08-26T16:31:30.762043Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:31:30.762066Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-26T16:31:30.762092Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:31:30.762110Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-26T16:31:30.762130Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 16
+2026-08-26T16:31:30.762148Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:31:30.762167Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-26T16:31:30.762188Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-26T16:31:30.762210Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:31:30.762231Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-26T16:31:30.762262Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-26T16:31:30.762285Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-26T16:31:30.762305Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-26T16:31:30.762323Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:31:30.762343Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-26T16:31:30.762362Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-26T16:31:30.762383Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-26T16:31:30.762406Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:31:30.762424Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:31:30.762444Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-26T16:31:30.762463Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:31:30.762482Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-26T16:31:30.762507Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:31:30.762529Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:31:30.762550Z  INFO ort::logging: Done saving initialized tensors
+2026-08-26T16:31:30.763209Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.763454Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.763670Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.763879Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.764101Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:31:30.765536Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:31:30.767030Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.767279Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.767542Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.767780Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.768008Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:31:30.769383Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:31:30.770715Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.770941Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.771148Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.771366Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.771596Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:31:30.773033Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:31:30.774374Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.774598Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.774803Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.775016Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.775232Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:31:30.776675Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:31:30.777968Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.778203Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.778416Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.778630Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.778848Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:31:30.780243Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:31:30.781487Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.781724Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.782032Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.782257Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:31:30.782473Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:31:30.783897Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:31:30.785530Z  INFO ort::logging: Session successfully initialized.
+2026-08-26T16:31:30.786251Z  INFO actix_server::builder: starting 4 workers
+2026-08-26T16:31:30.786350Z  INFO actix_server::server: Tokio runtime found; starting in existing Tokio runtime
+2026-08-26T16:31:30.786384Z  INFO actix_server::server: starting service: "actix-web-service-127.0.0.1:8000", workers: 4, listening on: 127.0.0.1:8000
+2026-08-26T16:31:30.786890Z  INFO MapleEMR: >get_application_secret_key()
+2026-08-26T16:31:30.787203Z DEBUG MapleEMR::webc::tile_factory: >WebContentFactory:new() : Attempting read of: C:\uol\csm500-final-project\src\app\webc\static\LoginTile.htl
+2026-08-26T16:31:30.790185Z  INFO MapleEMR: >get_application_secret_key()
+2026-08-26T16:31:30.790256Z DEBUG MapleEMR::webc::tile_factory: >WebContentFactory:new() : Attempting read of: C:\uol\csm500-final-project\src\app\webc\static\LoginTile.htl
+2026-08-26T16:31:30.791634Z  INFO MapleEMR: >get_application_secret_key()
+2026-08-26T16:31:30.791696Z DEBUG MapleEMR::webc::tile_factory: >WebContentFactory:new() : Attempting read of: C:\uol\csm500-final-project\src\app\webc\static\LoginTile.htl
+2026-08-26T16:31:30.793068Z  INFO MapleEMR: >get_application_secret_key()
+2026-08-26T16:31:30.793119Z DEBUG MapleEMR::webc::tile_factory: >WebContentFactory:new() : Attempting read of: C:\uol\csm500-final-project\src\app\webc\static\LoginTile.htl
+2026-08-26T16:33:59.768880Z DEBUG MapleEMR::route::default_route: -> /default_route Requested
+2026-08-26T16:33:59.768940Z DEBUG MapleEMR::route::default_route: Checking session for Validation errors
+2026-08-26T16:34:03.340378Z DEBUG MapleEMR::route::login_route: -> /login Requested
+2026-08-26T16:34:03.340453Z DEBUG MapleEMR::dao::auth_dao: Query: SELECT id, name, username, email, created_timestamp, password FROM USERS WHERE USERNAME = 'chath' AND PASSWORD = 'nurse1'
+2026-08-26T16:34:03.347457Z DEBUG sqlx::query: summary="SELECT id, name, username, …" db.statement="\n\nSELECT id, name, username, email, created_timestamp, password FROM USERS WHERE USERNAME = 'chath' AND PASSWORD = 'nurse1'\n" rows_affected=1 rows_returned=1 elapsed=6.5445ms elapsed_secs=0.0065445
+2026-08-26T16:34:03.347620Z DEBUG MapleEMR::dao::auth_dao: Successful login (results found) for: chath
+2026-08-26T16:34:03.347697Z DEBUG MapleEMR::route::login_route: User can login: chath redirect to /home
+2026-08-26T16:34:03.347722Z DEBUG MapleEMR::dao::auth_dao: get_user_permissions Query: SELECT department_id, permission_id FROM public.user_permission where active_flag = 'Y' and users_id = 2 group by department_id, permission_id order by permission_id
+2026-08-26T16:34:03.455086Z DEBUG sqlx::query: summary="SELECT department_id, permission_id FROM …" db.statement="\n\nSELECT department_id, permission_id FROM public.user_permission where active_flag = 'Y' and users_id = 2 group by department_id, permission_id order by permission_id\n" rows_affected=12 rows_returned=12 elapsed=5.5631ms elapsed_secs=0.0055631
+2026-08-26T16:34:03.460247Z DEBUG MapleEMR::route::home_route: -> /home Route Requested
+2026-08-26T16:34:03.460432Z DEBUG MapleEMR::dao::patient_dao: >get_patients_at_users_site_no_discharge() Query: SELECT p.id, e.id, e.location_id, legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as "legal_middle_names",
+                                        COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
+                                        birthdate, admit_timestamp,
+                                        discharge_timestamp as "discharge_timestamp?",
+                                        phn, l2.short_name "location_short_name"
+                                    FROM patient p
+                                    join encounter e on p.id = e.patient_id
+									join location l2 on l2.id = e.location_id
+                                    where discharge_timestamp is null
+                                      and location_id in (
+                                        select l.id
+                                        from location l
+                                        where site_id in (
+                                        select site_id
+                                        from user_permission up
+                                        where users_id = 2
+                                            and up.site_id = l.site_id)  )
+2026-08-26T16:34:03.471899Z DEBUG sqlx::query: summary="SELECT p.id, e.id, e.location_id, …" db.statement="\n\nSELECT p.id, e.id, e.location_id, legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as \"legal_middle_names\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\", COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        birthdate, admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        phn, l2.short_name \"location_short_name\"\n                                    FROM patient p\n                                    join encounter e on p.id = e.patient_id\n\t\t\t\t\t\t\t\t\tjoin location l2 on l2.id = e.location_id\n                                    where discharge_timestamp is null\n                                      and location_id in (\n                                        select l.id\n                                        from location l\n                                        where site_id in (\n                                        select site_id\n                                        from user_permission up\n                                        where users_id = 2\n                                            and up.site_id = l.site_id)  )\n" rows_affected=7 rows_returned=7 elapsed=11.0154ms elapsed_secs=0.0110154
+2026-08-26T16:34:03.471992Z DEBUG MapleEMR::route::home_route: Retrieved 7 patients:
+2026-08-26T16:34:03.480443Z DEBUG sqlx::query: summary="select e.id \"encounter_id\", admit_timestamp, …" db.statement="\n\n\n                                    select e.id \"encounter_id\", admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\",\n                                        COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        s.name \"encounter_site_name\",\n                                        l.short_name \"room_identifier\",\n                                        'Y' as \"current_encounter\"\n                                    from encounter e\n                                    join location l on e.location_id = l.id\n                                    join site s on s.id = l.site_id\n                                    where patient_id = 1\n                                      and discharge_timestamp is null\n                                      limit 1\n                                    \n" rows_affected=1 rows_returned=1 elapsed=8.1126ms elapsed_secs=0.0081126
+2026-08-26T16:34:03.486814Z DEBUG sqlx::query: summary="SELECT i.id intervention_id, encounter_id, …" db.statement="\n\n\n                                SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,\n                                    intervention_type_id, status_id,\n                                    l.room_identifier,\n                                    ref1.name \"intervention_type\", \n                                    ref2.name \"status\", i.scheduled_timestamp, i.performed_timestamp\n                                FROM intervention i\n                                join location l on  l.id = i.location_id\n                                join common_reference_type ref1 on i.intervention_type_id = ref1.id\n                                join common_reference_type ref2 on i.status_id = ref2.id \n                                where i.encounter_id = 1\n                                  AND i.intervention_type_id = 38\n                                ORDER BY i.id DESC LIMIT 1\n                                                \n" rows_affected=1 rows_returned=1 elapsed=5.8826ms elapsed_secs=0.0058826
+2026-08-26T16:34:03.488038Z DEBUG sqlx::query: summary="select e.id \"encounter_id\", admit_timestamp, …" db.statement="\n\n\n                                    select e.id \"encounter_id\", admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\",\n                                        COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        s.name \"encounter_site_name\",\n                                        l.short_name \"room_identifier\",\n                                        'Y' as \"current_encounter\"\n                                    from encounter e\n                                    join location l on e.location_id = l.id\n                                    join site s on s.id = l.site_id\n                                    where patient_id = 2\n                                      and discharge_timestamp is null\n                                      limit 1\n                                    \n" rows_affected=1 rows_returned=1 elapsed=831µs elapsed_secs=0.000831
+2026-08-26T16:34:03.489479Z DEBUG sqlx::query: summary="SELECT i.id intervention_id, encounter_id, …" db.statement="\n\n\n                                SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,\n                                    intervention_type_id, status_id,\n                                    l.room_identifier,\n                                    ref1.name \"intervention_type\", \n                                    ref2.name \"status\", i.scheduled_timestamp, i.performed_timestamp\n                                FROM intervention i\n                                join location l on  l.id = i.location_id\n                                join common_reference_type ref1 on i.intervention_type_id = ref1.id\n                                join common_reference_type ref2 on i.status_id = ref2.id \n                                where i.encounter_id = 2\n                                  AND i.intervention_type_id = 38\n                                ORDER BY i.id DESC LIMIT 1\n                                                \n" rows_affected=1 rows_returned=1 elapsed=1.0785ms elapsed_secs=0.0010785
+2026-08-26T16:34:03.490651Z DEBUG sqlx::query: summary="select e.id \"encounter_id\", admit_timestamp, …" db.statement="\n\n\n                                    select e.id \"encounter_id\", admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\",\n                                        COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        s.name \"encounter_site_name\",\n                                        l.short_name \"room_identifier\",\n                                        'Y' as \"current_encounter\"\n                                    from encounter e\n                                    join location l on e.location_id = l.id\n                                    join site s on s.id = l.site_id\n                                    where patient_id = 3\n                                      and discharge_timestamp is null\n                                      limit 1\n                                    \n" rows_affected=1 rows_returned=1 elapsed=817.3µs elapsed_secs=0.0008173
+2026-08-26T16:34:03.492361Z DEBUG sqlx::query: summary="SELECT i.id intervention_id, encounter_id, …" db.statement="\n\n\n                                SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,\n                                    intervention_type_id, status_id,\n                                    l.room_identifier,\n                                    ref1.name \"intervention_type\", \n                                    ref2.name \"status\", i.scheduled_timestamp, i.performed_timestamp\n                                FROM intervention i\n                                join location l on  l.id = i.location_id\n                                join common_reference_type ref1 on i.intervention_type_id = ref1.id\n                                join common_reference_type ref2 on i.status_id = ref2.id \n                                where i.encounter_id = 3\n                                  AND i.intervention_type_id = 38\n                                ORDER BY i.id DESC LIMIT 1\n                                                \n" rows_affected=1 rows_returned=1 elapsed=1.3683ms elapsed_secs=0.0013683
+2026-08-26T16:34:03.493764Z DEBUG sqlx::query: summary="select e.id \"encounter_id\", admit_timestamp, …" db.statement="\n\n\n                                    select e.id \"encounter_id\", admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\",\n                                        COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        s.name \"encounter_site_name\",\n                                        l.short_name \"room_identifier\",\n                                        'Y' as \"current_encounter\"\n                                    from encounter e\n                                    join location l on e.location_id = l.id\n                                    join site s on s.id = l.site_id\n                                    where patient_id = 5\n                                      and discharge_timestamp is null\n                                      limit 1\n                                    \n" rows_affected=1 rows_returned=1 elapsed=971µs elapsed_secs=0.000971
+2026-08-26T16:34:03.495255Z DEBUG sqlx::query: summary="SELECT i.id intervention_id, encounter_id, …" db.statement="\n\n\n                                SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,\n                                    intervention_type_id, status_id,\n                                    l.room_identifier,\n                                    ref1.name \"intervention_type\", \n                                    ref2.name \"status\", i.scheduled_timestamp, i.performed_timestamp\n                                FROM intervention i\n                                join location l on  l.id = i.location_id\n                                join common_reference_type ref1 on i.intervention_type_id = ref1.id\n                                join common_reference_type ref2 on i.status_id = ref2.id \n                                where i.encounter_id = 10\n                                  AND i.intervention_type_id = 38\n                                ORDER BY i.id DESC LIMIT 1\n                                                \n" rows_affected=0 rows_returned=0 elapsed=1.1408ms elapsed_secs=0.0011408
+2026-08-26T16:34:03.495338Z DEBUG MapleEMR::dao::intervention_dao: No Interventions found for encounter_id: 10 [count=0]
+2026-08-26T16:34:03.496861Z DEBUG sqlx::query: summary="select e.id \"encounter_id\", admit_timestamp, …" db.statement="\n\n\n                                    select e.id \"encounter_id\", admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\",\n                                        COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        s.name \"encounter_site_name\",\n                                        l.short_name \"room_identifier\",\n                                        'Y' as \"current_encounter\"\n                                    from encounter e\n                                    join location l on e.location_id = l.id\n                                    join site s on s.id = l.site_id\n                                    where patient_id = 25\n                                      and discharge_timestamp is null\n                                      limit 1\n                                    \n" rows_affected=1 rows_returned=1 elapsed=1.1723ms elapsed_secs=0.0011723
+2026-08-26T16:34:03.498591Z DEBUG sqlx::query: summary="SELECT i.id intervention_id, encounter_id, …" db.statement="\n\n\n                                SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,\n                                    intervention_type_id, status_id,\n                                    l.room_identifier,\n                                    ref1.name \"intervention_type\", \n                                    ref2.name \"status\", i.scheduled_timestamp, i.performed_timestamp\n                                FROM intervention i\n                                join location l on  l.id = i.location_id\n                                join common_reference_type ref1 on i.intervention_type_id = ref1.id\n                                join common_reference_type ref2 on i.status_id = ref2.id \n                                where i.encounter_id = 11\n                                  AND i.intervention_type_id = 38\n                                ORDER BY i.id DESC LIMIT 1\n                                                \n" rows_affected=0 rows_returned=0 elapsed=1.2538ms elapsed_secs=0.0012538
+2026-08-26T16:34:03.498709Z DEBUG MapleEMR::dao::intervention_dao: No Interventions found for encounter_id: 11 [count=0]
+2026-08-26T16:34:03.500011Z DEBUG sqlx::query: summary="select e.id \"encounter_id\", admit_timestamp, …" db.statement="\n\n\n                                    select e.id \"encounter_id\", admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\",\n                                        COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        s.name \"encounter_site_name\",\n                                        l.short_name \"room_identifier\",\n                                        'Y' as \"current_encounter\"\n                                    from encounter e\n                                    join location l on e.location_id = l.id\n                                    join site s on s.id = l.site_id\n                                    where patient_id = 26\n                                      and discharge_timestamp is null\n                                      limit 1\n                                    \n" rows_affected=1 rows_returned=1 elapsed=997.4µs elapsed_secs=0.0009974
+2026-08-26T16:34:03.501734Z DEBUG sqlx::query: summary="SELECT i.id intervention_id, encounter_id, …" db.statement="\n\n\n                                SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,\n                                    intervention_type_id, status_id,\n                                    l.room_identifier,\n                                    ref1.name \"intervention_type\", \n                                    ref2.name \"status\", i.scheduled_timestamp, i.performed_timestamp\n                                FROM intervention i\n                                join location l on  l.id = i.location_id\n                                join common_reference_type ref1 on i.intervention_type_id = ref1.id\n                                join common_reference_type ref2 on i.status_id = ref2.id \n                                where i.encounter_id = 12\n                                  AND i.intervention_type_id = 38\n                                ORDER BY i.id DESC LIMIT 1\n                                                \n" rows_affected=0 rows_returned=0 elapsed=1.3159ms elapsed_secs=0.0013159
+2026-08-26T16:34:03.501829Z DEBUG MapleEMR::dao::intervention_dao: No Interventions found for encounter_id: 12 [count=0]
+2026-08-26T16:34:03.503242Z DEBUG sqlx::query: summary="select e.id \"encounter_id\", admit_timestamp, …" db.statement="\n\n\n                                    select e.id \"encounter_id\", admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\",\n                                        COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        s.name \"encounter_site_name\",\n                                        l.short_name \"room_identifier\",\n                                        'Y' as \"current_encounter\"\n                                    from encounter e\n                                    join location l on e.location_id = l.id\n                                    join site s on s.id = l.site_id\n                                    where patient_id = 27\n                                      and discharge_timestamp is null\n                                      limit 1\n                                    \n" rows_affected=1 rows_returned=1 elapsed=1.0923ms elapsed_secs=0.0010923
+2026-08-26T16:34:03.504625Z DEBUG sqlx::query: summary="SELECT i.id intervention_id, encounter_id, …" db.statement="\n\n\n                                SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,\n                                    intervention_type_id, status_id,\n                                    l.room_identifier,\n                                    ref1.name \"intervention_type\", \n                                    ref2.name \"status\", i.scheduled_timestamp, i.performed_timestamp\n                                FROM intervention i\n                                join location l on  l.id = i.location_id\n                                join common_reference_type ref1 on i.intervention_type_id = ref1.id\n                                join common_reference_type ref2 on i.status_id = ref2.id \n                                where i.encounter_id = 13\n                                  AND i.intervention_type_id = 38\n                                ORDER BY i.id DESC LIMIT 1\n                                                \n" rows_affected=0 rows_returned=0 elapsed=1.043ms elapsed_secs=0.001043
+2026-08-26T16:34:03.504698Z DEBUG MapleEMR::dao::intervention_dao: No Interventions found for encounter_id: 13 [count=0]
+2026-08-26T16:34:04.831318Z DEBUG MapleEMR::route::patient_route: -> /patientdtls Route Requested
+2026-08-26T16:34:04.832163Z DEBUG sqlx::query: summary="select e.id \"encounter_id\", admit_timestamp, …" db.statement="\n\n\n                                    select e.id \"encounter_id\", admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\",\n                                        COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        s.name \"encounter_site_name\",\n                                        l.short_name \"room_identifier\",\n                                        'Y' as \"current_encounter\"\n                                    from encounter e\n                                    join location l on e.location_id = l.id\n                                    join site s on s.id = l.site_id\n                                    where patient_id = 2\n                                      and discharge_timestamp is null\n                                      limit 1\n                                    \n" rows_affected=1 rows_returned=1 elapsed=414.4µs elapsed_secs=0.0004144
+2026-08-26T16:34:04.833183Z DEBUG sqlx::query: summary="SELECT i.id intervention_id, encounter_id, …" db.statement="\n\n\n                                SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,\n                                    intervention_type_id, status_id,\n                                    l.room_identifier,\n                                    ref1.name \"intervention_type\", \n                                    ref2.name \"status\", i.scheduled_timestamp, i.performed_timestamp\n                                FROM intervention i\n                                join location l on  l.id = i.location_id\n                                join common_reference_type ref1 on i.intervention_type_id = ref1.id\n                                join common_reference_type ref2 on i.status_id = ref2.id \n                                where i.encounter_id = 2\n                                  AND i.intervention_type_id = 38\n                                ORDER BY i.id DESC LIMIT 1\n                                                \n" rows_affected=1 rows_returned=1 elapsed=609.4µs elapsed_secs=0.0006094
+2026-08-26T16:34:04.835411Z DEBUG sqlx::query: summary="select e.id \"encounter_id\", admit_timestamp, …" db.statement="\n\n\n                                    select e.id \"encounter_id\", admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\",\n                                        COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        s.name \"encounter_site_name\",\n                                        l.short_name \"room_identifier\",\n                                        CASE WHEN discharge_timestamp is null then 'Y' else 'N' end as \"current_encounter\"\n                                    from encounter e\n                                    join location l on e.location_id = l.id\n                                    join site s on s.id = l.site_id\n                                    where patient_id = 2\n                                    order by admit_timestamp desc\n                                    \n" rows_affected=1 rows_returned=1 elapsed=1.5061ms elapsed_secs=0.0015061
+2026-08-26T16:34:04.839580Z DEBUG sqlx::query: summary="SELECT i.id intervention_id, encounter_id, …" db.statement="\n\n\n                                SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,\n                                     intervention_type_id, status_id,\n                                    l.room_identifier,\n                                    ref1.name \"intervention_type\", \n                                    ref2.name \"status\", i.scheduled_timestamp, i.performed_timestamp\n                                FROM intervention i\n                                join location l on  l.id = i.location_id\n                                join common_reference_type ref1 on i.intervention_type_id = ref1.id\n                                join common_reference_type ref2 on i.status_id = ref2.id \n                                where i.encounter_id = 2\n                                ORDER BY i.id DESC\n                                               \n" rows_affected=1 rows_returned=1 elapsed=2.4194ms elapsed_secs=0.0024194
+2026-08-26T16:34:04.840091Z DEBUG MapleEMR::dao::patient_dao: get_patient_details Query: SELECT p.id "patient_id", e.id "encounter_id", e.location_id "location_id", legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as "legal_middle_names",
+                                                COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
+                                                birthdate, admit_timestamp,
+                                                discharge_timestamp as "discharge_timestamp?",
+                                                sin, phn, l2.short_name "location_short_name"
+                                            FROM patient p
+                                            join encounter e on p.id = e.patient_id
+											join location l2 on l2.id = e.location_id
+                                            where patient_id = 2
+2026-08-26T16:34:04.843765Z DEBUG sqlx::query: summary="SELECT p.id \"patient_id\", e.id …" db.statement="\n\nSELECT p.id \"patient_id\", e.id \"encounter_id\", e.location_id \"location_id\", legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as \"legal_middle_names\",\n                                                COALESCE(admit_notes, '') as \"admit_notes\", COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                                birthdate, admit_timestamp,\n                                                discharge_timestamp as \"discharge_timestamp?\",\n                                                sin, phn, l2.short_name \"location_short_name\"\n                                            FROM patient p\n                                            join encounter e on p.id = e.patient_id\n\t\t\t\t\t\t\t\t\t\t\tjoin location l2 on l2.id = e.location_id\n                                            where patient_id = 2\n" rows_affected=1 rows_returned=1 elapsed=3.2327ms elapsed_secs=0.0032327
+2026-08-26T16:34:04.843909Z DEBUG MapleEMR::dao::patient_dao: >get_patients_at_users_site_no_discharge() Query: SELECT p.id, e.id, e.location_id, legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as "legal_middle_names",
+                                        COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
+                                        birthdate, admit_timestamp,
+                                        discharge_timestamp as "discharge_timestamp?",
+                                        phn, l2.short_name "location_short_name"
+                                    FROM patient p
+                                    join encounter e on p.id = e.patient_id
+									join location l2 on l2.id = e.location_id
+                                    where discharge_timestamp is null
+                                      and location_id in (
+                                        select l.id
+                                        from location l
+                                        where site_id in (
+                                        select site_id
+                                        from user_permission up
+                                        where users_id = 2
+                                            and up.site_id = l.site_id)  )
+2026-08-26T16:34:04.844940Z DEBUG sqlx::query: summary="SELECT p.id, e.id, e.location_id, …" db.statement="\n\nSELECT p.id, e.id, e.location_id, legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as \"legal_middle_names\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\", COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        birthdate, admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        phn, l2.short_name \"location_short_name\"\n                                    FROM patient p\n                                    join encounter e on p.id = e.patient_id\n\t\t\t\t\t\t\t\t\tjoin location l2 on l2.id = e.location_id\n                                    where discharge_timestamp is null\n                                      and location_id in (\n                                        select l.id\n                                        from location l\n                                        where site_id in (\n                                        select site_id\n                                        from user_permission up\n                                        where users_id = 2\n                                            and up.site_id = l.site_id)  )\n" rows_affected=7 rows_returned=7 elapsed=667.7µs elapsed_secs=0.0006677
+2026-08-26T16:34:04.845037Z DEBUG MapleEMR::dao::common_dao: get_common_references()
+2026-08-26T16:34:04.847350Z DEBUG sqlx::query: summary="select id, name, description …" db.statement="\n\nselect id, name, description from common_reference_type where group_id = 1 ORDER BY NAME\n" rows_affected=13 rows_returned=13 elapsed=2.0216ms elapsed_secs=0.0020216
+2026-08-26T16:34:04.847428Z DEBUG MapleEMR::webc::tile_factory: >get_patient_details_full_tile()
+2026-08-26T16:34:11.297481Z  INFO MapleEMR::route::nle_route: -> /nlprompt Requested;  natural_language_prompt();  prompt: "this is a test"
+2026-08-26T16:34:11.297538Z  INFO MapleEMR::route::nle_route: CARGO_MANIFEST_DIR = C:\uol\csm500-final-project\src\app
+2026-08-26T16:34:11.298506Z  INFO ort::logging: Session Options {  execution_mode:0 execution_order:DEFAULT enable_profiling:0 optimized_model_filepath: enable_mem_pattern:1 enable_mem_reuse:1 enable_cpu_mem_arena:1 profile_file_prefix:onnxruntime_profile_ session_logid: session_log_severity_level:-1 session_log_verbosity_level:0 max_num_graph_transformation_steps:10 graph_optimization_level:1 intra_op_param:OrtThreadPoolParams { thread_pool_size: 1 auto_set_affinity: 0 allow_spinning: 0 dynamic_block_base_: 0 stack_size: 0 affinity_str:  set_denormal_as_zero: 0 } inter_op_param:OrtThreadPoolParams { thread_pool_size: 0 auto_set_affinity: 0 allow_spinning: 0 dynamic_block_base_: 0 stack_size: 0 affinity_str:  set_denormal_as_zero: 0 } use_per_session_threads:1 thread_pool_allow_spinning:1 use_deterministic_compute:0 ep_selection_policy:5 config_options: {  } }
+2026-08-26T16:34:11.298563Z  INFO ort::logging: Creating and using per session threadpools since use_per_session_threads_ is true
+2026-08-26T16:34:11.298587Z  INFO ort::logging: Dynamic block base set to 0
+2026-08-26T16:34:11.356522Z  INFO ort::logging: Initializing session.
+2026-08-26T16:34:11.356575Z  INFO ort::logging: Creating BFCArena for Cpu with following configs: initial_chunk_size_bytes: 1048576 max_dead_bytes_per_chunk: 134217728 initial_growth_chunk_size_bytes: 2097152 max_power_of_two_extend_bytes: 1073741824 memory limit: 18446744073709551615 arena_extend_strategy: 0
+2026-08-26T16:34:11.356645Z  INFO ort::logging: This model does not have any local functions defined. AOT Inlining is not performed
+2026-08-26T16:34:11.380705Z  INFO ort::logging: GraphTransformer EnsureUniqueDQForNodeUnit modified: 0 with status: OK
+2026-08-26T16:34:11.381082Z  INFO ort::logging: GraphTransformer Level1_RuleBasedTransformer modified: 0 with status: OK
+2026-08-26T16:34:11.381211Z  INFO ort::logging: GraphTransformer DoubleQDQPairsRemover modified: 0 with status: OK
+2026-08-26T16:34:11.382562Z  INFO ort::logging: Total shared scalar initializer count: 199
+2026-08-26T16:34:11.382592Z  INFO ort::logging: GraphTransformer ConstantSharing modified: 1 with status: OK
+2026-08-26T16:34:11.387274Z  INFO ort::logging: GraphTransformer CommonSubexpressionElimination modified: 1 with status: OK
+2026-08-26T16:34:11.394625Z  INFO ort::logging: GraphTransformer ConstantFolding modified: 1 with status: OK
+2026-08-26T16:34:11.399875Z  INFO ort::logging: Removing initializer '/1/Constant_8_output_0'. It is no longer used by any node.
+2026-08-26T16:34:11.399942Z  INFO ort::logging: Removing initializer '/0/auto_model/Shape_2_output_0'. It is no longer used by any node.
+2026-08-26T16:34:11.399959Z  INFO ort::logging: Removing initializer '/1/Shape_3_output_0'. It is no longer used by any node.
+2026-08-26T16:34:11.400196Z  INFO ort::logging: GraphTransformer MatMulAddFusion modified: 0 with status: OK
+2026-08-26T16:34:11.400345Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.0/attention/self/Reshape_output_0
+2026-08-26T16:34:11.400385Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.0/attention/self/Reshape_2_output_0
+2026-08-26T16:34:11.400423Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.0/attention/self/Reshape_1_output_0
+2026-08-26T16:34:11.400474Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.0/attention/self/Reshape_3_output_0
+2026-08-26T16:34:11.400523Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.1/attention/self/Reshape_output_0
+2026-08-26T16:34:11.400560Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.1/attention/self/Reshape_2_output_0
+2026-08-26T16:34:11.400597Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.1/attention/self/Reshape_1_output_0
+2026-08-26T16:34:11.400638Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.1/attention/self/Reshape_3_output_0
+2026-08-26T16:34:11.400676Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.2/attention/self/Reshape_output_0
+2026-08-26T16:34:11.400713Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.2/attention/self/Reshape_2_output_0
+2026-08-26T16:34:11.400749Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.2/attention/self/Reshape_1_output_0
+2026-08-26T16:34:11.400790Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.2/attention/self/Reshape_3_output_0
+2026-08-26T16:34:11.400827Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.3/attention/self/Reshape_output_0
+2026-08-26T16:34:11.400865Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.3/attention/self/Reshape_2_output_0
+2026-08-26T16:34:11.400902Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.3/attention/self/Reshape_1_output_0
+2026-08-26T16:34:11.400942Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.3/attention/self/Reshape_3_output_0
+2026-08-26T16:34:11.400980Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.4/attention/self/Reshape_output_0
+2026-08-26T16:34:11.401016Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.4/attention/self/Reshape_2_output_0
+2026-08-26T16:34:11.401052Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.4/attention/self/Reshape_1_output_0
+2026-08-26T16:34:11.401093Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.4/attention/self/Reshape_3_output_0
+2026-08-26T16:34:11.401130Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.5/attention/self/Reshape_output_0
+2026-08-26T16:34:11.401167Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.5/attention/self/Reshape_2_output_0
+2026-08-26T16:34:11.401210Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.5/attention/self/Reshape_1_output_0
+2026-08-26T16:34:11.401254Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.5/attention/self/Reshape_3_output_0
+2026-08-26T16:34:11.401273Z  INFO ort::logging: Total fused reshape node count: 24
+2026-08-26T16:34:11.401288Z  INFO ort::logging: GraphTransformer ReshapeFusion modified: 1 with status: OK
+2026-08-26T16:34:11.404138Z  INFO ort::logging: Removing initializer '/0/auto_model/encoder/layer.4/attention/self/Constant_11_output_0'. It is no longer used by any node.
+2026-08-26T16:34:11.404163Z  INFO ort::logging: Removing initializer '/0/auto_model/encoder/layer.4/attention/self/Constant_6_output_0'. It is no longer used by any node.
+2026-08-26T16:34:11.404187Z  INFO ort::logging: Removing initializer '/0/auto_model/encoder/layer.0/attention/self/Constant_15_output_0'. It is no longer used by any node.
+2026-08-26T16:34:11.404252Z  INFO ort::logging: GraphTransformer FreeDimensionOverrideTransformer modified: 0 with status: OK
+2026-08-26T16:34:11.404269Z  INFO ort::logging: GraphTransformer GeluFusionL1 modified: 0 with status: OK
+2026-08-26T16:34:11.404284Z  INFO ort::logging: GraphTransformer LayerNormFusionL1 modified: 0 with status: OK
+2026-08-26T16:34:11.404382Z  INFO ort::logging: GraphTransformer QDQPropagationTransformer modified: 0 with status: OK
+2026-08-26T16:34:11.404474Z  INFO ort::logging: GraphTransformer WeightBiasQuantization modified: 0 with status: OK
+2026-08-26T16:34:11.404563Z  INFO ort::logging: GraphTransformer EnsureUniqueDQForNodeUnit modified: 0 with status: OK
+2026-08-26T16:34:11.404646Z  INFO ort::logging: GraphTransformer WhereDummyDq modified: 0 with status: OK
+2026-08-26T16:34:11.405082Z  INFO ort::logging: GraphTransformer TransposeOptimizer modified: 0 with status: OK
+2026-08-26T16:34:11.405271Z  INFO ort::logging: GraphTransformer Level1_RuleBasedTransformer modified: 0 with status: OK
+2026-08-26T16:34:11.405355Z  INFO ort::logging: GraphTransformer DoubleQDQPairsRemover modified: 0 with status: OK
+2026-08-26T16:34:11.405694Z  INFO ort::logging: GraphTransformer CommonSubexpressionElimination modified: 0 with status: OK
+2026-08-26T16:34:11.405835Z  INFO ort::logging: GraphTransformer ConstantFolding modified: 0 with status: OK
+2026-08-26T16:34:11.405937Z  INFO ort::logging: GraphTransformer MatMulAddFusion modified: 0 with status: OK
+2026-08-26T16:34:11.406023Z  INFO ort::logging: GraphTransformer ReshapeFusion modified: 0 with status: OK
+2026-08-26T16:34:11.406041Z  INFO ort::logging: GraphTransformer FreeDimensionOverrideTransformer modified: 0 with status: OK
+2026-08-26T16:34:11.406057Z  INFO ort::logging: GraphTransformer GeluFusionL1 modified: 0 with status: OK
+2026-08-26T16:34:11.406071Z  INFO ort::logging: GraphTransformer LayerNormFusionL1 modified: 0 with status: OK
+2026-08-26T16:34:11.406157Z  INFO ort::logging: GraphTransformer QDQPropagationTransformer modified: 0 with status: OK
+2026-08-26T16:34:11.406237Z  INFO ort::logging: GraphTransformer WeightBiasQuantization modified: 0 with status: OK
+2026-08-26T16:34:11.406322Z  INFO ort::logging: GraphTransformer EnsureUniqueDQForNodeUnit modified: 0 with status: OK
+2026-08-26T16:34:11.406402Z  INFO ort::logging: GraphTransformer WhereDummyDq modified: 0 with status: OK
+2026-08-26T16:34:11.412160Z  INFO ort::logging: Running graph optimizations in loop 1 time/s (Graph Optimizations Loop Level : 1)
+2026-08-26T16:34:11.412595Z  INFO ort::logging: GraphTransformer RemoveDuplicateCastTransformer modified: 0 with status: OK
+2026-08-26T16:34:11.412618Z  INFO ort::logging: GraphTransformer CastFloat16Transformer modified: 0 with status: OK
+2026-08-26T16:34:11.412638Z  INFO ort::logging: GraphTransformer MemcpyTransformer modified: 0 with status: OK
+2026-08-26T16:34:11.417690Z  INFO ort::logging: Use DeviceBasedPartition as default
+2026-08-26T16:34:11.455518Z  INFO ort::logging: Saving initialized tensors.
+2026-08-26T16:34:11.455599Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-26T16:34:11.455642Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:34:11.455668Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:34:11.455693Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:34:11.455713Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-26T16:34:11.455736Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:34:11.455755Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-26T16:34:11.455789Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:34:11.455811Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:34:11.455835Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-26T16:34:11.455856Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-26T16:34:11.455880Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:34:11.455899Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-26T16:34:11.455926Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 16
+2026-08-26T16:34:11.455945Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:34:11.455967Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-26T16:34:11.455986Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-26T16:34:11.456007Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:34:11.456026Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-26T16:34:11.456048Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:34:11.456068Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:34:11.456088Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-26T16:34:11.456114Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-26T16:34:11.456133Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:34:11.456151Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:34:11.456171Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-26T16:34:11.456191Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-26T16:34:11.456211Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-26T16:34:11.456230Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 16
+2026-08-26T16:34:11.456249Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:34:11.456270Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-26T16:34:11.456297Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-26T16:34:11.456321Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-26T16:34:11.456344Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:34:11.456368Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-26T16:34:11.456395Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:34:11.456421Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-26T16:34:11.456443Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-26T16:34:11.456463Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-26T16:34:11.456482Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-26T16:34:11.456501Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-26T16:34:11.456519Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:34:11.456538Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-26T16:34:11.456569Z  INFO ort::logging: Done saving initialized tensors
+2026-08-26T16:34:11.457041Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.457323Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.457527Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.457919Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.458147Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:34:11.459660Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:34:11.460997Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.461222Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.461427Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.461642Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.461854Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:34:11.463327Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:34:11.464692Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.464919Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.465146Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.465360Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.465591Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:34:11.466995Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:34:11.468355Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.468580Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.468805Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.469023Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.469244Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:34:11.470770Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:34:11.472102Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.472340Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.472551Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.472798Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.473017Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:34:11.474683Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:34:11.476021Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.476258Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.476464Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.476688Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-26T16:34:11.476905Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:34:11.478405Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-26T16:34:11.480089Z  INFO ort::logging: Session successfully initialized.
+2026-08-26T16:34:11.573020Z DEBUG MapleEMR::nle::controller: CommandController::New() C:\uol\csm500-final-project\src\app\data\command_mapping.csv
+2026-08-26T16:34:11.580586Z DEBUG MapleEMR::nle::controller: get_classifier_rankings_filtered_for_permissions()
+2026-08-26T16:34:11.583607Z  INFO ort::logging: Extending BFCArena for Cpu. bin_num:0 (requested) num_bytes: 16 (actual) rounded_bytes:256
+2026-08-26T16:34:11.583668Z  INFO ort::logging: Extended allocation by 1048576 bytes.
+2026-08-26T16:34:11.583686Z  INFO ort::logging: Total allocated bytes: 43516792
+2026-08-26T16:34:11.583706Z  INFO ort::logging: Allocated memory at 000001D6C77F4080 to 000001D6C78F4080
+2026-08-26T16:34:11.583920Z  INFO ort::logging: Extending BFCArena for Cpu. bin_num:13 (requested) num_bytes: 2359296 (actual) rounded_bytes:2359296
+2026-08-26T16:34:11.583952Z  INFO ort::logging: Extended allocation by 4194304 bytes.
+2026-08-26T16:34:11.583968Z  INFO ort::logging: Total allocated bytes: 47711096
+2026-08-26T16:34:11.583983Z  INFO ort::logging: Allocated memory at 000001D6CB93C080 to 000001D6CBD3C080
+2026-08-26T16:34:11.584473Z  INFO ort::logging: Extending BFCArena for Cpu. bin_num:13 (requested) num_bytes: 2359296 (actual) rounded_bytes:2359296
+2026-08-26T16:34:11.584506Z  INFO ort::logging: Extended allocation by 4194304 bytes.
+2026-08-26T16:34:11.584521Z  INFO ort::logging: Total allocated bytes: 51905400
+2026-08-26T16:34:11.584535Z  INFO ort::logging: Allocated memory at 000001D6CBD48080 to 000001D6CC148080
+2026-08-26T16:34:11.585281Z  INFO ort::logging: Extending BFCArena for Cpu. bin_num:13 (requested) num_bytes: 2359296 (actual) rounded_bytes:2359296
+2026-08-26T16:34:11.585314Z  INFO ort::logging: Extended allocation by 8388608 bytes.
+2026-08-26T16:34:11.585329Z  INFO ort::logging: Total allocated bytes: 60294008
+2026-08-26T16:34:11.585343Z  INFO ort::logging: Allocated memory at 000001D6CC15B080 to 000001D6CC95B080
+2026-08-26T16:34:11.597200Z  INFO ort::logging: Extending BFCArena for Cpu. bin_num:15 (requested) num_bytes: 9437184 (actual) rounded_bytes:9437184
+2026-08-26T16:34:11.597270Z  INFO ort::logging: Extended allocation by 16777216 bytes.
+2026-08-26T16:34:11.597286Z  INFO ort::logging: Total allocated bytes: 77071224
+2026-08-26T16:34:11.597302Z  INFO ort::logging: Allocated memory at 000001D6D0097080 to 000001D6D1097080
+2026-08-26T16:34:11.600651Z  INFO ort::logging: Extending BFCArena for Cpu. bin_num:15 (requested) num_bytes: 9437184 (actual) rounded_bytes:9437184
+2026-08-26T16:34:11.600721Z  INFO ort::logging: Extended allocation by 33554432 bytes.
+2026-08-26T16:34:11.600742Z  INFO ort::logging: Total allocated bytes: 110625656
+2026-08-26T16:34:11.600759Z  INFO ort::logging: Allocated memory at 000001D6D10A1080 to 000001D6D30A1080
+2026-08-26T16:34:12.036309Z DEBUG MapleEMR::nle::controller: get_permission_for_operation(): Compare to prompt: 'admit patient'
+2026-08-26T16:34:12.036356Z DEBUG MapleEMR::nle::controller: get_permission_for_operation(): Compare to prompt: 'discharge patient'
+2026-08-26T16:34:12.036371Z DEBUG MapleEMR::nle::controller: get_permission_for_operation(): Compare to prompt: 'move patient'
+2026-08-26T16:34:12.036383Z DEBUG MapleEMR::nle::controller: get_permission_for_operation(): Compare to prompt: 'create patient'
+2026-08-26T16:34:12.036395Z DEBUG MapleEMR::nle::controller: get_permission_for_operation(): Compare to prompt: 'add patient'
+2026-08-26T16:34:12.036408Z DEBUG MapleEMR::nle::controller: get_permission_for_operation(): Compare to prompt: 'new open patient'
+2026-08-26T16:34:12.036419Z DEBUG MapleEMR::nle::controller: get_permission_for_operation(): Compare to prompt: 'admit add new open patient'
+2026-08-26T16:34:12.036432Z DEBUG MapleEMR::nle::controller: get_permission_for_operation(): Compare to prompt: 'add medication'
+2026-08-26T16:34:12.036443Z DEBUG MapleEMR::nle::controller: get_permission_for_operation(): Compare to prompt: 'prescribe medication'
+2026-08-26T16:34:12.036456Z DEBUG MapleEMR::nle::controller: get_permission_for_operation(): Compare to prompt: 'add information'
+2026-08-26T16:34:12.036468Z DEBUG MapleEMR::nle::controller: get_permission_for_operation(): Compare to prompt: 'update contact information'
+2026-08-26T16:34:12.036485Z DEBUG MapleEMR::nle::controller: get_permission_for_operation(): Compare to prompt: 'admit patient'
+2026-08-26T16:34:12.036501Z DEBUG MapleEMR::nle::controller: get_permission_for_operation(): Compare to prompt: 'discharge patient'
+2026-08-26T16:34:12.036517Z DEBUG MapleEMR::nle::controller: get_permission_for_operation(): Compare to prompt: 'move patient'
+2026-08-26T16:36:42.752419Z  INFO actix_server::server: SIGINT received; starting forced shutdown
+2026-08-26T16:36:42.752573Z DEBUG actix_server::accept: paused accepting connections on 127.0.0.1:8000
+2026-08-26T16:36:42.752611Z  INFO actix_server::accept: accept thread stopped
+2026-08-26T16:36:42.752766Z  INFO actix_server::worker: shutting down idle worker
+2026-08-26T16:36:42.752804Z  INFO actix_server::worker: shutting down idle worker
+2026-08-26T16:36:42.752864Z  INFO actix_server::worker: shutting down idle worker
+2026-08-26T16:36:42.752914Z  INFO actix_server::worker: shutting down idle worker

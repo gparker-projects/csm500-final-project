@@ -8,10 +8,12 @@
 
 use actix_web::{web, HttpResponse, Responder};
 use actix_session::{Session}; 
+use tracing;
 
 use crate::dto::encounter::Encounter;
 use crate::dao::{patient_dao::*, intervention_dao::*, encounter_dao::*}; 
 use crate::webc::menu_fmt::*;
+use crate::webc::simple_fmt::*;
 use crate::session;
 use crate::constants;
 
@@ -23,7 +25,7 @@ impl HomeRoute{
     /// Main workspace page of the application, to be supplemented with lots of Javascript, CSS and API calls
     /// 
     pub async fn route_to_home(app_session: web::Data<session::AppSession>, user_session: Session) -> impl Responder {
-        println!("-> /home Route Requested");
+        tracing::debug!("-> /home Route Requested");
 
         let user_session: session::UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
 
@@ -38,7 +40,7 @@ impl HomeRoute{
         let qry_results = dao.get_patients_at_users_site_no_discharge(user_session.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
         match qry_results {
             Some (patient_list) => {
-            //println!("Retrieved {} patients:", patient_list.len());
+            tracing::debug!("Retrieved {} patients:", patient_list.len());
             let mut pwrap: Vec<PatientWrapper> = Vec::new();
 
             for p in patient_list.clone(){
@@ -54,14 +56,14 @@ impl HomeRoute{
                 //print!(">> DEBUG Added pid={} e={} i={}", tmp_p, tmp_e, tmp_i);
             }
             
-            let patient_list_html = wcf.get_home_route_summary_of_patients_tile_using_wrapper(pwrap.clone()); 
+            let patient_list_html = SimpleFormatter::get_home_route_summary_of_patients_tile_using_wrapper(pwrap.clone()); 
             content = content.replace(constants::BODY_TILE_CONTENT_TAG, &patient_list_html);  // replace default string
 
             let std_menu_html = {MenuFormatter{}}.get_legacy_menu(patient_list.clone()); 
             content = content.replace(constants::LEGACY_MENU_TILE_TAG, &std_menu_html);  // replace default string       
             }
             None => {
-            println!("No patients found");
+                tracing::debug!("No patients found");
             }
         }
         // and adjust the menu

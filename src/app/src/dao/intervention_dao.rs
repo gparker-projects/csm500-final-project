@@ -1,10 +1,11 @@
 use sqlx::postgres::{PgPool}; 
 use sqlx::Row;
 use chrono::NaiveDateTime;
+use tracing;
+
 use crate::dto::{intervention::*, intervention_detail::*};
 use crate::constants;
 use crate::dao::db_query;
-
 use crate::webc::{data_forms::*};
 
 #[derive(Debug, Clone)]
@@ -40,8 +41,8 @@ impl InterventionDAO {
         .unwrap_or_default();
 
         if rows.is_empty() {
-            //println!(">get_interventions() Query: {}", query);
-            //println!("No Interventions found for encounter_id: {} [count={}]", intervention_id, rows.len());
+            tracing::debug!(">get_interventions() Query: {}", query);
+            tracing::debug!("No Interventions found for encounter_id: {} [count={}]", intervention_id, rows.len());
             return Ok( None );
         }
         else{
@@ -107,7 +108,7 @@ impl InterventionDAO {
 
         if rows.is_empty() {
             //println!(">get_interventions() Query: {}", query);
-            println!("No Interventions found for encounter_id: {} [count={}]", encounter_id, rows.len());
+            tracing::debug!("No Interventions found for encounter_id: {} [count={}]", encounter_id, rows.len());
             return Ok( Some( Vec::new() ) );
         }
         else{
@@ -174,9 +175,8 @@ impl InterventionDAO {
         .unwrap_or_default();
 
         if rows.is_empty() {
-            println!("No intervention details found for intervention_id: {} [{}]", intervention_id, rows.len());
-            
-            println!("get_interventions_details() Query: {}", query);
+            tracing::debug!("No intervention details found for intervention_id: {} [{}]", intervention_id, rows.len());
+            tracing::debug!("get_interventions_details() Query: {}", query);
             return Ok( Some( Vec::new() ) );
         }
         else{
@@ -221,7 +221,7 @@ impl InterventionDAO {
     /// RETURNS: i64: the id of the Intervention record that is created, if applicable
     /// 
     pub async fn upsert_intervention_from_intv_form(&self, form: InterventionDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
-        println!("  > upsert_intervention_from_intv_form (Intervention id={})", &form.intervention_id);
+        tracing::debug!("  > upsert_intervention_from_intv_form (Intervention id={})", &form.intervention_id);
 
         let mut query_level_0 = db_query::UPDATE_INTERVENTION.to_string();
 
@@ -242,7 +242,7 @@ impl InterventionDAO {
 
         let query = &query_level_9.replace("{status_id}", &form.status_id);
 
-        println!(" >> Intervention Upsert query: {}", query);
+        tracing::debug!(" >> Intervention Upsert query: {}", query);
 
         let result = sqlx::query(&query)
                                                         .fetch_one(&self.connection)

@@ -22,7 +22,7 @@ use actix_cors::Cors;
 use actix_files::*;
 use actix_session::{storage::CookieSessionStore, SessionMiddleware}; //, storage::RedisSessionStore} // for user session management: https://docs.rs/actix-session/latest/actix_session/
 
-use crate::webc::web_content::WebContentFactory; 
+use crate::webc::tile_factory::WebContentFactory; 
 use crate::route::admit_route::AdmitRoute;
 use crate::route::default_route::DefaultRoute;
 use crate::route::home_route::HomeRoute;
@@ -31,6 +31,10 @@ use crate::route::login_route::LoginRoute;
 use crate::route::patient_route::PatientRoute;
 use crate::route::nle_route::*;
 
+use tracing; //::{debug, error, info, trace, warn};
+use tracing_subscriber::{
+    Layer, filter::LevelFilter, layer::SubscriberExt, util::SubscriberInitExt,
+};
 
 use std::sync::Arc;
 use ort::{	session::{Session, builder::GraphOptimizationLevel} };
@@ -50,7 +54,7 @@ mod session;
 /// Allows a monitoring services to perform a basic "is the application up?" check
 /// 
 async fn is_it_up() -> impl Responder {
-  println!("-> /isItUp Requested");
+  tracing::info!("-> /isItUp Requested");
   HttpResponse::Ok().body("MapleEMR is Up")
 }
 
@@ -69,13 +73,37 @@ fn get_static_path_base() -> String{
 /// REF: https://docs.rs/actix-web/latest/actix_web/cookie/struct.Key.html
 /// 
 fn get_application_secret_key() -> Key {
-    println!(">get_application_secret_key()");
+    tracing::info!(">get_application_secret_key()");
 
     actix_web::cookie::Key::from(
     std::env::var("SESSION_KEY")
         .unwrap_or_else(|_| "this_is_a_new_system_key_to_prevent_regeneration_of_a_key_every_time_the_app_starts".to_string())
         .as_bytes()
     )
+}
+
+fn init_logging(){
+  // added per recommendation from 0-to-Prod
+  // https://rust.code-maven.com/logging/tracing-to-a-file.html
+  //
+  let log_filename = "maple_emr-".to_owned() + &chrono::Local::now().format("%Y-%b-%d_%H%M%S").to_string() +".log";
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::fmt::layer()
+                .with_ansi(false)
+                .with_writer(
+                    std::fs::OpenOptions::new()
+                        .create(true)
+                        .append(true)
+                        .open(log_filename)
+                        .unwrap(),
+                )
+                .with_filter(LevelFilter::DEBUG),
+        )
+        // Enable this to also log to STDOUT:
+        //.with(tracing_subscriber::fmt::layer())
+        .init();
+  tracing::info!("MapleEMR is running! Access via: http://127.0.0.1:8000");
 }
 
 /// # Main program
@@ -88,7 +116,7 @@ fn get_application_secret_key() -> Key {
 /// Returns std::io::Result<()> for 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
-  println!("MapleEMR is running! Access via: http://127.0.0.1:8000");
+  init_logging();
 
   //establish database connection for entire application here, add to the application session
   let db_url = constants::DB_CONN_STR;
@@ -98,18 +126,24 @@ async fn main() -> std::io::Result<()> {
       .connect(db_url)
       .await
   {
-      Ok(pool) => pool,
-      Err(e) => panic!("{}", e),
+      Ok(pool) => {
+        tracing::info!("Database connection established to: {}", db_url);
+        pool
+      },
+      Err(e) => {
+        tracing::error!("{}", e);
+        panic!("{}", e)
+      },
   };
 
   // collect the cargo manifest directory at runtime, which means it might not be present
   let base_model_dir = match env::var(constants::CARGO_MANIFEST_DIR) {
       Ok(tmp_path) => {
-          println!("CARGO_MANIFEST_DIR = {}", tmp_path);
+          tracing::info!("CARGO_MANIFEST_DIR = {}", tmp_path);
           tmp_path
       }
       Err(e) => {
-          println!("CARGO_MANIFEST_DIR not set: {}", e);
+          tracing::error!("CARGO_MANIFEST_DIR not set: {}", e);
           "INVALID_PATH".to_string()
       }
   } + constants::DATA_SUB_DIRECTORY;

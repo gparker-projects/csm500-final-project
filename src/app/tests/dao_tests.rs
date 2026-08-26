@@ -8,6 +8,7 @@ mod tests {
   use MapleEMR::dao::patient_dao::PatientDAO;
   use MapleEMR::constants;
   use sqlx::postgres::{PgPoolOptions}; 
+  use tracing;
 
   #[tokio::test]
   async fn test_get_assigned_patients() {
@@ -21,7 +22,10 @@ mod tests {
           .await
       {
           Ok(pool) => pool,
-          Err(e) => panic!("{}", e),
+          Err(e) => {
+            tracing::debug!("{}", e);
+            panic!("{}", e)
+          },
       };
 
     // instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
@@ -30,11 +34,11 @@ mod tests {
 
     match qry_results.unwrap() {
         Some (patient_list) => {
-          println!("Retrieved {} patients", patient_list.len());
+          tracing::debug!("Retrieved {} patients", patient_list.len());
           assert_eq!(patient_list.len(), 7);
         }
         None => {
-          println!("No patients");
+          tracing::debug!("No patients");
           assert!(false);
         }
     }

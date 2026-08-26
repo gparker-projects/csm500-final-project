@@ -1,6 +1,8 @@
 use sqlx::postgres::{PgPool}; //, PgRow};
 use sqlx::Row;
 use std::io::{Error, ErrorKind};
+use tracing;
+
 use crate::dao::db_query;
 use crate::dto::user::User;
 use crate::dto::user_auth::*;
@@ -34,14 +36,14 @@ impl AuthDAO {
         // columns MUST be lowercase and mapped as such below, Rust can not translate them
         let query = format!("SELECT id, name, username, email, created_timestamp, password FROM USERS WHERE USERNAME = '{}' AND PASSWORD = '{}'", user_name, user_password);
 
-        //println!("Query: {}", query);
+        tracing::debug!("Query: {}", query);
 
         match sqlx::query(&query)
         .fetch_optional(&self.connection)
         .await
         {
             Ok( Some(row) ) => {
-                println!("Successful login (results found) for: {}", user_name);
+                tracing::debug!("Successful login (results found) for: {}", user_name);
                 Ok( Some (   {
                         let tmp_new_id: i64 = row.get("id");  // Rust to Postgresql mappings: https://docs.rs/sqlx/latest/sqlx/postgres/types/index.html
                         let tmp_created_at: chrono::NaiveDateTime = row.get("created_timestamp");
@@ -58,11 +60,11 @@ impl AuthDAO {
                 ) )
             }
             Ok(None) => {
-                println!("No user found for: {}", user_name);
+                tracing::debug!("No user found for: {}", user_name);
                 Ok( None )
             }
             Err(err) => {
-                println!("Error on login for: {} ({})", user_name, err);
+                tracing::error!("Error on login for: {} ({})", user_name, err);
                 Ok( None )
             }
         }
@@ -74,7 +76,7 @@ impl AuthDAO {
     pub async fn get_user_permissions(&self, user_id: i64 ) -> Result< Option<UserAuthorization>, std::io::Error> {
         // construct query - we have a denormalized data structure here to save joins, so the table has all the Id's someone would ever need
         let query = format!("SELECT department_id, permission_id FROM public.user_permission where active_flag = 'Y' and users_id = {} group by department_id, permission_id order by permission_id", user_id);
-        //println!("get_user_permissions Query: {}", query);
+        tracing::debug!("get_user_permissions Query: {}", query);
 
         // https://docs.rs/sqlx/latest/sqlx/fn.query_as.html
         // https://stackoverflow.com/questions/67243108/mapping-nm-relations-into-vec-using-sqlx
@@ -86,11 +88,10 @@ impl AuthDAO {
 
         if rows.is_empty() {
             let errmsg = format!("No permissions found for user_id: {}", user_id);
-            println!("{}", errmsg); // had to use https://doc.rust-lang.org/std/io/struct.Error.html to return Error here
+            tracing::error!("{}", errmsg); // had to use https://doc.rust-lang.org/std/io/struct.Error.html to return Error here
             return Err(Error::new(ErrorKind::Other, errmsg));
         }
 
-        //println!("Loading permissions");
         let mut perms: Vec<Permission> = Vec::with_capacity(rows.len());
         for row in rows {
             let tmp_dept_id: i64 = row.0;
@@ -102,7 +103,6 @@ impl AuthDAO {
                     permission_id: tmp_perm_id,
                 }
             );
-            //println!("Load: ({},{})", dept_id, perm_id);
         }
         
         let result = UserAuthorization {
@@ -122,14 +122,14 @@ impl AuthDAO {
         let query_level_0: String = db_query::QRY_ALL_USERS_AND_DEPARTMENT_NAME.to_owned();
         let query = query_level_0.replace("{user_id}", &user_id.to_string());
 
-        println!("get_user_and_departments_at_current_user_sites()");
+        tracing::debug!("get_user_and_departments_at_current_user_sites()");
 
         let rows: Vec<( i64, String, String )> = sqlx::query_as(&query)
                                                 .fetch_all(&self.connection) 
                                                 .await
                                                 .unwrap_or_default();
         if rows.is_empty() {
-            println!("Users and departments not found for user_id={}", user_id);
+            tracing::error!("Users and departments not found for user_id={}", user_id);
             return Ok( Some( Vec::new() ) );
         }
         else{

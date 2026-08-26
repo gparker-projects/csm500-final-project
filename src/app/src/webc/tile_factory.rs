@@ -4,13 +4,13 @@
 use std::fs;
 use derive_more::Display;
 use std::collections::HashMap;
+use tracing;
 
 use crate::constants;
-use crate::dto::{patient::*, encounter::*, intervention::*, intervention_detail::*};
-use crate::dao::patient_dao::PatientWrapper;
+use crate::dto::{patient::*, intervention::*, intervention_detail::*};
 
 use crate::webc::common::CommonFormatter;
-use crate::webc::intervention_fmt::InterventionFormatter;
+use crate::webc::simple_fmt::SimpleFormatter;
 
 /// Enumeration for Web Content Tiles, each representing a tile of information
 /// to be presented by the application
@@ -53,7 +53,7 @@ impl WebContentFactory {
         let mut tiles = HashMap::new();
         let mut filename = content_root_path.to_owned() + "LoginTile.htl";
 
-        //println!("1]WebContentFactory:new() : Attempting read of: {}", filename.clone());
+        tracing::debug!(">WebContentFactory:new() : Attempting read of: {}", filename.clone());
         let mut contents = fs::read_to_string(&filename).expect(constants::ERROR_READING_TEMPLATE); 
         tiles.insert(WebContentItem::WCTypeLoginTile, contents ); 
 
@@ -97,10 +97,6 @@ impl WebContentFactory {
         return self.tile_hashmap[&tile_type].clone();
     }
 
-    // -----------------------------------------------------------------------------------
-    // Home tile formatters
-    // -----------------------------------------------------------------------------------
-
     ///
     /// Wrapper method to return the main home page tile.
     /// 
@@ -117,91 +113,7 @@ impl WebContentFactory {
         // add the user's identity
         return results.replace(constants::USER_IDENTITY_TILE_TAG, &user_identity_label)
     }
-
-    // -----------------------------------------------------------------------------------
-    // Route formatters
-    // -----------------------------------------------------------------------------------
-
-    ///
-    /// Provide rendering of a list of patients, as a screen tile
-    /// 
-    pub fn get_home_route_summary_of_patients_tile_using_wrapper(&self, patient_list: Vec<PatientWrapper>) -> String {
-        let mut results_sbuf = String::with_capacity(100); 
-        let mut counter: i8 = 1;
-
-        results_sbuf.push_str(&CommonFormatter::get_hidden_form("patientdtls".to_owned(), "patientDtlsFrm".to_owned()) );
-
-        for pwrap in patient_list{
-            results_sbuf.push_str("<a href=\"#\" onclick=\"redirect_to_patient("  ); 
-            results_sbuf.push_str( &pwrap.patient.id.to_string() ); 
-            results_sbuf.push_str("); return false;\">");
-            results_sbuf.push_str(&self.get_single_patient_summary( pwrap, counter));
-            results_sbuf.push_str("</a><p></p>");
-            counter = counter + 1;
-        }
-
-        return results_sbuf;
-    }
-
-    // -----------------------------------------------------------------------------------
-    // Patient formatters
-    // -----------------------------------------------------------------------------------
-    pub fn get_single_patient_summary(&self, pwrap: PatientWrapper, index: i8) -> String {
-        let mut results_sbuf = String::with_capacity(500); 
-	    let p = pwrap.patient;
-	    let e = pwrap.current_encounter;
-	    let i = pwrap.most_recent_intervention;
-
-	    results_sbuf.push_str("<table class=\"hover-table\"><tr><td>"); 
-
-        if index != -1 {
-            let idx = index.to_string();
-            results_sbuf.push_str(&idx);
-            results_sbuf.push_str(")&nbsp;");
-        }
-	    results_sbuf.push_str("<b>");
-	    results_sbuf.push_str( &p.legal_last_name ); 
-	    results_sbuf.push_str(", "); 
-	    results_sbuf.push_str( &p.legal_first_name );
-
-	    results_sbuf.push_str("</b>&nbsp;PHN:<i>&nbsp;"); 
-	    results_sbuf.push_str( &p.phn_to_string() );
-	    results_sbuf.push_str("</i>&nbsp;");
-
-	    results_sbuf.push_str("&nbsp;<div class='clinical-electric-blue'>DOB:<b>&nbsp;"); 
-	    results_sbuf.push_str( &p.birth_date_for_display() );
-
-	    results_sbuf.push_str("</b></div>&nbsp;[");
-
-	    results_sbuf.push_str( &p.age() );
-	    results_sbuf.push_str("yrs]&nbsp;@");
-
-	    results_sbuf.push_str( &e.room_identifier );
-	    results_sbuf.push_str("</td></tr>");
-
-	    results_sbuf.push_str("<tr><td>");
-	    results_sbuf.push_str("Admitted: ");
-	    results_sbuf.push_str(&p.admit_timestamp_for_display() );
-
-	    if i.is_some() {
-	       let tmp_intv = i.unwrap();
-
-	       results_sbuf.push_str("&nbsp;");
-	       results_sbuf.push_str( &tmp_intv.intervention_type );
-	       results_sbuf.push_str("&nbsp;@&nbsp;");
-	       results_sbuf.push_str( &tmp_intv.scheduled_timestamp_for_display() );
-
-	       results_sbuf.push_str("&nbsp;(");
-	       results_sbuf.push_str( &tmp_intv.status_code );
-	       results_sbuf.push_str(")");
-	    }
-	    results_sbuf.push_str("</td></tr>");
-
-	    results_sbuf.push_str("</table>");
-
-        return results_sbuf;
-    }
-
+  
     ///
     /// Provide (deep) summary details of a patient
     /// 
@@ -209,6 +121,7 @@ impl WebContentFactory {
                                                 user_identity_label: String, legacy_menu: String, intv_section: String, 
                                                 intervention_type_list: Vec<(i64, String, String)>,
                                                 patient_id: String, encounter_id: String) -> String {
+        tracing::debug!(">get_patient_details_full_tile()");
         let layout = self.get_tile(WebContentItem::WCTypePatientListTile);
 
         // base content
@@ -235,8 +148,8 @@ impl WebContentFactory {
     /// Provide HTML for creating a new patient admit, or completing it as a discharge for an existing patient
     /// It is the same table (Encounter), so one route should suffice
     /// 
-    pub fn get_admit_discharge_tile(&self, user_identity_label: String, current_patient: Option<Patient>, legacy_menu: String, location_menu: String, is_discharge_flag: bool) -> String {
-        println!(">get_admit_discharge_tile()");
+    pub fn get_admit_discharge_full_tile(&self, user_identity_label: String, current_patient: Option<Patient>, legacy_menu: String, location_menu: String, is_discharge_flag: bool) -> String {
+        tracing::debug!(">get_admit_discharge_tile()");
 
         let labels = ["{patient_first_name}","{patient_last_name}", "{middle_name}",
                                   "{phn}","{birthdate}", "{admit_notes}", "{encounter_id}", "{patient_id}"];
@@ -251,10 +164,10 @@ impl WebContentFactory {
 
             None =>{ // new patient (Admit) patH
                 if is_discharge_flag {
-                    println!("  Discharge without Patient => INVALID");
+                    tracing::debug!("  Discharge without Patient => INVALID");
                 }
                 else{
-                    println!("  Admit New Patient");
+                    tracing::debug!("  Admit New Patient");
                 }                
 
                 // admitting a new patient with no data => wipe out the tags
@@ -271,10 +184,10 @@ impl WebContentFactory {
             } 
             Some (p) => {
                 if is_discharge_flag {
-                    println!("  Discharge existing Patient");
+                    tracing::debug!("  Discharge existing Patient");
                 }
                 else{
-                    println!("  Admit update: existing Patient");
+                    tracing::debug!("  Admit update: existing Patient");
                 }         
                 let data_items = [&p.legal_first_name, &p.legal_last_name, &p.legal_middle_names,
                                                 &p.phn_to_string(), &p.birth_date_for_display(),  &p.admit_notes,
@@ -310,66 +223,11 @@ impl WebContentFactory {
         return home_tile_level_1.clone();
     }
    
-    // -----------------------------------------------------------------------------------
-    // Encounter formatters
-    // -----------------------------------------------------------------------------------
-    pub fn get_single_encounter_summary_tile(&self, encounter: Encounter) -> String {
-        let mut results_sbuf = String::with_capacity(100);
-
-        results_sbuf.push_str("<table <tr><th>Admit Reason</th><th>Site/Facility</th></tr>"); 
-
-        results_sbuf.push_str("  <tr>");
-        results_sbuf.push_str("<td><a href=\"#\" onclick=\"redirect_to_enc("  ); 
-        results_sbuf.push_str( &encounter.to_string() ); 
-        results_sbuf.push_str("); return false;\">"); 
-        results_sbuf.push_str( &encounter.admit_timestamp_for_display()); 
-        results_sbuf.push_str("</a></td><td>"); 
-        results_sbuf.push_str( &encounter.encounter_site_name );
-        results_sbuf.push_str("</td>"); 
-        results_sbuf.push_str("  </tr>\n");
-
-        results_sbuf.push_str("  <tr><td><b>Admit Reason:<\\b>&nbsp;");
-        results_sbuf.push_str( &encounter.admit_notes );
-        results_sbuf.push_str("<\\td>\n  </tr>");
-        
-        results_sbuf.push_str("</table>");
-
-
-        return results_sbuf;
-    }
-
-    ///
-    /// Provide HTML for all of a Patient's encounters
-    /// 
-    pub fn get_encounter_list_tile(&self, encounter_list: Vec<Encounter>) -> String {
-        let mut results_sbuf = String::with_capacity(100); 
-
-        //println!(">get_encounter_list_tile()");
-
-        results_sbuf.push_str(&CommonFormatter::get_hidden_form("encounterDtls".to_owned(), "encounterDtlsFrm".to_owned()) );
-
-        results_sbuf.push_str("<table <tr><th>Admit Date</th><th>Site/Facility</th></tr>"); 
-
-        for row in encounter_list{
-            results_sbuf.push_str("  <tr>");
-            results_sbuf.push_str("<td><a href=\"#\" onclick=\"redirect_to_enc("  ); 
-            results_sbuf.push_str( &row.id.to_string() ); 
-            results_sbuf.push_str("); return false;\">"); 
-            results_sbuf.push_str( &row.admit_timestamp_for_display()); 
-            results_sbuf.push_str("</a></td><td>"); 
-            results_sbuf.push_str( &row.encounter_site_name );
-            results_sbuf.push_str("</td>"); 
-            results_sbuf.push_str("  </tr>\n");
-        }
-        results_sbuf.push_str("</table>");
-
-        return results_sbuf;
-    }
    
     ///
     /// Provide HTML for modifying an Intervention
     /// 
-    pub fn get_modify_intervention_full_page_tile(&self, user_identity_label: String,
+    pub fn get_modify_intervention_full_tile(&self, user_identity_label: String,
                                                   current_intervention: Option<Intervention>,
                                                   legacy_menu: String,
                                                   user_dropdown_list: Vec<(i64, String, String)>,
@@ -381,7 +239,7 @@ impl WebContentFactory {
                                                   encounter_id: String,
                                                   intv_details_list: Option<Vec<InterventionDetail>>
                                                   ) -> String {
-        println!(">get_modify_intervention_full_page_tile()");
+        tracing::debug!(">get_modify_intervention_full_page_tile()");
 
         let tags = ["{intervention_id}",
                                 "{intervention_type}",
@@ -412,7 +270,7 @@ impl WebContentFactory {
 
         let data_items = match current_intervention{
             None =>{ // new patient (Admit) path
-                println!("  Create new Intervention");
+                tracing::debug!("  Create new Intervention");
                 dd_user = CommonFormatter::get_dropdown_user_with_department(user_dropdown_list,constants::NOT_SPECIFIED_ID); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
                 dd_intv_status =  CommonFormatter::get_dropdown_intervention_status(status_dropdown_list, constants::DEFAULT_INTERVENTION_STATUS_NEW); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
 
@@ -434,12 +292,12 @@ impl WebContentFactory {
                 tmp_data_items
             } 
             Some (intv) => {
-                println!("  Update existing Intervention");
+                tracing::debug!("  Update existing Intervention");
                 dd_user = CommonFormatter::get_dropdown_user_with_department(user_dropdown_list,intv.users_id); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
                 dd_intv_status =  CommonFormatter::get_dropdown_intervention_status(status_dropdown_list, intv.status_id); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
 
                 let intv_details_html = match intv_details_list {
-                    Some(list) => InterventionFormatter::get_view_only_intervention_details_list( list ),
+                    Some(list) => SimpleFormatter::get_view_only_intervention_details_list( list ),
                     None => "".to_string()
                 };
 

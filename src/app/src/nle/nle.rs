@@ -6,6 +6,7 @@
 //! This module provides struts and classes that will work with data and the Natural Language Model (NLM) for the application.
 //! This not only handles user-provided prompts, but also the work of initiating and calling the Machine Learning/NLM engine.
 //! 
+use tracing;
 use ndarray::{Ix2, Axis}; 
 use ort::{
 	Error,
@@ -31,9 +32,9 @@ impl NaturalLanguageEngine {
     // cargo_manifest_dir should be: env!("CARGO_MANIFEST_DIR")
     //
     pub async fn new(model_file_path: &str, tokenizer_file_path: &str) -> Self {
-        println!("NaturalLanguageEngine::new()");
-        println!("..load model for session: {}", model_file_path.clone());
-        println!("..load tokenizer: {}", tokenizer_file_path.clone());
+        tracing::debug!("NaturalLanguageEngine::new()");
+        tracing::debug!("..load model for session: {}", model_file_path.clone());
+        tracing::debug!("..load tokenizer: {}", tokenizer_file_path.clone());
         
         NaturalLanguageEngine {
             session: {
@@ -52,6 +53,7 @@ impl NaturalLanguageEngine {
       // println!("cwd: {:?}", std::env::current_dir().expect("Current dir could not be accessed"));
       // let canonical = std::fs::canonicalize("all-MiniLM-L6-v2.onnx").expect("File could not be accessed"); // errors if it doesn't exist
       // println!("resolved: {:?}", canonical);
+      tracing::debug!("NaturalLanguageEngine::get_classifier_rankings()");
       println!("NaturalLanguageEngine::get_classifier_rankings()");
 
       let mut results: Vec< (String, f32) > = vec![]; // assemble all results into vector to return
@@ -83,6 +85,7 @@ impl NaturalLanguageEngine {
           // Calculate cosine similarity against the 'query' sentence.
           let dot_product: f32 = query.iter().zip(embeddings.iter()).map(|(a, b)| a * b).sum();
           println!("\t'{}': {:.1}%", sentence, dot_product * 100.);
+          tracing::info!("\t'{}': {:.1}%", sentence, dot_product * 100.);
 
           // push each result comparison into our results
           results.push( (sentence.to_string(), dot_product)  );

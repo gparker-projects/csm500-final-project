@@ -9,6 +9,7 @@
 use actix_web::{web, Responder};
 use actix_session::{Session}; 
 use actix_web::http::StatusCode;
+use tracing;
 
 use crate::dao::{ auth_dao::*}; 
 use crate::webc::{ data_forms::*};
@@ -29,14 +30,14 @@ impl LoginRoute{
     /// check by going to: http://127.0.0.1:8000/db
     /// 
     pub async fn login(user_session: Session, req: web::Form<LoginFormData>, app_session: web::Data<session::AppSession>, ) -> impl Responder { // Box<dyn Responder<>> { //
-        println!("-> /login Requested");
+        tracing::debug!("-> /login Requested");
 
         let cur_db_conn = AuthDAO::new( app_session.get_db_connection() ).await;
         let user_can_login = cur_db_conn.can_user_login(req.username.clone(), req.password.clone()).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
 
         match user_can_login {
             Some (current_user) => {
-            println!("User can login: {} redirect to /home", req.username.clone());
+            tracing::debug!("User can login: {} redirect to /home", req.username.clone());
 
             let uid: i64 = current_user.id;
             let user_perms = cur_db_conn.get_user_permissions( uid ).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
@@ -55,7 +56,7 @@ impl LoginRoute{
             actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SEE_OTHER) 
             }
             None => {
-            println!("Login denied for {} redirect back to /<default route>", req.username.clone()); // must use the user from the session as DB was not successful
+            tracing::debug!("Login denied for {} redirect back to /<default route>", req.username.clone()); // must use the user from the session as DB was not successful
 
             // do not PURGE before this; it will trash the session including this new key
             let _ignore = user_session.insert(constants::VALIDATION_ERRORS, "Invalid user or password. Please try again.");

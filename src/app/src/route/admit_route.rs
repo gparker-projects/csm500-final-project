@@ -9,6 +9,7 @@
 use actix_web::{web, HttpResponse, Responder};
 use actix_session::{Session}; 
 use actix_web::http::StatusCode;
+use tracing;
 
 use crate::constants;
 use crate::dto::patient;
@@ -25,7 +26,7 @@ impl AdmitRoute{
   /// Route that will update the encounter to a discharged status
   /// 
   pub async fn route_to_discharge_patient_save(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<DischargeDataForm>) -> impl Responder {
-      println!("-> Route Requested: /route_to_discharge_patient_save ");
+      tracing::debug!("-> Route Requested: /route_to_discharge_patient_save ");
 
       let req_clone0 = req.clone();
       let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
@@ -35,11 +36,11 @@ impl AdmitRoute{
       match enc_results {
             Ok(e_id) => {
                 let p_id = req.patient_id.to_string();
-                println!("  >Patient (id={p_id}) discharged, [encounter (id={e_id})] updated");
+                tracing::debug!("  >Patient (id={p_id}) discharged, [encounter (id={e_id})] updated");
                 
             },
             Err(e) => {
-                println!("  >Patient not discharged: {e}");
+                tracing::debug!("  >Patient not discharged: {e}");
             }
       }
 
@@ -51,7 +52,7 @@ impl AdmitRoute{
   /// Route that will save patient data, from an Admit form submission
   /// 
   pub async fn route_to_admit_save(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitDataForm>) -> impl Responder {
-      println!("-> Route Requested: /route_to_admit_SAVE ");
+      tracing::debug!("-> Route Requested: /route_to_admit_SAVE ");
 
       let req_clone0 = req.clone();
       let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
@@ -60,7 +61,7 @@ impl AdmitRoute{
       let results = dao.upsert_patient_from_admit_form(req_clone0, user_session_details.get_userid_as_i64()).await;
       match results {
           Ok(p_id) => {
-            println!("  >(Step 1/2): Patient saved successfully, patient (id={p_id}) added/updated");
+            tracing::debug!("  >(Step 1/2): Patient saved successfully, patient (id={p_id}) added/updated");
             let mut req_clone2 = req.clone();
             req_clone2.patient_id = p_id.to_string();
 
@@ -68,9 +69,9 @@ impl AdmitRoute{
             let enc_results = dao.upsert_encounter_from_admit_form(req_clone2, user_session_details.get_userid_as_i64()).await;
             match enc_results {
                 Ok(e_id) => {
-                  println!("  >(Step 2/2): Encounter saved successfully, patient (id={p_id}) and encounter (id={e_id}) added/updated");
+                  tracing::debug!("  >(Step 2/2): Encounter saved successfully, patient (id={p_id}) and encounter (id={e_id}) added/updated");
 
-                  println!("<--- Redirect back to : /route_to_admit_discharge (001)");
+                  tracing::debug!("<--- Redirect back to : /route_to_admit_discharge (001)");
                   let req_clone = req.clone(); // local clone to avoid borrowing issues
 
                   Self::route_to_admit_discharge(app_session, user_session, web::Form(
@@ -90,8 +91,8 @@ impl AdmitRoute{
                   )).await
                 },
                 Err(e) => {
-                    println!("  >(Step 2/2): FAILED - Admit form did not save: {e}");
-                    println!("<--- Redirect back to : /route_to_admit_discharge (002)");
+                    tracing::debug!("  >(Step 2/2): FAILED - Admit form did not save: {e}");
+                    tracing::debug!("<--- Redirect back to : /route_to_admit_discharge (002)");
                     let req_clone = req.clone(); // local clone to avoid borrowing issues
 
                     Self::route_to_admit_discharge(app_session, user_session, web::Form(
@@ -114,8 +115,8 @@ impl AdmitRoute{
             }
           },
           Err(e) => {
-            println!("  >(Step 1/2): FAILED Admit form did not save: {e}");
-            println!("<--- Redirect back to : /route_to_admit_discharge (003)");
+            tracing::debug!("  >(Step 1/2): FAILED Admit form did not save: {e}");
+            tracing::debug!("<--- Redirect back to : /route_to_admit_discharge (003)");
             let req_clone = req.clone(); // local clone to avoid borrowing issues
 
             Self::route_to_admit_discharge(app_session, user_session, web::Form(
@@ -142,7 +143,7 @@ impl AdmitRoute{
   /// Wrapper route for the menu option to admit a patient without having any web form to pass data in from
   /// 
   pub async fn route_to_admit_new_no_patient(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitFormBasic>) -> impl Responder {
-       println!("-> Route Requested: /route_to_admit_new_no_patient");
+       tracing::debug!("-> Route Requested: /route_to_admit_new_no_patient");
 
         AdmitRoute::route_to_admit_discharge(app_session, user_session, web::Form(
             AdmitDataForm {
@@ -157,7 +158,7 @@ impl AdmitRoute{
   /// Wrapper route for the menu option to admit a patient without having any web form to pass data in from
   /// 
   pub async fn route_to_discharge_patient(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitFormBasic>) -> impl Responder {
-       println!("-> Route Requested: /route_to_discharge_patient");
+       tracing::debug!("-> Route Requested: /route_to_discharge_patient");
 
         AdmitRoute::route_to_admit_discharge(app_session, user_session, web::Form(
             AdmitDataForm {
@@ -172,7 +173,7 @@ impl AdmitRoute{
   /// Route for New patient admit, or existing patient discharge page
   /// 
   pub async fn route_to_admit_discharge(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitDataForm>) -> impl Responder {
-      println!("-> Route Requested: /admit_discharge");
+      tracing::debug!("-> Route Requested: /admit_discharge");
 
       let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
       let wcf = &app_session.get_web_content_factory();
@@ -182,15 +183,15 @@ impl AdmitRoute{
 
       let discharge: bool = req.action_flag.eq("discharge");
 
-      println!(">> route_to_admit_discharge() called");
+      tracing::debug!(">> route_to_admit_discharge() called");
 
       let existing_patient: Option<patient::Patient>
         = if patient_id == constants::NOT_SPECIFIED_ID {
-              println!("   No Patient specified: create a new Patient and Encounter");
+              tracing::debug!("   No Patient specified: create a new Patient and Encounter");
               None
           }
           else{
-              println!("   Patient exists: view existing Patient and Encounter");
+              tracing::debug!("   Patient exists: view existing Patient and Encounter");
               dao.get_patient_details( user_session_details.get_userid_as_i64(), patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND ) 
           };
 
@@ -202,7 +203,7 @@ impl AdmitRoute{
             {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id)
           }
           None => {
-              println!("No patients found for legacy menu. [Userid:{}]", user_session_details.get_userid_as_i64());
+              tracing::debug!("No patients found for legacy menu. [Userid:{}]", user_session_details.get_userid_as_i64());
               constants::LEGACY_MENU_ON_ERROR.to_string() // when no patient, return default error-expected menu
           }
       };
@@ -214,13 +215,13 @@ impl AdmitRoute{
               CommonFormatter::get_location_dropdown(loc_list.clone(), constants::DEFAULT_LOCATION_REGISTRATION)
           }
           None => {
-              println!("No locations found for user. [Userid:{}]", user_session_details.get_userid_as_i64());
+              tracing::debug!("No locations found for user. [Userid:{}]", user_session_details.get_userid_as_i64());
               constants::LEGACY_MENU_ON_ERROR.to_string() // when no patient, return default error-expected menu
           }
       };
 
       // construct the tile based on session, patient data and the legacy menu
-      let content = wcf.get_admit_discharge_tile(user_session_details.user_display_name,
+      let content = wcf.get_admit_discharge_full_tile(user_session_details.user_display_name,
                                          existing_patient,
                                          legacy_menu,
                                          location_menu,

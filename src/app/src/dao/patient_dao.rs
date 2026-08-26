@@ -1,8 +1,9 @@
 use sqlx::postgres::{PgPool}; 
 use sqlx::Row;
 use chrono::NaiveDateTime;
-use crate::constants;
+use tracing;
 
+use crate::constants;
 use crate::dao::db_query;
 use crate::dto::{patient::*, encounter::*, intervention::*};
 use crate::webc::{data_forms::*};
@@ -35,7 +36,7 @@ impl PatientDAO {
         let tmp: String = db_query::QRY_SINGLE_PATIENT_DETAILS.to_owned();
         let query = tmp.replace("{}", &patient_id.to_string());
 
-        //println!("get_patient_details Query: {}", query);
+        tracing::debug!("get_patient_details Query: {}", query);
 
         match sqlx::query(&query)
         .fetch_optional(&self.connection)
@@ -82,13 +83,13 @@ impl PatientDAO {
                 )
             }
             Ok(None) => {
-                println!("get_patient_details() Query: {}", query);
-                println!("No patient found for patient_id = {}", patient_id);
+                tracing::debug!("get_patient_details() Query: {}", query);
+                tracing::debug!("No patient found for patient_id = {}", patient_id);
                 Ok( None )
             }
             Err(err) => {
-                println!("get_patient_details() Query: {}", query);
-                println!("Error on patient for: {} ({})", patient_id, err);
+                tracing::debug!("get_patient_details() Query: {}", query);
+                tracing::error!("Error on patient for: {} ({})", patient_id, err);
                 Ok( None )
             }
         }
@@ -122,13 +123,13 @@ impl PatientDAO {
     /// RETURNS: i64: the id of the Encounter record that is created, if applicable
     /// 
     pub async fn update_encounter_from_discharge_form(&self, form: DischargeDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
-        println!("> update_encounter_from_discharge_form");
+        tracing::debug!("> update_encounter_from_discharge_form");
 
         let query_level_0 = db_query::UPDATE_ENCOUNTER_FOR_DISCHARGE.to_string();
         let query_level_1 = &query_level_0.replace("{discharge_notes}", &form.discharge_notes.clone().trim());
         let query_level_2 = &query_level_1.replace("{encounter_id}", &form.encounter_id.clone().trim());
 
-        println!(" >> Encounter Update from discharge: {}", query_level_2);
+        tracing::debug!(" >> Encounter Update from discharge: {}", query_level_2);
 
         let result = sqlx::query(&query_level_2)
                                                         .fetch_one(&self.connection)
@@ -146,7 +147,7 @@ impl PatientDAO {
     /// RETURNS: i64: the id of the Encounter record that is created, if applicable
     /// 
     pub async fn upsert_encounter_from_admit_form(&self, form: AdmitDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
-        println!("> upsert_encounter_from_admit_form");
+        tracing::debug!("> upsert_encounter_from_admit_form");
 
         let mut query_level_0 = db_query::UPDATE_ENCOUNTER.to_string();
 
@@ -161,7 +162,7 @@ impl PatientDAO {
         //let query_level_4 = &query_level_3.replace("{discharge_notes}", &form.discharge_notes.clone().trim());
         let query = &query_level_2.replace("{location_id}", &form.location_id.clone().trim());
 
-        println!(" >> Encounter Upsert: {}", query);
+        tracing::debug!(" >> Encounter Upsert: {}", query);
 
         let result = sqlx::query(&query)
                                                         .fetch_one(&self.connection)
@@ -181,7 +182,7 @@ impl PatientDAO {
     /// REF: https://medium.com/@francis.stephan/developing-a-web-app-with-rust-part-4-sqlx-data-validation-deployment-final-remarks-303e78c2a546
     /// 
     pub async fn upsert_patient_from_admit_form(&self, form: AdmitDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
-        println!("> upsert_patient_from_admit_form");
+        tracing::debug!("> upsert_patient_from_admit_form");
             
         let query_level_0 = db_query::UPSERT_PATIENT;
         let query_level_1 = &query_level_0.replace("{legal_last_name}", &form.patient_last_name.clone().trim());
@@ -191,7 +192,7 @@ impl PatientDAO {
         let query_level_5 = &query_level_4.replace("{phn}", &form.phn.clone());
         let query = query_level_5.clone();
 
-        println!(" >> Upsert: {}", query_level_5);
+        tracing::debug!(" >> Upsert: {}", query_level_5);
 
         let result = sqlx::query(&query)
                                                         .fetch_one(&self.connection)
@@ -216,7 +217,7 @@ impl PatientDAO {
         let tmp: String = db_query::QRY_ALL_PATIENTS_AT_USERS_SITE_NO_DISCHARGE.to_owned();
         let query = tmp.replace("{}", &user_id.to_string());
 
-        //println!(">get_patients_at_users_site_no_discharge() Query: {}", query);
+        tracing::debug!(">get_patients_at_users_site_no_discharge() Query: {}", query);
 
         let rows: Vec<(i64, i64, i64, String, String, String,
                         String, String,
@@ -229,8 +230,8 @@ impl PatientDAO {
         .unwrap_or_default();
 
         if rows.is_empty() {
-            println!(">get_patients_at_users_site_no_discharge() Query: {}", query);
-            println!("No patients found for user_id: {} [{}]", user_id, rows.len());
+            tracing::debug!(">get_patients_at_users_site_no_discharge() Query: {}", query);
+            tracing::debug!("No patients found for user_id: {} [{}]", user_id, rows.len());
             return Ok( Some( Vec::new() ) );
         }
         else{
@@ -277,13 +278,4 @@ impl PatientDAO {
             return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
         }
     }
-
-/* 
-    /// Updates the fields of a specific patient
-    pub async fn upsert_patient_enc_details(&self, _user_id: i64, p: Patient, e:Encounter) -> Result< Option<Patient>, std::io::Error> {
-        
-        println!("  >> upsert_patient_enc_details() to add/update Patient and Encounter");
-
-        todo!();
-    }*/
 }

@@ -5,8 +5,9 @@
 /// 
 #[cfg(test)]
 mod tests {
+  use tracing;
 
-  use MapleEMR::webc::web_content::WebContentItem;
+  use MapleEMR::webc::tile_factory::{WebContentFactory, WebContentItem};
 
   #[test]
   fn test_web_content_load() {
@@ -19,10 +20,10 @@ mod tests {
     // check path was constructed correctly
     assert_eq!(newpath, "C:\\uol\\csm500-final-project\\src\\app\\webc\\static\\"); 
 
-    let wcf = MapleEMR::webc::web_content::WebContentFactory::new(&newpath);
+    let wcf = WebContentFactory::new(&newpath);
     // content factor should have two entries currently
 
-    println!("As of Aug 17, there are [5] tiles being loaded");
+    tracing::debug!("As of Aug 17, there are [5] tiles being loaded");
     assert_eq!(wcf.get_tile_count(), 5); 
 
     let tmp_tile = wcf.get_tile(WebContentItem::WCTypeLoginTile);
