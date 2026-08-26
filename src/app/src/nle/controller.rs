@@ -115,6 +115,22 @@ impl CommandController{
         results
     }
 
+       ///
+    /// Retrieves the id of the permission associated with the operation (column 0 from the command mapping)
+    ///  that matches the prompt_string.
+    /// 
+    pub fn get_permission_and_label_for_operation (&self, prompt_string: String) -> (i64, String) {
+        tracing::debug!("get_permission_for_operation(): Compare to prompt: '{}'", prompt_string);
+        let mut results: (i64, String) = (constants::INVALID_OTHER_ID, "".to_string());
+        for item in self.full_command_hashset.clone().iter(){
+           if item.0 == prompt_string{
+                results = (item.2, item.1.to_string());  // phrase, user control label, id
+                break; // terminate early if we find a match
+           }
+        }
+        results
+    }
+
     ///
     /// Helper method to load the file lines into a BufReader, to better control flow
     /// REF: https://doc.rust-lang.org/rust-by-example/std_misc/file/read_lines.html

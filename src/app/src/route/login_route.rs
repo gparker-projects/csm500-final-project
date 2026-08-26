@@ -56,11 +56,11 @@ impl LoginRoute{
             actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SEE_OTHER) 
             }
             None => {
-            tracing::debug!("Login denied for {} redirect back to /<default route>", req.username.clone()); // must use the user from the session as DB was not successful
+                tracing::debug!("Login denied for {} redirect back to /<default route>", req.username.clone()); // must use the user from the session as DB was not successful
 
-            // do not PURGE before this; it will trash the session including this new key
-            let _ignore = user_session.insert(constants::VALIDATION_ERRORS, "Invalid user or password. Please try again.");
-            actix_web::web::Redirect::to("/").using_status_code(StatusCode::SEE_OTHER)
+                // do not PURGE before this; it will trash the session including this new key
+                let _ignore = user_session.insert(constants::VALIDATION_ERRORS, "Invalid user or password. Please try again.");
+                actix_web::web::Redirect::to("/").using_status_code(StatusCode::SEE_OTHER)
             }
         }
     }

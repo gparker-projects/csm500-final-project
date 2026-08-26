@@ -280,26 +280,26 @@ INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
     OVERRIDING SYSTEM VALUE
- VALUES (40, 2, 'Y', 'Alerts/CCI/SPI', 'Alerts/CCI/SPI');
+ VALUES (40, 1, 'Y', 'Alerts/CCI/SPI', 'Alerts/CCI/SPI');
  
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
     OVERRIDING SYSTEM VALUE
- VALUES (41, 2, 'Y', 'Appointments', 'Appointments');
+ VALUES (41, 1, 'Y', 'Appointments', 'Appointments');
  
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
      OVERRIDING SYSTEM VALUE
-  VALUES (42, 2, 'Y', 'Diagnoses', 'Diagnoses');
+  VALUES (42, 1, 'Y', 'Diagnoses', 'Diagnoses');
   
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
      OVERRIDING SYSTEM VALUE
- VALUES (43, 2, 'Y', 'Allergies', 'Allergies');
+ VALUES (43, 1, 'Y', 'Allergies', 'Allergies');
   
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
      OVERRIDING SYSTEM VALUE
- VALUES (43, 2, 'Y', 'Immunizations', 'Immunizations');
+ VALUES (43, 1, 'Y', 'Immunizations', 'Immunizations');
  
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
      OVERRIDING SYSTEM VALUE
- VALUES (44, 2, 'Y', 'Documents', 'Documents');
+ VALUES (44, 1, 'Y', 'Documents', 'Documents');
  
 COMMIT;

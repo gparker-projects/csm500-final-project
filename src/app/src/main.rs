@@ -103,7 +103,8 @@ fn init_logging(){
         // Enable this to also log to STDOUT:
         //.with(tracing_subscriber::fmt::layer())
         .init();
-  tracing::info!("MapleEMR is running! Access via: http://127.0.0.1:8000");
+  tracing::info!("MapleEMR is running!");
+  println!("MapleEMR is running! Access via: http://127.0.0.1:8000");
 }
 
 /// # Main program

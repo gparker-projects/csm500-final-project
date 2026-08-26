@@ -36,6 +36,19 @@
     //}
     return;
   }
+  
+  
+  function editIntvDtls(intvDtlsId){
+      //if(confirm('Are you sure you want to leave this page?')){
+          //document.getElementById('intvForm').action = "\patientdtls";
+          //intvForm.submit();
+      //}
+      
+      console.log("Called editIntvDtls(" + intvDtlsId +");");
+
+      return;
+  }
+  
   </script>
 </HEAD>
 <BODY>
