@@ -17,7 +17,8 @@ pub const COMMAND_DISCHARGE_PATIENT: i64 = 3;
 /// Provides logic and constraints around commands being executed by the NL model
 /// 
 pub struct CommandController{
-    command_hashset: Vec<(String, i64)>, // first item is a phrase for matching; second item is the index of a permission it would enable for the user, if matched
+    command_hashset: Vec<(String, i64)>, 
+    full_command_hashset: Vec<(String, String, i64)>,
     nl_engine: NaturalLanguageEngine
 }
 
@@ -28,6 +29,7 @@ impl CommandController{
     pub fn new(mapping_file_path: &str, nle: NaturalLanguageEngine) -> Self {
         //println!( "CommandController::New() {}", mapping_file_path );
         let mut tmp_command_hashset = Vec::<(String, i64)>::with_capacity(10);
+        let mut tmp_full_command_hashset = Vec::<(String, String, i64)>::with_capacity(10);
 
         // read in the command mapping config .CSV
         if let Ok(lines) = CommandController::read_lines( mapping_file_path ) {
@@ -37,12 +39,14 @@ impl CommandController{
                 // convert to an i64, matching all other system data structures
                 // be sure to trim() first, otherwise the parse fails!
                 let tmp_index: i64 = parts[1].trim().parse::<i64>().unwrap_or(constants::INVALID_OTHER_ID); 
-                tmp_command_hashset.push( ( parts[0].to_string(), tmp_index ) ); // only first two items are actually used
+                tmp_command_hashset.push( ( parts[0].to_string(), tmp_index ) ); // phrase, id
+                tmp_full_command_hashset.push( ( parts[0].to_string(), parts[2].to_string(), tmp_index ) ); // phrase, user control label, id
             }
         }
 
         CommandController{
             command_hashset: tmp_command_hashset,
+            full_command_hashset: tmp_full_command_hashset,
             nl_engine: nle
         }
     }
@@ -51,16 +55,15 @@ impl CommandController{
     ///
     /// Obtains classifier rankings, only inlcuding items that the user has a permission for
     /// 
-    pub async fn get_classifier_rankings_filtered_for_permissions(&mut self, prompt: String, user_auths: UserAuthorization ) -> Vec< (String, f32)>{
+    pub async fn get_classifier_rankings_filtered_for_permissions(&mut self, prompt: String, user_auths: UserAuthorization ) -> Vec<(String, f32)>{
         println!("get_classifier_rankings_filtered_for_permissions()");
         let ops_add_prompt: Vec<String> = self.get_all_operations_and_add_prompt( prompt.clone() );
         let mut results: Vec<(String, f32)> = vec![]; 
         let classifer_results: Vec<(String, f32)> = self.nl_engine.get_classifier_rankings(ops_add_prompt ).await;
 
+        // check that the user has the permission before adding it 
         for c_result in classifer_results{
-
             let pid: i64 = self.get_permission_for_operation (c_result.clone().0);
-
             if user_auths.has_permission(pid){
                 results.push( c_result );
             }
@@ -89,7 +92,7 @@ impl CommandController{
         // take the list we loaded, cut it into separate vectors by the columns
         // https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.unzip
         //
-        let  (mut sentences, _command_id): (Vec::<String>, Vec::<i64>) = self.command_hashset.clone().into_iter().unzip();
+        let  (mut sentences, _ignore_command_id): (Vec::<String>, Vec::<i64>) = self.command_hashset.clone().into_iter().unzip();
         sentences.insert(0, prompt.clone() );
 
         return sentences;

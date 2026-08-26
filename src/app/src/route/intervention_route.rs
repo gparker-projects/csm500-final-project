@@ -111,6 +111,8 @@ impl InterventionRoute{
         };
         let cur_intv2= cur_intv.clone(); // clone of above object to avoid move below
 
+        let intv_dtls = idao.get_all_intervention_details(intervention_id, constants::NOT_SPECIFIED_ID).await.unwrap();
+
         // refresh the patients in the menu (only)
         let pdao = PatientDAO::new( app_session.get_db_connection() ).await;
         let legacy_menu_results = pdao.get_patients_at_users_site_no_discharge(user_session_details.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
@@ -157,7 +159,8 @@ impl InterventionRoute{
                                                                          intv_type.unwrap(),
                                                                          req.patient_id.clone(),
                                                                          req.intervention_type_id.clone() ,
-                                                                         req.encounter_id.clone() );
+                                                                         req.encounter_id.clone(),
+                                                                         intv_dtls.clone() );
 
         HttpResponse::Ok().body(  content )
     }

@@ -1,8 +1,11 @@
-admit patient, 1, {ADMIT_NEW_PATIENT}
-add patient, 1, {ADMIT_NEW_PATIENT}
-add information, 2, {ADD_NEW_INTERVENTION}
-add medication, 2, {ADD_NEW_INTERVENTION}
-prescribe medication, 2, {ADD_NEW_INTERVENTION}
-move patient, 2, {ADD_NEW_INTERVENTION}
-update contact information, 2, {ADD_NEW_INTERVENTION}
-discharge patient, 3, {DISCHARGE_PATIENT}
+admit patient, 1, Admit New Patient
+admit add new open patient, 1, Admit New Patient
+add patient, 1, Admit New Patient
+new open patient, 1, Admit New Patient
+create patient, 1, Admit New Patient
+add information, 2, Add to Patient Chart
+add medication, 2, Add Medication
+prescribe medication, 2, Add Medication
+move patient, 2, Transfer Patient
+update contact information, 2, Update Patient Information
+discharge patient, 3, Discharge Patient

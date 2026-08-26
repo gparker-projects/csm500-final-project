@@ -151,6 +151,7 @@ impl InterventionDAO {
         }
     }
 
+    
     /// Finds and returns all Intervention Details, based on an Intervention
     /// 
     pub async fn get_all_intervention_details(&self, intervention_id: i64, type_id: i64) -> Result< Option< Vec<InterventionDetail> >, std::io::Error> {

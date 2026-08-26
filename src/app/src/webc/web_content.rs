@@ -6,8 +6,10 @@ use derive_more::Display;
 use std::collections::HashMap;
 
 use crate::constants;
-use crate::dto::{patient::*, encounter::*, intervention::*};
+use crate::dto::{patient::*, encounter::*, intervention::*, intervention_detail::*};
 use crate::dao::patient_dao::PatientWrapper;
+
+use crate::webc::intervention_formatter::InterventionFormatter;
 
 /// Enumeration for Web Content Tiles, each representing a tile of information
 /// to be presented by the application
@@ -509,7 +511,8 @@ impl WebContentFactory {
                                                   intv_type: (i64, String, String),
                                                   patient_id: String,
                                                   intervention_type_id: String,
-                                                  encounter_id: String
+                                                  encounter_id: String,
+                                                  intv_details_list: Option<Vec<InterventionDetail>>
                                                   ) -> String {
         println!(">get_modify_intervention_full_page_tile()");
 
@@ -525,7 +528,8 @@ impl WebContentFactory {
                                 "{notes}",
                                 "{encounter_id}",
                                 "{patient_id}",
-                                "{form_errors}"];
+                                "{form_errors}",
+                                "<div id=\"MapleEMR::InterventionDetailsList\">"];
 
         let id: String; // this entire block is required in order to address partial moves that occur below when we copy over the String values
         let intervention_type: String;             // this must all occur before the copy and outside of the match block below
@@ -545,7 +549,7 @@ impl WebContentFactory {
                 dd_user = self.get_dropdown_user_with_department(user_dropdown_list,constants::NOT_SPECIFIED_ID); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
                 dd_intv_status =  self.get_dropdown_intervention_status(status_dropdown_list, constants::DEFAULT_INTERVENTION_STATUS_NEW); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
 
-                let tmp_data_items: [String; 13] = [constants::NOT_SPECIFIED_ID.to_string(), //"{intervention_id}",
+                let tmp_data_items = [constants::NOT_SPECIFIED_ID.to_string(), //"{intervention_id}",
                                                   intv_type.1, //"{intervention_type}",
                                                   intervention_type_id.to_string(), //"{intervention_type_id}",  //TODO
                                                   scheduled_timestamp, //"{scheduled_timestamp}",
@@ -557,7 +561,8 @@ impl WebContentFactory {
                                                   "".to_string(), // "{notes}",
                                                   encounter_id.to_string(), // "{encounter_id}",  //TODO
                                                   patient_id.clone(),
-                                                  "".to_string() // "{form_errors}"];
+                                                  "".to_string(), // "{form_errors}"];
+                                                  "".to_string()
                                                   ];
                 tmp_data_items
             } 
@@ -565,6 +570,11 @@ impl WebContentFactory {
                 println!("  Update existing Intervention");
                 dd_user = self.get_dropdown_user_with_department(user_dropdown_list,intv.users_id); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
                 dd_intv_status =  self.get_dropdown_intervention_status(status_dropdown_list, intv.status_id); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
+
+                let intv_details_html = match intv_details_list {
+                    Some(list) => InterventionFormatter::get_view_only_intervention_details_list( list ),
+                    None => "".to_string()
+                };
 
                 id = intv.id.to_string();
                 intervention_type = intv.clone().intervention_type; // intv_type.1
@@ -588,7 +598,8 @@ impl WebContentFactory {
                                                     notes,
                                                     tmp_encounter_id,
                                                     patient_id.clone(),
-                                                    "{form_errors}".to_string()
+                                                    "{form_errors}".to_string(),
+                                                    intv_details_html
                                                 ];
                 tmp_data_items
             }

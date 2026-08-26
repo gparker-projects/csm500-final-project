@@ -9,3 +9,4 @@
 pub mod data_forms;
 pub mod menu_tile;
 pub mod web_content;
+pub mod intervention_formatter;
