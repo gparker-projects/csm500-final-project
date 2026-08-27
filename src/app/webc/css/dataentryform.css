@@ -28,3 +28,39 @@
   font-weight: normal;
   color: #376BA4;
 }
+
+.table-tight {
+  border-collapse: collapse;
+  border: 1px #559DD8;
+  padding: 4px;
+  width: auto;
+}
+
+.field-row {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid #376BA4;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  margin: 2px;
+}
+
+.field-label {
+  background-color: #376BA4;
+  color: #ffffff;
+  font-weight: bold;
+  padding: 6px 12px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+
+.field-value {
+  background: #ffffff;
+  color: #2f5fa8;
+  padding: 6px 16px;
+  display: flex;
+  align-items: center;
+  min-width: 60px;
+}

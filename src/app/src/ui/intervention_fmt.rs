@@ -7,9 +7,9 @@ use crate::dto::intervention::Intervention;
 
 use crate::webc::common::CommonFormatter;
 
-pub struct SimpleFormatter{}
+pub struct InterventionFormatter{}
 
-impl SimpleFormatter{
+impl InterventionFormatter{
 
     ///
     /// Provide HTML for a readonly list of InterventionDetail(s)

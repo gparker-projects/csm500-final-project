@@ -154,22 +154,23 @@ impl SimpleFormatter {
 
         results_sbuf.push_str("<table>");
         for item in intvdtls_list{
-            results_sbuf.push_str("<tr><td>");
+            results_sbuf.push_str("<tr class='field-row'>");
+            results_sbuf.push_str("<td class='field-label'>");
             results_sbuf.push_str( &counter.to_string() ); 
            
-            results_sbuf.push_str(")&nbsp;</td><td>");
+            results_sbuf.push_str(")&nbsp;");
             results_sbuf.push_str( &item.intervention_type ); 
-            results_sbuf.push_str("</td><td>"); 
+            results_sbuf.push_str("</td><td class='field-value'>"); 
             results_sbuf.push_str( &item.value );
-            results_sbuf.push_str("</td><td>"); 
+            results_sbuf.push_str("</td><td class='field-label'><i>"); 
             results_sbuf.push_str( &item.entry_timestamp_for_display() );
-            results_sbuf.push_str("</td><td>"); 
+            results_sbuf.push_str("</i></td><td class='field-label'>"); 
 
             results_sbuf.push_str("<a href=\"#\" onclick=\"editIntvDtls("  ); 
             results_sbuf.push_str( &item.id.to_string() );  
             results_sbuf.push_str("); return false;\">Edit</a>");
             
-            results_sbuf.push_str("<td></tr>\n");
+            results_sbuf.push_str("</td></tr>\n");
             counter = counter + 1;
         }
         results_sbuf.push_str("</table>");
@@ -177,7 +178,7 @@ impl SimpleFormatter {
         return results_sbuf;
     }
 
-     ///
+    ///
     /// Provide HTML for all of a (Patient's) Encounter's Interventions
     /// 
     pub fn get_intervention_list_for_patient_details_tile(intervention_list: Vec<Intervention>) -> String {
