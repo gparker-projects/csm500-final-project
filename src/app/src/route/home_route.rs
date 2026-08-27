@@ -12,8 +12,8 @@ use tracing;
 
 use crate::dto::encounter::Encounter;
 use crate::dao::{patient_dao::*, intervention_dao::*, encounter_dao::*}; 
-use crate::webc::menu_fmt::*;
-use crate::webc::simple_fmt::*;
+use crate::ui::menu_fmt::*;
+use crate::ui::simple_fmt::*;
 use crate::session;
 use crate::constants;
 

@@ -10,14 +10,13 @@ use actix_web::{web, HttpResponse, Responder};
 use actix_session::{Session}; 
 use std::env;
 use std::path::Path;
-use std::collections::{HashSet, HashMap};
+use std::collections::{HashSet};
 use tracing;
 
 use crate::constants;
 use crate::nle::controller::CommandController;
-use crate::webc::data_forms::*;//, menu_tile::*};
-use crate::session::AppSession;
-use crate::session::UserSession;
+use crate::ui::data_forms::*;
+use crate::session::{AppSession, UserSession};
 use crate::nle::nle::*;
 
 pub const COMMAND_MAPPING_FILE_NAME: &str = "command_mapping.csv";
@@ -131,7 +130,7 @@ impl NLERoute{
             results_sbuf.push_str( &item.2.to_string() ); 
             results_sbuf.push_str( "); return false;\" \\>" );
         }
-        results_sbuf.push_str("</div></div></form>");
+        results_sbuf.push_str("</div></div></form><p>");
         results_sbuf
     }
 }

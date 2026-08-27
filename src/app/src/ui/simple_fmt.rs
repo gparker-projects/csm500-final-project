@@ -5,7 +5,7 @@
 use crate::dto::{encounter::*, intervention::*, intervention_detail::*};
 use crate::dao::patient_dao::PatientWrapper;
 
-use crate::webc::common::CommonFormatter;
+use crate::ui::common::CommonFormatter;
 
 pub struct SimpleFormatter{}
 

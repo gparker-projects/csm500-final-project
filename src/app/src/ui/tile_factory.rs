@@ -9,8 +9,8 @@ use tracing;
 use crate::constants;
 use crate::dto::{patient::*, intervention::*, intervention_detail::*};
 
-use crate::webc::common::CommonFormatter;
-use crate::webc::simple_fmt::SimpleFormatter;
+use crate::ui::common::CommonFormatter;
+use crate::ui::simple_fmt::SimpleFormatter;
 
 /// Enumeration for Web Content Tiles, each representing a tile of information
 /// to be presented by the application

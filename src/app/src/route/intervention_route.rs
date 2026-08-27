@@ -13,9 +13,8 @@ use tracing;
 use crate::dto::intervention::Intervention;
 
 use crate::dao::{ patient_dao::*, intervention_dao::*, common_dao::*, auth_dao::*}; 
-use crate::webc::{data_forms::*, menu_fmt::*};
-use crate::webc::data_forms::InterventionDataForm;
-use crate::webc::common::CommonFormatter;
+use crate::ui::{data_forms::*, menu_fmt::*};
+use crate::ui::common::CommonFormatter;
 
 use crate::session::{AppSession, UserSession};
 

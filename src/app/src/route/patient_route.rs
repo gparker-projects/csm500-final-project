@@ -10,17 +10,12 @@ use actix_web::{web, HttpResponse, Responder};
 use actix_session::{Session}; 
 use tracing;
 
-//use crate::dto::patient::Patient;
+use crate::constants;
 use crate::dto::encounter::Encounter;
-
-use crate::dao::{common_dao::{self, *}, encounter_dao::*, intervention_dao::*, patient_dao::*}; 
-use crate::webc::simple_fmt::SimpleFormatter;
-use crate::webc::{tile_factory::*, data_forms::*, menu_fmt::*};
-
-
+use crate::dao::{common_dao::{self, *}, encounter_dao::*, intervention_dao::*, patient_dao::*};
+use crate::ui::{tile_factory::*, data_forms::*, menu_fmt::*, simple_fmt::*};
 use crate::session::{AppSession, UserSession};
 
-use crate::constants;
 
 pub struct PatientRoute{}
 

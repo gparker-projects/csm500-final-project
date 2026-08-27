@@ -6,7 +6,7 @@ use tracing;
 use crate::dto::{intervention::*, intervention_detail::*};
 use crate::constants;
 use crate::dao::db_query;
-use crate::webc::{data_forms::*};
+use crate::ui::{data_forms::*};
 
 #[derive(Debug, Clone)]
 pub struct InterventionDAO {

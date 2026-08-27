@@ -115,7 +115,7 @@ impl CommandController{
         results
     }
 
-       ///
+    ///
     /// Retrieves the id of the permission associated with the operation (column 0 from the command mapping)
     ///  that matches the prompt_string.
     /// 

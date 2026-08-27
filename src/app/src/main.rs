@@ -22,7 +22,7 @@ use actix_cors::Cors;
 use actix_files::*;
 use actix_session::{storage::CookieSessionStore, SessionMiddleware}; //, storage::RedisSessionStore} // for user session management: https://docs.rs/actix-session/latest/actix_session/
 
-use crate::webc::tile_factory::WebContentFactory; 
+use crate::ui::tile_factory::WebContentFactory; 
 use crate::route::admit_route::AdmitRoute;
 use crate::route::default_route::DefaultRoute;
 use crate::route::home_route::HomeRoute;
@@ -42,7 +42,7 @@ use ort::{	session::{Session, builder::GraphOptimizationLevel} };
 // TODO: ideally we'd use an external session store, not just cookies. Until the application is largely working, we'll have to leave this for now. //storage::RedisSessionStore}; 
 mod constants;
 mod dto;
-mod webc;
+mod ui;
 mod dao;
 mod nle;
 mod route;

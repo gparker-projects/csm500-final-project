@@ -7,7 +7,7 @@
 mod tests {
   use tracing;
 
-  use MapleEMR::webc::tile_factory::{WebContentFactory, WebContentItem};
+  use MapleEMR::ui::tile_factory::{WebContentFactory, WebContentItem};
 
   #[test]
   fn test_web_content_load() {

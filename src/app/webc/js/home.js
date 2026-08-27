@@ -19,7 +19,7 @@ async function validateNLPrompt() {
 
   if (userPrompt == '') {
 	errLabel.textContent = "Please enter a prompt.";
-	errLabel.style = "color: red";
+	errLabel.style = "clinical-emergency-red"; //"color: red";
 	isValid = false;
   }
 

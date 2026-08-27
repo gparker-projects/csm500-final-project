@@ -1,9 +1,9 @@
 use actix_web::cookie::Key;
+use std::sync::Arc;
 use sqlx::postgres::{PgPool};
 
-use crate::webc::tile_factory::{WebContentFactory}; 
+use crate::ui::tile_factory::{WebContentFactory}; 
 use crate::dto::{user_auth::*};
-use std::sync::Arc;
 
 ///
 /// Stores application-wide state/variables

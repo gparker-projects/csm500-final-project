@@ -14,9 +14,9 @@ use tracing;
 use crate::constants;
 use crate::dto::patient;
 use crate::dao::{ patient_dao::*, common_dao::*}; 
-use crate::webc::{data_forms::*, menu_fmt::*};
+use crate::ui::{data_forms::*, menu_fmt::*};
 use crate::session::{AppSession, UserSession};
-use crate::webc::common::CommonFormatter;
+use crate::ui::common::CommonFormatter;
 
 pub struct AdmitRoute{}
 
