@@ -18,6 +18,8 @@ use MapleEMR::ui::data_forms::*;
 use MapleEMR::dao::patient_dao::PatientDAO;
 use MapleEMR::dao::feature_preference_dao::FeaturePreferenceDAO;
 use MapleEMR::dto::feature_preference::FeaturePreference;
+use MapleEMR::dto::intervention_detail::InterventionDetail;
+
 
 #[tokio::test]
 
@@ -76,7 +78,6 @@ async fn test_ins_get_upd_intervention_details(){
     };
 
     let test_user_id = 2;
-    let test_feature_id = 2;
     let mut tmp_id: i64 = constants::INVALID_OTHER_ID;
 
     println!("Testing: upsert_intervention_details_from_intv_form(): first insertion");
@@ -90,33 +91,53 @@ async fn test_ins_get_upd_intervention_details(){
     frm.notes = "Unit test".to_string();
 
     //Step 1: create a record
-    let insert_results = idao.upsert_intervention_details_from_intv_form(frm.clone(), test_user_id).await.unwrap();
-    if insert_results == constants::NOT_SPECIFIED_ID{
+    let insert_ivdtls_results = idao.upsert_intervention_details_from_intv_form(frm.clone(), test_user_id).await.unwrap();
+    if insert_ivdtls_results == constants::NOT_SPECIFIED_ID{
         assert!(false); // did not receive a new id
     }
     else{ 
-        tmp_id = insert_results;
+        tmp_id = insert_ivdtls_results; // returns the indet
         assert!(true);
     }
 
+    let mut new_intv_dtls: InterventionDetail;
+
     //Step 2: get it back
-    let qry_results = idao.get_intervention(tmp_id).await;
-    match qry_results.unwrap() {
+    let qry_results = idao.get_all_intervention_details(insert_ivdtls_results, constants::NOT_SPECIFIED_ID).await;
+
+    let tmp_ivec = qry_results.unwrap().clone();
+    match tmp_ivec.clone(){
         Some ( results ) => {
-            if results.intervention_type_id == 9{
-                assert!(true);
+            let mut found: bool = false;
+
+            println!("....# of intervention details: {}", tmp_ivec.clone().iter().len());
+
+            for item in results{
+                println!("....check item.id {}={}", insert_ivdtls_results, item.id);
+                
+                if item.id == tmp_id {
+                    println!("....matched.");
+                    found = true;
+                    new_intv_dtls = item.clone();
+                }
             }
-            else{
-                assert!(false); // something came back, but not what we wanted
-            }
+            assert!( found );  // if the id was not found, the insert failed
         },
         None => {
             assert!(false);
         }
     }
 
+    //let new_intv_dtls: InterventionDetails;
 
+   /*  let intv = qry_results.qry_results.unwrap().clone();
     //Step 3: update
+    frm.type_id = 
+    frm.intervention_id = "1".to_string();
+    frm.value = "Not Detected".to_string();
+    frm.notes = "Unit test".to_string();
+    let insert_results = idao.upsert_intervention_details_from_intv_form(frm.clone(), test_user_id).await.unwrap();
+*/
     //Step 4: get it back and validate the changes
 }
 
@@ -174,7 +195,7 @@ async fn test_ins_get_upd_feature_priority() {
         let mut found: bool = false;
 
         for item in results{
-            println!("....cheeck item.id {}={}", fp_id, item.id);
+            println!("....check item.id {}={}", fp_id, item.id);
             
             if item.id == fp_id {
                 println!("....matched.");

@@ -120,15 +120,21 @@ pub const QRY_SINGLE_PATIENT_DETAILS: &str =  r##"SELECT p.id "patient_id", e.id
                                             where patient_id = {}"##;
 
 
-
-pub const QRY_ALL_INTERVENTION_DETAILS: &str =  r##"
+pub const QRY_ALL_INTERVENTION_DETAILS_FOR_AN_INTERVENTION: &str =  r##"
                                                     SELECT i.id "intervention_details_id", value, notes, entry_timestamp, ref1.name "intervention_type", intervention_id, type_id
                                                         FROM intervention_details i
                                                         JOIN common_reference_type ref1 on i.type_id = ref1.id 
-                                                        WHERE intervention_id = {}
+                                                        WHERE i.intervention_id = {}
                                                 "##;
 
-pub const QRY_ALL_INTERVENTION_DETAILS_FOR_TYPE: &str = r##"
+pub const QRY_GET_SINGLE_INTERVENTION_DETAIL: &str =  r##"
+                                                    SELECT i.id "intervention_details_id", value, notes, entry_timestamp, ref1.name "intervention_type", intervention_id, type_id
+                                                        FROM intervention_details i
+                                                        JOIN common_reference_type ref1 on i.type_id = ref1.id 
+                                                        WHERE i.id = {}
+                                                "##;
+
+pub const QRY_ALL_INTERVENTION_DETAILS_FOR_INTV_AND_TYPE: &str = r##"
                                                     SELECT i.id "intervention_details_id", value, notes,
                                                         entry_timestamp,
                                                         ref1.name "intervention_type", intervention_id, type_id

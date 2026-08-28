@@ -156,18 +156,19 @@ impl InterventionDAO {
     /// Finds and returns all Intervention Details, based on an Intervention
     /// 
     pub async fn get_all_intervention_details(&self, intervention_id: i64, type_id: i64) -> Result< Option< Vec<InterventionDetail> >, std::io::Error> {
-
+        println!("get_all_intervention_details()");
         let query =  match type_id == constants::NOT_SPECIFIED_ID {
             true => {
-                let tmp = db_query::QRY_ALL_INTERVENTION_DETAILS;
+                let tmp = db_query::QRY_ALL_INTERVENTION_DETAILS_FOR_AN_INTERVENTION;
                 tmp.replace("{}", &intervention_id.to_string())
             }
             false => {
-                let tmp =db_query::QRY_ALL_INTERVENTION_DETAILS_FOR_TYPE;
+                let tmp = db_query::QRY_ALL_INTERVENTION_DETAILS_FOR_INTV_AND_TYPE;
                 let tmp2 = tmp.replace("{1}", &intervention_id.to_string());
                 tmp2.replace("{2}", &type_id.to_string())
             }
         };
+        println!("..Query={}", query);
 
         let rows: Vec<(i64, String, String, NaiveDateTime, String,i64, i64 )> = sqlx::query_as(&query)
         .fetch_all(&self.connection) 
