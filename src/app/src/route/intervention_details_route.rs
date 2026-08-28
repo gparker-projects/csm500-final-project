@@ -1,24 +1,23 @@
+//! -------------------------------------------------------------------
 //! Intervention Details and related routes
 //!
 //!    CSM500 Project (April - October 2026)
 //!      Graham Parker (Student ID: 240120522)
 //! 
 //! REFERENCES
-//! 
+//!
+//! -------------------------------------------------------------------
 
 use actix_web::{web, HttpResponse, Responder};
 use actix_session::{Session}; 
 use tracing;
 
-use crate::dto::intervention::Intervention;
-
-use crate::dao::{ patient_dao::*, intervention_dao::*, common_dao::*, auth_dao::*}; 
-use crate::webc::{data_forms::*, menu_tile::*};
-use crate::webc::data_forms::InterventionDataForm;
-
-use crate::session::{AppSession, UserSession};
 
 use crate::constants;
+use crate::dao::intervention_dao::InterventionDAO;
+use crate::dto::intervention_detail::InterventionDetail;
+use crate::session::{AppSession, UserSession};
+use crate::ui::data_forms::*;
 
 pub struct InterventionDetailsRoute{}
 
@@ -27,11 +26,28 @@ impl InterventionDetailsRoute{
   ///
   /// Route that will update the intervention and then redirect back to the modify screen
   /// 
-  pub async fn route_to_intervention_detail_save(app_session: web::Data<AppSession>, user_session: Session, mut req: web::Form<InterventionDataForm>) -> impl Responder {
-      tracing::debug!("-> Route Requested: /route_to_discharge_patient_save ");
+  pub async fn route_to_intervention_detail_save(app_session: web::Data<AppSession>, user_session: Session, mut req: web::Form<InterventionDetailsDataForm>) -> impl Responder {
+      tracing::debug!("-> Route Requested: /route_to_intervention_detail_save ");
+      let mut results: String = constants::INVALID_OTHER_ID.to_string();
 
-      HttpResponse::Ok().body(  content )
+      //let req_clone0 = req.clone();
+      let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+      let idao = InterventionDAO::new( app_session.get_db_connection() ).await;
+
+      let insert_ivdtls_results = idao.upsert_intervention_details_from_intv_form(req.clone(), user_session_details.get_userid_as_i64()).await;
+      match insert_ivdtls_results {
+            Ok(intv_dtls_id) => {
+                tracing::debug!("  >Intervention (id={intv_dtls_id})] created/updated");
+                //req.0.intervention_id = intv_dtls_id.to_string();
+                results = intv_dtls_id.to_string();
+            },
+            Err(e) => {
+                tracing::debug!("  >Intervention not created/updated: {e}");
+            }
+      }
+
+      // route back to main form again
+      //InterventionRoute::route_to_view_or_modify_intervention( app_session, user_session, req ).await
+      HttpResponse::Ok().body( results )
   }
-
-
 }

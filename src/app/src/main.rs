@@ -1,4 +1,5 @@
-//! # Main program executable for the project
+//! ---------------------------------------------------------------------------------
+//! Main program executable for the project
 //!
 //!      CSM500 Project (April - October 2026)
 //!         Graham Parker (Student ID: 240120522)
@@ -7,37 +8,43 @@
 //! 
 //! Refs for Web and DB:
 //! [1] B. Gruber, Rust web development: with Warp, Tokio, and Reqwest. Shelter Island, NY: Manning Publications Co, 2023.
-//! https://learning.oreilly.com/library/view/rust-web-development/9781617299001/OEBPS/Text/07.htm#sigil_toc_id_85
-//! https://github.com/Rust-Web-Development/code
+//!   https://learning.oreilly.com/library/view/rust-web-development/9781617299001/OEBPS/Text/07.htm#sigil_toc_id_85
+//!   https://github.com/Rust-Web-Development/code
+//!   user session management: https://docs.rs/actix-session/latest/actix_session/
+//!   config file: Practical Rust Projects, pg 337-339; https://mojoauth.com/parse-and-generate-formats/parse-and-generate-toml-with-rust#error-handling-and-validation-with-toml
 //! 
 //! Refs for ML code:
 //! [2] S. Lyu and A. Rzeznik, Practical Rust Projects: Build Serverless, AI, Machine Learning, Embedded, Game, and Web Applications. Berkeley, CA: Apress, 2023. doi: DOI:%2010.1007/978-1-4842-9331-7.
-//! https://github.com/LukeMathWalker/zero-to-production
-//!
-use std::env;
-use sqlx::postgres::{PgPoolOptions};
-use actix_web::{web, App, HttpServer, HttpResponse, Responder};
-use actix_web::cookie::Key;
+//!   https://github.com/LukeMathWalker/zero-to-production
+//! 
+//! ---------------------------------------------------------------------------------
+
 use actix_cors::Cors;
 use actix_files::*;
-use actix_session::{storage::CookieSessionStore, SessionMiddleware}; //, storage::RedisSessionStore} // for user session management: https://docs.rs/actix-session/latest/actix_session/
-
-use crate::ui::tile_factory::WebContentFactory; 
-use crate::route::admit_route::AdmitRoute;
-use crate::route::default_route::DefaultRoute;
-use crate::route::home_route::HomeRoute;
-use crate::route::intervention_route::InterventionRoute;
-use crate::route::login_route::LoginRoute;
-use crate::route::patient_route::PatientRoute;
-use crate::route::nle_route::*;
-
-use tracing; //::{debug, error, info, trace, warn};
+use actix_session::{storage::CookieSessionStore, SessionMiddleware}; //, storage::RedisSessionStore}
+use actix_web::{web, App, HttpServer, HttpResponse, Responder};
+use actix_web::cookie::Key;
+use ort::{	session::{Session, builder::GraphOptimizationLevel} };
+//use serde::Deserialize;
+use std::env;
+use std::fs::read_to_string;
+use std::sync::Arc;
+use sqlx::postgres::{PgPoolOptions};
+use tracing;
 use tracing_subscriber::{
     Layer, filter::LevelFilter, layer::SubscriberExt, util::SubscriberInitExt,
 };
 
-use std::sync::Arc;
-use ort::{	session::{Session, builder::GraphOptimizationLevel} };
+use crate::ui::tile_factory::WebContentFactory;
+use crate::session::*;
+use crate::route::admit_route::AdmitRoute;
+use crate::route::default_route::DefaultRoute;
+use crate::route::home_route::HomeRoute;
+use crate::route::intervention_route::InterventionRoute;
+use crate::route::intervention_details_route::InterventionDetailsRoute;
+use crate::route::login_route::LoginRoute;
+use crate::route::patient_route::PatientRoute;
+use crate::route::nle_route::*;
 
 // TODO: ideally we'd use an external session store, not just cookies. Until the application is largely working, we'll have to leave this for now. //storage::RedisSessionStore}; 
 mod constants;
@@ -54,8 +61,8 @@ mod session;
 /// Allows a monitoring services to perform a basic "is the application up?" check
 /// 
 async fn is_it_up() -> impl Responder {
-  tracing::info!("-> /isItUp Requested");
-  HttpResponse::Ok().body("MapleEMR is Up")
+    tracing::info!("-> /isItUp Requested");
+    HttpResponse::Ok().body("MapleEMR is Up")
 }
 
 ///
@@ -107,6 +114,55 @@ fn init_logging(){
   println!("MapleEMR is running! Access via: http://127.0.0.1:8000");
 }
 
+///
+/// Reads the system configuration file from a static path... so it is the only one we need to do this from
+///  the rest of the config settings are in this config file, eliminating many constants otherwise requird by the application
+/// 
+fn init_config() -> SysConfig {
+    // collect the cargo manifest directory at runtime, which means it might not be present
+    let cargo_manifest_dir = match env::var(constants::CARGO_MANIFEST_DIR) {
+        Ok(tmp_path) => {
+            tracing::info!("CARGO_MANIFEST_DIR = {}", tmp_path);
+            tmp_path
+        }
+        Err(e) => {
+            tracing::error!("CARGO_MANIFEST_DIR not set: {}", e);
+            "INVALID_PATH".to_string()
+        }
+    };
+
+    let base_model_data_dir = cargo_manifest_dir.clone()  + constants::DATA_SUB_DIRECTORY;
+    let toml_config_file = cargo_manifest_dir.clone()  + constants::SYSTEM_CONFIGURATION_FILE;
+
+    let toml_config_str = read_to_string(toml_config_file.clone()); 
+    let mut final_config: session::SysConfig = Default::default();
+
+    match toml_config_str {
+        Ok(results) => {
+
+            let tmp_config = toml::from_str::<session::SysConfig>( &results );
+            match tmp_config {
+                Ok(ok_config) => {
+                    tracing::info!("Configuration loaded: {}", toml_config_file.clone());
+                    final_config = ok_config;
+                }
+                Err(e) => {
+                    tracing::error!("Error reading from TOML ({}): {}", toml_config_file.clone(), e);
+                    eprintln!("Error reading from TOML ({}): {}", toml_config_file.clone(), e);
+                },
+            }
+        }
+        Err(e) => {
+            tracing::error!("Error reading from TOML ({}): {}", toml_config_file.clone(), e);
+            eprintln!("Error reading from TOML ({}): {}", toml_config_file.clone(), e);
+        },
+    }
+    final_config.cargo_manifest_dir = cargo_manifest_dir; // override some of the values, with setting obtained elsewhere in by the system
+    final_config.model_data_dir = base_model_data_dir;
+
+    final_config
+}
+
 /// # Main program
 /// 
 /// Loads the NLP engine and adds handlers for key paths of the web application
@@ -118,9 +174,10 @@ fn init_logging(){
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
   init_logging();
+  let config = init_config();
 
   //establish database connection for entire application here, add to the application session
-  let db_url = constants::DB_CONN_STR;
+  let db_url = &config.db_conn_str.clone();
 
   let db_pool = match PgPoolOptions::new()
       .max_connections(5)
@@ -137,22 +194,11 @@ async fn main() -> std::io::Result<()> {
       },
   };
 
-  // collect the cargo manifest directory at runtime, which means it might not be present
-  let base_model_dir = match env::var(constants::CARGO_MANIFEST_DIR) {
-      Ok(tmp_path) => {
-          tracing::info!("CARGO_MANIFEST_DIR = {}", tmp_path);
-          tmp_path
-      }
-      Err(e) => {
-          tracing::error!("CARGO_MANIFEST_DIR not set: {}", e);
-          "INVALID_PATH".to_string()
-      }
-  } + constants::DATA_SUB_DIRECTORY;
 
   let nle_session: ort::session::Session = Session::builder().expect("Session could not be established")
                   .with_optimization_level(GraphOptimizationLevel::Level1).expect("No Session")
                   .with_intra_threads(1).expect("Insufficient threads")
-                  .commit_from_file(&(base_model_dir.clone() + LANGUAGE_MODEL_FILE_NAME) ).expect("File could not be accessed");
+                  .commit_from_file(&(config.model_data_dir.clone() + LANGUAGE_MODEL_FILE_NAME) ).expect("File could not be accessed");
   let shared_session = Arc::new(nle_session);
 
   // use the Builder pattern to add one route at a time
@@ -172,11 +218,11 @@ async fn main() -> std::io::Result<()> {
       )
       .app_data(  // this enclosure allows the session state to be created and made available to all routes. actix_web magic.
           web::Data::new( session::AppSession {
-                  app_version: "v1.0".to_string(),
                   //wcf: Mutex::new( WebContentFactory::new(&get_static_path_base()) )
                   wcf: WebContentFactory::new(&get_static_path_base()),
                   app_key: tmp_app_key.clone(),
                   connection: db_pool.clone(),
+                  system_config: config.clone(),
                   nle_session: Arc::clone(&shared_session), 
               }
           ) 
@@ -196,6 +242,7 @@ async fn main() -> std::io::Result<()> {
       .route("/intvnew", web::post().to( InterventionRoute::route_to_add_new_intervention ))
       .route("/intv", web::post().to( InterventionRoute::route_to_view_or_modify_intervention ))
       .route("/intvsave", web::post().to( InterventionRoute::route_to_intervention_save ))
+      .route("/intvdtlsave", web::post().to( InterventionDetailsRoute::route_to_intervention_detail_save ))
       .route("/isItUp", web::get().to( is_it_up ))
       .service(Files::new("/webc/", "./webc"))  // ref: ttps://actix.rs/docs/static-files/
   })

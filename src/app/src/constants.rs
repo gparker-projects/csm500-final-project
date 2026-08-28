@@ -1,8 +1,20 @@
-/// ---------------------------------------------------------------------------------
-/// Defines standard constants used across the application. Centralized
-/// for reuse, and also for easier management.
-/// ---------------------------------------------------------------------------------
-/// 
+//! ---------------------------------------------------------------------------------
+//! Defines standard constants used across the application. Centralized
+//!  for reuse, and also for easier management.
+//! ---------------------------------------------------------------------------------
+//!
+//!    CSM500 Project (April - October 2026)
+//!      Graham Parker (Student ID: 240120522)
+//! 
+//! ---------------------------------------------------------------------------------
+
+pub const SYSTEM_CONFIGURATION_FILE : &str = "\\config\\maple-config.toml";
+// todo: move this to a config file
+// application-wide database string; should come from a configurable parameter file (TODO)
+pub const DB_CONN_STR: &str = "postgres://postgres:csm500@localhost:5432/csm500";
+
+pub const DATA_SUB_DIRECTORY: &str = "\\data\\";
+
 pub const DATABASE_ERROR_NOT_FOUND : &str = "Not Found";
 pub const GENERAL_ERROR_NOT_FOUND : &str = "Not Found";
 pub const SESSION_ERROR_INVALID : &str = "User session invalid";
@@ -11,15 +23,7 @@ pub const SYSTEM_DATETIME_FORMAT : &str= "%Y-%b-%d %H:%M:%S";
 
 pub const CARGO_MANIFEST_DIR : &str= r##"CARGO_MANIFEST_DIR"##;
 
-pub const DATA_SUB_DIRECTORY: &str = "\\data\\";
-
-//pub const EMPTY_DATASET : &str = "No data was returned";
-
 pub const ERROR_READING_TEMPLATE : &str = "Error reading tile template file";
-
-// todo: move this to a config file
-// application-wide database string; should come from a configurable parameter file (TODO)
-pub const DB_CONN_STR: &str = "postgres://postgres:csm500@localhost:5432/csm500";
 
 pub const USER_SESSION : &str = r##"USER_SESSION"##;
 pub const VALIDATION_ERRORS : &str = r##"VALIDATION_ERRORS"##;
@@ -55,4 +59,3 @@ pub const ENCOUNTER_HISTORY_TILE_TAG : &str =r##"<div id="MapleEMR::EncounterHis
 pub const INTERVENTION_TYPE_DROP_DOWN_CONTROL_TAG : &str = r##"<div id="MapleEMR::InterventionTypeDropDownControl"></div>"##;
 
 pub const LEGACY_MENU_ON_ERROR : &str = r##"<div id="legacyMenu" align="left"><ul><li><a class="menuNotCurrent" href="\home">My Dashboard</li></ul></div>"##;
-

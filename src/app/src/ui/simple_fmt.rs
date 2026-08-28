@@ -8,6 +8,8 @@
 //! 
 //! REFERENCES
 //! 
+//! -------------------------------------------------------------------
+
 use crate::dto::{encounter::*, intervention::*, intervention_detail::*};
 use crate::dao::patient_dao::PatientWrapper;
 
@@ -146,40 +148,6 @@ impl SimpleFormatter {
 	    results_sbuf.push_str("</td></tr>");
 
 	    results_sbuf.push_str("</table>");
-
-        return results_sbuf;
-    }
-
-
-    ///
-    /// Provide HTML for a readonly list of InterventionDetail(s)
-    /// 
-    pub fn get_view_only_intervention_details_list(intvdtls_list: Vec<InterventionDetail>) -> String {
-        let mut results_sbuf = String::with_capacity(500); 
-        let mut counter = 1;
-
-        results_sbuf.push_str("<table>");
-        for item in intvdtls_list{
-            results_sbuf.push_str("<tr class='field-row'>");
-            results_sbuf.push_str("<td class='field-label'>");
-            results_sbuf.push_str( &counter.to_string() ); 
-           
-            results_sbuf.push_str(")&nbsp;");
-            results_sbuf.push_str( &item.intervention_type ); 
-            results_sbuf.push_str("</td><td class='field-value'>"); 
-            results_sbuf.push_str( &item.value );
-            results_sbuf.push_str("</td><td class='field-label'><i>"); 
-            results_sbuf.push_str( &item.entry_timestamp_for_display() );
-            results_sbuf.push_str("</i></td><td class='field-label'>"); 
-
-            results_sbuf.push_str("<a href=\"#\" onclick=\"editIntvDtls("  ); 
-            results_sbuf.push_str( &item.id.to_string() );  
-            results_sbuf.push_str("); return false;\">Edit</a>");
-            
-            results_sbuf.push_str("</td></tr>\n");
-            counter = counter + 1;
-        }
-        results_sbuf.push_str("</table>");
 
         return results_sbuf;
     }

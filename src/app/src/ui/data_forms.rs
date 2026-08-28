@@ -1,10 +1,18 @@
+//! -------------------------------------------------------------------
+//! Defines the Forms which are submitted to routes from the HTML UI of
+//!  the application. These forms are basically composite data objects
+//!  and are used by actix to assemble/transfer data.
 //!
+//! These could have been put into routes, but were assembled all together
+//! for easier reference, consistency and organization.
+//! 
 //!    CSM500 Project (April - October 2026)
 //!      Graham Parker (Student ID: 240120522)
 //! 
 //! REFERENCES
 //! 
-//! 
+//! -------------------------------------------------------------------
+
 use validator::{Validate, ValidationError};
 //use chrono::NaiveDateTime;
 //use crate::constants;

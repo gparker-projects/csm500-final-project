@@ -1,4 +1,22 @@
+//! ---------------------------------------------------------------------------------
+//! Application and user session structs to hold persistent information and 
+//!   connections that will be shared across the application to all users, or for
+//!   only a specific user, across all their interactions.
+//!
+//!      CSM500 Project (April - October 2026)
+//!         Graham Parker (Student ID: 240120522)
+//! 
+//! REFERENCES
+//!   For application-wide state/variables: 
+//!     https://actix.rs/docs/application/
+//! 
+//!   For Stores user session variables:
+//!     https://docs.rs/actix-session/latest/actix_session/struct.SessionMiddleware.html
+//! 
+//! ---------------------------------------------------------------------------------
+
 use actix_web::cookie::Key;
+use serde::Deserialize;
 use std::sync::Arc;
 use sqlx::postgres::{PgPool};
 
@@ -6,15 +24,29 @@ use crate::ui::tile_factory::{WebContentFactory};
 use crate::dto::{user_auth::*};
 
 ///
+/// Stores application-wide configuration loaded at startup
+/// 
+#[derive(Deserialize, Default, Clone)]
+pub struct SysConfig {
+    pub app_version: String,
+    pub db_conn_str: String,
+    pub cargo_manifest_dir: String, // provided by the application after load; do not actually set in the TOML
+    pub model_data_dir: String,     //   same as prior
+    pub command_mapping_file: String,
+    pub language_model_file: String,
+    pub tokenizer_file: String,
+    pub data_sub_dir: String 
+}
+
+///
 /// Stores application-wide state/variables
-/// REF: https://actix.rs/docs/application/
 /// 
 #[allow(dead_code)] // low priority warning; tired of seeing messages
 pub struct AppSession {
-    pub app_version: String,
     pub wcf: WebContentFactory,
     pub app_key: Key,
     pub connection: PgPool,
+    pub system_config: SysConfig,
     pub nle_session: Arc<ort::session::Session>
 }
 
@@ -44,7 +76,6 @@ impl AppSession {
 
 ///
 /// Stores user session variables
-/// REF: https://docs.rs/actix-session/latest/actix_session/struct.SessionMiddleware.html
 /// 
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct UserSession {

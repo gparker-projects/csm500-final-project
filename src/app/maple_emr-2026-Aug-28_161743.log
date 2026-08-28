@@ -1,0 +1,172 @@
+2026-08-28T23:17:43.979478Z  INFO MapleEMR: MapleEMR is running!
+2026-08-28T23:17:43.979948Z  INFO MapleEMR: CARGO_MANIFEST_DIR = C:\uol\csm500-final-project\src\app
+2026-08-28T23:17:43.980887Z  INFO MapleEMR: Configuration loaded: C:\uol\csm500-final-project\src\app\config\maple-config.toml
+2026-08-28T23:17:44.114590Z  INFO MapleEMR: Database connection established to: postgres://postgres:csm500@localhost:5432/csm500
+2026-08-28T23:17:44.167553Z  INFO ort::logging: Discovered OrtHardwareDevice {vendor_id:0x8086, device_id:0x1912, vendor:Intel Corporation, type:1, metadata: [Description=Intel(R) HD Graphics 530, Discrete=0, DxgiAdapterNumber=0, DxgiHighPerformanceIndex=0, DxgiVideoMemory=128 MB, LUID=49304, ]}
+2026-08-28T23:17:44.167827Z  INFO ort::logging: Discovered OrtHardwareDevice {vendor_id:0x8086, device_id:0x0, vendor:Intel, type:0, metadata: [Description=Intel(R) Core(TM) i5-6600 CPU @ 3.30GHz, ]}
+2026-08-28T23:17:44.168590Z  INFO ort::logging: Session Options {  execution_mode:0 execution_order:DEFAULT enable_profiling:0 optimized_model_filepath: enable_mem_pattern:1 enable_mem_reuse:1 enable_cpu_mem_arena:1 profile_file_prefix:onnxruntime_profile_ session_logid: session_log_severity_level:-1 session_log_verbosity_level:0 max_num_graph_transformation_steps:10 graph_optimization_level:1 intra_op_param:OrtThreadPoolParams { thread_pool_size: 1 auto_set_affinity: 0 allow_spinning: 0 dynamic_block_base_: 0 stack_size: 0 affinity_str:  set_denormal_as_zero: 0 } inter_op_param:OrtThreadPoolParams { thread_pool_size: 0 auto_set_affinity: 0 allow_spinning: 0 dynamic_block_base_: 0 stack_size: 0 affinity_str:  set_denormal_as_zero: 0 } use_per_session_threads:1 thread_pool_allow_spinning:1 use_deterministic_compute:0 ep_selection_policy:5 config_options: {  } }
+2026-08-28T23:17:44.168663Z  INFO ort::logging: Flush-to-zero and denormal-as-zero are off
+2026-08-28T23:17:44.168689Z  INFO ort::logging: Creating and using per session threadpools since use_per_session_threads_ is true
+2026-08-28T23:17:44.168743Z  INFO ort::logging: Dynamic block base set to 0
+2026-08-28T23:17:44.238799Z  INFO ort::logging: Initializing session.
+2026-08-28T23:17:44.238891Z  INFO ort::logging: Creating BFCArena for Cpu with following configs: initial_chunk_size_bytes: 1048576 max_dead_bytes_per_chunk: 134217728 initial_growth_chunk_size_bytes: 2097152 max_power_of_two_extend_bytes: 1073741824 memory limit: 18446744073709551615 arena_extend_strategy: 0
+2026-08-28T23:17:44.243642Z  INFO ort::logging: This model does not have any local functions defined. AOT Inlining is not performed
+2026-08-28T23:17:44.271840Z  INFO ort::logging: GraphTransformer EnsureUniqueDQForNodeUnit modified: 0 with status: OK
+2026-08-28T23:17:44.272356Z  INFO ort::logging: GraphTransformer Level1_RuleBasedTransformer modified: 0 with status: OK
+2026-08-28T23:17:44.272517Z  INFO ort::logging: GraphTransformer DoubleQDQPairsRemover modified: 0 with status: OK
+2026-08-28T23:17:44.274121Z  INFO ort::logging: Total shared scalar initializer count: 199
+2026-08-28T23:17:44.274169Z  INFO ort::logging: GraphTransformer ConstantSharing modified: 1 with status: OK
+2026-08-28T23:17:44.280155Z  INFO ort::logging: GraphTransformer CommonSubexpressionElimination modified: 1 with status: OK
+2026-08-28T23:17:44.289278Z  INFO ort::logging: GraphTransformer ConstantFolding modified: 1 with status: OK
+2026-08-28T23:17:44.294626Z  INFO ort::logging: Removing initializer '/1/Constant_8_output_0'. It is no longer used by any node.
+2026-08-28T23:17:44.294716Z  INFO ort::logging: Removing initializer '/0/auto_model/Shape_2_output_0'. It is no longer used by any node.
+2026-08-28T23:17:44.294736Z  INFO ort::logging: Removing initializer '/1/Shape_3_output_0'. It is no longer used by any node.
+2026-08-28T23:17:44.295067Z  INFO ort::logging: GraphTransformer MatMulAddFusion modified: 0 with status: OK
+2026-08-28T23:17:44.295292Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.0/attention/self/Reshape_output_0
+2026-08-28T23:17:44.295340Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.0/attention/self/Reshape_2_output_0
+2026-08-28T23:17:44.295430Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.0/attention/self/Reshape_1_output_0
+2026-08-28T23:17:44.295486Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.0/attention/self/Reshape_3_output_0
+2026-08-28T23:17:44.295531Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.1/attention/self/Reshape_output_0
+2026-08-28T23:17:44.295573Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.1/attention/self/Reshape_2_output_0
+2026-08-28T23:17:44.295613Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.1/attention/self/Reshape_1_output_0
+2026-08-28T23:17:44.295659Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.1/attention/self/Reshape_3_output_0
+2026-08-28T23:17:44.295702Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.2/attention/self/Reshape_output_0
+2026-08-28T23:17:44.295747Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.2/attention/self/Reshape_2_output_0
+2026-08-28T23:17:44.295787Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.2/attention/self/Reshape_1_output_0
+2026-08-28T23:17:44.295837Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.2/attention/self/Reshape_3_output_0
+2026-08-28T23:17:44.295879Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.3/attention/self/Reshape_output_0
+2026-08-28T23:17:44.295921Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.3/attention/self/Reshape_2_output_0
+2026-08-28T23:17:44.295962Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.3/attention/self/Reshape_1_output_0
+2026-08-28T23:17:44.296014Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.3/attention/self/Reshape_3_output_0
+2026-08-28T23:17:44.296057Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.4/attention/self/Reshape_output_0
+2026-08-28T23:17:44.296099Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.4/attention/self/Reshape_2_output_0
+2026-08-28T23:17:44.296143Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.4/attention/self/Reshape_1_output_0
+2026-08-28T23:17:44.296199Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.4/attention/self/Reshape_3_output_0
+2026-08-28T23:17:44.296245Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.5/attention/self/Reshape_output_0
+2026-08-28T23:17:44.296292Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.5/attention/self/Reshape_2_output_0
+2026-08-28T23:17:44.296334Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.5/attention/self/Reshape_1_output_0
+2026-08-28T23:17:44.296381Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.5/attention/self/Reshape_3_output_0
+2026-08-28T23:17:44.296402Z  INFO ort::logging: Total fused reshape node count: 24
+2026-08-28T23:17:44.296425Z  INFO ort::logging: GraphTransformer ReshapeFusion modified: 1 with status: OK
+2026-08-28T23:17:44.301937Z  INFO ort::logging: Removing initializer '/0/auto_model/encoder/layer.4/attention/self/Constant_11_output_0'. It is no longer used by any node.
+2026-08-28T23:17:44.301984Z  INFO ort::logging: Removing initializer '/0/auto_model/encoder/layer.4/attention/self/Constant_6_output_0'. It is no longer used by any node.
+2026-08-28T23:17:44.302028Z  INFO ort::logging: Removing initializer '/0/auto_model/encoder/layer.0/attention/self/Constant_15_output_0'. It is no longer used by any node.
+2026-08-28T23:17:44.302159Z  INFO ort::logging: GraphTransformer FreeDimensionOverrideTransformer modified: 0 with status: OK
+2026-08-28T23:17:44.302194Z  INFO ort::logging: GraphTransformer GeluFusionL1 modified: 0 with status: OK
+2026-08-28T23:17:44.302222Z  INFO ort::logging: GraphTransformer LayerNormFusionL1 modified: 0 with status: OK
+2026-08-28T23:17:44.302383Z  INFO ort::logging: GraphTransformer QDQPropagationTransformer modified: 0 with status: OK
+2026-08-28T23:17:44.302543Z  INFO ort::logging: GraphTransformer WeightBiasQuantization modified: 0 with status: OK
+2026-08-28T23:17:44.302658Z  INFO ort::logging: GraphTransformer EnsureUniqueDQForNodeUnit modified: 0 with status: OK
+2026-08-28T23:17:44.302762Z  INFO ort::logging: GraphTransformer WhereDummyDq modified: 0 with status: OK
+2026-08-28T23:17:44.303442Z  INFO ort::logging: GraphTransformer TransposeOptimizer modified: 0 with status: OK
+2026-08-28T23:17:44.303691Z  INFO ort::logging: GraphTransformer Level1_RuleBasedTransformer modified: 0 with status: OK
+2026-08-28T23:17:44.303798Z  INFO ort::logging: GraphTransformer DoubleQDQPairsRemover modified: 0 with status: OK
+2026-08-28T23:17:44.304228Z  INFO ort::logging: GraphTransformer CommonSubexpressionElimination modified: 0 with status: OK
+2026-08-28T23:17:44.304394Z  INFO ort::logging: GraphTransformer ConstantFolding modified: 0 with status: OK
+2026-08-28T23:17:44.304519Z  INFO ort::logging: GraphTransformer MatMulAddFusion modified: 0 with status: OK
+2026-08-28T23:17:44.304638Z  INFO ort::logging: GraphTransformer ReshapeFusion modified: 0 with status: OK
+2026-08-28T23:17:44.304661Z  INFO ort::logging: GraphTransformer FreeDimensionOverrideTransformer modified: 0 with status: OK
+2026-08-28T23:17:44.304679Z  INFO ort::logging: GraphTransformer GeluFusionL1 modified: 0 with status: OK
+2026-08-28T23:17:44.304695Z  INFO ort::logging: GraphTransformer LayerNormFusionL1 modified: 0 with status: OK
+2026-08-28T23:17:44.304790Z  INFO ort::logging: GraphTransformer QDQPropagationTransformer modified: 0 with status: OK
+2026-08-28T23:17:44.304879Z  INFO ort::logging: GraphTransformer WeightBiasQuantization modified: 0 with status: OK
+2026-08-28T23:17:44.304974Z  INFO ort::logging: GraphTransformer EnsureUniqueDQForNodeUnit modified: 0 with status: OK
+2026-08-28T23:17:44.305064Z  INFO ort::logging: GraphTransformer WhereDummyDq modified: 0 with status: OK
+2026-08-28T23:17:44.310563Z  INFO ort::logging: Running graph optimizations in loop 1 time/s (Graph Optimizations Loop Level : 1)
+2026-08-28T23:17:44.311052Z  INFO ort::logging: GraphTransformer RemoveDuplicateCastTransformer modified: 0 with status: OK
+2026-08-28T23:17:44.311083Z  INFO ort::logging: GraphTransformer CastFloat16Transformer modified: 0 with status: OK
+2026-08-28T23:17:44.311122Z  INFO ort::logging: GraphTransformer MemcpyTransformer modified: 0 with status: OK
+2026-08-28T23:17:44.317657Z  INFO ort::logging: Use DeviceBasedPartition as default
+2026-08-28T23:17:44.364011Z  INFO ort::logging: Saving initialized tensors.
+2026-08-28T23:17:44.364147Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-28T23:17:44.364192Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-28T23:17:44.364216Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-28T23:17:44.364241Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-28T23:17:44.364275Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-28T23:17:44.364304Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-28T23:17:44.364343Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-28T23:17:44.364363Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-28T23:17:44.364388Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-28T23:17:44.364431Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-28T23:17:44.364487Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-28T23:17:44.364531Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-28T23:17:44.364558Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-28T23:17:44.364582Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-28T23:17:44.364602Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-28T23:17:44.364647Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-28T23:17:44.364675Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-28T23:17:44.364703Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-28T23:17:44.364723Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-28T23:17:44.364754Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-28T23:17:44.364774Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-28T23:17:44.364796Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-28T23:17:44.364817Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-28T23:17:44.364852Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-28T23:17:44.364874Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-28T23:17:44.364909Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-28T23:17:44.364948Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-28T23:17:44.364991Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-28T23:17:44.365012Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-28T23:17:44.365049Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-28T23:17:44.365083Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-28T23:17:44.365104Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 16
+2026-08-28T23:17:44.365140Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-28T23:17:44.365377Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-28T23:17:44.366526Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-28T23:17:44.366576Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-28T23:17:44.366611Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 16
+2026-08-28T23:17:44.366649Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-28T23:17:44.366675Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-28T23:17:44.366793Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-28T23:17:44.366877Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-28T23:17:44.366923Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-28T23:17:44.366950Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-28T23:17:44.366974Z  INFO ort::logging: Done saving initialized tensors
+2026-08-28T23:17:44.368210Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.368567Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.368847Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.369129Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.369371Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-28T23:17:44.371320Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-28T23:17:44.373132Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.373487Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.373773Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.374036Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.374265Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-28T23:17:44.376067Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-28T23:17:44.377816Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.378176Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.378491Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.378776Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.379085Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-28T23:17:44.380893Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-28T23:17:44.383323Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.383742Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.383984Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.384219Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.384480Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-28T23:17:44.386118Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-28T23:17:44.387656Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.387985Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.388206Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.388448Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.388713Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-28T23:17:44.390275Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-28T23:17:44.391981Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.392368Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.392620Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.392906Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-28T23:17:44.393160Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-28T23:17:44.394862Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-28T23:17:44.397100Z  INFO ort::logging: Session successfully initialized.
+2026-08-28T23:17:44.398035Z  INFO actix_server::builder: starting 4 workers
+2026-08-28T23:17:44.398198Z  INFO actix_server::server: Tokio runtime found; starting in existing Tokio runtime
+2026-08-28T23:17:44.398234Z  INFO actix_server::server: starting service: "actix-web-service-127.0.0.1:8000", workers: 4, listening on: 127.0.0.1:8000
+2026-08-28T23:17:44.400156Z  INFO MapleEMR: >get_application_secret_key()
+2026-08-28T23:17:44.400851Z DEBUG MapleEMR::ui::tile_factory: >WebContentFactory:new() : Attempting read of: C:\uol\csm500-final-project\src\app\webc\static\LoginTile.htl
+2026-08-28T23:17:44.404298Z  INFO MapleEMR: >get_application_secret_key()
+2026-08-28T23:17:44.404394Z DEBUG MapleEMR::ui::tile_factory: >WebContentFactory:new() : Attempting read of: C:\uol\csm500-final-project\src\app\webc\static\LoginTile.htl
+2026-08-28T23:17:44.405824Z  INFO MapleEMR: >get_application_secret_key()
+2026-08-28T23:17:44.405907Z DEBUG MapleEMR::ui::tile_factory: >WebContentFactory:new() : Attempting read of: C:\uol\csm500-final-project\src\app\webc\static\LoginTile.htl
+2026-08-28T23:17:44.407501Z  INFO MapleEMR: >get_application_secret_key()
+2026-08-28T23:17:44.407569Z DEBUG MapleEMR::ui::tile_factory: >WebContentFactory:new() : Attempting read of: C:\uol\csm500-final-project\src\app\webc\static\LoginTile.htl

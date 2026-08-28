@@ -1,0 +1,1 @@
+del maple_emr-*.log

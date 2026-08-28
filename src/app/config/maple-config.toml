@@ -1,0 +1,8 @@
+app_version = "v1.0"
+db_conn_str = "postgres://postgres:csm500@localhost:5432/csm500"
+cargo_manifest_dir = "OVER WRITTEN"
+model_data_dir = "OVER WRITTEN"
+command_mapping_file = "command_mapping.csv"
+language_model_file = "all-MiniLM-L6-v2.onnx"
+tokenizer_file = "tokenizer.json"
+data_sub_dir = "data"

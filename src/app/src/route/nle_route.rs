@@ -40,7 +40,7 @@ impl NLERoute{
 
     /// accepts a natural language prompt and processes it using the built in engine
     /// 
-    pub async fn natural_language_prompt(_app_session: web::Data<AppSession>, user_session: Session, req: web::Form<NLPromptFormData>) -> impl Responder {
+    pub async fn natural_language_prompt(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<NLPromptFormData>) -> impl Responder {
         tracing::info!("-> /nlprompt Requested;  natural_language_prompt();  prompt: \"{}\"", req.prompt);
 
         let mut results_sbuf = String::with_capacity(500); // Single heap allocation
@@ -48,32 +48,25 @@ impl NLERoute{
         let prompt = req.prompt.clone();
        // let patient_id = req.patient_id.clone();
 
-        // collect the cargo manifest directory at runtime, which means it might not be present
-        let base_model_dir = match env::var(constants::CARGO_MANIFEST_DIR) {
-            Ok(tmp_path) => {
-                tracing::info!("CARGO_MANIFEST_DIR = {}", tmp_path);
-                tmp_path
-            }
-            Err(e) => {
-                tracing::info!("CARGO_MANIFEST_DIR not set: {}", e);
-                "INVALID_PATH".to_string()
-            }
-        };
-
+       let base_model_dir = app_session.system_config.cargo_manifest_dir.clone();
+       let data_dir = app_session.system_config.data_sub_dir.clone();
+       let language_model_file = app_session.system_config.language_model_file.clone();
+       let tokenizer_file = app_session.system_config.tokenizer_file.clone();
+       let command_mapping_file = app_session.system_config.command_mapping_file.clone();
                 
-        let nle = NaturalLanguageEngine::new( &Path::new( &base_model_dir )
-                                                                        .join(DATA_SUB_DIRECTORY)
-                                                                        .join(LANGUAGE_MODEL_FILE_NAME).to_string_lossy(),
+       let nle = NaturalLanguageEngine::new( &Path::new( &base_model_dir.clone() )
+                                                                        .join(data_dir.clone())
+                                                                        .join(language_model_file).to_string_lossy(),
 
-                                                    &Path::new( &base_model_dir )
-                                                                        .join(DATA_SUB_DIRECTORY)
-                                                                        .join(TOKENIZER_FILE_NAME).to_string_lossy()
+                                                    &Path::new( &base_model_dir.clone()  )
+                                                                        .join(data_dir.clone())
+                                                                        .join(tokenizer_file).to_string_lossy()
         ).await;
         
         // load the command controller structure, to manage proper use of the Language Engine
-        let mut cmd: CommandController = CommandController::new(&Path::new( &base_model_dir )
-                                                            .join(DATA_SUB_DIRECTORY)
-                                                            .join(COMMAND_MAPPING_FILE_NAME).to_string_lossy(), nle );
+        let mut cmd: CommandController = CommandController::new(&Path::new( &base_model_dir.clone() )
+                                                            .join(data_dir.clone())
+                                                            .join(command_mapping_file).to_string_lossy(), nle );
        
 
         let cur_session: Option<UserSession> = user_session.get(constants::USER_SESSION).unwrap();

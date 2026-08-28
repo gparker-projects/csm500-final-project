@@ -1,12 +1,19 @@
 //! -------------------------------------------------------------------
-//! Module for creating web (HTML) content
-//! -------------------------------------------------------------------'
+//! Module for loading pre-existing web (HTML) content from .htl files
+//!  (which are really just HTML with custom tags), as well as dynamically
+//!  create some HTML.
+//! 
+//! The concept is that each page is a tile, potentially with subtiles.
+//!  Following the MVC pattern, we are using data provided by the Controller (from the Model)
+//!  to create a presentation of it (the View)
+//! -------------------------------------------------------------------
 //!
 //!    CSM500 Project (April - October 2026)
 //!      Graham Parker (Student ID: 240120522)
 //! 
 //! REFERENCES
 //! 
+//! -------------------------------------------------------------------
 
 use std::fs;
 use derive_more::Display;
@@ -17,6 +24,7 @@ use crate::constants;
 use crate::dto::{patient::*, intervention::*, intervention_detail::*};
 
 use crate::ui::common::CommonFormatter;
+use crate::ui::intervention_fmt::InterventionFormatter;
 use crate::ui::simple_fmt::SimpleFormatter;
 
 /// Enumeration for Web Content Tiles, each representing a tile of information
@@ -304,7 +312,7 @@ impl WebContentFactory {
                 dd_intv_status =  CommonFormatter::get_dropdown_intervention_status(status_dropdown_list, intv.status_id); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
 
                 let intv_details_html = match intv_details_list {
-                    Some(list) => SimpleFormatter::get_view_only_intervention_details_list( list ),
+                    Some(list) => InterventionFormatter::get_view_only_intervention_details_list( list ),
                     None => "".to_string()
                 };
 
