@@ -4,9 +4,9 @@
 /// 
 
 use rand::{RngExt, rng};
- use chrono::{NaiveDate, NaiveDateTime, TimeDelta};
- 
- const LOREUM_IPSUM: &str = r##"
+use chrono::{NaiveDate, NaiveDateTime, TimeDelta};
+
+const LOREUM_IPSUM: &str = r##"
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla mollitia officia at tempora enim lorem praesentium labore. Quas voluptatum quaerat veniam duis exercitation magni ab similique nemo. Nisi anim quisquam adipiscing aliqua aute reprehenderit reprehenderit provident sit id ut ad. Irure sint deleniti neque duis obcaecati cillum laboris duis ad blanditiis dignissimos. Do magnam anim quas similique ipsam voluptate vitae minim. Mollitia dicta mollit ratione amet duis id fugit quas do proident explicabo praesentium nemo quos. Numquam minim culpa enim occaecat aspernatur tempor blanditiis magna lorem ut quisquam. 
 
 Nostrud aliqua ut architecto enim eius nemo porro ipsa ipsa eiusmod aut et consequat minim. Est duis aut eius excepteur atque. Dolores pariatur tempor irure eius veritatis quis elit ullamco minim id adipisci eos vitae sed. Ullamco voluptate non commodo fugiat. Ipsum cupiditate ratione eius magni veritatis. Aliqua id voluptatum dolores odit vitae veniam tempor nemo cillum nemo. Sunt architecto explicabo modi id ipsum similique ipsum ipsam.

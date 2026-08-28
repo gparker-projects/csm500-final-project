@@ -7,6 +7,7 @@
 //! system use. These allow consistency of use across the system and protect against errant use.
 //! 
 pub mod encounter;
+pub mod feature_preference;
 pub mod intervention;
 pub mod intervention_detail;
 pub mod patient;

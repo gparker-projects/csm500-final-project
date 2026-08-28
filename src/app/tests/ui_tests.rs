@@ -1,10 +1,10 @@
 ///
-/// Unit & Integration tests for the Web Content (webc) module
+/// Unit & Integration tests for the User Interface (ui) module
 ///
 /// Ref: Unit Testing in Rust is actually easy! - Flo Woelki (https://youtu.be/6wAFdBVJbwc?si=KdJfqvRdcXi9-mqo) - LOL NOT easy
 /// 
 #[cfg(test)]
-mod tests {
+mod ui_tests {
   use tracing;
 
   use MapleEMR::ui::tile_factory::{WebContentFactory, WebContentItem};

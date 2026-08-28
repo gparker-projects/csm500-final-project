@@ -255,4 +255,39 @@ impl InterventionDAO {
         Ok(inserted_id)
     }
 
+
+    ///
+    /// Given an InterventionDetailsDataForm, create a new Encounter reocrd, or update an existing one
+    /// RETURNS: i64: the id of the Intervention record that is created, if applicable
+    /// 
+    pub async fn upsert_intervention_details_from_intv_form(&self, form: InterventionDetailsDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
+        tracing::debug!("upsert_intervention_from_intv_form (Intv Dtls id={})", &form.intervention_details_id);
+
+        let mut query_level_0 = db_query::UPDATE_INTERVENTION_DETAILS.to_string();
+    
+        // if id is not specified, we INSERT
+        if &form.intervention_details_id == &constants::NOT_SPECIFIED_ID.to_string() {
+            query_level_0 = db_query::INSERT_INTERVENTION_DETAILS.to_string();
+        }
+
+        let query_level_1 = &query_level_0.replace("{value}", &form.value.trim());
+        let query_level_2 = &query_level_1.replace("{notes}", &form.notes.trim());
+        let query_level_3 = &query_level_2.replace("{intervention_details_id}", &form.intervention_details_id);
+        let query_level_4 = &query_level_3.replace("{type_id}", &form.type_id);
+        let query_level_5 = &query_level_4.replace("{entry_timestamp}", &form.entry_timestamp);
+        let query = &query_level_5.replace("{intervention_id}", &form.intervention_id); // INSERT does not include this field, only the UPDATE
+
+        tracing::debug!("..UPSERT query: {}", query);
+        println!("..UPSERT query: {}", query);
+
+        let result = sqlx::query(&query)
+                                                        .fetch_one(&self.connection)
+                                                        .await
+                                                        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
+        
+        // return the patient id that was created or updated
+        let inserted_id: i64 = result.get("id");
+
+        Ok(inserted_id)
+    }
 }

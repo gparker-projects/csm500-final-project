@@ -2,6 +2,7 @@ use sqlx::postgres::{PgPool};
 use tracing;
 
 use crate::{constants, dao::db_query};
+use crate::dto::feature_preference::FeaturePreference;
 
 pub const REF_TYPE_GROUP_1_INTERVENTION_TYPES: i64 = 1;
 pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;

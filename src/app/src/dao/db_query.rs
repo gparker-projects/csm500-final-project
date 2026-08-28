@@ -144,7 +144,7 @@ pub const QRY_COMMON_REF_TYPES_FOR_GROUP: &str = r##"select id, name, descriptio
 pub const QRY_COMMON_REF_TYPES_FOR_GROUP_ACTIVE_ONLY: &str = r##"select id, name, description from common_reference_type where group_id = {group_id} and active_flag = 'Y' ORDER BY NAME"##;
 
 
-pub const QRY_ACTIVE_LOCATIONS: &str = r##"select id, name ||' (' || short_name|| ')' from location where active_flag = 'Y'"##;
+pub const QRY_ACTIVE_LOCATIONS: &str = r##"select id, name ||' (' || short_name|| ')' from location where active_flag = 'Y'"##; // used by CommonDAO... not sure why the IDE keeps flagging as unused
 
 pub const QRY_ACTIVE_DEPARTMENTS: &str = r##"select id, name, name "description" from department where expiry_timestamp > now()"##;
 
@@ -169,10 +169,15 @@ pub const QRY_ALL_USERS_AND_DEPARTMENT_NAME: &str = r##"
                                                 join users u on up.users_id = u.id
                                                 join department d on up.department_id = d.id
                                                 where up.active_flag = 'Y'
-                                                and users_id = {user_id}
                                                 and site_id is not null
 												order by  d.name || ' ('|| u.name||')'
-                                                "##;                                    
+                                                "##;    // Removed clause --and users_id = {user_id}
+
+
+pub const QRY_GET_ALL_ACTIVE_FEATURE_PREFERENCE_FOR_USER: &str = r##"SELECT id, display_order, weight, calculation_date, department_id, feature_id
+                                                                     FROM feature_preference
+                                                                     where active_flag = 'Y' and users_id={users_id}
+                                                                     order by weight, calculation_date"##;
 
 // ------------------------------------------------------------------------------------------
 // 
@@ -249,7 +254,6 @@ pub const UPDATE_INTERVENTION: &str = r##"
     WHERE id={intervention_id} RETURNING ID;
 "##;
 
-/*
 pub const INSERT_INTERVENTION_DETAILS: &str = r##"
     INSERT INTO INTERVENTION_DETAILS(intervention_id,
                                      type_id, value,
@@ -269,4 +273,28 @@ pub const UPDATE_INTERVENTION_DETAILS: &str = r##"
             notes='{notes}'
         WHERE id={intervention_id} RETURNING ID;
 "##;
- */
+
+pub const INSERT_FEATURE_PREFERENCE: &str = r##"
+    INSERT INTO feature_preference(
+            display_order,
+            weight,
+            calculation_date,
+            users_id,
+            department_id,
+            active_flag,
+            feature_id)
+    VALUES (0, 0, NOW(),
+            {users_id},
+            null, 'Y',
+            {feature_id})
+    RETURNING ID;
+"##;
+
+pub const UPDATE_FEATURE_PREFERENCE: &str = r##"
+UPDATE feature_preference
+	SET weight = weight + 1,
+		calculation_date = NOW()
+	WHERE users_id = {users_id}
+	  AND feature_id = {feature_id}
+	  AND active_flag='Y' RETURNING ID;
+"##;

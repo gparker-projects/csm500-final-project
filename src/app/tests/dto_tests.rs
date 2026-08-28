@@ -3,15 +3,17 @@
 ///
 /// Ref: Unit Testing in Rust is actually easy! - Flo Woelki (https://youtu.be/6wAFdBVJbwc?si=KdJfqvRdcXi9-mqo) - LOL NOT easy
 /// 
-/// 
+///
 use chrono::{Utc, NaiveDateTime};
 use rand::{RngExt, rng};
 use MapleEMR::{constants, dto::{encounter::*, intervention::*, intervention_detail::*, patient::*, user::*}};
 use MapleEMR::dto::user_auth::*;
 
-mod common; // set up per: https://doc.rust-lang.org/book/ch11-03-test-organization.html
+mod common;
 
 use common::test_utils::*; 
+
+// set up per: https://doc.rust-lang.org/book/ch11-03-test-organization.html
 
 #[cfg(test)] 
 
@@ -163,7 +165,7 @@ use common::test_utils::*;
     let discharge_notes: String = DataGenerator::get_lorem_ipsum(2000);
 
     // instantiate a DTO to prove it accepts data, but more importantly, detect unexpected changes to it that will break the application
-     let obj = Patient::new(
+    let obj = Patient::new(
         patient_id.clone(), // patient_id
         constants::NOT_SPECIFIED_ID, //encounter_id, 
         legal_first_name.clone(), //legal_first_name, 
@@ -207,12 +209,12 @@ use common::test_utils::*;
     let password: String = DataGenerator::get_last_name(80) + &"!abcde"; // terribly poor actual security practise; good enough for basic DAO testing, at this time
 
     let obj = User::new (
-       user_id.clone(), // user_id
-       name.clone(),
-       user_name.clone(),
-       email.clone(),
-       created_timestamp.clone(),
-       password.clone()
+      user_id.clone(), // user_id
+      name.clone(),
+      user_name.clone(),
+      email.clone(),
+      created_timestamp.clone(),
+      password.clone()
     );
 
     assert_eq!(obj.id, user_id); 
@@ -249,5 +251,3 @@ use common::test_utils::*;
     assert!(!result.has_permission_for_dept(1,999)); // should fail
     assert!(!result.has_permission_for_dept(999,1)); // should fail
   }
-
-  
