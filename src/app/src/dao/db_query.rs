@@ -1,8 +1,13 @@
-/// ---------------------------------------------------------------------------------
-/// Defines standard database queries (as constants) used across the application. 
-/// Centralized for reuse, and also for easier management.
-/// ---------------------------------------------------------------------------------
-/// 
+//! ---------------------------------------------------------------------------------
+//! Defines standard database queries (as constants) used across the application. 
+//! Centralized for reuse, and also for easier management.
+//! --------------------------------------------------------------------------------- 
+//!
+//!    CSM500 Project (April - October 2026)
+//!      Graham Parker (Student ID: 240120522)
+//! 
+//! REFERENCES
+//! 
 
 // all patients at the current site of the user (per their permissions), where the patient has not been discharged
 pub const QRY_ALL_PATIENTS_AT_USERS_SITE_NO_DISCHARGE: &str = r##"SELECT p.id, e.id, e.location_id, legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as "legal_middle_names",

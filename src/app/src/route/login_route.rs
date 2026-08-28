@@ -1,6 +1,6 @@
-//! # Login and related routes
+//! Login and related routes
 //!
-//!      CSM500 Project (April - October 2026)
+//!    CSM500 Project (April - October 2026)
 //!      Graham Parker (Student ID: 240120522)
 //! 
 //! REFERENCES

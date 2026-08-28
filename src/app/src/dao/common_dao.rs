@@ -1,14 +1,15 @@
+//!
+//!    CSM500 Project (April - October 2026)
+//!      Graham Parker (Student ID: 240120522)
+//! 
+//! REFERENCES
+//! 
+
 use sqlx::postgres::{PgPool}; 
 use tracing;
 
 use crate::{constants, dao::db_query};
-use crate::dto::feature_preference::FeaturePreference;
 
-pub const REF_TYPE_GROUP_1_INTERVENTION_TYPES: i64 = 1;
-pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
-pub const REF_TYPE_GROUP_3_CARE_TYPES: i64 = 3;
-pub const REF_TYPE_GROUP_4_INTERVENTION_META_DATA: i64 = 4;
-pub const REF_TYPE_GROUP_5_STANDARD_MEASURES: i64 = 5;
 
 #[derive(Debug, Clone)]
 pub struct CommonDAO {
@@ -16,6 +17,13 @@ pub struct CommonDAO {
 }
 
 impl CommonDAO {
+
+pub const REF_TYPE_GROUP_1_INTERVENTION_TYPES: i64 = 1;
+pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
+//pub const REF_TYPE_GROUP_3_CARE_TYPES: i64 = 3;
+//pub const REF_TYPE_GROUP_4_INTERVENTION_META_DATA: i64 = 4;
+pub const REF_TYPE_GROUP_5_STANDARD_MEASURES: i64 = 5;
+
     /// Creates a new AuthObjects object, with a database pool for use by other calls
     /// 
     pub async fn new(db_connection: PgPool) -> Self {
@@ -170,7 +178,7 @@ impl CommonDAO {
     ///          - long name of the reference list item
     /// 
     pub async fn get_intervention_statuses(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
-        self.get_common_references(REF_TYPE_GROUP_2_INTERVENTION_STATUS, true).await
+        self.get_common_references(Self::REF_TYPE_GROUP_2_INTERVENTION_STATUS, true).await
     }
 
     ///
@@ -182,7 +190,7 @@ impl CommonDAO {
     ///          - long name of the reference list item
     /// 
     pub async fn get_intervention_types(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
-        self.get_common_references(REF_TYPE_GROUP_1_INTERVENTION_TYPES, true).await
+        self.get_common_references(Self::REF_TYPE_GROUP_1_INTERVENTION_TYPES, true).await
     }
 
     ///
@@ -194,7 +202,7 @@ impl CommonDAO {
     ///          - long name of the reference list item
     /// 
     pub async fn get_standard_measure_types(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
-        self.get_common_references(REF_TYPE_GROUP_5_STANDARD_MEASURES, true).await
+        self.get_common_references(Self::REF_TYPE_GROUP_5_STANDARD_MEASURES, true).await
     }
 
     ///

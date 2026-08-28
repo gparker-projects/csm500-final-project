@@ -1,11 +1,16 @@
+//! #Defines a Data Transfer Object for a Feature Preference, which 
+//!  stores information related to a feature which a user has used
+//!  at least once, but likely many times.
+//!
+//!    CSM500 Project (April - October 2026)
+//!      Graham Parker (Student ID: 240120522)
+//! 
+//! REFERENCES
+//! 
+
 use serde::{Deserialize, Serialize};
 use chrono::{NaiveDateTime}; 
-/// -------------------------------------------------------------------
-/// Defines a Data Transfer Object for a Feature Preference, which 
-///  stores information related to a feature which a user has used
-///  at least once, but likely many times.
-/// -------------------------------------------------------------------
-/// 
+
 #[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct FeaturePreference {
     #[serde(rename = "Feature Preference Id")]

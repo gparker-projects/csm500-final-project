@@ -1,3 +1,10 @@
+//! Natural Language Engline (NLE) controller module
+//!
+//!    CSM500 Project (April - October 2026)
+//!      Graham Parker (Student ID: 240120522)
+//! 
+//! REFERENCES
+//! 
 
 use std::fs::File;
 use std::io::{self, BufRead};

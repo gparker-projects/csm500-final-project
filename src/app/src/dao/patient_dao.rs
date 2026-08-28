@@ -212,7 +212,7 @@ impl PatientDAO {
     /// REFs: https://docs.rs/sqlx/latest/sqlx/fn.query_as.html
     ///       https://stackoverflow.com/questions/67243108/mapping-nm-relations-into-vec-using-sqlx
     ///       https://doc.rust-lang.org/std/io/struct.Error.html - for return Error
-    /// 
+    /// get_patients_at_users_site_no_discharge
     pub async fn get_patients_at_users_site_no_discharge(&self, user_id: i64, _include_discharged: bool) -> Result< Option< Vec<Patient> >, std::io::Error> {
         let tmp: String = db_query::QRY_ALL_PATIENTS_AT_USERS_SITE_NO_DISCHARGE.to_owned();
         let query = tmp.replace("{}", &user_id.to_string());

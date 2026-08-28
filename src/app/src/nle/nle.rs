@@ -2,10 +2,16 @@
 //! 
 //! Structs and functions within the nlp module
 //!
+//!    CSM500 Project (April - October 2026)
+//!      Graham Parker (Student ID: 240120522)
+//! 
+//! REFERENCES
+//! 
 //! ## Overview
 //! This module provides struts and classes that will work with data and the Natural Language Model (NLM) for the application.
 //! This not only handles user-provided prompts, but also the work of initiating and calling the Machine Learning/NLM engine.
-//! 
+//!
+ 
 use tracing;
 use ndarray::{Ix2, Axis}; 
 use ort::{

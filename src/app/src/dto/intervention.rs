@@ -1,8 +1,12 @@
-/// -------------------------------------------------------------------
-/// Defines a Data Transfer Object for a (Patient) Intervention, which represents
-/// some form of medical treatment or operation performed/to be performed
-/// on a patient.
-/// -------------------------------------------------------------------
+//! Defines a Data Transfer Object for a (Patient) Intervention, which represents
+//!  some form of medical treatment or operation performed/to be performed
+//!  on a patient.
+//!
+//!    CSM500 Project (April - October 2026)
+//!      Graham Parker (Student ID: 240120522)
+//! 
+//! REFERENCES
+//! 
 
 use serde::{Deserialize, Serialize};
 use chrono::{NaiveDateTime}; 

@@ -1,11 +1,15 @@
+//! # Defines a Data Transfer Object for a Patient
+//!
+//!    CSM500 Project (April - October 2026)
+//!      Graham Parker (Student ID: 240120522)
+//! 
+//! REFERENCES
+//! 
+
 use serde::{Deserialize, Serialize};
 use chrono::{NaiveDateTime, Utc}; 
 use std::fmt;
 
-/// -------------------------------------------------------------------
-/// Defines a Data Transfer Object for a Patient
-/// -------------------------------------------------------------------
-/// 
 #[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct Patient {
     // fields from the PATIENT table

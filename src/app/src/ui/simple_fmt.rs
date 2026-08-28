@@ -1,7 +1,13 @@
-/// -------------------------------------------------------------------
-/// Struct and implementation for creating html that formats Inverventions
-///   and Intervention Details.
-/// -------------------------------------------------------------------
+//! -------------------------------------------------------------------
+//! Struct and implementation for creating html that formats Inverventions
+//!   and Intervention Details.
+//! -------------------------------------------------------------------
+//!
+//!    CSM500 Project (April - October 2026)
+//!      Graham Parker (Student ID: 240120522)
+//! 
+//! REFERENCES
+//! 
 use crate::dto::{encounter::*, intervention::*, intervention_detail::*};
 use crate::dao::patient_dao::PatientWrapper;
 

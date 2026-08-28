@@ -1,9 +1,14 @@
+//! Defines a Data Transfer Object for a User
+//!
+//!    CSM500 Project (April - October 2026)
+//!      Graham Parker (Student ID: 240120522)
+//! 
+//! REFERENCES
+//! 
+
 use serde::{Deserialize, Serialize};
 use chrono::{NaiveDateTime}; 
-/// -------------------------------------------------------------------
-/// Defines a Data Transfer Object for a User
-/// -------------------------------------------------------------------
-/// 
+ 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct User {
     #[serde(rename = "ID")]

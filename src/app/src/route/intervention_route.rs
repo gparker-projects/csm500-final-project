@@ -1,6 +1,6 @@
-//! # Intervention, Intervention Details and related routes
+//! Intervention, Intervention Details and related routes
 //!
-//!      CSM500 Project (April - October 2026)
+//!    CSM500 Project (April - October 2026)
 //!      Graham Parker (Student ID: 240120522)
 //! 
 //! REFERENCES
@@ -112,7 +112,7 @@ impl InterventionRoute{
         };
         let cur_intv2= cur_intv.clone(); // clone of above object to avoid move below
 
-        let intv_dtls = idao.get_all_intervention_details(intervention_id, constants::NOT_SPECIFIED_ID).await.unwrap();
+        let intv_dtls = idao.get_all_intervention_details_for_an_intervention(intervention_id, constants::NOT_SPECIFIED_ID).await.unwrap();
 
         // refresh the patients in the menu (only)
         let pdao = PatientDAO::new( app_session.get_db_connection() ).await;

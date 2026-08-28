@@ -1,10 +1,14 @@
+//! Defines a Data Transfer Object that contains permissions and departments
+//!  associated with a user.
+//!
+//!    CSM500 Project (April - October 2026)
+//!      Graham Parker (Student ID: 240120522)
+//! 
+//! REFERENCES
+//! 
+
 use serde::{Deserialize, Serialize};
 
-/// -------------------------------------------------------------------
-/// Defines a Data Transfer Object that contains permissions and departments
-/// associated with a user.
-/// -------------------------------------------------------------------
-/// 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Permission {
     #[serde(rename = "department_id")]

@@ -1,3 +1,10 @@
+//!
+//!    CSM500 Project (April - October 2026)
+//!      Graham Parker (Student ID: 240120522)
+//! 
+//! REFERENCES
+//! 
+
 use sqlx::postgres::{PgPool}; 
 use sqlx::Row;
 use chrono::NaiveDateTime;
@@ -155,7 +162,7 @@ impl InterventionDAO {
     
     /// Finds and returns all Intervention Details, based on an Intervention
     /// 
-    pub async fn get_all_intervention_details(&self, intervention_id: i64, type_id: i64) -> Result< Option< Vec<InterventionDetail> >, std::io::Error> {
+    pub async fn get_all_intervention_details_for_an_intervention(&self, intervention_id: i64, type_id: i64) -> Result< Option< Vec<InterventionDetail> >, std::io::Error> {
         println!("get_all_intervention_details()");
         let query =  match type_id == constants::NOT_SPECIFIED_ID {
             true => {

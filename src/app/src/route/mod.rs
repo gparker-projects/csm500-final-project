@@ -1,9 +1,9 @@
 //! # mod.rs for the route module
-//! 
-//! Code for the /admin and related routing
 //!
-//! ## Overview
-//! This module provides TODO
+//!    CSM500 Project (April - October 2026)
+//!      Graham Parker (Student ID: 240120522)
+//! 
+//! REFERENCES
 //! 
 
 pub mod admit_route;

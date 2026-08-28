@@ -1,6 +1,6 @@
-//! # patient and related routes
+//! Patient and related routes
 //!
-//!      CSM500 Project (April - October 2026)
+//!    CSM500 Project (April - October 2026)
 //!      Graham Parker (Student ID: 240120522)
 //! 
 //! REFERENCES
@@ -106,7 +106,7 @@ impl PatientRoute{
     };
 
     // no user should be able to get into the system without a location assigned, so we will not worry about an exception here
-    let item_list = {CommonDAO::new( app_session.get_db_connection() ).await}.get_common_references(common_dao::REF_TYPE_GROUP_1_INTERVENTION_TYPES, true ).await.unwrap();
+    let item_list = {CommonDAO::new( app_session.get_db_connection() ).await}.get_common_references(CommonDAO::REF_TYPE_GROUP_1_INTERVENTION_TYPES, true ).await.unwrap();
 
     let consolidated_content = wcf.get_patient_details_full_tile(patient_header,
                                                                          cur_enc_section,

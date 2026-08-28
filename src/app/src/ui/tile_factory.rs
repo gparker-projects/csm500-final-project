@@ -1,6 +1,13 @@
-/// -------------------------------------------------------------------
-/// module for creating web (HTML) content
-/// -------------------------------------------------------------------'
+//! -------------------------------------------------------------------
+//! Module for creating web (HTML) content
+//! -------------------------------------------------------------------'
+//!
+//!    CSM500 Project (April - October 2026)
+//!      Graham Parker (Student ID: 240120522)
+//! 
+//! REFERENCES
+//! 
+
 use std::fs;
 use derive_more::Display;
 use std::collections::HashMap;

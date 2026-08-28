@@ -1,8 +1,12 @@
-/// -------------------------------------------------------------------
-/// Defines a Data Transfer Object for a (Patient) Encounter, which represents
-/// an event whereby a patient has attended the hospital to have one or 
-/// more interventions applied to them.
-/// -------------------------------------------------------------------
+//! # Defines a Data Transfer Object for a (Patient) Encounter, which represents
+//! an event whereby a patient has attended the hospital to have one or 
+//! more interventions applied to them.
+//!
+//!    CSM500 Project (April - October 2026)
+//!      Graham Parker (Student ID: 240120522)
+//! 
+//! REFERENCES
+//! 
 
 use serde::{Deserialize, Serialize};
 use chrono::{NaiveDateTime}; 

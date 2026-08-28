@@ -1,8 +1,14 @@
-/// -------------------------------------------------------------------
-/// Struct and implementation for creating html that formats common data
-/// controls such as drop down lists, generic hidden forms etc.
-/// -------------------------------------------------------------------
-//use crate::dto::intervention_detail::InterventionDetail;
+//! -------------------------------------------------------------------
+//! Struct and implementation for creating html that formats common data
+//! controls such as drop down lists, generic hidden forms etc.
+//! -------------------------------------------------------------------
+//! 
+//!    CSM500 Project (April - October 2026)
+//!      Graham Parker (Student ID: 240120522)
+//! 
+//! REFERENCES
+//! 
+
 
 pub struct CommonFormatter{}
 

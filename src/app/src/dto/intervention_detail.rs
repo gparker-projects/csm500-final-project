@@ -1,7 +1,12 @@
-/// -------------------------------------------------------------------
-/// Defines a Data Transfer Object for an Intervention Detail, which represents
-/// a measure taken or other facet of care performed as part of an Intervention.
-/// -------------------------------------------------------------------
+//! Defines a Data Transfer Object for an Intervention Detail, which represents
+//! a measure taken or other facet of care performed as part of an Intervention.
+//!
+//!    CSM500 Project (April - October 2026)
+//!      Graham Parker (Student ID: 240120522)
+//! 
+//! REFERENCES
+//! 
+
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use std::fmt;
