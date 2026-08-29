@@ -1,0 +1,370 @@
+2026-08-29T17:10:31.569582Z  INFO MapleEMR: MapleEMR is running!
+2026-08-29T17:10:31.569927Z  INFO MapleEMR: CARGO_MANIFEST_DIR = C:\uol\csm500-final-project\src\app
+2026-08-29T17:10:31.570531Z  INFO MapleEMR: Configuration loaded: C:\uol\csm500-final-project\src\app\config\maple-config.toml
+2026-08-29T17:10:31.748248Z  INFO MapleEMR: Database connection established to: postgres://postgres:csm500@localhost:5432/csm500
+2026-08-29T17:10:31.834805Z  INFO ort::logging: Discovered OrtHardwareDevice {vendor_id:0x8086, device_id:0x1912, vendor:Intel Corporation, type:1, metadata: [Description=Intel(R) HD Graphics 530, Discrete=0, DxgiAdapterNumber=0, DxgiHighPerformanceIndex=0, DxgiVideoMemory=128 MB, LUID=49304, ]}
+2026-08-29T17:10:31.835287Z  INFO ort::logging: Discovered OrtHardwareDevice {vendor_id:0x8086, device_id:0x0, vendor:Intel, type:0, metadata: [Description=Intel(R) Core(TM) i5-6600 CPU @ 3.30GHz, ]}
+2026-08-29T17:10:31.836257Z  INFO ort::logging: Session Options {  execution_mode:0 execution_order:DEFAULT enable_profiling:0 optimized_model_filepath: enable_mem_pattern:1 enable_mem_reuse:1 enable_cpu_mem_arena:1 profile_file_prefix:onnxruntime_profile_ session_logid: session_log_severity_level:-1 session_log_verbosity_level:0 max_num_graph_transformation_steps:10 graph_optimization_level:1 intra_op_param:OrtThreadPoolParams { thread_pool_size: 1 auto_set_affinity: 0 allow_spinning: 0 dynamic_block_base_: 0 stack_size: 0 affinity_str:  set_denormal_as_zero: 0 } inter_op_param:OrtThreadPoolParams { thread_pool_size: 0 auto_set_affinity: 0 allow_spinning: 0 dynamic_block_base_: 0 stack_size: 0 affinity_str:  set_denormal_as_zero: 0 } use_per_session_threads:1 thread_pool_allow_spinning:1 use_deterministic_compute:0 ep_selection_policy:5 config_options: {  } }
+2026-08-29T17:10:31.836352Z  INFO ort::logging: Flush-to-zero and denormal-as-zero are off
+2026-08-29T17:10:31.836375Z  INFO ort::logging: Creating and using per session threadpools since use_per_session_threads_ is true
+2026-08-29T17:10:31.836443Z  INFO ort::logging: Dynamic block base set to 0
+2026-08-29T17:10:31.905336Z  INFO ort::logging: Initializing session.
+2026-08-29T17:10:31.905453Z  INFO ort::logging: Creating BFCArena for Cpu with following configs: initial_chunk_size_bytes: 1048576 max_dead_bytes_per_chunk: 134217728 initial_growth_chunk_size_bytes: 2097152 max_power_of_two_extend_bytes: 1073741824 memory limit: 18446744073709551615 arena_extend_strategy: 0
+2026-08-29T17:10:31.912474Z  INFO ort::logging: This model does not have any local functions defined. AOT Inlining is not performed
+2026-08-29T17:10:31.943835Z  INFO ort::logging: GraphTransformer EnsureUniqueDQForNodeUnit modified: 0 with status: OK
+2026-08-29T17:10:31.944413Z  INFO ort::logging: GraphTransformer Level1_RuleBasedTransformer modified: 0 with status: OK
+2026-08-29T17:10:31.944739Z  INFO ort::logging: GraphTransformer DoubleQDQPairsRemover modified: 0 with status: OK
+2026-08-29T17:10:31.947736Z  INFO ort::logging: Total shared scalar initializer count: 199
+2026-08-29T17:10:31.947859Z  INFO ort::logging: GraphTransformer ConstantSharing modified: 1 with status: OK
+2026-08-29T17:10:31.956974Z  INFO ort::logging: GraphTransformer CommonSubexpressionElimination modified: 1 with status: OK
+2026-08-29T17:10:31.967718Z  INFO ort::logging: GraphTransformer ConstantFolding modified: 1 with status: OK
+2026-08-29T17:10:31.973909Z  INFO ort::logging: Removing initializer '/1/Constant_8_output_0'. It is no longer used by any node.
+2026-08-29T17:10:31.973983Z  INFO ort::logging: Removing initializer '/0/auto_model/Shape_2_output_0'. It is no longer used by any node.
+2026-08-29T17:10:31.974003Z  INFO ort::logging: Removing initializer '/1/Shape_3_output_0'. It is no longer used by any node.
+2026-08-29T17:10:31.974309Z  INFO ort::logging: GraphTransformer MatMulAddFusion modified: 0 with status: OK
+2026-08-29T17:10:31.974534Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.0/attention/self/Reshape_output_0
+2026-08-29T17:10:31.974583Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.0/attention/self/Reshape_2_output_0
+2026-08-29T17:10:31.974703Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.0/attention/self/Reshape_1_output_0
+2026-08-29T17:10:31.974771Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.0/attention/self/Reshape_3_output_0
+2026-08-29T17:10:31.974889Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.1/attention/self/Reshape_output_0
+2026-08-29T17:10:31.974962Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.1/attention/self/Reshape_2_output_0
+2026-08-29T17:10:31.975005Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.1/attention/self/Reshape_1_output_0
+2026-08-29T17:10:31.975079Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.1/attention/self/Reshape_3_output_0
+2026-08-29T17:10:31.975136Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.2/attention/self/Reshape_output_0
+2026-08-29T17:10:31.975178Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.2/attention/self/Reshape_2_output_0
+2026-08-29T17:10:31.975257Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.2/attention/self/Reshape_1_output_0
+2026-08-29T17:10:31.975317Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.2/attention/self/Reshape_3_output_0
+2026-08-29T17:10:31.975361Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.3/attention/self/Reshape_output_0
+2026-08-29T17:10:31.975402Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.3/attention/self/Reshape_2_output_0
+2026-08-29T17:10:31.975452Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.3/attention/self/Reshape_1_output_0
+2026-08-29T17:10:31.975517Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.3/attention/self/Reshape_3_output_0
+2026-08-29T17:10:31.975574Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.4/attention/self/Reshape_output_0
+2026-08-29T17:10:31.975630Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.4/attention/self/Reshape_2_output_0
+2026-08-29T17:10:31.975671Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.4/attention/self/Reshape_1_output_0
+2026-08-29T17:10:31.975742Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.4/attention/self/Reshape_3_output_0
+2026-08-29T17:10:31.975804Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.5/attention/self/Reshape_output_0
+2026-08-29T17:10:31.975891Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.5/attention/self/Reshape_2_output_0
+2026-08-29T17:10:31.975951Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.5/attention/self/Reshape_1_output_0
+2026-08-29T17:10:31.976038Z  INFO ort::logging: Fused reshape node: /0/auto_model/encoder/layer.5/attention/self/Reshape_3_output_0
+2026-08-29T17:10:31.976061Z  INFO ort::logging: Total fused reshape node count: 24
+2026-08-29T17:10:31.976095Z  INFO ort::logging: GraphTransformer ReshapeFusion modified: 1 with status: OK
+2026-08-29T17:10:31.980380Z  INFO ort::logging: Removing initializer '/0/auto_model/encoder/layer.4/attention/self/Constant_11_output_0'. It is no longer used by any node.
+2026-08-29T17:10:31.980434Z  INFO ort::logging: Removing initializer '/0/auto_model/encoder/layer.4/attention/self/Constant_6_output_0'. It is no longer used by any node.
+2026-08-29T17:10:31.980467Z  INFO ort::logging: Removing initializer '/0/auto_model/encoder/layer.0/attention/self/Constant_15_output_0'. It is no longer used by any node.
+2026-08-29T17:10:31.980607Z  INFO ort::logging: GraphTransformer FreeDimensionOverrideTransformer modified: 0 with status: OK
+2026-08-29T17:10:31.980658Z  INFO ort::logging: GraphTransformer GeluFusionL1 modified: 0 with status: OK
+2026-08-29T17:10:31.980699Z  INFO ort::logging: GraphTransformer LayerNormFusionL1 modified: 0 with status: OK
+2026-08-29T17:10:31.980940Z  INFO ort::logging: GraphTransformer QDQPropagationTransformer modified: 0 with status: OK
+2026-08-29T17:10:31.981175Z  INFO ort::logging: GraphTransformer WeightBiasQuantization modified: 0 with status: OK
+2026-08-29T17:10:31.981295Z  INFO ort::logging: GraphTransformer EnsureUniqueDQForNodeUnit modified: 0 with status: OK
+2026-08-29T17:10:31.981397Z  INFO ort::logging: GraphTransformer WhereDummyDq modified: 0 with status: OK
+2026-08-29T17:10:31.982572Z  INFO ort::logging: GraphTransformer TransposeOptimizer modified: 0 with status: OK
+2026-08-29T17:10:31.983982Z  INFO ort::logging: GraphTransformer Level1_RuleBasedTransformer modified: 0 with status: OK
+2026-08-29T17:10:31.984233Z  INFO ort::logging: GraphTransformer DoubleQDQPairsRemover modified: 0 with status: OK
+2026-08-29T17:10:31.984890Z  INFO ort::logging: GraphTransformer CommonSubexpressionElimination modified: 0 with status: OK
+2026-08-29T17:10:31.985168Z  INFO ort::logging: GraphTransformer ConstantFolding modified: 0 with status: OK
+2026-08-29T17:10:31.985381Z  INFO ort::logging: GraphTransformer MatMulAddFusion modified: 0 with status: OK
+2026-08-29T17:10:31.985895Z  INFO ort::logging: GraphTransformer ReshapeFusion modified: 0 with status: OK
+2026-08-29T17:10:31.985970Z  INFO ort::logging: GraphTransformer FreeDimensionOverrideTransformer modified: 0 with status: OK
+2026-08-29T17:10:31.985991Z  INFO ort::logging: GraphTransformer GeluFusionL1 modified: 0 with status: OK
+2026-08-29T17:10:31.986022Z  INFO ort::logging: GraphTransformer LayerNormFusionL1 modified: 0 with status: OK
+2026-08-29T17:10:31.986176Z  INFO ort::logging: GraphTransformer QDQPropagationTransformer modified: 0 with status: OK
+2026-08-29T17:10:31.986341Z  INFO ort::logging: GraphTransformer WeightBiasQuantization modified: 0 with status: OK
+2026-08-29T17:10:31.986580Z  INFO ort::logging: GraphTransformer EnsureUniqueDQForNodeUnit modified: 0 with status: OK
+2026-08-29T17:10:31.986746Z  INFO ort::logging: GraphTransformer WhereDummyDq modified: 0 with status: OK
+2026-08-29T17:10:31.995982Z  INFO ort::logging: Running graph optimizations in loop 1 time/s (Graph Optimizations Loop Level : 1)
+2026-08-29T17:10:31.996811Z  INFO ort::logging: GraphTransformer RemoveDuplicateCastTransformer modified: 0 with status: OK
+2026-08-29T17:10:31.996856Z  INFO ort::logging: GraphTransformer CastFloat16Transformer modified: 0 with status: OK
+2026-08-29T17:10:31.996919Z  INFO ort::logging: GraphTransformer MemcpyTransformer modified: 0 with status: OK
+2026-08-29T17:10:32.006678Z  INFO ort::logging: Use DeviceBasedPartition as default
+2026-08-29T17:10:32.063383Z  INFO ort::logging: Saving initialized tensors.
+2026-08-29T17:10:32.063536Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-29T17:10:32.063580Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-29T17:10:32.063618Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-29T17:10:32.063643Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-29T17:10:32.063692Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-29T17:10:32.063734Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-29T17:10:32.063762Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-29T17:10:32.063785Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-29T17:10:32.063877Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-29T17:10:32.063931Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-29T17:10:32.063974Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-29T17:10:32.064006Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-29T17:10:32.064040Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-29T17:10:32.064067Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-29T17:10:32.064088Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-29T17:10:32.064134Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-29T17:10:32.064175Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-29T17:10:32.064204Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-29T17:10:32.064239Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-29T17:10:32.064284Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-29T17:10:32.064305Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-29T17:10:32.064332Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-29T17:10:32.064355Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-29T17:10:32.064391Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-29T17:10:32.064412Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-29T17:10:32.064442Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-29T17:10:32.064482Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-29T17:10:32.064513Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-29T17:10:32.064535Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-29T17:10:32.064560Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-29T17:10:32.064593Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-29T17:10:32.064614Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 16
+2026-08-29T17:10:32.064637Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-29T17:10:32.064681Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-29T17:10:32.064704Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 8
+2026-08-29T17:10:32.064725Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 4
+2026-08-29T17:10:32.064746Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 16
+2026-08-29T17:10:32.064796Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-29T17:10:32.064831Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 24
+2026-08-29T17:10:32.064859Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-29T17:10:32.065141Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-29T17:10:32.065186Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-29T17:10:32.065234Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 32
+2026-08-29T17:10:32.065257Z  INFO ort::logging: Done saving initialized tensors
+2026-08-29T17:10:32.066628Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.067049Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.067310Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.067628Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.067899Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-29T17:10:32.069867Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-29T17:10:32.072005Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.072350Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.072630Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.072931Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.073259Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-29T17:10:32.075016Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-29T17:10:32.076993Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.077309Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.077663Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.077983Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.078487Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-29T17:10:32.080122Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-29T17:10:32.082418Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.082894Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.083864Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.084283Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.084604Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-29T17:10:32.086817Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-29T17:10:32.088773Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.089031Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.089248Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.089506Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.089853Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-29T17:10:32.091745Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-29T17:10:32.093712Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.094078Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.094530Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.094916Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 589824
+2026-08-29T17:10:32.095296Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-29T17:10:32.097700Z  INFO ort::logging: Reserving memory in BFCArena for Cpu size: 2359296
+2026-08-29T17:10:32.100626Z  INFO ort::logging: Session successfully initialized.
+2026-08-29T17:10:32.101257Z  INFO actix_server::builder: starting 4 workers
+2026-08-29T17:10:32.101344Z  INFO actix_server::server: Tokio runtime found; starting in existing Tokio runtime
+2026-08-29T17:10:32.101382Z  INFO actix_server::server: starting service: "actix-web-service-127.0.0.1:8000", workers: 4, listening on: 127.0.0.1:8000
+2026-08-29T17:10:32.101966Z  INFO MapleEMR: >get_application_secret_key()
+2026-08-29T17:10:32.102421Z DEBUG MapleEMR::ui::tile_factory: >WebContentFactory:new() : Attempting read of: C:\uol\csm500-final-project\src\app\webc\static\LoginTile.htl
+2026-08-29T17:10:32.105737Z  INFO MapleEMR: >get_application_secret_key()
+2026-08-29T17:10:32.105840Z DEBUG MapleEMR::ui::tile_factory: >WebContentFactory:new() : Attempting read of: C:\uol\csm500-final-project\src\app\webc\static\LoginTile.htl
+2026-08-29T17:10:32.107757Z  INFO MapleEMR: >get_application_secret_key()
+2026-08-29T17:10:32.107826Z DEBUG MapleEMR::ui::tile_factory: >WebContentFactory:new() : Attempting read of: C:\uol\csm500-final-project\src\app\webc\static\LoginTile.htl
+2026-08-29T17:10:32.109357Z  INFO MapleEMR: >get_application_secret_key()
+2026-08-29T17:10:32.109422Z DEBUG MapleEMR::ui::tile_factory: >WebContentFactory:new() : Attempting read of: C:\uol\csm500-final-project\src\app\webc\static\LoginTile.htl
+2026-08-29T17:10:39.639412Z DEBUG MapleEMR::route::default_route: -> /default_route Requested
+2026-08-29T17:10:39.639474Z DEBUG MapleEMR::route::default_route: Checking session for Validation errors
+2026-08-29T17:10:39.639495Z DEBUG MapleEMR::route::default_route: Ok( None ) No active session
+2026-08-29T17:10:44.559597Z DEBUG MapleEMR::route::login_route: -> /login Requested
+2026-08-29T17:10:44.559656Z DEBUG MapleEMR::dao::auth_dao: Query: SELECT id, name, username, email, created_timestamp, password FROM USERS WHERE USERNAME = 'chath' AND PASSWORD = 'nurse1'
+2026-08-29T17:10:44.568493Z DEBUG sqlx::query: summary="SELECT id, name, username, …" db.statement="\n\nSELECT id, name, username, email, created_timestamp, password FROM USERS WHERE USERNAME = 'chath' AND PASSWORD = 'nurse1'\n" rows_affected=1 rows_returned=1 elapsed=8.4095ms elapsed_secs=0.0084095
+2026-08-29T17:10:44.568633Z DEBUG MapleEMR::dao::auth_dao: Successful login (results found) for: chath
+2026-08-29T17:10:44.568709Z DEBUG MapleEMR::route::login_route: User can login: chath redirect to /home
+2026-08-29T17:10:44.568741Z DEBUG MapleEMR::dao::auth_dao: get_user_permissions Query: SELECT department_id, permission_id FROM public.user_permission where active_flag = 'Y' and users_id = 2 group by department_id, permission_id order by permission_id
+2026-08-29T17:10:44.682217Z DEBUG sqlx::query: summary="SELECT department_id, permission_id FROM …" db.statement="\n\nSELECT department_id, permission_id FROM public.user_permission where active_flag = 'Y' and users_id = 2 group by department_id, permission_id order by permission_id\n" rows_affected=12 rows_returned=12 elapsed=4.2554ms elapsed_secs=0.0042554
+2026-08-29T17:10:44.690109Z DEBUG MapleEMR::route::home_route: -> /home Route Requested
+2026-08-29T17:10:44.690305Z DEBUG MapleEMR::dao::patient_dao: >get_patients_at_users_site_no_discharge() Query: SELECT p.id, e.id, e.location_id, legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as "legal_middle_names",
+                                        COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
+                                        birthdate, admit_timestamp,
+                                        discharge_timestamp as "discharge_timestamp?",
+                                        phn, l2.short_name "location_short_name"
+                                    FROM patient p
+                                    join encounter e on p.id = e.patient_id
+									join location l2 on l2.id = e.location_id
+                                    where discharge_timestamp is null
+                                      and location_id in (
+                                        select l.id
+                                        from location l
+                                        where site_id in (
+                                        select site_id
+                                        from user_permission up
+                                        where users_id = 2
+                                            and up.site_id = l.site_id)  )
+2026-08-29T17:10:44.704193Z DEBUG sqlx::query: summary="SELECT p.id, e.id, e.location_id, …" db.statement="\n\nSELECT p.id, e.id, e.location_id, legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as \"legal_middle_names\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\", COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        birthdate, admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        phn, l2.short_name \"location_short_name\"\n                                    FROM patient p\n                                    join encounter e on p.id = e.patient_id\n\t\t\t\t\t\t\t\t\tjoin location l2 on l2.id = e.location_id\n                                    where discharge_timestamp is null\n                                      and location_id in (\n                                        select l.id\n                                        from location l\n                                        where site_id in (\n                                        select site_id\n                                        from user_permission up\n                                        where users_id = 2\n                                            and up.site_id = l.site_id)  )\n" rows_affected=7 rows_returned=7 elapsed=13.475ms elapsed_secs=0.013475
+2026-08-29T17:10:44.704307Z DEBUG MapleEMR::route::home_route: Retrieved 7 patients:
+2026-08-29T17:10:44.712691Z DEBUG sqlx::query: summary="select e.id \"encounter_id\", admit_timestamp, …" db.statement="\n\n\n                                    select e.id \"encounter_id\", admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\",\n                                        COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        s.name \"encounter_site_name\",\n                                        l.short_name \"room_identifier\",\n                                        'Y' as \"current_encounter\"\n                                    from encounter e\n                                    join location l on e.location_id = l.id\n                                    join site s on s.id = l.site_id\n                                    where patient_id = 1\n                                      and discharge_timestamp is null\n                                      limit 1\n                                    \n" rows_affected=1 rows_returned=1 elapsed=7.9945ms elapsed_secs=0.0079945
+2026-08-29T17:10:44.718879Z DEBUG sqlx::query: summary="SELECT i.id intervention_id, encounter_id, …" db.statement="\n\n\n                                SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,\n                                    intervention_type_id, status_id,\n                                    l.room_identifier,\n                                    ref1.name \"intervention_type\", \n                                    ref2.name \"status\", i.scheduled_timestamp, i.performed_timestamp\n                                FROM intervention i\n                                join location l on  l.id = i.location_id\n                                join common_reference_type ref1 on i.intervention_type_id = ref1.id\n                                join common_reference_type ref2 on i.status_id = ref2.id \n                                where i.encounter_id = 1\n                                  AND i.intervention_type_id = 38\n                                ORDER BY i.id DESC LIMIT 1\n                                                \n" rows_affected=1 rows_returned=1 elapsed=5.787ms elapsed_secs=0.005787
+2026-08-29T17:10:44.948413Z DEBUG sqlx::query: summary="select e.id \"encounter_id\", admit_timestamp, …" db.statement="\n\n\n                                    select e.id \"encounter_id\", admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\",\n                                        COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        s.name \"encounter_site_name\",\n                                        l.short_name \"room_identifier\",\n                                        'Y' as \"current_encounter\"\n                                    from encounter e\n                                    join location l on e.location_id = l.id\n                                    join site s on s.id = l.site_id\n                                    where patient_id = 2\n                                      and discharge_timestamp is null\n                                      limit 1\n                                    \n" rows_affected=1 rows_returned=1 elapsed=7.7016ms elapsed_secs=0.0077016
+2026-08-29T17:10:44.952723Z DEBUG sqlx::query: summary="SELECT i.id intervention_id, encounter_id, …" db.statement="\n\n\n                                SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,\n                                    intervention_type_id, status_id,\n                                    l.room_identifier,\n                                    ref1.name \"intervention_type\", \n                                    ref2.name \"status\", i.scheduled_timestamp, i.performed_timestamp\n                                FROM intervention i\n                                join location l on  l.id = i.location_id\n                                join common_reference_type ref1 on i.intervention_type_id = ref1.id\n                                join common_reference_type ref2 on i.status_id = ref2.id \n                                where i.encounter_id = 2\n                                  AND i.intervention_type_id = 38\n                                ORDER BY i.id DESC LIMIT 1\n                                                \n" rows_affected=1 rows_returned=1 elapsed=3.5768ms elapsed_secs=0.0035768
+2026-08-29T17:10:44.956333Z DEBUG sqlx::query: summary="select e.id \"encounter_id\", admit_timestamp, …" db.statement="\n\n\n                                    select e.id \"encounter_id\", admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\",\n                                        COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        s.name \"encounter_site_name\",\n                                        l.short_name \"room_identifier\",\n                                        'Y' as \"current_encounter\"\n                                    from encounter e\n                                    join location l on e.location_id = l.id\n                                    join site s on s.id = l.site_id\n                                    where patient_id = 3\n                                      and discharge_timestamp is null\n                                      limit 1\n                                    \n" rows_affected=1 rows_returned=1 elapsed=3.2169ms elapsed_secs=0.0032169
+2026-08-29T17:10:44.960227Z DEBUG sqlx::query: summary="SELECT i.id intervention_id, encounter_id, …" db.statement="\n\n\n                                SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,\n                                    intervention_type_id, status_id,\n                                    l.room_identifier,\n                                    ref1.name \"intervention_type\", \n                                    ref2.name \"status\", i.scheduled_timestamp, i.performed_timestamp\n                                FROM intervention i\n                                join location l on  l.id = i.location_id\n                                join common_reference_type ref1 on i.intervention_type_id = ref1.id\n                                join common_reference_type ref2 on i.status_id = ref2.id \n                                where i.encounter_id = 3\n                                  AND i.intervention_type_id = 38\n                                ORDER BY i.id DESC LIMIT 1\n                                                \n" rows_affected=1 rows_returned=1 elapsed=3.479ms elapsed_secs=0.003479
+2026-08-29T17:10:44.961503Z DEBUG sqlx::query: summary="select e.id \"encounter_id\", admit_timestamp, …" db.statement="\n\n\n                                    select e.id \"encounter_id\", admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\",\n                                        COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        s.name \"encounter_site_name\",\n                                        l.short_name \"room_identifier\",\n                                        'Y' as \"current_encounter\"\n                                    from encounter e\n                                    join location l on e.location_id = l.id\n                                    join site s on s.id = l.site_id\n                                    where patient_id = 5\n                                      and discharge_timestamp is null\n                                      limit 1\n                                    \n" rows_affected=1 rows_returned=1 elapsed=903.1µs elapsed_secs=0.0009031
+2026-08-29T17:10:44.963157Z DEBUG sqlx::query: summary="SELECT i.id intervention_id, encounter_id, …" db.statement="\n\n\n                                SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,\n                                    intervention_type_id, status_id,\n                                    l.room_identifier,\n                                    ref1.name \"intervention_type\", \n                                    ref2.name \"status\", i.scheduled_timestamp, i.performed_timestamp\n                                FROM intervention i\n                                join location l on  l.id = i.location_id\n                                join common_reference_type ref1 on i.intervention_type_id = ref1.id\n                                join common_reference_type ref2 on i.status_id = ref2.id \n                                where i.encounter_id = 10\n                                  AND i.intervention_type_id = 38\n                                ORDER BY i.id DESC LIMIT 1\n                                                \n" rows_affected=0 rows_returned=0 elapsed=1.2697ms elapsed_secs=0.0012697
+2026-08-29T17:10:44.963233Z DEBUG MapleEMR::dao::intervention_dao: No Interventions found for encounter_id: 10 [count=0]
+2026-08-29T17:10:44.964471Z DEBUG sqlx::query: summary="select e.id \"encounter_id\", admit_timestamp, …" db.statement="\n\n\n                                    select e.id \"encounter_id\", admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\",\n                                        COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        s.name \"encounter_site_name\",\n                                        l.short_name \"room_identifier\",\n                                        'Y' as \"current_encounter\"\n                                    from encounter e\n                                    join location l on e.location_id = l.id\n                                    join site s on s.id = l.site_id\n                                    where patient_id = 25\n                                      and discharge_timestamp is null\n                                      limit 1\n                                    \n" rows_affected=1 rows_returned=1 elapsed=912.2µs elapsed_secs=0.0009122
+2026-08-29T17:10:44.966288Z DEBUG sqlx::query: summary="SELECT i.id intervention_id, encounter_id, …" db.statement="\n\n\n                                SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,\n                                    intervention_type_id, status_id,\n                                    l.room_identifier,\n                                    ref1.name \"intervention_type\", \n                                    ref2.name \"status\", i.scheduled_timestamp, i.performed_timestamp\n                                FROM intervention i\n                                join location l on  l.id = i.location_id\n                                join common_reference_type ref1 on i.intervention_type_id = ref1.id\n                                join common_reference_type ref2 on i.status_id = ref2.id \n                                where i.encounter_id = 11\n                                  AND i.intervention_type_id = 38\n                                ORDER BY i.id DESC LIMIT 1\n                                                \n" rows_affected=0 rows_returned=0 elapsed=1.3902ms elapsed_secs=0.0013902
+2026-08-29T17:10:44.966355Z DEBUG MapleEMR::dao::intervention_dao: No Interventions found for encounter_id: 11 [count=0]
+2026-08-29T17:10:44.967904Z DEBUG sqlx::query: summary="select e.id \"encounter_id\", admit_timestamp, …" db.statement="\n\n\n                                    select e.id \"encounter_id\", admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\",\n                                        COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        s.name \"encounter_site_name\",\n                                        l.short_name \"room_identifier\",\n                                        'Y' as \"current_encounter\"\n                                    from encounter e\n                                    join location l on e.location_id = l.id\n                                    join site s on s.id = l.site_id\n                                    where patient_id = 26\n                                      and discharge_timestamp is null\n                                      limit 1\n                                    \n" rows_affected=1 rows_returned=1 elapsed=1.1962ms elapsed_secs=0.0011962
+2026-08-29T17:10:44.969271Z DEBUG sqlx::query: summary="SELECT i.id intervention_id, encounter_id, …" db.statement="\n\n\n                                SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,\n                                    intervention_type_id, status_id,\n                                    l.room_identifier,\n                                    ref1.name \"intervention_type\", \n                                    ref2.name \"status\", i.scheduled_timestamp, i.performed_timestamp\n                                FROM intervention i\n                                join location l on  l.id = i.location_id\n                                join common_reference_type ref1 on i.intervention_type_id = ref1.id\n                                join common_reference_type ref2 on i.status_id = ref2.id \n                                where i.encounter_id = 12\n                                  AND i.intervention_type_id = 38\n                                ORDER BY i.id DESC LIMIT 1\n                                                \n" rows_affected=0 rows_returned=0 elapsed=980.7µs elapsed_secs=0.0009807
+2026-08-29T17:10:44.969331Z DEBUG MapleEMR::dao::intervention_dao: No Interventions found for encounter_id: 12 [count=0]
+2026-08-29T17:10:44.970541Z DEBUG sqlx::query: summary="select e.id \"encounter_id\", admit_timestamp, …" db.statement="\n\n\n                                    select e.id \"encounter_id\", admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\",\n                                        COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        s.name \"encounter_site_name\",\n                                        l.short_name \"room_identifier\",\n                                        'Y' as \"current_encounter\"\n                                    from encounter e\n                                    join location l on e.location_id = l.id\n                                    join site s on s.id = l.site_id\n                                    where patient_id = 27\n                                      and discharge_timestamp is null\n                                      limit 1\n                                    \n" rows_affected=1 rows_returned=1 elapsed=879.2µs elapsed_secs=0.0008792
+2026-08-29T17:10:44.972051Z DEBUG sqlx::query: summary="SELECT i.id intervention_id, encounter_id, …" db.statement="\n\n\n                                SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,\n                                    intervention_type_id, status_id,\n                                    l.room_identifier,\n                                    ref1.name \"intervention_type\", \n                                    ref2.name \"status\", i.scheduled_timestamp, i.performed_timestamp\n                                FROM intervention i\n                                join location l on  l.id = i.location_id\n                                join common_reference_type ref1 on i.intervention_type_id = ref1.id\n                                join common_reference_type ref2 on i.status_id = ref2.id \n                                where i.encounter_id = 13\n                                  AND i.intervention_type_id = 38\n                                ORDER BY i.id DESC LIMIT 1\n                                                \n" rows_affected=0 rows_returned=0 elapsed=1.1721ms elapsed_secs=0.0011721
+2026-08-29T17:10:44.972107Z DEBUG MapleEMR::dao::intervention_dao: No Interventions found for encounter_id: 13 [count=0]
+2026-08-29T17:10:46.594914Z DEBUG MapleEMR::route::patient_route: -> /patientdtls Route Requested
+2026-08-29T17:10:46.596443Z DEBUG sqlx::query: summary="select e.id \"encounter_id\", admit_timestamp, …" db.statement="\n\n\n                                    select e.id \"encounter_id\", admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\",\n                                        COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        s.name \"encounter_site_name\",\n                                        l.short_name \"room_identifier\",\n                                        'Y' as \"current_encounter\"\n                                    from encounter e\n                                    join location l on e.location_id = l.id\n                                    join site s on s.id = l.site_id\n                                    where patient_id = 1\n                                      and discharge_timestamp is null\n                                      limit 1\n                                    \n" rows_affected=1 rows_returned=1 elapsed=1.1159ms elapsed_secs=0.0011159
+2026-08-29T17:10:46.598436Z DEBUG sqlx::query: summary="SELECT i.id intervention_id, encounter_id, …" db.statement="\n\n\n                                SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,\n                                    intervention_type_id, status_id,\n                                    l.room_identifier,\n                                    ref1.name \"intervention_type\", \n                                    ref2.name \"status\", i.scheduled_timestamp, i.performed_timestamp\n                                FROM intervention i\n                                join location l on  l.id = i.location_id\n                                join common_reference_type ref1 on i.intervention_type_id = ref1.id\n                                join common_reference_type ref2 on i.status_id = ref2.id \n                                where i.encounter_id = 1\n                                  AND i.intervention_type_id = 38\n                                ORDER BY i.id DESC LIMIT 1\n                                                \n" rows_affected=1 rows_returned=1 elapsed=1.4572ms elapsed_secs=0.0014572
+2026-08-29T17:10:46.604528Z DEBUG sqlx::query: summary="select e.id \"encounter_id\", admit_timestamp, …" db.statement="\n\n\n                                    select e.id \"encounter_id\", admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\",\n                                        COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        s.name \"encounter_site_name\",\n                                        l.short_name \"room_identifier\",\n                                        CASE WHEN discharge_timestamp is null then 'Y' else 'N' end as \"current_encounter\"\n                                    from encounter e\n                                    join location l on e.location_id = l.id\n                                    join site s on s.id = l.site_id\n                                    where patient_id = 1\n                                    order by admit_timestamp desc\n                                    \n" rows_affected=1 rows_returned=1 elapsed=2.1712ms elapsed_secs=0.0021712
+2026-08-29T17:10:46.604634Z DEBUG MapleEMR::ui::simple_fmt: >get_encounter_list_tile()
+2026-08-29T17:10:46.606226Z DEBUG sqlx::query: summary="SELECT i.id intervention_id, encounter_id, …" db.statement="\n\n\n                                SELECT i.id intervention_id, encounter_id, i.description, i.notes, location_id, users_id,\n                                     intervention_type_id, status_id,\n                                    l.room_identifier,\n                                    ref1.name \"intervention_type\", \n                                    ref2.name \"status\", i.scheduled_timestamp, i.performed_timestamp\n                                FROM intervention i\n                                join location l on  l.id = i.location_id\n                                join common_reference_type ref1 on i.intervention_type_id = ref1.id\n                                join common_reference_type ref2 on i.status_id = ref2.id \n                                where i.encounter_id = 1\n                                ORDER BY i.id DESC\n                                               \n" rows_affected=1 rows_returned=1 elapsed=1.2353ms elapsed_secs=0.0012353
+2026-08-29T17:10:46.606305Z DEBUG MapleEMR::ui::simple_fmt: >get_intervention_list_tile()
+2026-08-29T17:10:46.606380Z DEBUG MapleEMR::dao::patient_dao: get_patient_details Query: SELECT p.id "patient_id", e.id "encounter_id", e.location_id "location_id", legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as "legal_middle_names",
+                                                COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
+                                                birthdate, admit_timestamp,
+                                                discharge_timestamp as "discharge_timestamp?",
+                                                sin, phn, l2.short_name "location_short_name"
+                                            FROM patient p
+                                            join encounter e on p.id = e.patient_id
+											join location l2 on l2.id = e.location_id
+                                            where patient_id = 1
+2026-08-29T17:10:46.610282Z DEBUG sqlx::query: summary="SELECT p.id \"patient_id\", e.id …" db.statement="\n\nSELECT p.id \"patient_id\", e.id \"encounter_id\", e.location_id \"location_id\", legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as \"legal_middle_names\",\n                                                COALESCE(admit_notes, '') as \"admit_notes\", COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                                birthdate, admit_timestamp,\n                                                discharge_timestamp as \"discharge_timestamp?\",\n                                                sin, phn, l2.short_name \"location_short_name\"\n                                            FROM patient p\n                                            join encounter e on p.id = e.patient_id\n\t\t\t\t\t\t\t\t\t\t\tjoin location l2 on l2.id = e.location_id\n                                            where patient_id = 1\n" rows_affected=1 rows_returned=1 elapsed=3.5897ms elapsed_secs=0.0035897
+2026-08-29T17:10:46.610449Z DEBUG MapleEMR::dao::patient_dao: >get_patients_at_users_site_no_discharge() Query: SELECT p.id, e.id, e.location_id, legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as "legal_middle_names",
+                                        COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
+                                        birthdate, admit_timestamp,
+                                        discharge_timestamp as "discharge_timestamp?",
+                                        phn, l2.short_name "location_short_name"
+                                    FROM patient p
+                                    join encounter e on p.id = e.patient_id
+									join location l2 on l2.id = e.location_id
+                                    where discharge_timestamp is null
+                                      and location_id in (
+                                        select l.id
+                                        from location l
+                                        where site_id in (
+                                        select site_id
+                                        from user_permission up
+                                        where users_id = 2
+                                            and up.site_id = l.site_id)  )
+2026-08-29T17:10:46.611432Z DEBUG sqlx::query: summary="SELECT p.id, e.id, e.location_id, …" db.statement="\n\nSELECT p.id, e.id, e.location_id, legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as \"legal_middle_names\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\", COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        birthdate, admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        phn, l2.short_name \"location_short_name\"\n                                    FROM patient p\n                                    join encounter e on p.id = e.patient_id\n\t\t\t\t\t\t\t\t\tjoin location l2 on l2.id = e.location_id\n                                    where discharge_timestamp is null\n                                      and location_id in (\n                                        select l.id\n                                        from location l\n                                        where site_id in (\n                                        select site_id\n                                        from user_permission up\n                                        where users_id = 2\n                                            and up.site_id = l.site_id)  )\n" rows_affected=7 rows_returned=7 elapsed=639.5µs elapsed_secs=0.0006395
+2026-08-29T17:10:46.611559Z DEBUG MapleEMR::dao::common_dao: get_common_references()
+2026-08-29T17:10:46.612802Z DEBUG sqlx::query: summary="select id, name, description …" db.statement="\n\nselect id, name, description from common_reference_type where group_id = 1 ORDER BY NAME\n" rows_affected=19 rows_returned=19 elapsed=985.1µs elapsed_secs=0.0009851
+2026-08-29T17:10:46.612865Z DEBUG MapleEMR::ui::tile_factory: >get_patient_details_full_tile()
+2026-08-29T17:10:46.612960Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(intervention_type_id)
+2026-08-29T17:10:48.226966Z DEBUG MapleEMR::route::intervention_route: -> Route Requested: /intvlink  route_to_modify_intervention_basic()
+2026-08-29T17:10:48.227016Z DEBUG MapleEMR::route::intervention_route: -> Route Requested: /intv  (add/modify)
+2026-08-29T17:10:48.227089Z DEBUG MapleEMR::route::intervention_route:    Intervention exists: view existing Intervention
+2026-08-29T17:10:48.228857Z DEBUG sqlx::query: summary="SELECT i.id intervention_id, encounter_id, …" db.statement="\n\nSELECT i.id intervention_id,\n                                                encounter_id,\n                                                i.description,\n                                                i.notes,\n                                                i.location_id,\n                                                users_id,\n                                                intervention_type_id,\n                                                status_id,\n                                                l.room_identifier,\n                                                ref1.name \"intervention_type\", \n                                                ref2.name \"status\",\n                                                i.scheduled_timestamp,\n                                                i.performed_timestamp,\n                                                e.patient_id\n                                            FROM intervention i\n                                            join encounter e ON e.id = i.encounter_id\n                                            join location l on  l.id = i.location_id\n                                            join common_reference_type ref1 on i.intervention_type_id = ref1.id\n                                            join common_reference_type ref2 on i.status_id = ref2.id \n                                            where i.id = 1\n                                              \n" rows_affected=1 rows_returned=1 elapsed=1.3775ms elapsed_secs=0.0013775
+2026-08-29T17:10:48.238496Z DEBUG sqlx::query: summary="SELECT i.id \"intervention_details_id\", value, …" db.statement="\n\n\n                                                    SELECT i.id \"intervention_details_id\", value, notes, entry_timestamp, ref1.name \"intervention_type\", intervention_id, type_id\n                                                        FROM intervention_details i\n                                                        JOIN common_reference_type ref1 on i.type_id = ref1.id \n                                                        WHERE i.intervention_id = 1\n                                                \n" rows_affected=13 rows_returned=13 elapsed=6.8551ms elapsed_secs=0.0068551
+2026-08-29T17:10:48.238622Z DEBUG MapleEMR::dao::patient_dao: >get_patients_at_users_site_no_discharge() Query: SELECT p.id, e.id, e.location_id, legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as "legal_middle_names",
+                                        COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
+                                        birthdate, admit_timestamp,
+                                        discharge_timestamp as "discharge_timestamp?",
+                                        phn, l2.short_name "location_short_name"
+                                    FROM patient p
+                                    join encounter e on p.id = e.patient_id
+									join location l2 on l2.id = e.location_id
+                                    where discharge_timestamp is null
+                                      and location_id in (
+                                        select l.id
+                                        from location l
+                                        where site_id in (
+                                        select site_id
+                                        from user_permission up
+                                        where users_id = 2
+                                            and up.site_id = l.site_id)  )
+2026-08-29T17:10:48.245848Z DEBUG sqlx::query: summary="SELECT p.id, e.id, e.location_id, …" db.statement="\n\nSELECT p.id, e.id, e.location_id, legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as \"legal_middle_names\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\", COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        birthdate, admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        phn, l2.short_name \"location_short_name\"\n                                    FROM patient p\n                                    join encounter e on p.id = e.patient_id\n\t\t\t\t\t\t\t\t\tjoin location l2 on l2.id = e.location_id\n                                    where discharge_timestamp is null\n                                      and location_id in (\n                                        select l.id\n                                        from location l\n                                        where site_id in (\n                                        select site_id\n                                        from user_permission up\n                                        where users_id = 2\n                                            and up.site_id = l.site_id)  )\n" rows_affected=7 rows_returned=7 elapsed=6.8052ms elapsed_secs=0.0068052
+2026-08-29T17:10:48.245977Z DEBUG MapleEMR::dao::auth_dao: get_user_and_departments_at_current_user_sites()
+2026-08-29T17:10:48.255786Z DEBUG sqlx::query: summary="select distinct u.id user_id, …" db.statement="\n\n\n                                                select distinct u.id user_id,\n                                                    d.name || ' ('|| u.name||')' \"name\",\n                                                    u.name \"user_name\"\n                                                from user_permission up\n                                                join users u on up.users_id = u.id\n                                                join department d on up.department_id = d.id\n                                                where up.active_flag = 'Y'\n                                                and site_id is not null\n\t\t\t\t\t\t\t\t\t\t\t\torder by  d.name || ' ('|| u.name||')'\n                                                \n" rows_affected=10 rows_returned=10 elapsed=9.3881ms elapsed_secs=0.0093881
+2026-08-29T17:10:48.255917Z DEBUG MapleEMR::dao::common_dao: get_common_reference()
+2026-08-29T17:10:48.256999Z DEBUG sqlx::query: summary="SELECT id, name, description …" db.statement="\n\nSELECT id, name, description FROM common_reference_type WHERE ID = 38 LIMIT 1\n" rows_affected=1 rows_returned=1 elapsed=719.5µs elapsed_secs=0.0007195
+2026-08-29T17:10:48.257089Z DEBUG MapleEMR::dao::common_dao: get_common_references()
+2026-08-29T17:10:48.258387Z DEBUG sqlx::query: summary="select id, name, description …" db.statement="\n\nselect id, name, description from common_reference_type where group_id = 5 ORDER BY NAME\n" rows_affected=3 rows_returned=3 elapsed=943.2µs elapsed_secs=0.0009432
+2026-08-29T17:10:48.258446Z DEBUG MapleEMR::dao::common_dao: get_common_references()
+2026-08-29T17:10:48.259527Z DEBUG sqlx::query: summary="select id, name, description …" db.statement="\n\nselect id, name, description from common_reference_type where group_id = 2 ORDER BY NAME\n" rows_affected=6 rows_returned=6 elapsed=769.2µs elapsed_secs=0.0007692
+2026-08-29T17:10:48.259635Z DEBUG MapleEMR::dao::common_dao: get_locations_for_user()
+2026-08-29T17:10:48.261969Z DEBUG sqlx::query: summary="select id, name || …" db.statement="\n\n\n                                        select id, name || ' (' || short_name|| ')' from location\n                                        where active_flag = 'Y'\n                                        and site_id in (\n                                            select site_id\n                                            from user_permission\n                                            where users_id = 2\n                                                and active_flag = 'Y' )\n" rows_affected=34 rows_returned=34 elapsed=1.9625ms elapsed_secs=0.0019625
+2026-08-29T17:10:48.262368Z DEBUG MapleEMR::ui::common: > get_location_dropdown()
+2026-08-29T17:10:48.262526Z DEBUG MapleEMR::ui::tile_factory: >get_modify_intervention_full_page_tile()
+2026-08-29T17:10:48.262599Z DEBUG MapleEMR::ui::tile_factory:   Update existing Intervention
+2026-08-29T17:10:48.262619Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(users_id)
+2026-08-29T17:10:48.262708Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(status_id)
+2026-08-29T17:10:48.262787Z DEBUG MapleEMR::ui::intervention_fmt: >get_view_only_intervention_details_list()
+2026-08-29T17:10:48.262961Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_30)
+2026-08-29T17:10:48.263057Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_31)
+2026-08-29T17:10:48.263161Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_33)
+2026-08-29T17:10:48.263278Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_9)
+2026-08-29T17:10:48.263404Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_9)
+2026-08-29T17:10:48.263562Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_9)
+2026-08-29T17:10:48.263726Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_9)
+2026-08-29T17:10:48.264011Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_9)
+2026-08-29T17:10:48.264158Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_9)
+2026-08-29T17:10:48.264289Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_9)
+2026-08-29T17:10:48.264377Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_9)
+2026-08-29T17:10:48.264524Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_9)
+2026-08-29T17:10:48.264698Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_10)
+2026-08-29T17:11:17.918845Z DEBUG MapleEMR::route::intervention_route: -> Route Requested: /intvlink  route_to_modify_intervention_basic()
+2026-08-29T17:11:17.919159Z DEBUG MapleEMR::route::intervention_route: -> Route Requested: /intv  (add/modify)
+2026-08-29T17:11:17.919346Z DEBUG MapleEMR::route::intervention_route:    Intervention exists: view existing Intervention
+2026-08-29T17:11:17.921278Z DEBUG sqlx::query: summary="SELECT i.id intervention_id, encounter_id, …" db.statement="\n\nSELECT i.id intervention_id,\n                                                encounter_id,\n                                                i.description,\n                                                i.notes,\n                                                i.location_id,\n                                                users_id,\n                                                intervention_type_id,\n                                                status_id,\n                                                l.room_identifier,\n                                                ref1.name \"intervention_type\", \n                                                ref2.name \"status\",\n                                                i.scheduled_timestamp,\n                                                i.performed_timestamp,\n                                                e.patient_id\n                                            FROM intervention i\n                                            join encounter e ON e.id = i.encounter_id\n                                            join location l on  l.id = i.location_id\n                                            join common_reference_type ref1 on i.intervention_type_id = ref1.id\n                                            join common_reference_type ref2 on i.status_id = ref2.id \n                                            where i.id = 1\n                                              \n" rows_affected=1 rows_returned=1 elapsed=1.5034ms elapsed_secs=0.0015034
+2026-08-29T17:11:17.924880Z DEBUG sqlx::query: summary="SELECT i.id \"intervention_details_id\", value, …" db.statement="\n\n\n                                                    SELECT i.id \"intervention_details_id\", value, notes, entry_timestamp, ref1.name \"intervention_type\", intervention_id, type_id\n                                                        FROM intervention_details i\n                                                        JOIN common_reference_type ref1 on i.type_id = ref1.id \n                                                        WHERE i.intervention_id = 1\n                                                \n" rows_affected=13 rows_returned=13 elapsed=2.7008ms elapsed_secs=0.0027008
+2026-08-29T17:11:17.924980Z DEBUG MapleEMR::dao::patient_dao: >get_patients_at_users_site_no_discharge() Query: SELECT p.id, e.id, e.location_id, legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as "legal_middle_names",
+                                        COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
+                                        birthdate, admit_timestamp,
+                                        discharge_timestamp as "discharge_timestamp?",
+                                        phn, l2.short_name "location_short_name"
+                                    FROM patient p
+                                    join encounter e on p.id = e.patient_id
+									join location l2 on l2.id = e.location_id
+                                    where discharge_timestamp is null
+                                      and location_id in (
+                                        select l.id
+                                        from location l
+                                        where site_id in (
+                                        select site_id
+                                        from user_permission up
+                                        where users_id = 2
+                                            and up.site_id = l.site_id)  )
+2026-08-29T17:11:17.926016Z DEBUG sqlx::query: summary="SELECT p.id, e.id, e.location_id, …" db.statement="\n\nSELECT p.id, e.id, e.location_id, legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as \"legal_middle_names\",\n                                        COALESCE(admit_notes, '') as \"admit_notes\", COALESCE(discharge_notes, '') as \"discharge_notes\",\n                                        birthdate, admit_timestamp,\n                                        discharge_timestamp as \"discharge_timestamp?\",\n                                        phn, l2.short_name \"location_short_name\"\n                                    FROM patient p\n                                    join encounter e on p.id = e.patient_id\n\t\t\t\t\t\t\t\t\tjoin location l2 on l2.id = e.location_id\n                                    where discharge_timestamp is null\n                                      and location_id in (\n                                        select l.id\n                                        from location l\n                                        where site_id in (\n                                        select site_id\n                                        from user_permission up\n                                        where users_id = 2\n                                            and up.site_id = l.site_id)  )\n" rows_affected=7 rows_returned=7 elapsed=668.3µs elapsed_secs=0.0006683
+2026-08-29T17:11:17.926102Z DEBUG MapleEMR::dao::auth_dao: get_user_and_departments_at_current_user_sites()
+2026-08-29T17:11:17.931735Z DEBUG sqlx::query: summary="select distinct u.id user_id, …" db.statement="\n\n\n                                                select distinct u.id user_id,\n                                                    d.name || ' ('|| u.name||')' \"name\",\n                                                    u.name \"user_name\"\n                                                from user_permission up\n                                                join users u on up.users_id = u.id\n                                                join department d on up.department_id = d.id\n                                                where up.active_flag = 'Y'\n                                                and site_id is not null\n\t\t\t\t\t\t\t\t\t\t\t\torder by  d.name || ' ('|| u.name||')'\n                                                \n" rows_affected=10 rows_returned=10 elapsed=5.3324ms elapsed_secs=0.0053324
+2026-08-29T17:11:17.931820Z DEBUG MapleEMR::dao::common_dao: get_common_reference()
+2026-08-29T17:11:17.935055Z DEBUG sqlx::query: summary="SELECT id, name, description …" db.statement="\n\nSELECT id, name, description FROM common_reference_type WHERE ID = 38 LIMIT 1\n" rows_affected=1 rows_returned=1 elapsed=2.8427ms elapsed_secs=0.0028427
+2026-08-29T17:11:17.935266Z DEBUG MapleEMR::dao::common_dao: get_common_references()
+2026-08-29T17:11:17.937667Z DEBUG sqlx::query: summary="select id, name, description …" db.statement="\n\nselect id, name, description from common_reference_type where group_id = 5 ORDER BY NAME\n" rows_affected=3 rows_returned=3 elapsed=1.7442ms elapsed_secs=0.0017442
+2026-08-29T17:11:17.937741Z DEBUG MapleEMR::dao::common_dao: get_common_references()
+2026-08-29T17:11:17.939038Z DEBUG sqlx::query: summary="select id, name, description …" db.statement="\n\nselect id, name, description from common_reference_type where group_id = 2 ORDER BY NAME\n" rows_affected=6 rows_returned=6 elapsed=894.2µs elapsed_secs=0.0008942
+2026-08-29T17:11:17.939236Z DEBUG MapleEMR::dao::common_dao: get_locations_for_user()
+2026-08-29T17:11:17.940791Z DEBUG sqlx::query: summary="select id, name || …" db.statement="\n\n\n                                        select id, name || ' (' || short_name|| ')' from location\n                                        where active_flag = 'Y'\n                                        and site_id in (\n                                            select site_id\n                                            from user_permission\n                                            where users_id = 2\n                                                and active_flag = 'Y' )\n" rows_affected=34 rows_returned=34 elapsed=1.157ms elapsed_secs=0.001157
+2026-08-29T17:11:17.940882Z DEBUG MapleEMR::ui::common: > get_location_dropdown()
+2026-08-29T17:11:17.940944Z DEBUG MapleEMR::ui::tile_factory: >get_modify_intervention_full_page_tile()
+2026-08-29T17:11:17.940976Z DEBUG MapleEMR::ui::tile_factory:   Update existing Intervention
+2026-08-29T17:11:17.940989Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(users_id)
+2026-08-29T17:11:17.941035Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(status_id)
+2026-08-29T17:11:17.941057Z DEBUG MapleEMR::ui::intervention_fmt: >get_view_only_intervention_details_list()
+2026-08-29T17:11:17.941151Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_30)
+2026-08-29T17:11:17.941217Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_31)
+2026-08-29T17:11:17.941319Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_33)
+2026-08-29T17:11:17.941420Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_9)
+2026-08-29T17:11:17.941488Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_9)
+2026-08-29T17:11:17.941553Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_9)
+2026-08-29T17:11:17.941620Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_9)
+2026-08-29T17:11:17.941686Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_9)
+2026-08-29T17:11:17.941752Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_9)
+2026-08-29T17:11:17.941819Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_9)
+2026-08-29T17:11:17.941979Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_9)
+2026-08-29T17:11:17.942084Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_9)
+2026-08-29T17:11:17.942204Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(type_id_10)
+2026-08-29T17:16:45.398371Z  INFO actix_server::server: SIGINT received; starting forced shutdown
+2026-08-29T17:16:45.398536Z DEBUG actix_server::accept: paused accepting connections on 127.0.0.1:8000
+2026-08-29T17:16:45.398603Z  INFO actix_server::accept: accept thread stopped
+2026-08-29T17:16:45.398688Z  INFO actix_server::worker: shutting down idle worker
+2026-08-29T17:16:45.398976Z  INFO actix_server::worker: shutting down idle worker
+2026-08-29T17:16:45.399020Z  INFO actix_server::worker: shutting down idle worker
+2026-08-29T17:16:45.398981Z  INFO actix_server::worker: shutting down idle worker

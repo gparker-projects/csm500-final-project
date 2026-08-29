@@ -1,49 +1,51 @@
 <tr class="data-label">
-<input type="submit" value="+" onclick="addNewMeasure(); return false;">
-
-<div id="myDiv">
+<div id="divRO_{MapleEMR::itemId}">
 <table id="addMeasureForm">
   <tr class="field-row">
-  <td class="field-label">13)&nbsp;Procedure: Blood Transfusion</td><td class="field-value">Detected</td><td class="field-label"><i>2026-Aug-02 15:00:00</i></td><td class="field-label">
-  <input type="button" id="toggleBtnEdit" value="Edit"></td></tr>
+  <td class="field-label">{count})&nbsp;{type_name}</td><td class="field-value">{value}</td><td class="field-value">{notes}</td><td class="field-label"><i>{entry_timestamp}</i></td><td class="field-label">
+  <input type="button" id="itemEdit" value="Edit"></td></tr>
 </table>
 </div>
 
-<div id="myDivAlt" class="hidden">
-<form action="/intvdtlsave" method="post" id="addIntvDtlsForm" name="addIntvDtlsForm" onsubmit="event.preventDefault(); return validateForm()">
+<div id="divRW_{MapleEMR::itemId}" class="hidden">
+<form action="/intvdtlsave" method="post" id="itemForm_{MapleEMR::itemId}" name="itemForm_{MapleEMR::itemId}" onsubmit="event.preventDefault(); return validateForm()">
 	<table id="addMeasureForm">
 		 <tr class="data-label">
-		   <td><div>Type</div><div class="data-field-ro"><select name="type_id" id="type_id">
+		   <td><div>Type</div><div class="data-field-ro">
+		   <div id="MapleEMR::InterventionDetailsTypeDropDownControl"></div>
+		   <select name="type_id" id="type_id">
 			  <option value="1">Height (cm)</option>
 			  <option value="2">Weight (lbs)</option>
 			  <option value="3">Diastolic</option>
-			</select></div></td>
-		   <input type="hidden" name="intervention_id" id="intervention_id" value="1">
-		   <input type="hidden" name="id" id="id" value="-1">
-		   <td><div>Value</div><input type="text" name="value" id="value" class="data-field-rw" value=""></td>
-		   <td><div>Note</div><textarea id="notes" name="notes" rows="2" cols="50" class="data-field-rw"></textarea></td>
-		   <td><input type="submit" value="Save" onclick="saveNewMeasure(); return false;"><input type="button" id="toggleBtnCancel" value="Cancel"></td>
+			</select></div>
+			</td>
+		   <input type="hidden" name="intervention_id" id="intervention_id" value="{intervention_id}">
+		   <input type="hidden" name="id" id="id" value="{id}">
+		   <td><div>Value</div><input type="text" name="value" id="value" class="data-field-rw" value="{value}"></td>
+		   <td><div>Note</div><textarea id="notes" name="notes" rows="2" cols="50" class="data-field-rw">{notes}</textarea></td>
+		   <td><input type="submit" value="Save" onclick="saveNewMeasure(); return false;"><input type="button" id="itemCancel_{MapleEMR::itemId}" value="Cancel"></td>
 		</tr>
 	</table>
 </form>
 </div>
 
 <script>
-	const toggleBtn = document.getElementById('toggleBtn');
-	const myDiv = document.getElementById('myDiv');
-	const myDivAlt = document.getElementById('myDivAlt');
+	const itemEdit_{MapleEMR::itemId} = document.getElementById('itemEdit_{MapleEMR::itemId}');
+	const itemCancel_{MapleEMR::itemId} = document.getElementById('itemEdit_{MapleEMR::itemId}');
+	const divRO_{MapleEMR::itemId} = document.getElementById('divRO_{MapleEMR::itemId}');
+	const divRW_{MapleEMR::itemId} = document.getElementById('divRW_{MapleEMR::itemId}');
 
-	toggleBtnCancel.addEventListener('click', () => {
+	itemCancel_{MapleEMR::itemId}.addEventListener('click', () => {
 	  event.preventDefault();
-	  myDiv.classList.toggle('hidden');
-	  myDivAlt.classList.toggle('hidden');
+	  divRO_{MapleEMR::itemId}.classList.toggle('hidden');
+	  divRW_{MapleEMR::itemId}.classList.toggle('hidden');
 	  event.preventDefault();
 	});
 
-	toggleBtnEdit.addEventListener('click', () => {
+	itemEdit_{MapleEMR::itemId}.addEventListener('click', () => {
 	  event.preventDefault();
-	  myDiv.classList.toggle('hidden');
-	  myDivAlt.classList.toggle('hidden');
+	  divRO_{MapleEMR::itemId}.classList.toggle('hidden');
+	  divRW_{MapleEMR::itemId}.classList.toggle('hidden');
 	  event.preventDefault();
 	});
 </script>

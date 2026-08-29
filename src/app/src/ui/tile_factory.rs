@@ -259,7 +259,8 @@ impl WebContentFactory {
                                                   patient_id: String,
                                                   intervention_type_id: String,
                                                   encounter_id: String,
-                                                  intv_details_list: Option<Vec<InterventionDetail>>
+                                                  intv_details_list: Option<Vec<InterventionDetail>>,
+                                                  measures_dropdown_list: Vec<(i64, String, String)>,
                                                   ) -> String {
         tracing::debug!(">get_modify_intervention_full_page_tile()");
 
@@ -318,10 +319,7 @@ impl WebContentFactory {
                 dd_user = CommonFormatter::get_dropdown_user_with_department(user_dropdown_list,intv.users_id); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
                 dd_intv_status =  CommonFormatter::get_dropdown_intervention_status(status_dropdown_list, intv.status_id); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
 
-                let intv_details_html = match intv_details_list {
-                    Some(list) => InterventionFormatter::get_view_only_intervention_details_list( list ),
-                    None => "".to_string()
-                };
+                let intv_details_html =  InterventionFormatter::get_view_only_intervention_details_list( self.get_tile(WebContentItem::WCTypeIntvDetailItemTile), intv_details_list, measures_dropdown_list );
 
                 id = intv.id.to_string();
                 intervention_type = intv.clone().intervention_type; // intv_type.1

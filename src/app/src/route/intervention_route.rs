@@ -134,7 +134,9 @@ impl InterventionRoute{
         let cdao = CommonDAO::new( app_session.get_db_connection() ).await;
         
         let intv_type=  cdao.get_intervention_type( intervention_type_id ).await.unwrap();
+        let intv_details_type=  cdao.get_standard_measure_types().await.unwrap();
 
+      
         let status_dropdown_list=  cdao.get_intervention_statuses().await.unwrap();
         let location_results = cdao.get_locations_for_user(user_session_details.get_userid_as_i64()).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
         let location_menu = match location_results {
@@ -163,7 +165,8 @@ impl InterventionRoute{
                                                                          req.patient_id.clone(),
                                                                          req.intervention_type_id.clone() ,
                                                                          req.encounter_id.clone(),
-                                                                         intv_dtls.clone() );
+                                                                         intv_dtls.clone(),
+                                                                         intv_details_type.unwrap() );
 
         HttpResponse::Ok().body(  content )
     }

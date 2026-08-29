@@ -9,11 +9,8 @@
 //! ---------------------------------------------------------------------------------
 
 pub const SYSTEM_CONFIGURATION_FILE : &str = "\\config\\maple-config.toml";
-// todo: move this to a config file
-// application-wide database string; should come from a configurable parameter file (TODO)
-pub const DB_CONN_STR: &str = "postgres://postgres:csm500@localhost:5432/csm500";
 
-pub const DATA_SUB_DIRECTORY: &str = "\\data\\";
+pub const DATA_SUB_DIRECTORY: &str = "\\data\\"; // TODO
 
 pub const DATABASE_ERROR_NOT_FOUND : &str = "Not Found";
 pub const GENERAL_ERROR_NOT_FOUND : &str = "Not Found";
@@ -39,7 +36,6 @@ pub const INVALID_OTHER_ID: i64 = -1;
 
 pub const NOT_SPECIFIED_ID: i64 = -1;
 
-
 pub const DEFAULT_INTERVENTION_STATUS_NEW: i64 = 13;
 
 /// ------------------   ------------------   ------------------   ------------------
@@ -59,3 +55,7 @@ pub const ENCOUNTER_HISTORY_TILE_TAG : &str =r##"<div id="MapleEMR::EncounterHis
 pub const INTERVENTION_TYPE_DROP_DOWN_CONTROL_TAG : &str = r##"<div id="MapleEMR::InterventionTypeDropDownControl"></div>"##;
 
 pub const LEGACY_MENU_ON_ERROR : &str = r##"<div id="legacyMenu" align="left"><ul><li><a class="menuNotCurrent" href="\home">My Dashboard</li></ul></div>"##;
+
+// The Intervention Details editing section has a lot of inline/control level replaces, so the regular tagging above becomes cumbersome to work with
+pub const ITEM_ID_INLINE_TAG : &str = r##"{MapleEMR::itemId}"##; // This one is different from the rest because it will be used multiple times in a single tile
+pub const INTERVENTION_DETAILS_TYPE_DROP_DOWN_CONTROL_TAG : &str = r##"<div id="MapleEMR::InterventionDetailsTypeDropDownControl"></div>"##;

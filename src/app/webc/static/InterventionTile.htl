@@ -47,8 +47,7 @@
       console.log("Called editIntvDtls(" + intvDtlsId +");");
 
       return;
-  }
-  
+  }  
   </script>
 </HEAD>
 <BODY>
@@ -113,6 +112,40 @@
 
 <tr>
 <td>
+
+<input type="button" value="+" id="btnShowHideNewMeasure">
+
+<div id="divaddNewMeasure" class="hidden">
+<form action="/intvdtlsave" method="post" id="itemForm_0" name="itemForm_0" onsubmit="event.preventDefault(); return validateMeasureForm(0)">
+	<table id="addMeasureForm">
+		 <tr class="data-label">
+		   <td><div>Type</div><div class="data-field-ro">
+		   <div id="MapleEMR::InterventionDetailsTypeDropDownControl"></div>
+		   <select name="type_id" id="type_id">
+			  <option value="1">Height (cm)</option>
+			  <option value="2">Weight (lbs)</option>
+			  <option value="3">Diastolic</option>
+			</select></div>
+			</td>
+		   <!-- input type="hidden" name="intervention_id" id="intervention_id" value="{intervention_id}" -->
+		   <input type="hidden" name="id" id="id" value="-1">
+		   <td><div>Value</div><input type="text" name="value" id="value" class="data-field-rw" value=""></td>
+		   <td><div>Note</div><textarea id="notes" name="notes" rows="2" cols="50" class="data-field-rw"></textarea></td>
+		   <td><input type="submit" value="Add" onclick="saveNewMeasure(); return false;"><input type="button" id="itemCancel_0" value="Cancel" onClick="event.preventDefault(); btnShowHideNewMeasure.click();"></td>
+		</tr>
+	</table>
+</form>
+
+<script>
+	const btnShowHideNewMeasure = document.getElementById('btnShowHideNewMeasure');
+
+	btnShowHideNewMeasure.addEventListener('click', () => {
+	  event.preventDefault();
+	  divaddNewMeasure.classList.toggle('hidden');
+	  event.preventDefault();
+	});
+</script>
+
 <div id="MapleEMR::InterventionDetailsList"></div>
 </td>
 </tr>

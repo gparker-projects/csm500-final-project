@@ -513,3 +513,11 @@
 2026-08-28T23:48:19.442423Z DEBUG MapleEMR::ui::common: > get_dropdown_generic(status_id)
 2026-08-28T23:51:48.339252Z  INFO ort::logging: Done Adding ETW Sink to logger with severity level: 2
 2026-08-29T01:42:42.811745Z  INFO ort::logging: Done Adding ETW Sink to logger with severity level: 2
+2026-08-29T14:58:28.538983Z  INFO ort::logging: Done Adding ETW Sink to logger with severity level: 2
+2026-08-29T16:14:09.048077Z  INFO actix_server::server: SIGINT received; starting forced shutdown
+2026-08-29T16:14:09.048371Z DEBUG actix_server::accept: paused accepting connections on 127.0.0.1:8000
+2026-08-29T16:14:09.048481Z  INFO actix_server::accept: accept thread stopped
+2026-08-29T16:14:09.048616Z  INFO actix_server::worker: shutting down idle worker
+2026-08-29T16:14:09.049039Z  INFO actix_server::worker: shutting down idle worker
+2026-08-29T16:14:09.049341Z  INFO actix_server::worker: shutting down idle worker
+2026-08-29T16:14:09.049407Z  INFO actix_server::worker: shutting down idle worker
