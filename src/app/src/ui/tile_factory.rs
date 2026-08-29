@@ -46,6 +46,8 @@ pub enum WebContentItem {
     WCTypeAdmitTile,
     #[display("Intervention Full Page Tile")]
     WCTypeInterventionFullPageTile,
+    #[display("Intervention-Detail Item Tile")]
+    WCTypeIntvDetailItemTile,
 }
 
 /// -------------------------------------------------------------------
@@ -92,6 +94,11 @@ impl WebContentFactory {
         filename = content_root_path.to_owned() + "InterventionTile.htl";        
         contents = fs::read_to_string(&filename).expect(constants::ERROR_READING_TEMPLATE);
         tiles.insert(WebContentItem::WCTypeInterventionFullPageTile, contents ); 
+
+        filename = content_root_path.to_owned() + "IntvDetailItemTile.htl";        
+        contents = fs::read_to_string(&filename).expect(constants::ERROR_READING_TEMPLATE);
+        tiles.insert(WebContentItem::WCTypeIntvDetailItemTile, contents ); 
+            
         
         WebContentFactory { tile_hashmap: tiles } 
     }

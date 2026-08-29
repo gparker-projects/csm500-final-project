@@ -18,12 +18,14 @@ pub struct InterventionFormatter{}
 
 impl InterventionFormatter{
 
-       ///
+    ///
     /// Provide HTML for a readonly list of InterventionDetail(s)
     /// 
     pub fn get_view_only_intervention_details_list(intvdtls_list: Vec<InterventionDetail>) -> String {
         let mut results_sbuf = String::with_capacity(500); 
         let mut counter = 1;
+
+        // let results = self.tile_hashmap[&WebContentItem::WCTypeHomePage].clone();
 
         results_sbuf.push_str("<table>");
         for item in intvdtls_list{
@@ -44,6 +46,10 @@ impl InterventionFormatter{
             results_sbuf.push_str("); return false;\">Edit</a>");
             
             results_sbuf.push_str("</td></tr>\n");
+
+
+
+
             counter = counter + 1;
         }
         results_sbuf.push_str("</table>");
@@ -51,7 +57,7 @@ impl InterventionFormatter{
         return results_sbuf;
     }
 
-     ///
+    ///
     /// Provide HTML for all of a (Patient's) Encounter's Interventions
     /// 
     pub fn get_intervention_list_for_patient_details_tile(intervention_list: Vec<Intervention>) -> String {

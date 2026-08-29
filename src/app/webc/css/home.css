@@ -5,6 +5,10 @@
   font-weight: bold;
 }
 
+.hidden {
+  display: none;
+}
+
 ul {
   list-style-type: none;
   margin: 0;
