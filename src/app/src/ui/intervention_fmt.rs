@@ -23,7 +23,8 @@ impl InterventionFormatter{
     /// 
     pub fn get_view_only_intervention_details_list(intervention_details_item_tile: String,
                                                    intvdtls_list: Option<Vec<InterventionDetail>>, 
-                                                   measures_dropdown_list: Vec<(i64, String, String)>) -> String {
+                                                   measures_dropdown_list: Vec<(i64, String, String)>,
+                                                   patient_id: String) -> String {
         let mut results_sbuf = String::with_capacity(500); 
         let mut counter = 1;
         tracing::debug!(">get_view_only_intervention_details_list()");
@@ -44,9 +45,8 @@ impl InterventionFormatter{
                     let html_level_3 = &html_level_2.replace("{type_name}",  &item.type_name().to_string());
                     let html_level_4 = &html_level_3.replace("{intervention_id}",  &item.intervention_id.to_string());
                     let html_level_5 = &html_level_4.replace("{count}",  &counter.to_string());
-                    let html_level_6 = &html_level_5.replace("{entry_timestamp}",  &item.entry_timestamp_for_display().to_string()); 
-
-                 
+                    let html_level_6 = &html_level_5.replace("{entry_timestamp}",  &item.entry_timestamp_for_display().to_string());
+                    let html_level_7 = &html_level_6.replace("{patient_id}",  &patient_id); 
 
                     let html_level_final = &html_level_6.replace(constants::INTERVENTION_DETAILS_TYPE_DROP_DOWN_CONTROL_TAG,
                                                                         &&CommonFormatter::get_dropdown_generic( measures_dropdown_list.clone(),

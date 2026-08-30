@@ -349,7 +349,7 @@ impl InterventionDetailsDataForm {
 #[derive(serde::Deserialize)]
 pub struct InterventionDetailsAddFormBasic {
     pub addFrm_intv_id: String,
-    //pub intv_dtls_id: String,
+    pub addFrm_patient_id: String,
     pub addFrm_type_id: String,
     pub addFrm_value: String,
     pub addFrm_notes: String,
