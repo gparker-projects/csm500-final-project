@@ -79,7 +79,7 @@ impl CommandController{
         results
     }
 
-
+/*
     ///
     /// Obtains basic classifier rankings, without limits or security concerns applied
     /// 
@@ -91,6 +91,7 @@ impl CommandController{
 
         classifer_results 
     }
+*/
 
     ///
     /// Constructs a list of strings ( Vec<String> ) from the previously loaded command mapping file, and adds the user's prompt as the first element

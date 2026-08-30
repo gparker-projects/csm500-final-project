@@ -163,7 +163,7 @@ impl InterventionDAO {
     /// Finds and returns all Intervention Details, based on an Intervention
     /// 
     pub async fn get_all_intervention_details_for_an_intervention(&self, intervention_id: i64, type_id: i64) -> Result< Option< Vec<InterventionDetail> >, std::io::Error> {
-        println!("get_all_intervention_details()");
+        println!("get_all_intervention_details_for_an_intervention()");
         let query =  match type_id == constants::NOT_SPECIFIED_ID {
             true => {
                 let tmp = db_query::QRY_ALL_INTERVENTION_DETAILS_FOR_AN_INTERVENTION;
@@ -183,12 +183,12 @@ impl InterventionDAO {
         .unwrap_or_default();
 
         if rows.is_empty() {
-            tracing::debug!("No intervention details found for intervention_id: {} [{}]", intervention_id, rows.len());
-            tracing::debug!("get_interventions_details() Query: {}", query);
+            tracing::debug!("..No intervention details found for intervention_id: {} [{}]", intervention_id, rows.len());
+            tracing::debug!("..Query: {}", query);
             return Ok( Some( Vec::new() ) );
         }
         else{
-            //println!("get_all_intervention_details() -> Loading {} Intervention Details",  rows.len());
+            //println!("get_all_intervention_details_for_an_intervention() -> Loading {} Intervention Details",  rows.len());
             let mut results: Vec<InterventionDetail> = Vec::with_capacity(rows.len());
             for row in rows {
                 let tmp_id: i64 = row.0; // id
@@ -270,6 +270,7 @@ impl InterventionDAO {
     /// 
     pub async fn upsert_intervention_details_from_intv_form(&self, form: InterventionDetailsDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
         tracing::debug!("upsert_intervention_from_intv_form (Intv Dtls id={})", &form.intervention_details_id);
+        println!("upsert_intervention_from_intv_form (Intv Dtls id={})", &form.intervention_details_id);
 
         let mut query_level_0 = db_query::UPDATE_INTERVENTION_DETAILS.to_string();
     
@@ -294,7 +295,9 @@ impl InterventionDAO {
                                                         .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
         
         // return the patient id that was created or updated
-        let inserted_id: i64 = result.get("id");
+        let inserted_id: i64 = result.get("id"); // NOTE: MUST be lowercase, per Postgresql
+
+
 
         Ok(inserted_id)
     }

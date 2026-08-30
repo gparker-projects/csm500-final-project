@@ -33,7 +33,7 @@ impl InterventionDetailsRoute{
                 web::Form(
                     InterventionDetailsDataForm {
                         intervention_id: req.addFrm_intv_id.clone(),
-                        intervention_details_id: constants::INVALID_OTHER_ID.to_string(),
+                        intervention_details_id: req.addFrm_intv_dtls_id.clone(),//constants::INVALID_OTHER_ID.to_string(),
                         type_id: req.addFrm_type_id.clone(),
                         value: req.addFrm_value.clone(),
                         notes: req.addFrm_notes.clone(),
@@ -59,7 +59,7 @@ impl InterventionDetailsRoute{
     ///
     /// Route that will update the intervention and then redirect back to the modify screen
     /// 
-    pub async fn route_to_intervention_detail_save(app_session: web::Data<AppSession>, user_session: Session, mut req: web::Form<InterventionDetailsDataForm>) -> impl Responder {
+    pub async fn route_to_intervention_detail_save(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<InterventionDetailsDataForm>) -> impl Responder {
         tracing::debug!("-> Route Requested: /route_to_intervention_detail_save ");
         let mut results: String = constants::INVALID_OTHER_ID.to_string();
 
@@ -70,11 +70,11 @@ impl InterventionDetailsRoute{
         let insert_ivdtls_results = idao.upsert_intervention_details_from_intv_form(req.clone(), user_session_details.get_userid_as_i64()).await;
         match insert_ivdtls_results {
                 Ok(intv_dtls_id) => {
-                    tracing::debug!("  >Intervention (id={intv_dtls_id})] created/updated");
+                    tracing::debug!("..Intervention Details (id={intv_dtls_id})] created/updated");
                     results = intv_dtls_id.to_string();
                 },
                 Err(e) => {
-                    tracing::debug!("  >Intervention not created/updated: {e}");
+                    tracing::debug!("..!Intervention Details not created/updated: {e}");
                 }
         }
 

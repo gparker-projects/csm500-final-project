@@ -25,7 +25,6 @@ use crate::dto::{patient::*, intervention::*, intervention_detail::*};
 
 use crate::ui::common::CommonFormatter;
 use crate::ui::intervention_fmt::InterventionFormatter;
-use crate::ui::simple_fmt::SimpleFormatter;
 
 /// Enumeration for Web Content Tiles, each representing a tile of information
 /// to be presented by the application
@@ -105,7 +104,9 @@ impl WebContentFactory {
 
     ///
     /// TEST only: returns the number of tiles that have been loaded into the factory.
+    /// Actually used, not dead_code. Cargo Check keeps flagging as it is only used in a TEST case
     ///
+    #[allow(dead_code)]
     pub fn get_tile_count(&self) -> usize {
         return self.tile_hashmap.len();
     }

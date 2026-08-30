@@ -8,7 +8,6 @@
 
 use actix_web::{web, HttpResponse, Responder};
 use actix_session::{Session}; 
-use std::env;
 use std::path::Path;
 use std::collections::{HashSet};
 use tracing;
@@ -19,10 +18,10 @@ use crate::ui::data_forms::*;
 use crate::session::{AppSession, UserSession};
 use crate::nle::nle::*;
 
-pub const COMMAND_MAPPING_FILE_NAME: &str = "command_mapping.csv";
-pub const DATA_SUB_DIRECTORY: &str = "data";
-pub const LANGUAGE_MODEL_FILE_NAME: &str = "all-MiniLM-L6-v2.onnx";
-pub const TOKENIZER_FILE_NAME: &str = "tokenizer.json";
+//pub const COMMAND_MAPPING_FILE_NAME: &str = "command_mapping.csv";
+//pub const DATA_SUB_DIRECTORY: &str = "data";
+//pub const LANGUAGE_MODEL_FILE_NAME: &str = "all-MiniLM-L6-v2.onnx";
+//pub const TOKENIZER_FILE_NAME: &str = "tokenizer.json";
 
 pub struct NLERoute{}
 

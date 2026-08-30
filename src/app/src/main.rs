@@ -198,7 +198,7 @@ async fn main() -> std::io::Result<()> {
   let nle_session: ort::session::Session = Session::builder().expect("Session could not be established")
                   .with_optimization_level(GraphOptimizationLevel::Level1).expect("No Session")
                   .with_intra_threads(1).expect("Insufficient threads")
-                  .commit_from_file(&(config.model_data_dir.clone() + LANGUAGE_MODEL_FILE_NAME) ).expect("File could not be accessed");
+                  .commit_from_file(&(config.model_data_dir.clone() + &config.language_model_file.clone()) ).expect("File could not be accessed");
   let shared_session = Arc::new(nle_session);
 
   // use the Builder pattern to add one route at a time

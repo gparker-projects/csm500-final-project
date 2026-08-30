@@ -130,14 +130,16 @@ pub const QRY_ALL_INTERVENTION_DETAILS_FOR_AN_INTERVENTION: &str =  r##"
                                                         FROM intervention_details i
                                                         JOIN common_reference_type ref1 on i.type_id = ref1.id 
                                                         WHERE i.intervention_id = {}
+                                                        order by i.id desc
                                                 "##;
 
+                                                /*
 pub const QRY_GET_SINGLE_INTERVENTION_DETAIL: &str =  r##"
                                                     SELECT i.id "intervention_details_id", value, notes, entry_timestamp, ref1.name "intervention_type", intervention_id, type_id
                                                         FROM intervention_details i
                                                         JOIN common_reference_type ref1 on i.type_id = ref1.id 
                                                         WHERE i.id = {}
-                                                "##;
+                                                "##; */
 
 pub const QRY_ALL_INTERVENTION_DETAILS_FOR_INTV_AND_TYPE: &str = r##"
                                                     SELECT i.id "intervention_details_id", value, notes,
@@ -147,6 +149,7 @@ pub const QRY_ALL_INTERVENTION_DETAILS_FOR_INTV_AND_TYPE: &str = r##"
                                                         JOIN common_reference_type ref1 on i.type_id = ref1.id 
                                                         WHERE intervention_id = {1}
                                                             AND type_id = {2}
+                                                        order by i.id desc
                                                 "##;
 
 
@@ -154,9 +157,10 @@ pub const QRY_COMMON_REF_TYPES_FOR_GROUP: &str = r##"select id, name, descriptio
 
 pub const QRY_COMMON_REF_TYPES_FOR_GROUP_ACTIVE_ONLY: &str = r##"select id, name, description from common_reference_type where group_id = {group_id} and active_flag = 'Y' ORDER BY NAME"##;
 
-
+#[allow(dead_code)]
 pub const QRY_ACTIVE_LOCATIONS: &str = r##"select id, name ||' (' || short_name|| ')' from location where active_flag = 'Y'"##; // used by CommonDAO... not sure why the IDE keeps flagging as unused
 
+#[allow(dead_code)]
 pub const QRY_ACTIVE_DEPARTMENTS: &str = r##"select id, name, name "description" from department where expiry_timestamp > now()"##;
 
 pub const QRY_COMMON_REF_TYPES_SINGLE_FOR_A_GROUP_AND_TYPE: &str = r##"SELECT id, name, description FROM common_reference_type WHERE ID = {common_ref_id} LIMIT 1"##;
@@ -281,8 +285,9 @@ pub const UPDATE_INTERVENTION_DETAILS: &str = r##"
         SET intervention_id={intervention_id},
             type_id={type_id},
             value='{value}',
-            notes='{notes}'
-        WHERE id={intervention_id} RETURNING ID;
+            notes='{notes}',
+            entry_timestamp=NOW()
+        WHERE id={intervention_details_id} RETURNING ID;
 "##;
 
 pub const INSERT_FEATURE_PREFERENCE: &str = r##"

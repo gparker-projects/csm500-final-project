@@ -11,7 +11,6 @@
 use crate::constants;
 
 use crate::dto::intervention_detail::InterventionDetail;
-use crate::dto::intervention::Intervention;
 use crate::ui::common::CommonFormatter;
 
 pub struct InterventionFormatter{}
@@ -36,7 +35,8 @@ impl InterventionFormatter{
             Some(inner_list) => {  // if there were no intervention details, fill out the details
                 for item in inner_list{ // assemble each separate intervention detail
                     let raw_tile = intervention_details_item_tile.clone(); // we receive a raw tile that has the Intervention Details add/edit HTML
-                    let type_drop_down_control_name = "type_id_".to_string() + &item.type_id.to_string(); // due to dynamic additions etc, careful naming required
+                    let type_drop_down_control_name = "type_id_".to_string() + &item.id.to_string(); // due to dynamic additions etc, careful naming required
+                    //println!("..Create control id={}", type_drop_down_control_name.clone());
 
                     // page body content
                     let html_level_0 = &raw_tile.replace(constants::ITEM_ID_INLINE_TAG, &item.id.to_string());
@@ -48,7 +48,7 @@ impl InterventionFormatter{
                     let html_level_6 = &html_level_5.replace("{entry_timestamp}",  &item.entry_timestamp_for_display().to_string());
                     let html_level_7 = &html_level_6.replace("{patient_id}",  &patient_id); 
 
-                    let html_level_final = &html_level_6.replace(constants::INTERVENTION_DETAILS_TYPE_DROP_DOWN_CONTROL_TAG,
+                    let html_level_final = &html_level_7.replace(constants::INTERVENTION_DETAILS_TYPE_DROP_DOWN_CONTROL_TAG,
                                                                         &&CommonFormatter::get_dropdown_generic( measures_dropdown_list.clone(),
                                                                                 type_drop_down_control_name,
                                                                                 item.type_id));
@@ -62,10 +62,11 @@ impl InterventionFormatter{
         return results_html_final;
     }
 
+ /*
     ///
     /// Provide HTML for all of a (Patient's) Encounter's Interventions
     /// 
-    pub fn get_intervention_list_for_patient_details_tile(intervention_list: Vec<Intervention>) -> String {
+   pub fn get_intervention_list_for_patient_details_tile(intervention_list: Vec<Intervention>) -> String {
         let mut results_sbuf = String::with_capacity(100); 
         tracing::debug!(">get_intervention_list_tile()");
 
@@ -92,6 +93,6 @@ impl InterventionFormatter{
         results_sbuf.push_str("</table>");
 
         return results_sbuf;
-    }
+    }*/
 
 }

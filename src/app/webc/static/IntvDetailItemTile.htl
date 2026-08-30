@@ -16,8 +16,8 @@
 	<table>
 		 <tr class="data-label">
 		   <td><div class="data-field-ro"><div id="MapleEMR::InterventionDetailsTypeDropDownControl"></div></td>
-		   <input type="hidden" name="intv_id" id="intv_id" value="{intervention_id}">
-		   <input type="hidden" name="intv_dtls_id" id="intv_dtls_id" value="{id}">
+		   <input type="hidden" name="intv_id_{MapleEMR::itemId}" id="intv_id_{MapleEMR::itemId}" value="{intervention_id}">
+		   <input type="hidden" name="intv_dtls_id_{MapleEMR::itemId}" id="intv_dtls_id_{MapleEMR::itemId}" value="{MapleEMR::itemId}">
 		   <td><input type="text" name="intv_dtls_value_{MapleEMR::itemId}" id="intv_dtls_value_{MapleEMR::itemId}" class="data-field-rw" value="{value}"></td>
 		   <td><div>Note</div><textarea id="intv_dtls_notes_{MapleEMR::itemId}" name="intv_dtls_notes_{MapleEMR::itemId}" rows="2" cols="50" class="data-field-rw">{notes}</textarea></td>
 		   <td>
