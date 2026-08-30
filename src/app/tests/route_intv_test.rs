@@ -9,33 +9,37 @@
 //!   https://doc.rust-lang.org/book/ch11-03-test-organization.html
 //! 
 //! -------------------------------------------------------------------
-use chrono::{Utc, NaiveDateTime};
-use rand::{RngExt, rng};
+//use chrono::{Utc, NaiveDateTime};
+//use rand::{RngExt, rng};
 use sqlx::postgres::{PgPoolOptions}; 
 use std::env;
-use actix_session::{storage::CookieSessionStore, SessionMiddleware}; //, storage::RedisSessionStore}
+//use actix_session::{storage::CookieSessionStore, SessionMiddleware}; //, storage::RedisSessionStore}
 use std::sync::Arc;
 use ort::{	session::{Session, builder::GraphOptimizationLevel} };
-use actix_web::cookie::Key;
+//use actix_web::cookie::Key;
 
-use common::test_utils::*; 
-use MapleEMR::{constants, dto::{encounter::*, intervention::*, intervention_detail::*, patient::*, user::*}};
-use MapleEMR::dto::user_auth::*;
+//use common::test_utils::*; 
+use maple_emr::{constants, dto::{encounter::*, intervention::*, intervention_detail::*, patient::*, user::*}};
+use maple_emr::dto::user_auth::*;
 
-use MapleEMR::route::intervention_details_route::InterventionDetailsRoute;
-use MapleEMR::ui::data_forms::InterventionDetailsDataForm;
-use MapleEMR::session::{AppSession, UserSession};
+use maple_emr::route::intervention_details_route::InterventionDetailsRoute;
+use maple_emr::ui::data_forms::InterventionDetailsDataForm;
+use maple_emr::session::{AppSession, UserSession};
 
-use MapleEMR::ui::tile_factory::WebContentFactory; 
+use maple_emr::ui::tile_factory::WebContentFactory; 
+
+pub const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500";
 
 mod common;
+
+#[cfg(test)]
 
 #[tokio::test]
 
 async fn test_route_to_intervention_detail_save() {
     //async fn route_to_intervention_detail_save(app_session: web::Data<AppSession>, user_session: Session, mut req: web::Form<InterventionDetailsDataForm>) -> impl Responder {
 
-    let db_url = constants::DB_CONN_STR;
+    let db_url = DB_CONN_STR;
     let db_pool = match PgPoolOptions::new()
         .max_connections(5)
         .connect(db_url)
@@ -72,13 +76,16 @@ async fn test_route_to_intervention_detail_save() {
         .as_bytes()
     );
 
+    let cfg: SysConfig;
+
     let app_session = AppSession {
-        app_version: "v1.0".to_string(),
         wcf: WebContentFactory::new(&base_model_dir),
         app_key: app_key,
         connection: db_pool,
+        system_config: cfg,
         nle_session: Arc::clone(&shared_session), 
     };
+
 
     let perm1= Permission {
         department_id: 4,

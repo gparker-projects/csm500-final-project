@@ -103,7 +103,7 @@ impl PatientDAO {
     /// 
     /// REF: https://medium.com/@francis.stephan/developing-a-web-app-with-rust-part-4-sqlx-data-validation-deployment-final-remarks-303e78c2a546
     /// 
-    pub async fn upsert_from_admit_form(&self, form: AdmitDataForm, audit_user_id: i64)-> Result<(i64, i64), sqlx::Error> {
+    /*pub async fn upsert_from_admit_form(&self, form: AdmitDataForm, audit_user_id: i64)-> Result<(i64, i64), sqlx::Error> {
         let patient_results = self.upsert_patient_from_admit_form(form.clone(), audit_user_id).await;
         match patient_results {
             Ok(p_id) => {
@@ -116,7 +116,7 @@ impl PatientDAO {
             },
             Err(_e) =>  Ok((constants::INVALID_PATIENT_ID, constants::INVALID_OTHER_ID))
         }
-    }
+    }*/
 
     ///
     /// Given an AdmitFormData, create a new Encounter reocrd, or update an existing one

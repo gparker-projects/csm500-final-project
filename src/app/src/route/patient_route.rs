@@ -12,7 +12,7 @@ use tracing;
 
 use crate::constants;
 use crate::dto::encounter::Encounter;
-use crate::dao::{common_dao::{self, *}, encounter_dao::*, intervention_dao::*, patient_dao::*};
+use crate::dao::{common_dao::*, encounter_dao::*, intervention_dao::*, patient_dao::*};
 use crate::ui::{tile_factory::*, data_forms::*, menu_fmt::*, simple_fmt::*};
 use crate::session::{AppSession, UserSession};
 

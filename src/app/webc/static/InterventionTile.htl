@@ -160,7 +160,6 @@
 		    event.preventDefault(); // Stop the form from submitting if there are errors
 		}
 		else{
-			alert("validateAddMeasureForm()");
 			addFrm_intv_dtls_id.value = -1; // make sure we are creating a new entry "on add"
 		    addMeasureForm.submit();
 		}
@@ -178,21 +177,18 @@
 		let isValid = true;		
 
 		console.log("..GOT HERE 1: "+ field_value.value);
-		//if (document.getElementById( field_value ).value.trim() == '') {
         if ( field_value.value.trim() == '') {
 			formErrors.textContent = "Value is required.";
 			isValid = false;
 		}
 
 		console.log("..GOT HERE 2: "+ field_value.value);
-		//if (document.getElementById( field_value ).value.length > 100 || document.getElementById( field_value ).value.length < 1) {
 		if ( field_value.value.length > 100 || field_value.value.length < 1) {
 			formErrors.textContent = "Value must be between 1 and 100 characters.";
 			isValid = false;
 		}
 		
 		console.log("..GOT HERE 3: "+ field_notes.value);
-		//if (document.getElementById( field_notes ).value.length > 2000) {
 		if (field_notes.value.length > 2000) {
 			formErrors.textContent = "Notes must be less than 2000 characters.";
 			isValid = false;
@@ -205,12 +201,8 @@
 		}
 		else{
 			// copy values over to edit form, for clean submission to the params the backend server is expecting
-			alert("copy " + document.getElementById("intv_id_" + itemId).value + " to addFrm_intv_id");
 			document.getElementById("addFrm_intv_id").value = document.getElementById("intv_id_" + itemId).value;
-
-			alert("copy " + document.getElementById("intv_dtls_id_" + itemId).value + " to addFrm_intv_dtls_id");
 			document.getElementById("addFrm_intv_dtls_id").value = document.getElementById("intv_dtls_id_" + itemId).value;
-
 			document.getElementById("addFrm_type_id").value = document.getElementById("type_id_" + itemId).value;
 			document.getElementById("addFrm_value").value = field_value.value;
 			document.getElementById("addFrm_notes").value = field_notes.value;

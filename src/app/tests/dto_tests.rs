@@ -6,8 +6,8 @@
 ///
 use chrono::{Utc, NaiveDateTime};
 use rand::{RngExt, rng};
-use MapleEMR::{constants, dto::{encounter::*, intervention::*, intervention_detail::*, patient::*, user::*}};
-use MapleEMR::dto::user_auth::*;
+use maple_emr::{constants, dto::{encounter::*, intervention::*, intervention_detail::*, patient::*, user::*}};
+use maple_emr::dto::user_auth::*;
 
 mod common;
 

@@ -17,9 +17,9 @@ use crate::nle::nle::*;
 
 
 // Commands that can be executed via the NL model
-pub const COMMAND_ADMIT_NEW_PATIENT: i64 = 1;
+/*pub const COMMAND_ADMIT_NEW_PATIENT: i64 = 1;
 pub const COMMAND_ADD_NEW_INTERVENTION: i64 = 2;
-pub const COMMAND_DISCHARGE_PATIENT: i64 = 3;
+pub const COMMAND_DISCHARGE_PATIENT: i64 = 3; */
 
 ///
 /// Provides logic and constraints around commands being executed by the NL model

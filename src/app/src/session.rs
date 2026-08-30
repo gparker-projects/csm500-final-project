@@ -66,12 +66,13 @@ impl AppSession {
       return self.connection.clone();
   }
 
+  /*
   ///
   /// Returns a cloned Arc thread of the NL engine session (from ort)
   /// 
   pub fn get_nle_session(&self) -> Arc<ort::session::Session>{
       return Arc::clone(&self.nle_session);
-  }
+  }*/
 }
 
 ///

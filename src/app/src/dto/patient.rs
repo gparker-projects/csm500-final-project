@@ -45,7 +45,10 @@ pub struct Patient {
 
 impl Patient {
     /// Basic constructor
+    ///
+    /// Note: used by test cases only
     /// 
+    #[allow(dead_code)] 
     pub fn new(id: i64,
                 encounter_id: i64,
                 legal_first_name: String,
@@ -103,12 +106,12 @@ impl Patient {
     ///
     /// accessor method to return the discharge date (date and time) in a format that can be easily displayed
     /// 
-    pub fn discharge_timestamp_for_display(&self) -> String{
+    /*pub fn discharge_timestamp_for_display(&self) -> String{
         match self.discharge_timestamp {
             Some(_t) => _t.format("%Y-%b-%d %H:%M:%S").to_string(),
             None => "".to_string()
         }        
-    }
+    }*/
 
     ///
     /// accessor method to return the birth date (date portion only) in a format that can be easily displayed

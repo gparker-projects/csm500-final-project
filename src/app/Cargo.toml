@@ -1,5 +1,5 @@
 [package]
-name = "MapleEMR"
+name = "maple_emr"
 version = "0.1.0"
 edition = "2024" # Cargo edition, not the package
 

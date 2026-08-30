@@ -39,8 +39,8 @@ impl NaturalLanguageEngine {
     //
     pub async fn new(model_file_path: &str, tokenizer_file_path: &str) -> Self {
         tracing::debug!("NaturalLanguageEngine::new()");
-        tracing::debug!("..load model for session: {}", model_file_path.clone());
-        tracing::debug!("..load tokenizer: {}", tokenizer_file_path.clone());
+        tracing::debug!("..load model for session: {}", model_file_path);
+        tracing::debug!("..load tokenizer: {}", tokenizer_file_path);
         
         NaturalLanguageEngine {
             session: {

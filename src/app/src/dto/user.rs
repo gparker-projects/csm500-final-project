@@ -28,6 +28,9 @@ pub struct User {
 impl User {
     /// Basic constructor
     /// 
+    /// Note: used by test cases only
+    /// 
+    #[allow(dead_code)] 
     pub fn new(id: i64,
                 name: String,
                 user_name: String,

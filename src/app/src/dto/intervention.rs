@@ -46,7 +46,9 @@ pub struct Intervention {
 
 impl Intervention {
     /// Basic constructor
+    /// Note: used by test cases only
     /// 
+    #[allow(dead_code)] 
     pub fn new(id: i64,
                encounter_id: i64,
                description: String,

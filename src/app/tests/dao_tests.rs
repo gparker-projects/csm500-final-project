@@ -7,20 +7,24 @@
 
 mod common;
 
-use MapleEMR::dao::intervention_dao::InterventionDAO;
-use common::test_utils::*; 
+use maple_emr::dao::intervention_dao::InterventionDAO;
+//use common::test_utils::*; 
 
 use sqlx::postgres::{PgPoolOptions}; 
 use tracing;
 
-use MapleEMR::constants;
-use MapleEMR::ui::data_forms::*;
-use MapleEMR::dao::patient_dao::PatientDAO;
-use MapleEMR::dao::feature_preference_dao::FeaturePreferenceDAO;
-use MapleEMR::dto::feature_preference::FeaturePreference;
-use MapleEMR::dto::intervention_detail::InterventionDetail;
+use maple_emr::constants;
+use maple_emr::ui::data_forms::*;
+use maple_emr::dao::patient_dao::PatientDAO;
+use maple_emr::dao::feature_preference_dao::FeaturePreferenceDAO;
+use maple_emr::dto::feature_preference::FeaturePreference;
+use maple_emr::dto::intervention_detail::InterventionDetail;
 
-use MapleEMR::dto::patient::Patient;
+use maple_emr::dto::patient::Patient;
+
+pub const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500";
+
+#[cfg(test)]
 
 #[tokio::test]
 
@@ -30,7 +34,7 @@ use MapleEMR::dto::patient::Patient;
 async fn test_get_patients_at_users_site_no_discharge() {
   let test_user_id = 2;
 
-    let db_url = constants::DB_CONN_STR;
+    let db_url = DB_CONN_STR;
 
     let db_pool = match PgPoolOptions::new()
         .max_connections(5)
@@ -64,7 +68,7 @@ async fn test_get_patients_at_users_site_no_discharge() {
 /// Tests the ability for the DAO to CREATE, SELECT and UPDATE Intervention Detail records
 /// 
 async fn test_ins_get_upd_intervention_details(){
-    let db_url = constants::DB_CONN_STR;
+    let db_url = DB_CONN_STR;
     let db_pool = match PgPoolOptions::new()
         .max_connections(5)
         .connect(db_url)
@@ -174,7 +178,7 @@ async fn test_ins_get_upd_intervention_details(){
 /// Tests the ability for the DAO to CREATE, SELECT and UPDATE Feature Priority records
 /// 
 async fn test_ins_get_upd_feature_priority() {
-  let db_url = constants::DB_CONN_STR;
+  let db_url = DB_CONN_STR;
   let db_pool = match PgPoolOptions::new()
       .max_connections(5)
       .connect(db_url)

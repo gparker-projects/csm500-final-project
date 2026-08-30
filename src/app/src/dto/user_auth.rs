@@ -19,6 +19,7 @@ pub struct Permission {
 
 impl Permission {
     /// Basic constructor
+    /// Note: used by test cases only
     /// 
     pub fn new(department_id: i64,
                permission_id: i64,
@@ -44,8 +45,10 @@ pub struct UserAuthorization {
 } 
 
 impl UserAuthorization {
-    // Basic constructor
-    // 
+    /// Basic constructor
+    /// Note: used by test cases only
+    /// 
+    #[allow(dead_code)]
     pub fn new(p: Vec<Permission>) -> Self {
         Self { 
             granted_permissions: p
@@ -63,8 +66,10 @@ impl UserAuthorization {
         return false;
     }
 
-    // confirms the permission set has a specific permission, for a department
-    // TODO: if there is time, this could be done with a HashSet instead. Small dataset however will not benefit much.
+    
+    // Confirms the permission set has a specific permission, for a department
+    // Note: used by test cases only
+    #[allow(dead_code)] 
     pub fn has_permission_for_dept(&self, p_id: i64, department_id: i64) -> bool{
         for p in self.granted_permissions.iter() {
             if p.permission_id == p_id && p.department_id == department_id {
@@ -72,5 +77,5 @@ impl UserAuthorization {
             } 
         }
         return false;
-    }
+    } 
 }

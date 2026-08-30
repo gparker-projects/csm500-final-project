@@ -38,7 +38,7 @@ pub const REF_TYPE_GROUP_5_STANDARD_MEASURES: i64 = 5;
     /// Returns: a tuple (i64, String) containing the id of the location and an aggregated string
     ///          describing the location.
     /// 
-    pub async fn get_locations(&self)-> Result< Option< Vec<(i64, String)> >, std::io::Error> {
+    /*pub async fn get_locations(&self)-> Result< Option< Vec<(i64, String)> >, std::io::Error> {
         let query: String = db_query::QRY_ACTIVE_LOCATIONS.to_owned();
         tracing::debug!("get_locations()");
 
@@ -60,7 +60,7 @@ pub const REF_TYPE_GROUP_5_STANDARD_MEASURES: i64 = 5;
             }
             return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
         }
-    }
+    }*/
 
     ///
     /// Accessor to retrieve locations from the database into a tuple. 
@@ -189,9 +189,9 @@ pub const REF_TYPE_GROUP_5_STANDARD_MEASURES: i64 = 5;
     ///          - short name of the reference list item
     ///          - long name of the reference list item
     /// 
-    pub async fn get_intervention_types(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
+    /*pub async fn get_intervention_types(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
         self.get_common_references(Self::REF_TYPE_GROUP_1_INTERVENTION_TYPES, true).await
-    }
+    }*/
 
     ///
     /// Shortcut method to obtain Standard Measure group (id=5) entries from the COMMON REFERENCE TYPE table
