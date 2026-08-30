@@ -65,4 +65,11 @@ impl LoginRoute{
         }
     }
 
+    ///
+    /// Provides a means for the user to exit the system
+    /// 
+    pub async fn logout(user_session: Session ) -> impl Responder { // Box<dyn Responder<>> { //
+        let _ignore = user_session.insert(constants::VALIDATION_ERRORS, "Invalid user or password. Please try again.");
+        actix_web::web::Redirect::to("/").using_status_code(StatusCode::SEE_OTHER)
+    }
 }

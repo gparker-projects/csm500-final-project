@@ -119,7 +119,7 @@ textarea {
   flex-wrap: wrap;
 }
 
-#userIdentity {
+.userIdentity {
   color: #559DD8;
   text-decoration: none;
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;

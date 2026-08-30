@@ -39,8 +39,6 @@ async function validateNLPrompt() {
 	  newBody = "Error occurred: " + error;
 	}
 
-	//document.getElementById("mainContentArea").innerHTML = (newBody);
-
 	document.getElementById("MapleEMR::NLPCanvas").innerHTML = (newBody);
   }
 
@@ -98,11 +96,11 @@ async function admit_patient(){
     frm.submit();
 }
 
-/*async function redirect_to_enc(enc_id){
+async function logout()){
     const data = document.getElementById('target_id');
     data.value = enc_id;
 
     const frm = document.getElementById('encHistoryFrm');
     frm.submit();
-}*/
+}
 

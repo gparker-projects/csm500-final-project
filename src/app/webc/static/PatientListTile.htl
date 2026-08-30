@@ -2,8 +2,6 @@
 <script src="/webc/js/patientListTile.js" defer></script>
 
 <div id="MapleEMR::PatientHeader"></div><p></p>
-<h3>Current Admission</h3>
-<div id="MapleEMR::CurrentEncounter"></div><p></p>
 
 <div align="center" >
 <form action="/discharge" method="post" id="dischargeForm" onSubmit="event.preventDefault(); return submitDischargeForm()">

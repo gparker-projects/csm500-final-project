@@ -52,6 +52,9 @@ impl MenuFormatter {
         }
         results_sbuf.push_str(admit_menu_item);
         results_sbuf.push_str("<li><a class=\"menuOther\" href=\"javascript:admit_patient()\">Admit New Patient</a></li>");
+        results_sbuf.push_str("<li><p><p><p><p></li>");
+        results_sbuf.push_str("<li><a class=\"menuOther\" href=\"\\\">Log Out</a></li>");
+        results_sbuf.push_str("<li class='userIdentity'><p>&nbsp;&nbsp;<div id=\"MapleEMR::UserIdentity\"></div></li>");
         results_sbuf.push_str("</ul></div>");
 
         return results_sbuf;
