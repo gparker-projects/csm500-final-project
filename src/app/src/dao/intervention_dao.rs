@@ -175,7 +175,7 @@ impl InterventionDAO {
                 tmp2.replace("{2}", &type_id.to_string())
             }
         };
-        println!("..Query={}", query);
+        //println!("..Query={}", query);
 
         let rows: Vec<(i64, String, String, NaiveDateTime, String,i64, i64 )> = sqlx::query_as(&query)
         .fetch_all(&self.connection) 

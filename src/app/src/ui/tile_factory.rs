@@ -319,7 +319,7 @@ impl WebContentFactory {
                 dd_user = CommonFormatter::get_dropdown_user_with_department(user_dropdown_list,intv.users_id); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
                 dd_intv_status =  CommonFormatter::get_dropdown_intervention_status(status_dropdown_list, intv.status_id); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
 
-                let intv_details_html =  InterventionFormatter::get_view_only_intervention_details_list( self.get_tile(WebContentItem::WCTypeIntvDetailItemTile), intv_details_list, measures_dropdown_list );
+                let intv_details_html =  InterventionFormatter::get_view_only_intervention_details_list( self.get_tile(WebContentItem::WCTypeIntvDetailItemTile), intv_details_list, measures_dropdown_list.clone() );
 
                 id = intv.id.to_string();
                 intervention_type = intv.clone().intervention_type; // intv_type.1
@@ -356,10 +356,16 @@ impl WebContentFactory {
         for i in 0..tags.len() {
             body_tile_level_1 = body_tile_level_1.replace(tags[i], &data_items[i]);
         }
+
+        // this one is required for the local Add Measures dropdown
+        let body_tile_level_2 = &body_tile_level_1.replace(constants::INTERVENTION_DETAILS_TYPE_DROP_DOWN_CONTROL_TAG,
+                                                                        &&CommonFormatter::get_dropdown_generic( measures_dropdown_list,
+                                                                        "addFrm_type_id".to_string(),
+                                                                        constants::INVALID_OTHER_ID));
         
-        let body_tile_level_2 = body_tile_level_1.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
+        let body_tile_level_3 = body_tile_level_2.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
         
-        let home_tile_level_0 = &self.get_home_tile_with_user_identity(user_identity_label).replace(constants::BODY_TILE_CONTENT_TAG, &body_tile_level_2.clone()); // build the individual sections
+        let home_tile_level_0 = &self.get_home_tile_with_user_identity(user_identity_label).replace(constants::BODY_TILE_CONTENT_TAG, &body_tile_level_3.clone()); // build the individual sections
         let home_tile_level_final = &home_tile_level_0.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
 
         return home_tile_level_final.clone();

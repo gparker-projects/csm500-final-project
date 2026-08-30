@@ -58,4 +58,4 @@ pub const LEGACY_MENU_ON_ERROR : &str = r##"<div id="legacyMenu" align="left"><u
 
 // The Intervention Details editing section has a lot of inline/control level replaces, so the regular tagging above becomes cumbersome to work with
 pub const ITEM_ID_INLINE_TAG : &str = r##"{MapleEMR::itemId}"##; // This one is different from the rest because it will be used multiple times in a single tile
-pub const INTERVENTION_DETAILS_TYPE_DROP_DOWN_CONTROL_TAG : &str = r##"<div id="MapleEMR::InterventionDetailsTypeDropDownControl"></div>"##;
+pub const INTERVENTION_DETAILS_TYPE_DROP_DOWN_CONTROL_TAG : &str = r##"<div id="MapleEMR::InterventionDetailsTypeDropDownControl"></div>"##;              

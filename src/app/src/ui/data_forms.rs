@@ -288,7 +288,7 @@ pub struct InterventionDetailsDataForm {
 
     #[validate(length(min = 1, max = 10, message = "Intervention Id invalid"))]
     pub intervention_id: String,
-
+    
     #[validate(length(min = 1, max = 1000000000, message = "Type must be a number"))]
     pub type_id: String, 
 
@@ -344,4 +344,14 @@ impl InterventionDetailsDataForm {
             }
         }
     }
+}
+
+#[derive(serde::Deserialize)]
+pub struct InterventionDetailsAddFormBasic {
+    pub addFrm_intv_id: String,
+    //pub intv_dtls_id: String,
+    pub addFrm_type_id: String,
+    pub addFrm_value: String,
+    pub addFrm_notes: String,
+    //pub add_measure_form_errors: String
 }

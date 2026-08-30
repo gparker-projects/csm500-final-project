@@ -54,17 +54,21 @@
 
 <h1>{intervention_type}&nbsp;Details</h1>
 	
+
+<div>
+
+<table>
+<tr>
+
 <form action="/intvsave" method="post" id="intvForm" name="intvForm" onSubmit="event.preventDefault(); return validateForm()">
+<input type="hidden" name="form_errors" id="form_errors" value="">
 <input type="hidden" name="encounter_id" id="encounter_id" value="{encounter_id}">
 <input type="hidden" name="intervention_id" id="intervention_id" value="{intervention_id}">
 <input type="hidden" name="intervention_type_id" id="intervention_type_id" value="{intervention_type_id}">
 <input type="hidden" name="patient_id" id="patient_id" value="{patient_id}">
 <input type="hidden" name="target_id" id="target_id" value="{patient_id}">
-<div>
 
-<input type="hidden" name="form_errors" id="form_errors" value="">
-<table>
-<tr><td>
+<td>
 	<label id="errLabel"></label>
 	<table>
 
@@ -109,30 +113,26 @@
 <input type="button" value="Close" onclick="cancelForm()">
 </td>
 </tr>
+</form>
 
 <tr>
 <td>
-
 <input type="button" value="+" id="btnShowHideNewMeasure">
 
 <div id="divaddNewMeasure" class="hidden">
-<form action="/intvdtlsave" method="post" id="itemForm_0" name="itemForm_0" onsubmit="event.preventDefault(); return validateMeasureForm(0)">
-	<table id="addMeasureForm">
+<form action="/intvdtlnew" method="post" id="addMeasureForm" name="addMeasureForm" onsubmit="event.preventDefault(); return validateAddMeasureForm(0);">
+	<table id="addMeasureTbl">
 		 <tr class="data-label">
-		   <td><div>Type</div><div class="data-field-ro">
-		   <div id="MapleEMR::InterventionDetailsTypeDropDownControl"></div>
-		   <select name="type_id" id="type_id">
-			  <option value="1">Height (cm)</option>
-			  <option value="2">Weight (lbs)</option>
-			  <option value="3">Diastolic</option>
-			</select></div>
-			</td>
-		   <!-- input type="hidden" name="intervention_id" id="intervention_id" value="{intervention_id}" -->
-		   <input type="hidden" name="id" id="id" value="-1">
-		   <td><div>Value</div><input type="text" name="value" id="value" class="data-field-rw" value=""></td>
-		   <td><div>Note</div><textarea id="notes" name="notes" rows="2" cols="50" class="data-field-rw"></textarea></td>
-		   <td><input type="submit" value="Add" onclick="saveNewMeasure(); return false;"><input type="button" id="itemCancel_0" value="Cancel" onClick="event.preventDefault(); btnShowHideNewMeasure.click();"></td>
+		   <td><div class="data-field-ro"><div id="MapleEMR::InterventionDetailsTypeDropDownControl"></div></td>
+		   <input type="hidden" name="addFrm_intv_id" id="addFrm_intv_id" value="{intervention_id}">
+		   <td><div>Value</div><input type="text" name="addFrm_value" id="addFrm_value" class="data-field-rw" value=""></td>
+		   <td><div>Note</div><textarea id="addFrm_notes" name="addFrm_notes" rows="2" cols="50" class="data-field-rw"></textarea></td>
+		   <td>
+		       <input type="submit" value="Add" onclick="event.preventDefault(); return validateAddMeasureForm(0);">
+		       <input type="button" id="itemCancel_0" value="Cancel" onClick="event.preventDefault(); btnShowHideNewMeasure.click();">
+		   </td>
 		</tr>
+		<tr class="data-label"><input type="hidden" name="addFrm_errors" id="addFrm_errors" value=""></tr>
 	</table>
 </form>
 
@@ -144,6 +144,26 @@
 	  divaddNewMeasure.classList.toggle('hidden');
 	  event.preventDefault();
 	});
+
+	function validateAddMeasureForm() {
+		const addFrm_errors = document.getElementById('addFrm_errors');
+		addFrm_errors.textContent = '';
+		let isValid = true;
+
+		if (document.getElementById('addFrm_value').value.trim() == '') {
+			addFrm_errors.textContent = "Value is required.";
+			isValid = false;
+		}
+
+		if (!isValid) {
+			addFrm_errors.style = "color: red";
+		    event.preventDefault(); // Stop the form from submitting if there are errors
+		}
+		else{
+		    addMeasureForm.submit();
+		}
+		return isValid; // If isValid remains true, the browser automatically proceeds to submit!
+	}
 </script>
 
 <div id="MapleEMR::InterventionDetailsList"></div>
@@ -152,7 +172,7 @@
 
 </table>
 </div>
-</form>
+
 
 
 </BODY>

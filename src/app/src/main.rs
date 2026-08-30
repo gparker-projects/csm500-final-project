@@ -242,6 +242,7 @@ async fn main() -> std::io::Result<()> {
       .route("/intvnew", web::post().to( InterventionRoute::route_to_add_new_intervention ))
       .route("/intv", web::post().to( InterventionRoute::route_to_view_or_modify_intervention ))
       .route("/intvsave", web::post().to( InterventionRoute::route_to_intervention_save ))
+      .route("/intvdtlnew", web::post().to( InterventionDetailsRoute::route_to_add_intervention_detail ))
       .route("/intvdtlsave", web::post().to( InterventionDetailsRoute::route_to_intervention_detail_save ))
       .route("/isItUp", web::get().to( is_it_up ))
       .service(Files::new("/webc/", "./webc"))  // ref: ttps://actix.rs/docs/static-files/

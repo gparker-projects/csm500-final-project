@@ -8,23 +8,17 @@
 </div>
 
 <div id="divRW_{MapleEMR::itemId}" class="hidden">
-<form action="/intvdtlsave" method="post" id="itemForm_{MapleEMR::itemId}" name="itemForm_{MapleEMR::itemId}" onsubmit="event.preventDefault(); return validateForm()">
+<form action="/intvdtlsave" method="post" id="itemForm_{MapleEMR::itemId}" name="itemForm_{MapleEMR::itemId}" onsubmit="event.preventDefault(); return validateItvDtlsForm();">
 	<table id="addMeasureForm">
 		 <tr class="data-label">
-		   <td><div>Type</div><div class="data-field-ro">
-		   <div id="MapleEMR::InterventionDetailsTypeDropDownControl"></div>
-		   <select name="type_id" id="type_id">
-			  <option value="1">Height (cm)</option>
-			  <option value="2">Weight (lbs)</option>
-			  <option value="3">Diastolic</option>
-			</select></div>
-			</td>
-		   <input type="hidden" name="intervention_id" id="intervention_id" value="{intervention_id}">
-		   <input type="hidden" name="id" id="id" value="{id}">
-		   <td><div>Value</div><input type="text" name="value" id="value" class="data-field-rw" value="{value}"></td>
+		   <td><div class="data-field-ro"><div id="MapleEMR::InterventionDetailsTypeDropDownControl"></div></td>
+		   <input type="hidden" name="intv_id" id="intv_id" value="{intervention_id}">
+		   <input type="hidden" name="intv_dtls_id" id="intv_dtls_id" value="{id}">
+		   <td><input type="text" name="value" id="value" class="data-field-rw" value="{value}"></td>
 		   <td><div>Note</div><textarea id="notes" name="notes" rows="2" cols="50" class="data-field-rw">{notes}</textarea></td>
-		   <td><input type="submit" value="Save" onclick="saveNewMeasure(); return false;"><input type="button" id="itemCancel_{MapleEMR::itemId}" value="Cancel"></td>
+		   <td><input type="submit" value="Save" onclick="event.preventDefault(); return validateItvDtlsForm();"><input type="button" id="itemCancel_{MapleEMR::itemId}" value="Cancel"></td>
 		</tr>
+		<tr class="data-label"><input type="hidden" name="addMeasureForm_errors" id="addMeasureForm_errors" value=""></tr>
 	</table>
 </form>
 </div>
