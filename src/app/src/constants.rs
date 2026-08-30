@@ -41,6 +41,8 @@ pub const DEFAULT_INTERVENTION_STATUS_NEW: i64 = 13;
 /// ------------------   ------------------   ------------------   ------------------
 //  Externalized HTML tags that will be present in the static tile files (*.htl)
 /// ------------------   ------------------   ------------------   ------------------
+
+pub const RELEASE_NUMBER: &str = r##"<div id="MapleEMR::ReleaseNumber"></div>"##;
 pub const LEGACY_MENU_TILE_TAG : &str = r##"<div id="MapleEMR::LegacyMenu"></div>"##;
 pub const USER_IDENTITY_TILE_TAG : &str = r##"<div id="MapleEMR::UserIdentity"></div>"##;
 pub const BODY_TILE_CONTENT_TAG: &str = r##"<div id="MapleEMR::BodyTile"></div>"##;

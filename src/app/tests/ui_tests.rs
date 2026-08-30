@@ -7,7 +7,7 @@
 mod ui_tests {
   use tracing;
 
-  use MapleEMR::ui::tile_factory::{WebContentFactory, WebContentItem};
+  use maple_emr::ui::tile_factory::{WebContentFactory, WebContentItem};
 
   #[test]
   fn test_wcf() {

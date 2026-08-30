@@ -104,7 +104,7 @@ impl PatientRoute{
             constants::LEGACY_MENU_ON_ERROR.to_string()
         }
     };
-
+    
     // no user should be able to get into the system without a location assigned, so we will not worry about an exception here
     let item_list = {CommonDAO::new( app_session.get_db_connection() ).await}.get_common_references(CommonDAO::REF_TYPE_GROUP_1_INTERVENTION_TYPES, true ).await.unwrap();
 

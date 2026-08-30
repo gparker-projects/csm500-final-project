@@ -9,7 +9,7 @@
 </head>
 <body>
 
-<div id="userIdentity"><img src="/webc/img/mapleLogo.png"><div id="MapleEMR::UserIdentity"></div></div>
+<div id="userIdentity"><img src="/webc/img/mapleLogo.png" alt="MapleEMR" title="<div id="MapleEMR::UserIdentity"></div>"><div id="MapleEMR::ReleaseNumber"></div></div>
 <p>
 <div id="MapleEMR::LegacyMenu"></div>
 

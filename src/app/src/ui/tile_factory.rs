@@ -65,40 +65,24 @@ impl WebContentFactory {
     /// 
     /// https://doc.rust-lang.org/rust-by-example/std_misc/file/read_lines.html#a-more-efficient-approach
     /// 
-    pub fn new( content_root_path: &str) -> Self {
+    pub fn new( content_root_path: &str, app_version: String) -> Self {
         let mut tiles = HashMap::new();
-        let mut filename = content_root_path.to_owned() + "LoginTile.htl";
+        tracing::debug!("WebContentFactory:new()");
+        let tile_files = [("LoginTile.htl", WebContentItem::WCTypeLoginTile),
+                                ("PatientListTile.htl", WebContentItem::WCTypePatientListTile),
+                                ("Workspace.htl", WebContentItem::WCTypeHomePage),
+                                ("AdmitTile.htl", WebContentItem::WCTypeAdmitTile),
+                                ("DischargeTile.htl", WebContentItem::WCTypeDischargeTile), 
+                                ("InterventionTile.htl", WebContentItem::WCTypeInterventionFullPageTile),
+                                ("IntvDetailItemTile.htl", WebContentItem::WCTypeIntvDetailItemTile)        ];
 
-        tracing::debug!(">WebContentFactory:new() : Attempting read of: {}", filename.clone());
-        let mut contents = fs::read_to_string(&filename).expect(constants::ERROR_READING_TEMPLATE); 
-        tiles.insert(WebContentItem::WCTypeLoginTile, contents ); 
+        // load tiles from pre-defined files, assigning to known constants so that the application can reliably load them later
+        for item in tile_files{
+           tracing::debug!("..Load tile from: {}", item.0);
+           let tmp_content = fs::read_to_string(&( content_root_path.to_owned() + item.0) ).expect(constants::ERROR_READING_TEMPLATE);
 
-        filename = content_root_path.to_owned() + "PatientListTile.htl";        
-        //println!("2]WebContentFactory:new() : Attempting read of: {}", filename.clone());
-        contents = fs::read_to_string(&filename).expect(constants::ERROR_READING_TEMPLATE);
-        tiles.insert(WebContentItem::WCTypePatientListTile, contents ); 
-
-        filename = content_root_path.to_owned() + "Workspace.htl";        
-        contents = fs::read_to_string(&filename).expect(constants::ERROR_READING_TEMPLATE);
-        tiles.insert(WebContentItem::WCTypeHomePage, contents ); 
-
-        filename = content_root_path.to_owned() + "AdmitTile.htl";        
-        contents = fs::read_to_string(&filename).expect(constants::ERROR_READING_TEMPLATE);
-        tiles.insert(WebContentItem::WCTypeAdmitTile, contents ); 
-
-        filename = content_root_path.to_owned() + "DischargeTile.htl";        
-        contents = fs::read_to_string(&filename).expect(constants::ERROR_READING_TEMPLATE);
-        tiles.insert(WebContentItem::WCTypeDischargeTile, contents ); 
-
-        filename = content_root_path.to_owned() + "InterventionTile.htl";        
-        contents = fs::read_to_string(&filename).expect(constants::ERROR_READING_TEMPLATE);
-        tiles.insert(WebContentItem::WCTypeInterventionFullPageTile, contents ); 
-
-        filename = content_root_path.to_owned() + "IntvDetailItemTile.htl";        
-        contents = fs::read_to_string(&filename).expect(constants::ERROR_READING_TEMPLATE);
-        tiles.insert(WebContentItem::WCTypeIntvDetailItemTile, contents ); 
-            
-        
+           tiles.insert(item.1, tmp_content.replace(constants::RELEASE_NUMBER, &app_version)); 
+        }      
         WebContentFactory { tile_hashmap: tiles } 
     }
 

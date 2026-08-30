@@ -219,7 +219,7 @@ async fn main() -> std::io::Result<()> {
       .app_data(  // this enclosure allows the session state to be created and made available to all routes. actix_web magic.
           web::Data::new( session::AppSession {
                   //wcf: Mutex::new( WebContentFactory::new(&get_static_path_base()) )
-                  wcf: WebContentFactory::new(&get_static_path_base()),
+                  wcf: WebContentFactory::new(&get_static_path_base(), config.app_version.clone()),
                   app_key: tmp_app_key.clone(),
                   connection: db_pool.clone(),
                   system_config: config.clone(),
