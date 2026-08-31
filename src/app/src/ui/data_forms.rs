@@ -311,6 +311,14 @@ pub struct InterventionDetailsDataForm {
 
 impl InterventionDetailsDataForm {
 
+    pub fn get_type_id_as_i64(&self) -> i64{
+        let result: i64 = self.type_id.parse().unwrap();
+        return result;
+    }    
+}
+
+impl InterventionDetailsDataForm {
+
     pub fn validate_fields(&self) -> Result<(), ValidationError> {
 
         if ! (self.intervention_details_id.len() > 0) || ! self.intervention_details_id.parse::<i64>().is_ok() {

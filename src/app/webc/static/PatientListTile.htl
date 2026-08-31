@@ -21,8 +21,19 @@
       <input type="submit" value="Add/Request">
       <div id="MapleEMR::InterventionTypeDropDownControl"></div>
   </div>
+  <input type="hidden" id="patient_id" name="patient_id" value="{patient_id}">
   <input type="hidden" id="encounter_id" name="encounter_id" value="{encounter_id}">
   <input type="hidden" id="intervention_id" name="intervention_id" value="-1">
+</form>
+</div><p></p>
+
+<div align=\"center\">
+<form action="/fast" method="post" id="fastForm" onsubmit="event.preventDefault(); return fastAction();">
+  <div align="left">
+      <div id="MapleEMR::FeaturePreference"></div>
+  </div>
   <input type="hidden" id="patient_id" name="patient_id" value="{patient_id}">
+  <input type="hidden" id="encounter_id" name="encounter_id" value="{encounter_id}">
+  <input type="hidden" id="intervention_id" name="intervention_id" value="{intervention_id}">
 </form>
 </div>

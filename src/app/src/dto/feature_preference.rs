@@ -27,6 +27,10 @@ pub struct FeaturePreference {
     pub department_id: i64, 
     #[serde(rename = "Feature Id")]
     pub feature_id: i64, 
+     #[serde(rename = "Ref Group Id")]
+    pub ref_group_id: i64, // ref_group_id
+     #[serde(rename = "Ref Name")]
+    pub ref_name: String, // ref_name
 }		
 
 impl FeaturePreference {
@@ -36,7 +40,9 @@ impl FeaturePreference {
                calculation_date: NaiveDateTime,
                users_id: i64,
                department_id: i64,
-               feature_id: i64
+               feature_id: i64,
+               ref_group_id: i64,
+               ref_name: String
             ) -> Self {
         Self { id,
                display_order,
@@ -44,7 +50,9 @@ impl FeaturePreference {
                calculation_date,
                users_id,
                department_id,
-               feature_id
+               feature_id,
+               ref_group_id,
+               ref_name
         }
     }
 }

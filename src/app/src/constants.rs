@@ -38,6 +38,8 @@ pub const NOT_SPECIFIED_ID: i64 = -1;
 
 pub const DEFAULT_INTERVENTION_STATUS_NEW: i64 = 13;
 
+pub const COMMON_REF_TYPE_INTERVENTION_GROUP_ID: i64 = 1;
+
 /// ------------------   ------------------   ------------------   ------------------
 //  Externalized HTML tags that will be present in the static tile files (*.htl)
 /// ------------------   ------------------   ------------------   ------------------
@@ -47,7 +49,7 @@ pub const LEGACY_MENU_TILE_TAG : &str = r##"<div id="MapleEMR::LegacyMenu"></div
 pub const USER_IDENTITY_TILE_TAG : &str = r##"<div id="MapleEMR::UserIdentity"></div>"##;
 pub const BODY_TILE_CONTENT_TAG: &str = r##"<div id="MapleEMR::BodyTile"></div>"##;
 
-pub const USER_COMMANDS_TILE_TAG : &str = r##"<div id="MapleEMR::UserCommands"></div>"##;
+pub const FEATURE_PREFERENCE_TILE_TAG : &str = r##"<div id="MapleEMR::FeaturePreference"></div>"##;
 
 pub const PATIENT_HEADER_TILE_TAG : &str = r##"<div id="MapleEMR::PatientHeader"></div>"##;
 pub const CURRENT_ENCOUNTER_TILE_TAG : &str =r##"<div id="MapleEMR::CurrentEncounter"></div>"##;

@@ -21,7 +21,7 @@ use std::collections::HashMap;
 use tracing;
 
 use crate::constants;
-use crate::dto::{patient::*, intervention::*, intervention_detail::*};
+use crate::dto::{patient::*, intervention::*, intervention_detail::*, feature_preference::*};
 
 use crate::ui::common::CommonFormatter;
 use crate::ui::intervention_fmt::InterventionFormatter;
@@ -47,6 +47,8 @@ pub enum WebContentItem {
     WCTypeInterventionFullPageTile,
     #[display("Intervention-Detail Item Tile")]
     WCTypeIntvDetailItemTile,
+    #[display("Fast Action Tile")]
+    WCTypeFastActionTile,
 }
 
 /// -------------------------------------------------------------------
@@ -74,7 +76,8 @@ impl WebContentFactory {
                                 ("AdmitTile.htl", WebContentItem::WCTypeAdmitTile),
                                 ("DischargeTile.htl", WebContentItem::WCTypeDischargeTile), 
                                 ("InterventionTile.htl", WebContentItem::WCTypeInterventionFullPageTile),
-                                ("IntvDetailItemTile.htl", WebContentItem::WCTypeIntvDetailItemTile)        ];
+                                ("IntvDetailItemTile.htl", WebContentItem::WCTypeIntvDetailItemTile),
+                                ("FastActionTile.htl", WebContentItem::WCTypeFastActionTile)        ];
 
         // load tiles from pre-defined files, assigning to known constants so that the application can reliably load them later
         for item in tile_files{
@@ -127,7 +130,9 @@ impl WebContentFactory {
     pub fn get_patient_details_full_tile(&self, patient_header: String, current_encounter: String, encounter_section: String,
                                                 user_identity_label: String, legacy_menu: String, intv_section: String, 
                                                 intervention_type_list: Vec<(i64, String, String)>,
-                                                patient_id: String, encounter_id: String) -> String {
+                                                feature_pref_section: String,
+                                                patient_id: String,
+                                                encounter_id: String) -> String {
         tracing::debug!(">get_patient_details_full_tile()");
         let layout = self.get_tile(WebContentItem::WCTypePatientListTile);
 
@@ -139,14 +144,14 @@ impl WebContentFactory {
         let ht4 = &ht3.replace(constants::CURRENT_ENCOUNTER_TILE_TAG, &current_encounter);
         let ht5 = &ht4.replace(constants::CURRENT_INTERVENTIONS_TILE_TAG, &intv_section);
         let ht6 = &ht5.replace(constants::ENCOUNTER_HISTORY_TILE_TAG, &encounter_section);
-
         let ht7 = &ht6.replace("{patient_id}",  &patient_id);
         let ht8 = &ht7.replace("{encounter_id}",  &encounter_id);
-
         let ht9 = &ht8.replace(constants::INTERVENTION_TYPE_DROP_DOWN_CONTROL_TAG, &&CommonFormatter::get_dropdown_generic( intervention_type_list,
                                                                                                                                   "intervention_type_id".to_string(),
                                                                                                                                   constants::NOT_SPECIFIED_ID));
-        let ht_final = &ht9.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
+        let ht10 = &ht9.replace(constants::FEATURE_PREFERENCE_TILE_TAG, &feature_pref_section);
+
+        let ht_final = &ht10.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
 
         return ht_final.clone();
     }
@@ -358,5 +363,41 @@ impl WebContentFactory {
         let home_tile_level_final = &home_tile_level_0.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
 
         return home_tile_level_final.clone();
+    }
+
+
+    ///
+    /// Generates an HTML tile based on a list of FeaturePreference objects.
+    /// 
+    pub fn get_feature_preference_section(&self, feature_pref_list: Option<Vec<FeaturePreference>>) -> String {
+        tracing::debug!("get_feature_preference_tile()");
+        //let base_tile = self.get_tile(WebContentItem::WCTypeFastActionTile); // Step 1: get the baseline tile for the section
+        let mut results_sbuf = String::with_capacity(100);
+
+        let results = match feature_pref_list{
+            Some(pref_list) => {
+                let single_pref_tile: &str = r##"<input type="submit"
+                                                  name="fast_action_btn_id_{fast_action_id}"
+                                                    id="fast_action_btn_id_{fast_action_id}"
+                                                  value="{fast_action_name}"
+                                                  onclick="event.preventDefault(); return fastAction({fast_action_id});">
+                                                 "##;
+
+                for item in pref_list{
+                    let item_layout_0 = single_pref_tile; // start with base tile
+                    let item_layout_1 = item_layout_0.replace("{fast_action_id}", &item.feature_id.to_string()); //
+                    //let item_layout_2 = item_layout_1.replace("{patient_id}", patient_id); //patient_id 
+                    //let item_layout_3 = item_layout_2.replace("{encounter_id}", encounter_id); // encounter_id
+                    //let item_layout_4 = item_layout_3.replace("{intervention_id}", intervention_id); // intervention_id
+
+                    let item_layout_final = item_layout_1.replace("{fast_action_name}", &item.ref_name); //   
+                    results_sbuf.push_str(&item_layout_final); // add the fp item's layout to the section body
+                }
+                results_sbuf
+            },
+            None => "".to_string(), // if no content, return nothing
+        };
+        results        
+        //base_tile.replace(constants::FEATURE_PREFERENCE_TILE_TAG, &results) // replace the placeholder tag and return the final content
     }
 }

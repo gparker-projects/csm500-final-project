@@ -10,6 +10,8 @@
 //! 
 //! -------------------------------------------------------------------
 
+use crate::dto::feature_preference::FeaturePreference;
+
 pub struct CommonFormatter{}
 
 impl CommonFormatter {
@@ -92,5 +94,4 @@ impl CommonFormatter {
 
         return results_sbuf;
     }
-
 }

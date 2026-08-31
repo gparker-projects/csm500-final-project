@@ -26,22 +26,22 @@ impl FeaturePreferenceDAO {
             connection: db_connection,
         }
     }
+
     ///
-    /// Obtains all active features preferences for a user. Disregards department, only includes active.
+    /// Obtains all active features preferences for a user. Disregards department, only includes active. Disregards department, only includes active preferences and active common_reference_types.
     /// 
-    pub async fn get_all_active_feature_preferences_for_user(&self, user_id: i64)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
+    pub async fn get_active_feature_preferences_for_user(&self, user_id: i64, intervention_level_only: bool)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
         tracing::debug!("get_all_active_feature_preferences_for_user()");
-        //println!("get_all_active_feature_preferences_for_user()");
 
         let query_level_0 = db_query::QRY_GET_ALL_ACTIVE_FEATURE_PREFERENCE_FOR_USER;
         let query = query_level_0.replace("{users_id}", &user_id.to_string());
 
-        //tracing::debug!("..SELECT sql: {}", query);
+        tracing::debug!("..SELECT sql: {}", query);
 
                      //id, display_order, weight,
-                     //  calculation_date, department_id, feature_id
+                     //  calculation_date, department_id, feature_id, ref_group_id, ref_name
         let rows: Vec<( i64, i32, i32,
-                        NaiveDateTime, Option<i64>, i64
+                        NaiveDateTime, Option<i64>, i64, i64, String
          )> = sqlx::query_as(&query)
                                                 .fetch_all(&self.connection) 
                                                 .await
@@ -57,32 +57,62 @@ impl FeaturePreferenceDAO {
             //tracing::debug!("..Populating results");
 
             for row in rows {
-                let tmp_id: i64 = row.0; // id
-                let tmp_display_order: i64 = i64::from(row.1); //  display_order
-                let tmp_weight: i64 = i64::from(row.2);  //weight
-                let tmp_calculation_date: NaiveDateTime = row.3; // calculation_date
-                let tmp_department_id: i64 = match row.4 {
-                    None => constants::INVALID_OTHER_ID,
-                    Some(dept_id) => dept_id
-                }; //  department_id
-
                 let tmp_feature_id: i64 = row.5;  //feature_id
 
-                results.push( FeaturePreference {
-                        id: tmp_id,
-                        display_order: tmp_display_order,
-                        weight: tmp_weight,
-                        calculation_date: tmp_calculation_date,
-                        department_id: tmp_department_id,
-                        users_id: user_id, // spelling in DTO matches DB
-                        feature_id: tmp_feature_id
-                    }
-                );
+                // only collect items that are a) an intervention, when only interventions are requested
+                //  or b) everything other than intervention-level, when no interventions are wanted
+                if (!intervention_level_only && tmp_feature_id != constants::COMMON_REF_TYPE_INTERVENTION_GROUP_ID) ||
+                    (intervention_level_only && tmp_feature_id == constants::COMMON_REF_TYPE_INTERVENTION_GROUP_ID){
+                    let tmp_id: i64 = row.0; // id
+                    let tmp_display_order: i64 = i64::from(row.1); //  display_order
+                    let tmp_weight: i64 = i64::from(row.2);  //weight
+                    let tmp_calculation_date: NaiveDateTime = row.3; // calculation_date
+                    let tmp_department_id: i64 = match row.4 {
+                        None => constants::INVALID_OTHER_ID,
+                        Some(dept_id) => dept_id
+                    }; //  department_id                    
+
+                    let tmp_ref_group_id: i64 = i64::from(row.6); // ref_group_id
+                    let tmp_ref_name: String = row.7; // ref_name
+
+                    results.push( FeaturePreference {
+                            id: tmp_id,
+                            display_order: tmp_display_order,
+                            weight: tmp_weight,
+                            calculation_date: tmp_calculation_date,
+                            department_id: tmp_department_id,
+                            users_id: user_id, // spelling in DTO matches DB
+                            feature_id: tmp_feature_id, 
+                            ref_group_id: tmp_ref_group_id,
+                            ref_name: tmp_ref_name
+                        }
+                    );
+                }
             }
             return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
         }
     }
 
+    ///
+    /// Specialized wrapper for get_active_feature_preferences_for_user(user, TRUE)
+    /// 
+    /// 
+    /// Obtains all active features preferences for a user, that are at the intervention level only (common_reference_type.group_id=1).
+    /// Disregards department, only includes active preferences and active common_reference_types.
+    /// 
+    pub async fn get_active_feature_preferences_of_interventions_for_user(&self, user_id: i64)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
+        self.get_active_feature_preferences_for_user(user_id, true).await
+    }
+
+    ///
+    /// Specialized wrapper for get_active_feature_preferences_for_user(user, FALSE)
+    /// 
+    /// Obtains all active features preferences for a user, that are not at the intervention level only (common_reference_type.group_id <> 1).
+    /// Disregards department, only includes active preferences and active common_reference_types.
+    /// 
+    pub async fn get_active_feature_preferences_of_intervention_details_for_user(&self, user_id: i64)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
+        self.get_active_feature_preferences_for_user(user_id, false).await
+    }
 
     //https://users.rust-lang.org/t/calling-stored-procedures-setting-parameters-and-returning-parameters-on-postgresql/91508/4
 

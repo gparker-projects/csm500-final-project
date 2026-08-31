@@ -11,11 +11,12 @@ use actix_session::{Session};
 use tracing;
 
 use crate::constants;
+use crate::dao::feature_preference_dao::FeaturePreferenceDAO;
 use crate::dto::encounter::Encounter;
+use crate::dto::feature_preference::FeaturePreference;
 use crate::dao::{common_dao::*, encounter_dao::*, intervention_dao::*, patient_dao::*};
 use crate::ui::{tile_factory::*, data_forms::*, menu_fmt::*, simple_fmt::*};
 use crate::session::{AppSession, UserSession};
-
 
 pub struct PatientRoute{}
 
@@ -93,6 +94,9 @@ impl PatientRoute{
     // no user should be able to get into the system without a location assigned, so we will not worry about an exception here
     let item_list = {CommonDAO::new( app_session.get_db_connection() ).await}.get_intervention_types().await.unwrap();
 
+    //
+    let pref_list: Option<Vec<FeaturePreference>> = {FeaturePreferenceDAO::new( app_session.get_db_connection() ).await}.get_active_feature_preferences_of_intervention_details_for_user(userid.clone()).await.unwrap();
+
     let consolidated_content = wcf.get_patient_details_full_tile(patient_header,
                                                                          cur_enc_section,
                                                                          enc_section,
@@ -100,6 +104,7 @@ impl PatientRoute{
                                                                          legacy_menu,
                                                                          intv_section,
                                                                          item_list.unwrap(), 
+                                                                         wcf.get_feature_preference_section(pref_list),
                                                                          patient_id.to_string(),
                                                                          cur_enc_id);
 

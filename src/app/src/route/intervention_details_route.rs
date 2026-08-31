@@ -73,10 +73,11 @@ impl InterventionDetailsRoute{
                 Ok(intv_dtls_id) => {
                     tracing::debug!("..Intervention Details (id={intv_dtls_id})] created/updated");
                     results = intv_dtls_id.to_string();
+                    let type_id = req.clone().get_type_id_as_i64(); // extract type for updating the user's feature preference
 
                     // if save successful, record a feature preference as well
                     let fpdao = FeaturePreferenceDAO::new( app_session.get_db_connection() ).await;
-                    let _ignore = fpdao.upsert_feature_preference( user_session_details.clone().get_userid_as_i64() , intv_dtls_id.clone()).await.unwrap();
+                    let _ignore = fpdao.upsert_feature_preference( user_session_details.clone().get_userid_as_i64() , type_id).await.unwrap();
                 },
                 Err(e) => {
                     tracing::debug!("..!Intervention Details not created/updated: {e}");
