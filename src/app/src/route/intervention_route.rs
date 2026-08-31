@@ -12,16 +12,14 @@ use actix_web::{web, HttpResponse, Responder};
 use actix_session::{Session}; 
 use tracing;
 
+use crate::constants;
 use crate::dto::intervention::Intervention;
-
-use crate::dao::{ patient_dao::*, intervention_dao::*, common_dao::*, auth_dao::*}; 
+use crate::dto::feature_preference::FeaturePreference;
+use crate::dao::feature_preference_dao::FeaturePreferenceDAO;
+use crate::dao::{patient_dao::*, intervention_dao::*, common_dao::*, auth_dao::*}; 
+use crate::session::{AppSession, UserSession};
 use crate::ui::{data_forms::*, menu_fmt::*};
 use crate::ui::common::CommonFormatter;
-
-use crate::session::{AppSession, UserSession};
-use crate::dao::feature_preference_dao::FeaturePreferenceDAO;
-
-use crate::constants;
 
 pub struct InterventionRoute{}
 
@@ -99,6 +97,7 @@ impl InterventionRoute{
         tracing::debug!("-> Route Requested: /intv  (add/modify)");
         let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
         let wcf = &app_session.get_web_content_factory();
+        let userid = user_session_details.clone().get_userid_as_i64();
 
         let intervention_type_id: i64;
         let intervention_id: i64 = req.intervention_id.parse().unwrap(); // get the intervention id from the form that was passed in; includes for server-side validation errors
@@ -125,7 +124,7 @@ impl InterventionRoute{
 
         // refresh the patients in the menu (only)
         let pdao = PatientDAO::new( app_session.get_db_connection() ).await;
-        let legacy_menu_results = pdao.get_patients_at_users_site_no_discharge(user_session_details.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+        let legacy_menu_results = pdao.get_patients_at_users_site_no_discharge(userid, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
         let legacy_menu = match legacy_menu_results {
             Some (patients_for_menu_lst) => {
                 {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), req.get_patient_id_as_i64(), user_session_details.user_display_name.clone())
@@ -136,7 +135,7 @@ impl InterventionRoute{
             }
         };
 
-        let user_dropdown_list = {AuthDAO::new( app_session.get_db_connection() ).await}.get_user_and_departments_at_current_user_sites(user_session_details.get_userid_as_i64() ).await.unwrap();
+        let user_dropdown_list = {AuthDAO::new( app_session.get_db_connection() ).await}.get_user_and_departments_at_current_user_sites(userid ).await.unwrap();
 
         let cdao = CommonDAO::new( app_session.get_db_connection() ).await;
         
@@ -145,7 +144,7 @@ impl InterventionRoute{
 
       
         let status_dropdown_list=  cdao.get_intervention_statuses().await.unwrap();
-        let location_results = cdao.get_locations_for_user(user_session_details.get_userid_as_i64()).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+        let location_results = cdao.get_locations_for_user(userid).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
         let location_menu = match location_results {
           Some (loc_list) => {
               
@@ -157,10 +156,12 @@ impl InterventionRoute{
               )
           }
           None => {
-              tracing::debug!("No locations found for user. [Userid:{}]", user_session_details.get_userid_as_i64());
+              tracing::debug!("No locations found for user. [Userid:{}]", userid);
               constants::LEGACY_MENU_ON_ERROR.to_string() // when no patient, return default error-expected menu
           }
         };
+
+        let pref_list: Option<Vec<FeaturePreference>> = {FeaturePreferenceDAO::new( app_session.get_db_connection() ).await}.get_active_feature_preferences_of_intervention_details_for_user(userid).await.unwrap();
 
         let content = wcf.get_modify_intervention_full_tile(user_session_details.user_display_name,
                                                                          cur_intv2,
@@ -173,8 +174,8 @@ impl InterventionRoute{
                                                                          req.intervention_type_id.clone() ,
                                                                          req.encounter_id.clone(),
                                                                          intv_dtls.clone(),
-                                                                         intv_details_type.unwrap() );
-
+                                                                         intv_details_type.unwrap(),
+                                                                         wcf.get_feature_preference_section( pref_list ));
         HttpResponse::Ok().body(  content )
     }
 }

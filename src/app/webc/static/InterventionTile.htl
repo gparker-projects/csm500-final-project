@@ -176,25 +176,25 @@
 		formErrors.textContent = '';
 		let isValid = true;		
 
-		console.log("..GOT HERE 1: "+ field_value.value);
+		//console.log("..GOT HERE 1: "+ field_value.value);
         if ( field_value.value.trim() == '') {
 			formErrors.textContent = "Value is required.";
 			isValid = false;
 		}
 
-		console.log("..GOT HERE 2: "+ field_value.value);
+		//console.log("..GOT HERE 2: "+ field_value.value);
 		if ( field_value.value.length > 100 || field_value.value.length < 1) {
 			formErrors.textContent = "Value must be between 1 and 100 characters.";
 			isValid = false;
 		}
 		
-		console.log("..GOT HERE 3: "+ field_notes.value);
+		//console.log("..GOT HERE 3: "+ field_notes.value);
 		if (field_notes.value.length > 2000) {
 			formErrors.textContent = "Notes must be less than 2000 characters.";
 			isValid = false;
 		}
 
-        console.log("..GOT HERE 4");
+        //console.log("..GOT HERE 4");
 		if (!isValid) {
 			formErrors.style = "color: red";
 		    event.preventDefault(); // Stop the form from submitting if there are errors
@@ -216,16 +216,14 @@
 
 </td>
 </tr>
+</div>
 
 <tr>
 	<td>
 		<div id="MapleEMR::FeaturePreference"></div>
 	</td>
 </tr>
-
-
 </table>
-</div>
 
 </BODY>
 </HTML>

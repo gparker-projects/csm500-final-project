@@ -31,8 +31,7 @@ impl FeaturePreferenceDAO {
     /// Obtains all active features preferences for a user. Disregards department, only includes active. Disregards department, only includes active preferences and active common_reference_types.
     /// 
     pub async fn get_active_feature_preferences_for_user(&self, user_id: i64, intervention_level_only: bool)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
-        tracing::debug!("get_all_active_feature_preferences_for_user()");
-
+        tracing::debug!("get_active_feature_preferences_for_user()");
         let query_level_0 = db_query::QRY_GET_ALL_ACTIVE_FEATURE_PREFERENCE_FOR_USER;
         let query = query_level_0.replace("{users_id}", &user_id.to_string());
 
@@ -53,16 +52,20 @@ impl FeaturePreferenceDAO {
         }
         else{
             let mut results: Vec<FeaturePreference> = Vec::with_capacity(rows.len());
-
             //tracing::debug!("..Populating results");
 
             for row in rows {
                 let tmp_feature_id: i64 = row.5;  //feature_id
+                let tmp_ref_group_id: i64 = i64::from(row.6); // ref_group_id
 
                 // only collect items that are a) an intervention, when only interventions are requested
                 //  or b) everything other than intervention-level, when no interventions are wanted
-                if (!intervention_level_only && tmp_feature_id != constants::COMMON_REF_TYPE_INTERVENTION_GROUP_ID) ||
-                    (intervention_level_only && tmp_feature_id == constants::COMMON_REF_TYPE_INTERVENTION_GROUP_ID){
+                if (!intervention_level_only && tmp_ref_group_id != constants::COMMON_REF_TYPE_INTERVENTION_GROUP_ID) ||
+                    (intervention_level_only && tmp_ref_group_id == constants::COMMON_REF_TYPE_INTERVENTION_GROUP_ID){
+
+                    //tracing::debug!("....intervention_level_only={}", intervention_level_only.to_string());
+                    //tracing::debug!("....tmp_feature_id={}", tmp_feature_id.to_string());
+
                     let tmp_id: i64 = row.0; // id
                     let tmp_display_order: i64 = i64::from(row.1); //  display_order
                     let tmp_weight: i64 = i64::from(row.2);  //weight
@@ -72,7 +75,6 @@ impl FeaturePreferenceDAO {
                         Some(dept_id) => dept_id
                     }; //  department_id                    
 
-                    let tmp_ref_group_id: i64 = i64::from(row.6); // ref_group_id
                     let tmp_ref_name: String = row.7; // ref_name
 
                     results.push( FeaturePreference {

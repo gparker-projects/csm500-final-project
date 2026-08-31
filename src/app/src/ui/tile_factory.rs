@@ -251,6 +251,7 @@ impl WebContentFactory {
                                                   encounter_id: String,
                                                   intv_details_list: Option<Vec<InterventionDetail>>,
                                                   measures_dropdown_list: Vec<(i64, String, String)>,
+                                                  feature_pref_section: String
                                                   ) -> String {
         tracing::debug!(">get_modify_intervention_full_page_tile()");
 
@@ -267,16 +268,16 @@ impl WebContentFactory {
                                 "{encounter_id}",
                                 "{patient_id}",
                                 "{form_errors}",
-                                "<div id=\"MapleEMR::InterventionDetailsList\">"];
+                                "<div id=\"MapleEMR::InterventionDetailsList\">",
+                                constants::FEATURE_PREFERENCE_TILE_TAG];
 
         let id: String; // this entire block is required in order to address partial moves that occur below when we copy over the String values
         let intervention_type: String;             // this must all occur before the copy and outside of the match block below
         let tmp_intervention_type_id: String;          // as the selection of Some()/None does not allow the move
         let mut scheduled_timestamp: String = chrono::Utc::now().format(constants::SYSTEM_DATETIME_FORMAT ).to_string();
-        let mut performed_timestamp: String = chrono::Utc::now().format(constants::SYSTEM_DATETIME_FORMAT ).to_string();
+        let mut performed_timestamp: String = scheduled_timestamp.clone();
         let dd_user: String;
         let dd_intv_status: String;
-        //let location_id: String;
         let description: String;
         let notes: String;
         let tmp_encounter_id: String;
@@ -291,16 +292,17 @@ impl WebContentFactory {
                                                   intv_type.1, //"{intervention_type}",
                                                   intervention_type_id.to_string(), //"{intervention_type_id}",  //TODO
                                                   scheduled_timestamp, //"{scheduled_timestamp}",
-                                                  performed_timestamp, // "{performed_timestamp}",
-                                                  location_menu, //"{location_id}", 
-                                                  dd_user, // "<div id=\"MapleEMR::UserIdDropDownControl\">",
-                                                  dd_intv_status, // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
-                                                  "".to_string(), // "{description}",
-                                                  "".to_string(), // "{notes}",
+                                                  performed_timestamp, //"{performed_timestamp}",
+                                                  location_menu , //"{location_id}", 
+                                                  dd_user,        //"<div id=\"MapleEMR::UserIdDropDownControl\">",
+                                                  dd_intv_status, //"<div id=\"MapleEMR::StatusIdDropDownControl\">",
+                                                  String::new(), //"{description}",
+                                                  String::new(), //"{notes}",
                                                   encounter_id.to_string(), // "{encounter_id}",  //TODO
                                                   patient_id.clone(),
-                                                  "".to_string(), // "{form_errors}"];
-                                                  "".to_string()
+                                                  String::new(), //"{form_errors}"];
+                                                  String::new(),  //"<div id=\"MapleEMR::InterventionDetailsList\">"
+                                                  feature_pref_section
                                                   ];
                 tmp_data_items
             } 
@@ -338,7 +340,8 @@ impl WebContentFactory {
                                                     tmp_encounter_id,
                                                     patient_id.clone(),
                                                     "{form_errors}".to_string(),
-                                                    intv_details_html
+                                                    intv_details_html,
+                                                    feature_pref_section
                                                 ];
                 tmp_data_items
             }
@@ -358,6 +361,7 @@ impl WebContentFactory {
                                                                         constants::INVALID_OTHER_ID));
         
         let body_tile_level_3 = body_tile_level_2.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
+        //let body_tile_level_3 = body_tile_level_2.replace(constants::FEATURE_PREFERENCE_TILE_TAG, &feature_pref_section);
         
         let home_tile_level_0 = &self.get_home_tile_with_user_identity(user_identity_label).replace(constants::BODY_TILE_CONTENT_TAG, &body_tile_level_3.clone()); // build the individual sections
         let home_tile_level_final = &home_tile_level_0.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
@@ -371,33 +375,26 @@ impl WebContentFactory {
     /// 
     pub fn get_feature_preference_section(&self, feature_pref_list: Option<Vec<FeaturePreference>>) -> String {
         tracing::debug!("get_feature_preference_tile()");
-        //let base_tile = self.get_tile(WebContentItem::WCTypeFastActionTile); // Step 1: get the baseline tile for the section
-        let mut results_sbuf = String::with_capacity(100);
+        let mut results_sbuf = String::with_capacity(500);
 
         let results = match feature_pref_list{
             Some(pref_list) => {
                 let single_pref_tile: &str = r##"<input type="submit"
                                                   name="fast_action_btn_id_{fast_action_id}"
                                                     id="fast_action_btn_id_{fast_action_id}"
-                                                  value="{fast_action_name}"
+                                                  value="(+) {fast_action_name}"
                                                   onclick="event.preventDefault(); return fastAction({fast_action_id});">
                                                  "##;
-
                 for item in pref_list{
                     let item_layout_0 = single_pref_tile; // start with base tile
-                    let item_layout_1 = item_layout_0.replace("{fast_action_id}", &item.feature_id.to_string()); //
-                    //let item_layout_2 = item_layout_1.replace("{patient_id}", patient_id); //patient_id 
-                    //let item_layout_3 = item_layout_2.replace("{encounter_id}", encounter_id); // encounter_id
-                    //let item_layout_4 = item_layout_3.replace("{intervention_id}", intervention_id); // intervention_id
-
-                    let item_layout_final = item_layout_1.replace("{fast_action_name}", &item.ref_name); //   
-                    results_sbuf.push_str(&item_layout_final); // add the fp item's layout to the section body
+                    let item_layout_1 = item_layout_0.replace("{fast_action_id}", &item.feature_id.to_string()); 
+                    let item_layout_final = item_layout_1.replace("{fast_action_name}", &item.ref_name); 
+                    results_sbuf.push_str(&item_layout_final); 
                 }
                 results_sbuf
             },
             None => "".to_string(), // if no content, return nothing
         };
         results        
-        //base_tile.replace(constants::FEATURE_PREFERENCE_TILE_TAG, &results) // replace the placeholder tag and return the final content
     }
 }
