@@ -13,6 +13,7 @@ use actix_session::{Session};
 use tracing;
 
 use crate::constants;
+use crate::dao::feature_preference_dao::FeaturePreferenceDAO;
 use crate::dao::intervention_dao::InterventionDAO;
 use crate::route::intervention_route::InterventionRoute;
 use crate::session::{AppSession, UserSession};
@@ -72,6 +73,10 @@ impl InterventionDetailsRoute{
                 Ok(intv_dtls_id) => {
                     tracing::debug!("..Intervention Details (id={intv_dtls_id})] created/updated");
                     results = intv_dtls_id.to_string();
+
+                    // if save successful, record a feature preference as well
+                    let fpdao = FeaturePreferenceDAO::new( app_session.get_db_connection() ).await;
+                    let _ignore = fpdao.upsert_feature_preference( user_session_details.clone().get_userid_as_i64() , intv_dtls_id.clone()).await.unwrap();
                 },
                 Err(e) => {
                     tracing::debug!("..!Intervention Details not created/updated: {e}");

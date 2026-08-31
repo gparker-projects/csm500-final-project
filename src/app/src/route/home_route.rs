@@ -28,6 +28,7 @@ impl HomeRoute{
         tracing::debug!("-> /home Route Requested");
 
         let user_session: session::UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+        let user_display_name = user_session.clone().user_display_name;
 
         let wcf = &app_session.get_web_content_factory(); // https://actix.rs/docs/application/
         let mut content = wcf.get_home_tile(); // retrieve the page base content
@@ -59,7 +60,7 @@ impl HomeRoute{
             let patient_list_html = SimpleFormatter::get_home_route_summary_of_patients_tile_using_wrapper(pwrap.clone()); 
             content = content.replace(constants::BODY_TILE_CONTENT_TAG, &patient_list_html);  // replace default string
 
-            let std_menu_html = {MenuFormatter{}}.get_legacy_menu(patient_list.clone()); 
+            let std_menu_html = {MenuFormatter{}}.get_legacy_menu(patient_list.clone(), user_session.user_display_name); 
             content = content.replace(constants::LEGACY_MENU_TILE_TAG, &std_menu_html);  // replace default string       
             }
             None => {
@@ -69,7 +70,7 @@ impl HomeRoute{
         // and adjust the menu
 
         // add the user's identity
-        content = content.replace(constants::USER_IDENTITY_TILE_TAG, &&user_session.user_display_name); 
+        content = content.replace(constants::USER_IDENTITY_TILE_TAG, &&user_display_name.clone()); 
 
         //change to get_home_tile_with_user_identity(&&user_session.user_display_name);
 

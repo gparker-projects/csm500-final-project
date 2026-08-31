@@ -78,7 +78,7 @@ impl AppSession {
 ///
 /// Stores user session variables
 /// 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, Clone)]
 pub struct UserSession {
     pub user_id: String,
     pub user_display_name: String,

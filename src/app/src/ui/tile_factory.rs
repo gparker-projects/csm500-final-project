@@ -70,7 +70,7 @@ impl WebContentFactory {
         tracing::debug!("WebContentFactory:new()");
         let tile_files = [("LoginTile.htl", WebContentItem::WCTypeLoginTile),
                                 ("PatientListTile.htl", WebContentItem::WCTypePatientListTile),
-                                ("Workspace.htl", WebContentItem::WCTypeHomePage),
+                                ("Home.htl", WebContentItem::WCTypeHomePage),
                                 ("AdmitTile.htl", WebContentItem::WCTypeAdmitTile),
                                 ("DischargeTile.htl", WebContentItem::WCTypeDischargeTile), 
                                 ("InterventionTile.htl", WebContentItem::WCTypeInterventionFullPageTile),

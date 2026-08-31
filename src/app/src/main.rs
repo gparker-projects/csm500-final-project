@@ -245,6 +245,7 @@ async fn main() -> std::io::Result<()> {
       .route("/intvdtlnew", web::post().to( InterventionDetailsRoute::route_to_add_intervention_detail ))
       .route("/intvdtlsave", web::post().to( InterventionDetailsRoute::route_to_intervention_detail_save ))
       .route("/isItUp", web::get().to( is_it_up ))
+      .route("/logout", web::get().to( LoginRoute::logout ))
       .service(Files::new("/webc/", "./webc"))  // ref: ttps://actix.rs/docs/static-files/
   })
   .bind("127.0.0.1:8000")?

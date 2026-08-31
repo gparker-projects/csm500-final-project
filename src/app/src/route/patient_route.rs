@@ -27,9 +27,10 @@ impl PatientRoute{
     tracing::debug!("-> /patientdtls Route Requested");
 
     //todo: this should direct to a standard error or login screen when session is lost
-    let user_session: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+    let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+    let userid = user_session_details.clone().get_userid_as_i64();
+    let user_display_name = user_session_details.clone().user_display_name;
     let wcf: &WebContentFactory = &app_session.get_web_content_factory(); 
-
 
     let patient_id: i64 = req.get_uid_as_i64();
 
@@ -49,32 +50,19 @@ impl PatientRoute{
     // get encounters for the patient
     let enc_results = edao.get_encounters(patient_id, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
     let enc_section: String = match enc_results {
-        Some (encounters) => {
-            //println!("Patient details obtained");
-            SimpleFormatter::get_encounter_list_tile(encounters)
-        }
-        None =>{
-            //println!("No Encounters found");
-            "No Encounters found".to_owned()
-        } 
+        Some (encounters) => SimpleFormatter::get_encounter_list_tile(encounters),
+        None => "No Encounters found".to_owned()
     };
 
     // get all interventions for the patient
     let intv_results = idao.get_interventions(cur_enc.id, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
     let intv_section = match intv_results {
-        Some (intvs) => {
-            //println!("Patient details obtained");
-            //wcf.get_intervention_list_for_patient_details_tile(intvs)
-            SimpleFormatter::get_intervention_list_for_patient_details_tile(intvs)
-        }
-        None =>{
-            //println!("No Encounters found");
-            "No Interventions found".to_owned()
-        } 
+        Some (intvs) =>  SimpleFormatter::get_intervention_list_for_patient_details_tile(intvs),
+        None => "No Interventions found".to_owned(),
     };
 
     // get patient encounter history
-    let patient_results = pdao.get_patient_details( user_session.get_userid_as_i64(), patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+    let patient_results = pdao.get_patient_details( userid.clone(), patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
     let patient_header = match patient_results {
         Some (patient_details) => {
             //println!("Patient details obtained"); //: {}", &tile_content);
@@ -87,17 +75,14 @@ impl PatientRoute{
 
             SimpleFormatter::get_single_patient_summary( pwrap, -1)
         }
-        None =>{
-            //println!("No patients found");
-            "No patients found".to_owned()
-        } 
+        None => "No patients found".to_owned()
     };
 
     // refresh the patients in the menu (only)
-    let legacy_menu_results = pdao.get_patients_at_users_site_no_discharge(user_session.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+    let legacy_menu_results = pdao.get_patients_at_users_site_no_discharge(userid.clone(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
     let legacy_menu = match legacy_menu_results {
         Some (patients_for_menu_lst) => {
-            {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id)
+            {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id, user_session_details.user_display_name)
         }
         None => {
             tracing::debug!("No patients found for legacy menu");
@@ -106,12 +91,12 @@ impl PatientRoute{
     };
     
     // no user should be able to get into the system without a location assigned, so we will not worry about an exception here
-    let item_list = {CommonDAO::new( app_session.get_db_connection() ).await}.get_common_references(CommonDAO::REF_TYPE_GROUP_1_INTERVENTION_TYPES, true ).await.unwrap();
+    let item_list = {CommonDAO::new( app_session.get_db_connection() ).await}.get_intervention_types().await.unwrap();
 
     let consolidated_content = wcf.get_patient_details_full_tile(patient_header,
                                                                          cur_enc_section,
                                                                          enc_section,
-                                                                         user_session.user_display_name,
+                                                                         user_display_name.clone(),
                                                                          legacy_menu,
                                                                          intv_section,
                                                                          item_list.unwrap(), 

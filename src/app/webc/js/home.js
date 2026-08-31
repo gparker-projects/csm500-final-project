@@ -96,7 +96,7 @@ async function admit_patient(){
     frm.submit();
 }
 
-async function logout()){
+async function logout(){
     const data = document.getElementById('target_id');
     data.value = enc_id;
 

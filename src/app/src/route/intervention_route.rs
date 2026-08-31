@@ -19,6 +19,7 @@ use crate::ui::{data_forms::*, menu_fmt::*};
 use crate::ui::common::CommonFormatter;
 
 use crate::session::{AppSession, UserSession};
+use crate::dao::feature_preference_dao::FeaturePreferenceDAO;
 
 use crate::constants;
 
@@ -37,11 +38,17 @@ impl InterventionRoute{
       let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
       let idao = InterventionDAO::new( app_session.get_db_connection() ).await;
 
-      let results = idao.upsert_intervention_from_intv_form(req_clone0, user_session_details.get_userid_as_i64()).await;
+      let results = idao.upsert_intervention_from_intv_form(req_clone0.clone(), user_session_details.get_userid_as_i64()).await;
       match results {
             Ok(intv_id) => {
                 tracing::debug!("  >Intervention (id={intv_id})] created/updated");
-                req.0.intervention_id = intv_id.to_string();
+                req.0.intervention_id = intv_id.clone().to_string();
+
+                let type_id: i64 = req_clone0.clone().get_intervention_type_as_i64();
+                // if save successful, record a feature preference as well
+                let fpdao = FeaturePreferenceDAO::new( app_session.get_db_connection() ).await;
+                let _ignore = fpdao.upsert_feature_preference( user_session_details.clone().get_userid_as_i64(), 
+                                                                            type_id).await.unwrap();
             },
             Err(e) => {
                 tracing::debug!("  >Intervention not created/updated: {e}");
@@ -121,7 +128,7 @@ impl InterventionRoute{
         let legacy_menu_results = pdao.get_patients_at_users_site_no_discharge(user_session_details.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
         let legacy_menu = match legacy_menu_results {
             Some (patients_for_menu_lst) => {
-                {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), req.get_patient_id_as_i64())
+                {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), req.get_patient_id_as_i64(), user_session_details.user_display_name.clone())
             }
             None => {
                 tracing::debug!("No patients found for legacy menu");

@@ -24,7 +24,8 @@ use maple_emr::dto::user_auth::*;
 
 use maple_emr::route::intervention_details_route::InterventionDetailsRoute;
 use maple_emr::ui::data_forms::InterventionDetailsDataForm;
-use maple_emr::session::{AppSession, UserSession};
+
+use maple_emr::session::*;
 
 use maple_emr::ui::tile_factory::WebContentFactory; 
 
@@ -38,6 +39,8 @@ mod common;
 
 async fn test_route_to_intervention_detail_save() {
     //async fn route_to_intervention_detail_save(app_session: web::Data<AppSession>, user_session: Session, mut req: web::Form<InterventionDetailsDataForm>) -> impl Responder {
+
+    use actix_web::web;
 
     let db_url = DB_CONN_STR;
     let db_pool = match PgPoolOptions::new()
@@ -62,6 +65,7 @@ async fn test_route_to_intervention_detail_save() {
             "INVALID_PATH".to_string()
         }
     } + constants::DATA_SUB_DIRECTORY;
+
     
     let nle_session: ort::session::Session = Session::builder().expect("Session could not be established")
                   .with_optimization_level(GraphOptimizationLevel::Level1).expect("No Session")
@@ -76,16 +80,24 @@ async fn test_route_to_intervention_detail_save() {
         .as_bytes()
     );
 
-    let cfg: SysConfig;
+    let cfg = SysConfig{
+        app_version: "v.0.UnitTest".to_string(),
+        db_conn_str: DB_CONN_STR.to_string(),
+        cargo_manifest_dir: base_model_dir.clone(),
+        model_data_dir: base_model_dir.clone(),
+        command_mapping_file: "command.mapping.csv".to_string(),
+        language_model_file: "all-MiniLM-L6-v2.onnx".to_string(),
+        tokenizer_file: "tokenizer.json".to_string(),
+        data_sub_dir: "data".to_string(),
+    };
 
     let app_session = AppSession {
-        wcf: WebContentFactory::new(&base_model_dir),
+        wcf: WebContentFactory::new(&base_model_dir,"v0.UnitTest".to_string()),
         app_key: app_key,
         connection: db_pool,
         system_config: cfg,
         nle_session: Arc::clone(&shared_session), 
     };
-
 
     let perm1= Permission {
         department_id: 4,
@@ -120,7 +132,9 @@ async fn test_route_to_intervention_detail_save() {
         form_errors: "".to_string(),
     };
 
-    //let results = InterventionDetailsRoute::route_to_intervention_detail_save(web::Data<&app_session>, user_session, frm);
+    //const tmp = web::Data::<app_session>;
+
+    //InterventionDetailsRoute::route_to_intervention_detail_save(app_session, user_session, frm);
 
     assert!(true);
     //assert_eq!(body_str, r#"{"message":"Hello world!"}"#);

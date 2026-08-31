@@ -131,7 +131,7 @@ impl FeaturePreferenceDAO {
                         Ok( inner_row.get("id") )
                     },
                     None => {
-                        tracing::debug!(" >> Feature Preference insert failed for user_id={} feature_id={}", user_id, feature_id);
+                        tracing::debug!(" >> Feature Preference insert failed user_id={} feature_id={}", user_id, feature_id);
                         Ok( Some(constants::INVALID_OTHER_ID) ) 
                     }
                 }

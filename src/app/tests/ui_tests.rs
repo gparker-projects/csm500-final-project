@@ -20,7 +20,7 @@ mod ui_tests {
     // check path was constructed correctly
     assert_eq!(newpath, "C:\\uol\\csm500-final-project\\src\\app\\webc\\static\\"); 
 
-    let wcf = WebContentFactory::new(&newpath);
+    let wcf = WebContentFactory::new(&newpath, "fake user".to_string());
     // content factor should have two entries currently
 
     tracing::debug!("As of Aug 28, there are [6] tiles being loaded");

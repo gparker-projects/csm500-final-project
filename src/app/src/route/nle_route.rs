@@ -18,22 +18,27 @@ use crate::ui::data_forms::*;
 use crate::session::{AppSession, UserSession};
 use crate::nle::nle::*;
 
-//pub const COMMAND_MAPPING_FILE_NAME: &str = "command_mapping.csv";
-//pub const DATA_SUB_DIRECTORY: &str = "data";
-//pub const LANGUAGE_MODEL_FILE_NAME: &str = "all-MiniLM-L6-v2.onnx";
-//pub const TOKENIZER_FILE_NAME: &str = "tokenizer.json";
-
 pub struct NLERoute{}
 
 impl NLERoute{
 
+    /* Reference Command mapping
+        admit patient, 1, Admit New Patient
+        admit add new open patient, 1, Admit New Patient
+        add patient, 1, Admit New Patient
+        new open patient, 1, Admit New Patient
+        create patient, 1, Admit New Patient
+        add information, 2, Add to Patient Chart
+        add medication, 2, Add Medication
+        prescribe medication, 2, Add Medication
+        move patient, 2, Transfer Patient
+        update contact information, 2, Update Patient Information
+        discharge patient, 3, Discharge Patient
+    */
 
    /*   pub async fn natural_language_prompt_test2(&self, _app_session: web::Data<AppSession>, _user_session: Session, req: web::Form<NLPromptFormData>) -> impl Responder {
         println!("-> /nlprompt Requested;  natural_language_prompt_test2();  prompt: \"{}\"", req.prompt);
 
-
-        
-        
         HttpResponse::Ok().body( "SUCCESS" )
     }*/
 

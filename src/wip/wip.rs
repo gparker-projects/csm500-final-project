@@ -1,64 +1,14 @@
+use crate::dao::feature_preference_dao::FeaturePreferenceDAO;
 
-Diagnoses (No data within last 12 weeks)
-
-admit Keenan Waynes for broken foot and blood loss. age 25, 6ft 10, 125kg
-
-A 34-year-old male patient, James Whitfield, weighing 82 kg (181 lbs), was admitted to the emergency department following a fall from a ladder at home, presenting with acute pain and swelling in the right wrist. Initial examination revealed deformity consistent with a suspected fracture, and the patient reported limited range of motion and tenderness on palpation. Vital signs were stable on arrival. X-ray imaging was ordered to confirm the extent of the injury, and the patient was given pain management while awaiting orthopedic consultation.
+let fpdao = FeaturePreferenceDAO::new( app_session.get_db_connection() ).await;
+let _ignore =  fpdao.upsert_feature_preference(user_id: i64, feature_id: i64).await.unwrap();
 
 
-<tr class="data-label">
-<input type="submit" value="+" onclick="addNewMeasure(); return false;">
+                // if save successful, record a feature preference as well
+                let fpdao = FeaturePreferenceDAO::new( app_session.get_db_connection() ).await;
+                let _ignore = fpdao.upsert_feature_preference( user_session_details.clone().get_userid_as_i64() , intv_id.clone()).await.unwrap();
 
-<div id="myDiv">
-<table id="addMeasureForm">
-  <tr class="field-row">
-  <td class="field-label">13)&nbsp;Procedure: Blood Transfusion</td><td class="field-value">Detected</td><td class="field-label"><i>2026-Aug-02 15:00:00</i></td><td class="field-label">
-  <input type="button" id="toggleBtnEdit" value="Edit"></td></tr>
-</table>
-</div>
 
-<div id="myDivAlt" class="hidden">
-<form action="/intvdtlsave" method="post" id="addIntvDtlsForm" name="addIntvDtlsForm" onsubmit="event.preventDefault(); return validateForm()">
-	<table id="addMeasureForm">
-		 <tr class="data-label">
-		   <td><div>Type</div><div class="data-field-ro"><select name="type_id" id="type_id">
-			  <option value="1">Height (cm)</option>
-			  <option value="2">Weight (lbs)</option>
-			  <option value="3">Diastolic</option>
-			</select></div></td>
-		   <input type="hidden" name="intervention_id" id="intervention_id" value="1">
-		   <input type="hidden" name="id" id="id" value="-1">
-		   <td><div>Value</div><input type="text" name="value" id="value" class="data-field-rw" value=""></td>
-		   <td><div>Note</div><textarea id="notes" name="notes" rows="2" cols="50" class="data-field-rw"></textarea></td>
-		   <td><input type="submit" value="Save" onclick="saveNewMeasure(); return false;"><input type="button" id="toggleBtnCancel" value="Cancel"></td>
-		</tr>
-	</table>
-</form>
-</div>
-</tr>
+get_all_active_feature_preferences_for_user(&self, user_id: i64)-> Result< Option< Vec<FeaturePreference> >
 
-<style>
-  .hidden {
-    display: none;
-  }
-</style>
-
-<script>
-	const toggleBtn = document.getElementById('toggleBtn');
-	const myDiv = document.getElementById('myDiv');
-	const myDivAlt = document.getElementById('myDivAlt');
-
-	toggleBtnCancel.addEventListener('click', () => {
-	  event.preventDefault();
-	  myDiv.classList.toggle('hidden');
-	  myDivAlt.classList.toggle('hidden');
-	  event.preventDefault();
-	});
-
-	toggleBtnEdit.addEventListener('click', () => {
-	  event.preventDefault();
-	  myDiv.classList.toggle('hidden');
-	  myDivAlt.classList.toggle('hidden');
-	  event.preventDefault();
-	});
-</script>
+ ->  Result< Option< i64 >, std::io::Error>

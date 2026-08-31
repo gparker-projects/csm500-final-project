@@ -17,20 +17,20 @@ impl MenuFormatter {
     ///
     /// Provide HTML for the main system menu; replaces tag: <!--MapleEMR::LegacyMenu-->
     /// 
-    pub fn get_legacy_menu(&self, patient_list: Vec<Patient>) -> String {
-       return self.get_legacy_menu_with_patient(patient_list, constants::INVALID_PATIENT_ID);
+    pub fn get_legacy_menu(&self, patient_list: Vec<Patient>, user_identity: String) -> String {
+       return self.get_legacy_menu_with_patient(patient_list, constants::INVALID_PATIENT_ID, user_identity.clone());
     }
 
     ///
     /// Provide HTML for the main system menu; replaces tag: <!--MapleEMR::LegacyMenu-->
     /// 
-    pub fn get_legacy_menu_with_patient(&self, patient_list: Vec<Patient>, patient_id: i64) -> String {
+    pub fn get_legacy_menu_with_patient(&self, patient_list: Vec<Patient>, patient_id: i64, user_identity: String) -> String {
         let mut results_sbuf = String::with_capacity(100); 
 
         let admit_menu_item = r##"<form action="/admitnew" method="post" id="admitFrm" name="admitFrm"><input type="hidden" id="patient_id" name="patient_id" value="-1"><input type="hidden" id="action_flag" name="action_flag" value="admit"></form>"##;
         let mut first_entry: bool = true;
 
-        results_sbuf.push_str("<div id=\"legacyMenu\" align=\"left\"><ul><li><a class=\"menuNotCurrent\" href=\"\\home\">My Dashboard</li>");
+        results_sbuf.push_str("<div id=\"legacyMenu\" align=\"left\"><ul><li><a class=\"menuNotCurrent\" href=\"\\home\">Current Patients</li>");
         for p in patient_list{
 
             // either we include ALL patients, OR we only include the current patient
@@ -54,8 +54,9 @@ impl MenuFormatter {
         results_sbuf.push_str("<li><a class=\"menuOther\" href=\"javascript:admit_patient()\">Admit New Patient</a></li>");
         results_sbuf.push_str("<li><p><p><p><p></li>");
         results_sbuf.push_str("<li><a class=\"menuOther\" href=\"\\\">Log Out</a></li>");
-        results_sbuf.push_str("<li class='userIdentity'><p>&nbsp;&nbsp;<div id=\"MapleEMR::UserIdentity\"></div></li>");
-        results_sbuf.push_str("</ul></div>");
+        results_sbuf.push_str("<li><p></p><div class='userIdentity'>&nbsp;&nbsp;");
+        results_sbuf.push_str(&user_identity);
+        results_sbuf.push_str("</div></li></ul></div>");
 
         return results_sbuf;
     }

@@ -58,7 +58,7 @@ impl AdmitRoute{
       let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
       let dao = PatientDAO::new( app_session.get_db_connection() ).await;
 
-      let results = dao.upsert_patient_from_admit_form(req_clone0, user_session_details.get_userid_as_i64()).await;
+      let results = dao.upsert_patient_from_admit_form(req_clone0, user_session_details.clone().get_userid_as_i64()).await;
       match results {
           Ok(p_id) => {
             tracing::debug!("  >(Step 1/2): Patient saved successfully, patient (id={p_id}) added/updated");
@@ -66,7 +66,7 @@ impl AdmitRoute{
             req_clone2.patient_id = p_id.to_string();
 
             // if patient was successful, we need the Encounter as well
-            let enc_results = dao.upsert_encounter_from_admit_form(req_clone2, user_session_details.get_userid_as_i64()).await;
+            let enc_results = dao.upsert_encounter_from_admit_form(req_clone2, user_session_details.clone().get_userid_as_i64()).await;
             match enc_results {
                 Ok(e_id) => {
                   tracing::debug!("  >(Step 2/2): Encounter saved successfully, patient (id={p_id}) and encounter (id={e_id}) added/updated");
@@ -176,6 +176,9 @@ impl AdmitRoute{
       tracing::debug!("-> Route Requested: /admit_discharge");
 
       let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+      let userid = user_session_details.clone().get_userid_as_i64();
+      let user_display_name = user_session_details.clone().user_display_name;
+
       let wcf = &app_session.get_web_content_factory();
 
       let patient_id: i64 = req.patient_id.parse().unwrap(); // get the patient id from the form that was passed in; includes for server-side validation errors
@@ -192,36 +195,36 @@ impl AdmitRoute{
           }
           else{
               tracing::debug!("   Patient exists: view existing Patient and Encounter");
-              dao.get_patient_details( user_session_details.get_userid_as_i64(), patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND ) 
+              dao.get_patient_details( userid.clone(), patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND ) 
           };
 
 
       // construct the legacy menu based on the user's patients and site
-      let legacy_menu_results = dao.get_patients_at_users_site_no_discharge(user_session_details.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+      let legacy_menu_results = dao.get_patients_at_users_site_no_discharge(userid.clone(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
       let legacy_menu = match legacy_menu_results {
           Some (patients_for_menu_lst) => {
-            {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id)
+            {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id, user_display_name.clone())
           }
           None => {
-              tracing::debug!("No patients found for legacy menu. [Userid:{}]", user_session_details.get_userid_as_i64());
+              tracing::debug!("No patients found for legacy menu. [Userid:{}]", userid.clone());
               constants::LEGACY_MENU_ON_ERROR.to_string() // when no patient, return default error-expected menu
           }
       };
 
       let cdao = CommonDAO::new( app_session.get_db_connection() ).await;
-      let location_results = cdao.get_locations_for_user(user_session_details.get_userid_as_i64()).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+      let location_results = cdao.get_locations_for_user(userid.clone()).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
       let location_menu = match location_results {
           Some (loc_list) => {
               CommonFormatter::get_location_dropdown(loc_list.clone(), constants::DEFAULT_LOCATION_REGISTRATION)
           }
           None => {
-              tracing::debug!("No locations found for user. [Userid:{}]", user_session_details.get_userid_as_i64());
+              tracing::debug!("No locations found for user. [Userid:{}]", userid.clone() );
               constants::LEGACY_MENU_ON_ERROR.to_string() // when no patient, return default error-expected menu
           }
       };
 
       // construct the tile based on session, patient data and the legacy menu
-      let content = wcf.get_admit_discharge_full_tile(user_session_details.user_display_name,
+      let content = wcf.get_admit_discharge_full_tile(user_display_name.clone(),
                                          existing_patient,
                                          legacy_menu,
                                          location_menu,

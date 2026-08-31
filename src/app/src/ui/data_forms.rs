@@ -212,6 +212,11 @@ impl InterventionDataForm {
         return result;
     }
 
+    pub fn get_intervention_type_as_i64(&self) -> i64{
+        let result: i64 = self.intervention_type_id.parse().unwrap();
+        return result;
+    }
+
     /*
     fn valid_date(value: &str) -> Result<(), ValidationError> {
         NaiveDateTime::parse_from_str(value, "%Y-%m-%d")
