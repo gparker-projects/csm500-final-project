@@ -4,7 +4,7 @@
 
 <div id="MapleEMR::PatientHeader"></div><p></p>
 
-<div align="center" >
+<div align="left" >
 <form action="/discharge" method="post" id="dischargeForm" onSubmit="event.preventDefault(); return submitDischargeForm()">
   <input type="submit" value="Discharge Patient">
   <input type="hidden" id="patient_id" name="patient_id" value="{patient_id}">
@@ -15,7 +15,7 @@
 <h1>Treatments, Procedures and Medication</h1>
 <div id="MapleEMR::CurrentInterventions"></div><p></p>
 
-<div align="center" >
+<div align="left" >
 <form action="/intvnew" method="post" id="addIntvForm" onSubmit="event.preventDefault(); return submitAddIntvForm()">
   <div align="left" >
       <input type="submit" value="Add/Request">

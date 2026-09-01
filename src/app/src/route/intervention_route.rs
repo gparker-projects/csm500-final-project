@@ -141,8 +141,8 @@ impl InterventionRoute{
         let cdao = CommonDAO::new( app_session.get_db_connection() ).await;
         
         let intv_type=  cdao.get_intervention_type( intervention_type_id ).await.unwrap();
-        let intv_details_type=  cdao.get_standard_measure_types().await.unwrap();
-
+        //let intv_details_type=  cdao.get_standard_measure_types().await.unwrap();
+        let intv_details_type=  cdao.get_common_references(intervention_type_id, true).await.unwrap();
       
         let status_dropdown_list=  cdao.get_intervention_statuses().await.unwrap();
         let location_results = cdao.get_locations_for_user(userid).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
