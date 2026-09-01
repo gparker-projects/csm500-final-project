@@ -55,4 +55,15 @@ impl FeaturePreference {
                ref_name
         }
     }
+
+    ///
+    /// Provides a unique composite key for the FeaturePreference within the set of FeaturePreference combinations possible.
+    /// This is the combination of the feature_id and reference_group_id, as a string. This is not globally unique, but rather
+    /// for use in comparing entries for logical equivalency, such as for sorting and with HashSets etc. 
+    /// 
+    /// Returns: a String representing the unique key for the feature preference.
+    /// 
+    pub fn get_unique_key(&self) -> String {
+        self.ref_group_id.to_string() + "." + &self.feature_id.to_string()
+    }
 }

@@ -190,13 +190,14 @@ pub const QRY_ALL_USERS_AND_DEPARTMENT_NAME: &str = r##"
 
 
 pub const QRY_GET_ALL_ACTIVE_FEATURE_PREFERENCE_FOR_USER: &str = r##"
-                                                SELECT fp.id, display_order, weight, calculation_date, department_id, feature_id,
-                                                       crf.group_id "ref_group_id", crf.name "ref_name"
-                                                FROM feature_preference fp
-                                                JOIN common_reference_type crf on fp.feature_id = crf.id
-                                                where fp.active_flag = 'Y' and crf.active_flag = 'Y'
-                                                  and users_id={users_id} 
-                                                order by weight, calculation_date
+                                                    SELECT fp.id, display_order, weight, calculation_date, department_id, feature_id,
+                                                        crf.group_id "ref_group_id", crf.name "ref_name"
+                                                    FROM feature_preference fp
+                                                    JOIN common_reference_type crf on fp.feature_id = crf.id
+                                                    where fp.active_flag = 'Y' and crf.active_flag = 'Y'
+                                                    and users_id={users_id} 
+                                                    and calculation_date >= now() - INTERVAL '{limit_days} days'
+                                                    order by calculation_date, weight desc limit {limit_rows}
                                                                      "##;
 
 // ------------------------------------------------------------------------------------------
