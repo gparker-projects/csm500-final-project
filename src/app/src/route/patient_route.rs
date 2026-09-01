@@ -14,6 +14,8 @@ use crate::constants;
 use crate::dao::feature_preference_dao::FeaturePreferenceDAO;
 use crate::dto::encounter::Encounter;
 use crate::dto::feature_preference::FeaturePreference;
+
+use crate::ui::feat_preference_fmt::FeaturePreferenceFormatter;
 use crate::dao::{common_dao::*, encounter_dao::*, intervention_dao::*, patient_dao::*};
 use crate::ui::{tile_factory::*, data_forms::*, menu_fmt::*, simple_fmt::*};
 use crate::session::{AppSession, UserSession};
@@ -102,7 +104,7 @@ impl PatientRoute{
                                                                          legacy_menu,
                                                                          intv_section,
                                                                          item_list.unwrap(), 
-                                                                         wcf.get_feature_preference_section(pref_list),
+                                                                         FeaturePreferenceFormatter::get_feature_preference_section(pref_list),
                                                                          patient_id.to_string(),
                                                                          cur_enc_id);
 

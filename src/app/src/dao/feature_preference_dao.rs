@@ -5,6 +5,7 @@
 //! REFERENCES
 //! 
 
+use actix_session::config;
 use chrono::NaiveDateTime;
 use std::collections::HashSet;
 use sqlx::postgres::{PgPool}; 
@@ -89,15 +90,15 @@ impl FeaturePreferenceDAO {
                             ref_name: tmp_ref_name
                     };
 
-                    tracing::warn!("..Evaluating Pref ID={}", &tmp_fp.get_unique_key());
+                    //tracing::warn!("..Evaluating Pref ID={}", &tmp_fp.get_unique_key());
 
                     if !lookup.contains( &tmp_fp.get_unique_key() ) {
-                        tracing::warn!("...Adding ID={}", &tmp_fp.get_unique_key());
+                        //tracing::debug!("...Adding ID={}", &tmp_fp.get_unique_key());
                         results.push( tmp_fp.clone() );
                         lookup.insert( tmp_fp.get_unique_key() );
                     }
                     else{
-                        tracing::warn!("..Not Adding ID={}", &tmp_fp.get_unique_key());
+                        tracing::debug!("..Not Adding ID={}", &tmp_fp.get_unique_key());
                     }
                 }
             }

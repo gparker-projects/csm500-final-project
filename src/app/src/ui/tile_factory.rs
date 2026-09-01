@@ -369,32 +369,5 @@ impl WebContentFactory {
         return home_tile_level_final.clone();
     }
 
-
-    ///
-    /// Generates an HTML tile based on a list of FeaturePreference objects.
-    /// 
-    pub fn get_feature_preference_section(&self, feature_pref_list: Option<Vec<FeaturePreference>>) -> String {
-        tracing::debug!("get_feature_preference_tile()");
-        let mut results_sbuf = String::with_capacity(500);
-
-        let results = match feature_pref_list{
-            Some(pref_list) => {
-                let single_pref_tile: &str = r##"<input type="submit"
-                                                  name="fast_action_btn_id_{fast_action_id}"
-                                                    id="fast_action_btn_id_{fast_action_id}"
-                                                  value="(+) {fast_action_name}"
-                                                  onclick="event.preventDefault(); return fastAction({fast_action_id});">
-                                                 "##;
-                for item in pref_list{
-                    let item_layout_0 = single_pref_tile; // start with base tile
-                    let item_layout_1 = item_layout_0.replace("{fast_action_id}", &item.feature_id.to_string()); 
-                    let item_layout_final = item_layout_1.replace("{fast_action_name}", &item.ref_name); 
-                    results_sbuf.push_str(&item_layout_final); 
-                }
-                results_sbuf
-            },
-            None => "".to_string(), // if no content, return nothing
-        };
-        results        
-    }
+ 
 }
