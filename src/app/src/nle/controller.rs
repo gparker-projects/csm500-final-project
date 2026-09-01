@@ -15,12 +15,6 @@ use crate::constants;
 use crate::dto::user_auth::*;
 use crate::nle::nle::*;
 
-
-// Commands that can be executed via the NL model
-/*pub const COMMAND_ADMIT_NEW_PATIENT: i64 = 1;
-pub const COMMAND_ADD_NEW_INTERVENTION: i64 = 2;
-pub const COMMAND_DISCHARGE_PATIENT: i64 = 3; */
-
 ///
 /// Provides logic and constraints around commands being executed by the NL model
 /// 
@@ -79,20 +73,6 @@ impl CommandController{
         results
     }
 
-/*
-    ///
-    /// Obtains basic classifier rankings, without limits or security concerns applied
-    /// 
-    pub async fn get_classifier_rankings(&mut self, prompt: String ) -> Vec< (String, f32)>{
-        tracing::debug!("get_classifier_rankings()");
-        let ops_add_prompt: Vec<String> = self.get_all_operations_and_add_prompt( prompt.clone() );
-
-        let classifer_results: Vec< (String, f32)> = self.nl_engine.get_classifier_rankings(ops_add_prompt ).await;
-
-        classifer_results 
-    }
-*/
-
     ///
     /// Constructs a list of strings ( Vec<String> ) from the previously loaded command mapping file, and adds the user's prompt as the first element
     /// This required by the NL model we are using ATM, for its comparison routine.
@@ -128,7 +108,7 @@ impl CommandController{
     ///  that matches the prompt_string.
     /// 
     pub fn get_permission_and_label_for_operation (&self, prompt_string: String) -> (i64, String) {
-        tracing::debug!("get_permission_for_operation(): Compare to prompt: '{}'", prompt_string);
+        tracing::debug!("get_permission_and_label_for_operation(): Compare to prompt: '{}'", prompt_string);
         let mut results: (i64, String) = (constants::INVALID_OTHER_ID, "".to_string());
         for item in self.full_command_hashset.clone().iter(){
            if item.0 == prompt_string{
@@ -148,12 +128,4 @@ impl CommandController{
             let file = File::open(filename)?;
             Ok(io::BufReader::new(file).lines())
     }
-
-
-
-    // get patients
-
-    // get_workflow
-      // does it contain a patient?
-      // does it match an operation?
 }

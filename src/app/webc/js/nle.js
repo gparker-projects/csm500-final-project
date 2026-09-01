@@ -12,19 +12,36 @@ function performNLAction(action_id){
         redirect_to_intv(13);
         break;
     case 3: // discharge patient
-        submitDischargeForm();
+        quickDischarge();
         break;
     default:
         // home screen or do nothing
     }
-    //const data = document.getElementById('intervention_id');
-    //data.value = intv_id;
-
-    //const frm = document.getElementById('addIntvForm');
-    //frm.action = "/intvlink";
-
-    //performNLSubAction(action_id);
     return true;
+}
+
+function quickDischarge(){   // highjack the nlCommand form; we're about to refresh the screen anyway
+    console.log("nle.js::quickDischarge()");
+    const cmd_frm = document.getElementById('nlpCommandForm');
+    const patient_id = document.createElement('input');
+    const action_flag = document.createElement('input');    
+
+    action_flag.id = "action_flag";
+    action_flag.name = "action_flag";
+    action_flag.type = "hidden";
+    action_flag.value = "discharge";
+    cmd_frm.appendChild(action_flag);
+    console.log("nle.js::quickDischarge(): action_id=" + action_flag.value);
+
+    patient_id.id = "patient_id";
+    patient_id.name = "patient_id";
+    patient_id.type = "hidden";
+    patient_id.value = "-1";
+    cmd_frm.appendChild(patient_id);
+    console.log("nle.js::quickDischarge(): patient_id=" + patient_id.value);
+
+    cmd_frm.action="/discharge";
+    cmd_frm.submit();
 }
 
 function performNLSubAction(action_id){

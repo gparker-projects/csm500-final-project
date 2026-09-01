@@ -1,5 +1,6 @@
 #mainContentArea {
   height: 900px;
+  overflow-x: auto;
   overflow-y: auto;
 }
 
@@ -101,22 +102,18 @@ textarea {
   resize: vertical;
   max-width: 100%;
   box-sizing: border-box;
-  width: 800px; /* Example parent width */
+  width: 350px;
 }
 
 #nlpCommandArea {
   border-radius: 12px;
   border: 2px solid #376BA4;
   padding: 6px;
-  /*width: 100%;
-  /height: 80px;*/
   position: absolute;
   background-color: white;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   cursor: move;
   z-index: 1000;
-  /*top: 50px;
-  left: 600px;*/
   bottom: 20px;
   right: 20px;
   width: 400px;

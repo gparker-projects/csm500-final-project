@@ -160,7 +160,7 @@ impl FeaturePreferenceDAO {
         //   However if it fails as well, we just carry on and do not interrupt the user with an error.
         //
         tracing::debug!("..UPDATE sql: {}", query);
-        println!("..UPDATE sql: {}", query);
+        //println!("..UPDATE sql: {}", query);  // tracing does not preserve formatting, making copy/paste useless
         let result = sqlx::query(&query)
                                                         .fetch_optional(&self.connection)
                                                         .await
@@ -176,7 +176,7 @@ impl FeaturePreferenceDAO {
                 let query = &query_level_1.replace("{feature_id}", &feature_id.to_string());
 
                 tracing::debug!("..INSERT sql: {}", query);
-                println!("..INSERT sql: {}", query);
+                //println!("..INSERT sql: {}", query); // tracing does not preserve formatting, making copy/paste useless
 
                 let inner_result = sqlx::query(&query)
                                                 .fetch_optional(&self.connection)
