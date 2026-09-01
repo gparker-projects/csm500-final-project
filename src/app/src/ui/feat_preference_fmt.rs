@@ -15,16 +15,17 @@
 //! -------------------------------------------------------------------
 use crate::constants;
 
-use crate::dto::intervention_detail::InterventionDetail;
-use crate::ui::common::CommonFormatter;
 use crate::dto::feature_preference::FeaturePreference;
 
 pub struct FeaturePreferenceFormatter{}
 
 impl FeaturePreferenceFormatter{
 
-       ///
+    ///
     /// Generates an HTML tile based on a list of FeaturePreference objects.
+    ///  Two cases are present: when the feature preference is at the Intervention Level and when it is at the 
+    ///  Intervention Details level (could be expanded). This is identified by the item's ref_group_id (from the
+    ///  database) matching "1", which is the group to which all Intervention types belong.
     /// 
     pub fn get_feature_preference_section(feature_pref_list: Option<Vec<FeaturePreference>>) -> String {
         tracing::debug!("get_feature_preference_tile()");
@@ -36,12 +37,26 @@ impl FeaturePreferenceFormatter{
                                                   name="fast_action_btn_id_{fast_action_id}"
                                                     id="fast_action_btn_id_{fast_action_id}"
                                                   value="(+) {fast_action_name}"
-                                                  onclick="event.preventDefault(); return fastAction({fast_action_id});">
+                                                  onclick="event.preventDefault(); return {javascript_action}({fast_action_id});">
                                                  "##;
+
                 for item in pref_list{
                     let item_layout_0 = single_pref_tile; // start with base tile
                     let item_layout_1 = item_layout_0.replace("{fast_action_id}", &item.feature_id.to_string()); 
-                    let item_layout_final = item_layout_1.replace("{fast_action_name}", &item.ref_name); 
+                    let item_layout_2 = item_layout_1.replace("{fast_action_name}", &item.ref_name);
+
+                    // when the item is referring to an Intervention level feature/action to execute, provide different text
+                    // these are different because this code is actually executing on completely *different tiles*
+                    let javascript_action = match item.ref_group_id {
+                        constants::COMMON_REF_TYPE_INTERVENTION_GROUP_ID => {
+                            "fast_action_add_intv" //  Interventions; on the InterventionTile.htl tile. This javascript function is in: patientListTile.js
+                        },
+                        _ => {
+                            "fast_action_add_measure" // for measures/Intervention Details; on the PatientListTile.htl tile. This javascript function is in: interventionTile.js
+                        }
+                    };
+                    let item_layout_final = item_layout_2.replace("{javascript_action}", &javascript_action);
+
                     results_sbuf.push_str(&item_layout_final); 
                 }
                 results_sbuf
@@ -49,45 +64,5 @@ impl FeaturePreferenceFormatter{
             None => "".to_string(), // if no content, return nothing
         };
         results        
-    }
-
-    ///
-    /// Provide HTML for a single-click button that will navigate to admit a patient
-    /// 
-    pub fn get_admit_button(patient_id: i64, _payload: String) -> String {
-        tracing::debug!(">get_discharge_button()");
-        let mut results_sbuf = String::with_capacity(500); 
-
-        results_sbuf
-    }
-
-    ///
-    /// Provide HTML for a single-click button that will navigate to discharge a patient
-    /// 
-    pub fn get_discharge_button(patient_id: i64, _payload: String) -> String {
-        tracing::debug!(">get_discharge_button()");
-        let mut results_sbuf = String::with_capacity(500); 
-
-        results_sbuf
-    }
-
-    ///
-    /// Provide HTML for a single-click button that will navigate to discharge a patient
-    /// 
-    pub fn get_add_intervention_button(patient_id: i64, encounter_id: i64, _payload: String) -> String {
-        tracing::debug!(">get_discharge_button()");
-        let mut results_sbuf = String::with_capacity(500); 
-
-        results_sbuf
-    }
-
-    ///
-    /// Provide HTML for a single-click button that will navigate to discharge a patient
-    /// 
-    pub fn get_add_measure_button(patient_id: i64, encounter_id: i64, intervention_id: i64, _payload: String) -> String {
-        tracing::debug!(">get_discharge_button()");
-        let mut results_sbuf = String::with_capacity(500); 
-
-        results_sbuf
     }
 }

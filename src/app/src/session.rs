@@ -35,7 +35,25 @@ pub struct SysConfig {
     pub command_mapping_file: String,
     pub language_model_file: String,
     pub tokenizer_file: String,
-    pub data_sub_dir: String 
+    pub data_sub_dir: String,
+    pub max_general_fastactions: String,
+    pub max_nle_fastactions: String,
+}
+
+impl SysConfig{
+    ///
+    /// Basic accessor that converts the max_general_fastactions to a usize (generic integer)
+    /// 
+    pub fn get_max_general_fastactions(&self) -> usize{
+        self.max_general_fastactions.parse().unwrap()
+    }
+
+    ///
+    /// Basic accessor that converts the max_nle_fastactions to a usize (generic integer)
+    /// 
+    pub fn get_max_nle_fastactions(&self) -> usize{
+        self.max_nle_fastactions.parse().unwrap()
+    }
 }
 
 ///

@@ -33,7 +33,7 @@ impl FeaturePreferenceDAO {
     ///
     /// Obtains all active features preferences for a user. Disregards department, only includes active. Disregards department, only includes active preferences and active common_reference_types.
     /// 
-    pub async fn get_active_feature_preferences_for_user(&self, user_id: i64, intervention_level_only: bool)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
+    pub async fn get_active_feature_preferences_for_user(&self, user_id: i64, upper_limit: usize, intervention_level_only: bool)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
         tracing::debug!("get_active_feature_preferences_for_user()");
         let query_level_0 = db_query::QRY_GET_ALL_ACTIVE_FEATURE_PREFERENCE_FOR_USER;
         let query_level_1 = query_level_0.replace("{users_id}", &user_id.to_string());
@@ -58,15 +58,27 @@ impl FeaturePreferenceDAO {
         else{
             let mut results: Vec<FeaturePreference> = Vec::with_capacity(rows.len());
             let mut lookup: HashSet<String> = HashSet::new();
+            let mut counter: usize = 0;
+
+            //if intervention_level_only {
+            //    println!("..Intervention Level only");
+            //}
+            //else{
+            //    println!("..Intervention Details Level");
+            //}
 
             for row in rows {
                 let tmp_feature_id: i64 = row.5;  //feature_id
                 let tmp_ref_group_id: i64 = i64::from(row.6); // ref_group_id
 
+                //println!("....tmp_ref_group_id={}", tmp_ref_group_id ); 
+
                 // only collect items that are a) an intervention, when only interventions are requested
                 //  or b) everything other than intervention-level, when no interventions are wanted
                 if (!intervention_level_only && tmp_ref_group_id != constants::COMMON_REF_TYPE_INTERVENTION_GROUP_ID) ||
                     (intervention_level_only && tmp_ref_group_id == constants::COMMON_REF_TYPE_INTERVENTION_GROUP_ID){
+
+                    //println!("....> Adding" ); 
                     let tmp_id: i64 = row.0; // id
                     let tmp_display_order: i64 = i64::from(row.1); //  display_order
                     let tmp_weight: i64 = i64::from(row.2);  //weight
@@ -79,23 +91,24 @@ impl FeaturePreferenceDAO {
                     let tmp_ref_name: String = row.7; // ref_name
 
                     let tmp_fp = FeaturePreference {
-                            id: tmp_id,
-                            display_order: tmp_display_order,
-                            weight: tmp_weight,
-                            calculation_date: tmp_calculation_date,
-                            department_id: tmp_department_id,
-                            users_id: user_id, // spelling in DTO matches DB
-                            feature_id: tmp_feature_id, 
-                            ref_group_id: tmp_ref_group_id,
-                            ref_name: tmp_ref_name
+                        id: tmp_id,
+                        display_order: tmp_display_order,
+                        weight: tmp_weight,
+                        calculation_date: tmp_calculation_date,
+                        department_id: tmp_department_id,
+                        users_id: user_id, // spelling in DTO matches DB
+                        feature_id: tmp_feature_id, 
+                        ref_group_id: tmp_ref_group_id,
+                        ref_name: tmp_ref_name
                     };
 
                     //tracing::warn!("..Evaluating Pref ID={}", &tmp_fp.get_unique_key());
 
-                    if !lookup.contains( &tmp_fp.get_unique_key() ) {
+                    if !lookup.contains( &tmp_fp.get_unique_key() ) && counter < upper_limit{
                         //tracing::debug!("...Adding ID={}", &tmp_fp.get_unique_key());
                         results.push( tmp_fp.clone() );
                         lookup.insert( tmp_fp.get_unique_key() );
+                        counter = counter + 1;
                     }
                     else{
                         tracing::debug!("..Not Adding ID={}", &tmp_fp.get_unique_key());
@@ -113,8 +126,8 @@ impl FeaturePreferenceDAO {
     /// Obtains all active features preferences for a user, that are at the intervention level only (common_reference_type.group_id=1).
     /// Disregards department, only includes active preferences and active common_reference_types.
     /// 
-    pub async fn get_active_feature_preferences_of_interventions_for_user(&self, user_id: i64)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
-        self.get_active_feature_preferences_for_user(user_id, true).await
+    pub async fn get_active_feature_preferences_of_interventions_for_user(&self, user_id: i64, upper_limit: usize)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
+        self.get_active_feature_preferences_for_user(user_id, upper_limit, true).await
     }
 
     ///
@@ -123,8 +136,8 @@ impl FeaturePreferenceDAO {
     /// Obtains all active features preferences for a user, that are not at the intervention level only (common_reference_type.group_id <> 1).
     /// Disregards department, only includes active preferences and active common_reference_types.
     /// 
-    pub async fn get_active_feature_preferences_of_intervention_details_for_user(&self, user_id: i64)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
-        self.get_active_feature_preferences_for_user(user_id, false).await
+    pub async fn get_active_feature_preferences_of_intervention_details_for_user(&self, user_id: i64, upper_limit: usize)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
+        self.get_active_feature_preferences_for_user(user_id, upper_limit, false).await
     }
 
     //https://users.rust-lang.org/t/calling-stored-procedures-setting-parameters-and-returning-parameters-on-postgresql/91508/4

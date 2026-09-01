@@ -20,3 +20,11 @@ function redirect_to_intv(intv_id){
     frm.onSubmit = "";
     frm.submit();
 }
+
+function fast_action_add_intv(type_id){
+    const frm_type = document.getElementById('intervention_type_id');
+    const frm = document.getElementById('addIntvForm');
+
+    frm_type.value = type_id;
+    frm.submit();
+}

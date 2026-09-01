@@ -18,7 +18,7 @@ use crate::dto::feature_preference::FeaturePreference;
 use crate::ui::feat_preference_fmt::FeaturePreferenceFormatter;
 use crate::dao::{common_dao::*, encounter_dao::*, intervention_dao::*, patient_dao::*};
 use crate::ui::{tile_factory::*, data_forms::*, menu_fmt::*, simple_fmt::*};
-use crate::session::{AppSession, UserSession};
+use crate::session::{AppSession, SysConfig, UserSession};
 
 pub struct PatientRoute{}
 
@@ -95,7 +95,8 @@ impl PatientRoute{
     
     // no user should be able to get into the system without a location assigned, so we will not worry about an exception here
     let item_list = {CommonDAO::new( app_session.get_db_connection() ).await}.get_intervention_types().await.unwrap();
-    let pref_list: Option<Vec<FeaturePreference>> = {FeaturePreferenceDAO::new( app_session.get_db_connection() ).await}.get_active_feature_preferences_of_interventions_for_user(userid.clone()).await.unwrap();
+    let fast_actions_upper_limit = app_session.clone().system_config.get_max_general_fastactions();
+    let pref_list: Option<Vec<FeaturePreference>> = {FeaturePreferenceDAO::new( app_session.get_db_connection() ).await}.get_active_feature_preferences_of_interventions_for_user(userid.clone(), fast_actions_upper_limit).await.unwrap();
 
     let consolidated_content = wcf.get_patient_details_full_tile(patient_header,
                                                                          cur_enc_section,

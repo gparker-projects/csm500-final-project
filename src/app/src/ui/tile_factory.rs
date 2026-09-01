@@ -269,7 +269,8 @@ impl WebContentFactory {
                                 "{patient_id}",
                                 "{form_errors}",
                                 "<div id=\"MapleEMR::InterventionDetailsList\">",
-                                constants::FEATURE_PREFERENCE_TILE_TAG];
+                                constants::FEATURE_PREFERENCE_TILE_TAG,
+                                "{hide_add_new_measure}"];
 
         let id: String; // this entire block is required in order to address partial moves that occur below when we copy over the String values
         let intervention_type: String;             // this must all occur before the copy and outside of the match block below
@@ -283,7 +284,7 @@ impl WebContentFactory {
         let tmp_encounter_id: String;
 
         let data_items = match current_intervention{
-            None =>{ // new patient (Admit) path
+            None =>{ // Create new Intervention path
                 tracing::debug!("  Create new Intervention");
                 dd_user = CommonFormatter::get_dropdown_user_with_department(user_dropdown_list,constants::NOT_SPECIFIED_ID); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
                 dd_intv_status =  CommonFormatter::get_dropdown_intervention_status(status_dropdown_list, constants::DEFAULT_INTERVENTION_STATUS_NEW); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
@@ -302,7 +303,8 @@ impl WebContentFactory {
                                                   patient_id.clone(),
                                                   String::new(), //"{form_errors}"];
                                                   String::new(),  //"<div id=\"MapleEMR::InterventionDetailsList\">"
-                                                  feature_pref_section
+                                                  String::new(), // feature_pref_section // if the intervention has not been saved, do not allow preference additions
+                                                  " class='hidden'".to_string()
                                                   ];
                 tmp_data_items
             } 
@@ -341,7 +343,8 @@ impl WebContentFactory {
                                                     patient_id.clone(),
                                                     "{form_errors}".to_string(),
                                                     intv_details_html,
-                                                    feature_pref_section
+                                                    feature_pref_section,
+                                                    String::new()
                                                 ];
                 tmp_data_items
             }
