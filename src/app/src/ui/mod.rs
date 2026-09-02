@@ -11,5 +11,6 @@ pub mod data_forms;
 pub mod feat_preference_fmt;
 pub mod intervention_fmt;
 pub mod menu_fmt;
+pub mod nle_command_fmt;
 pub mod simple_fmt;
 pub mod tile_factory;

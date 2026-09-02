@@ -9,7 +9,7 @@
 use actix_web::{web, HttpResponse, Responder};
 use actix_session::{Session}; 
 use std::path::Path;
-use std::collections::{HashSet};
+//use std::collections::{HashSet};
 use tracing;
 
 use crate::constants;
@@ -17,6 +17,13 @@ use crate::nle::controller::CommandController;
 use crate::ui::data_forms::*;
 use crate::session::{AppSession, UserSession};
 use crate::nle::nle::*;
+
+use crate::ui::nle_command_fmt::NLECommandFormatter;
+use crate::dao::patient_dao::*; //common_dao::*, encounter_dao::*, intervention_dao::*,
+
+const NO_PATIENT_FOUND: i8 = 0;
+const UNKNOWN_PATIENT_FOUND: i8 = 1;
+const KNOWN_PATIENT_FOUND: i8 = 2;
 
 pub struct NLERoute{}
 
@@ -48,17 +55,17 @@ impl NLERoute{
         tracing::info!("-> /nlprompt Requested;  natural_language_prompt();  prompt: \"{}\"", req.prompt);
 
         let mut results_sbuf = String::with_capacity(500); // Single heap allocation
-        
         let prompt = req.prompt.clone();
-       // let patient_id = req.patient_id.clone();
+        let userid = user_session.clone().get_userid_as_i64();
+        //let patient_id = req.patient_id.clone();
 
-       let base_model_dir = app_session.system_config.cargo_manifest_dir.clone();
-       let data_dir = app_session.system_config.data_sub_dir.clone();
-       let language_model_file = app_session.system_config.language_model_file.clone();
-       let tokenizer_file = app_session.system_config.tokenizer_file.clone();
-       let command_mapping_file = app_session.system_config.command_mapping_file.clone();
+        let base_model_dir = app_session.system_config.cargo_manifest_dir.clone();
+        let data_dir = app_session.system_config.data_sub_dir.clone();
+        let language_model_file = app_session.system_config.language_model_file.clone();
+        let tokenizer_file = app_session.system_config.tokenizer_file.clone();
+        let command_mapping_file = app_session.system_config.command_mapping_file.clone();
                 
-       let nle = NaturalLanguageEngine::new( &Path::new( &base_model_dir.clone() )
+        let nle = NaturalLanguageEngine::new( &Path::new( &base_model_dir.clone() )
                                                                         .join(data_dir.clone())
                                                                         .join(language_model_file).to_string_lossy(),
 
@@ -71,63 +78,48 @@ impl NLERoute{
         let mut cmd: CommandController = CommandController::new(&Path::new( &base_model_dir.clone() )
                                                             .join(data_dir.clone())
                                                             .join(command_mapping_file).to_string_lossy(), nle );
-       
 
-        let cur_session: Option<UserSession> = user_session.get(constants::USER_SESSION).unwrap();
+        let cur_session: UserSession = user_session.get(constants::USER_SESSION).unwrap().unwrap();
+        let pdao = PatientDAO::new( app_session.get_db_connection() ).await;
+        let referenced_patient = self.get_referenced_patient(pdao, userid, prompt.clone());
 
+       // if cur_session.user_authorizations.has_permission(p_id){
+       // }
 
         //let classifer_results: Vec< (String, f32)> = cmd.get_classifier_rankings( prompt.clone() ).await;
-        let classifer_results: Vec< (String, f32)> = cmd.get_classifier_rankings_filtered_for_permissions( prompt.clone(), cur_session.unwrap().user_authorizations ).await;
-        
+        let classifer_results: Vec< (String, f32)> = cmd.get_classifier_rankings_filtered_for_permissions( prompt.clone(), cur_session.user_authorizations ).await;
 
         //results_sbuf.push_str("<H1>natural language prompt</H1>\n");
-        results_sbuf.push_str( &NLERoute::get_nle_options_content(classifer_results, prompt, cmd) );
+        results_sbuf.push_str( &NLECommandFormatter::get_nle_options_content(classifer_results, prompt, cmd) );
         
         HttpResponse::Ok().body( results_sbuf )
     }
 
     ///
+    /// Checks if the user has access to any patients and if they were referenced in the prompt. If found, returns the basics of the record (Id, First and Last name).
     /// 
+    /// Note: Rule is that oly a single patient may be referenced in a prompt, or more specifically, only one will be recognized and returned.
     /// 
-    pub fn get_nle_options_content( items: Vec< (String, f32)>, prompt: String, cmd: CommandController) -> String{
-        let mut results_sbuf = String::with_capacity(500); 
-        let mut unique_ids: HashSet<i64> = HashSet::new();
-        let mut user_options: Vec<(String, f32, i64)> = Vec::new();
+    pub async fn get_referenced_patient(&self, pdao: PatientDAO, userid: i64, prompt: String) -> (i8, Option<Patient>){
+        let patients_list = pdao.get_patients_at_users_site_no_discharge(userid, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
+        let result_code: i8 = NO_PATIENT_FOUND;
+        let result: Option<Patient>;
 
-        results_sbuf.push_str( "<div id=\"MapleEMR::NLPCanvas\">" );
-        results_sbuf.push_str(&format!( "<!-- Prompt :\n {} -->", prompt )  );
-        
-        results_sbuf.push_str("<div class='data'>Here are some options, based on your prompt:<p>");
-        results_sbuf.push_str("<form action=\"/nlprompt\" method=\"post\" id=\"nlpActionCmdForm\" name=\"nlpActionCmdForm\" onSubmit=\"event.preventDefault(); return performNLAction(0)\" align=\"right\" class=\"nlpCommandAreaCls\">");
-
-        let option_limit = 3;
-
-        for item in items.into_iter(){
-            
-            let permission = cmd.get_permission_and_label_for_operation(item.clone().0);
-            //let permission_id = cmd.get_permission_for_operation(item.clone().0);
-            
-            // check if we already have the option captured, up to the upper limit
-            if (unique_ids.len() < option_limit) && !unique_ids.contains( &permission.0 ){
-                unique_ids.insert(permission.0);
-                user_options.push( (permission.1, item.1, permission.0) );
+        for p in patients_list {
+            if prompt.contains(p.legal_first_name) && prompt.contains(p.legal_last_name){
+                result_code = KNOWN_PATIENT_FOUND;
+                results = Ok(p);
+                break;
             }
         }
 
-        for item in user_options.into_iter(){
-            results_sbuf.push_str( "<input type='button' id='nlp_action_");
-            results_sbuf.push_str( &item.2.to_string() ); 
-            results_sbuf.push_str( "' name='nlp_action_" );
-            results_sbuf.push_str( &item.2.to_string() ); 
-            results_sbuf.push_str( "' value='" );
-            results_sbuf.push_str( &item.0);
-            //results_sbuf.push_str( &format!("{}: {:.1}% => id={}' \\><p>", item.0, item.1 * 100., permission_id) );
-
-            results_sbuf.push_str("' onclick=\"performNLAction(");
-            results_sbuf.push_str( &item.2.to_string() ); 
-            results_sbuf.push_str( "); return false;\" \\>" );
+        // if there was no known patient found, check if there is a new patient
+        if result_code == NO_PATIENT_FOUND {
+            //if prompt.contains("admit") // TODO: replace this with an NLE check for "Admission"
+            result_code = UNKNOWN_PATIENT_FOUND;
         }
-        results_sbuf.push_str("</div></div></form><p>");
-        results_sbuf
+
+        ( result_code, results )
     }
+
 }

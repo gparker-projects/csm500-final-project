@@ -52,7 +52,6 @@ impl CommandController{
             nl_engine: nle
         }
     }
-    
 
     ///
     /// Obtains classifier rankings, only inlcuding items that the user has a permission for
