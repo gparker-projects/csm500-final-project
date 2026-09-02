@@ -6,7 +6,7 @@
 ///
 use chrono::{Utc, NaiveDateTime};
 use rand::{RngExt, rng};
-use maple_emr::{constants, dto::{encounter::*, intervention::*, intervention_detail::*, patient::*, user::*}};
+use maple_emr::{constants, dto::{encounter::*, intervention::*, intervention_detail::*, patient::*, user::*, feature_preference::*, encounter::*}};
 use maple_emr::dto::user_auth::*;
 
 mod common;
@@ -250,4 +250,80 @@ use common::test_utils::*;
     assert!(result.has_permission_for_dept(1,2));    // should succeed
     assert!(!result.has_permission_for_dept(1,999)); // should fail
     assert!(!result.has_permission_for_dept(999,1)); // should fail
+  }
+
+
+  fn test_encounter_dto(){   
+    let current_time: NaiveDateTime = Utc::now().naive_utc();
+    let mut rng = rng();
+    let tmp_id: i64 = rng.random();
+
+    let tmp_admit_notes : String = DataGenerator::get_first_name(2000);
+    let tmp_admit_timestamp : NaiveDateTime = current_time;
+    let tmp_discharge_notes:  String = DataGenerator::get_first_name(2000);
+    let tmp_discharge_timestamp: NaiveDateTime = Utc::now().naive_utc();
+    let tmp_patient_id = rng.random();
+    let tmp_encounter_site_name = "TEST SITE NAME".to_owned();
+    let tmp_room_identifier = "R00-999".to_owned();
+    let tmp_is_current_encounter: String = "Y".to_owned();
+
+    let obj = Encounter{
+      id: tmp_id,
+      admit_notes: tmp_admit_notes.clone(),
+      admit_timestamp: tmp_admit_timestamp,
+      discharge_notes: tmp_discharge_notes.clone(),
+      discharge_timestamp: Some(tmp_discharge_timestamp),
+      patient_id: tmp_patient_id,
+      encounter_site_name: tmp_encounter_site_name.clone(),
+      room_identifier: tmp_room_identifier.clone(),
+      is_current_encounter: tmp_is_current_encounter.clone()
+    };
+
+    assert_eq!(obj.id, tmp_id); 
+    assert_eq!(obj.admit_notes, tmp_admit_notes); 
+    assert_eq!(obj.admit_timestamp, tmp_admit_timestamp); 
+    assert_eq!(obj.discharge_notes, tmp_discharge_notes); 
+    assert_eq!(obj.discharge_timestamp,  Some(tmp_discharge_timestamp)); 
+    assert_eq!(obj.patient_id, tmp_patient_id); 
+    assert_eq!(obj.encounter_site_name, tmp_encounter_site_name); 
+    assert_eq!(obj.room_identifier, tmp_room_identifier); 
+    assert_eq!(obj.is_current_encounter, tmp_is_current_encounter); 
+  }
+
+
+  fn test_feature_preference_dto(){
+    let current_time: NaiveDateTime = Utc::now().naive_utc();
+    let mut rng = rng();
+
+    let tmp_id: i64 = rng.random();
+    let tmp_display_order: i64 = 99999999;
+    let tmp_weight: i64 = 0;
+    let tmp_calculation_date: NaiveDateTime = Utc::now().naive_utc();
+    let tmp_users_id: i64 = rng.random();
+    let tmp_department_id: i64 = rng.random();
+    let tmp_feature_id: i64 = rng.random();
+    let tmp_ref_group_id: i64 = rng.random();
+    let tmp_ref_name: String = "REFERENCE NAME".to_string();
+
+    let obj = FeaturePreference {
+        id: tmp_id, 
+        display_order: tmp_display_order,
+        weight: tmp_weight,
+        calculation_date: tmp_calculation_date,
+        users_id: tmp_users_id,
+        department_id: tmp_department_id,
+        feature_id: tmp_feature_id,
+        ref_group_id: tmp_ref_group_id,
+        ref_name: tmp_ref_name.clone()
+    };
+
+    assert_eq!(obj.id, tmp_id); 
+    assert_eq!(obj.display_order, tmp_display_order); 
+    assert_eq!(obj.weight, tmp_weight); 
+    assert_eq!(obj.calculation_date, tmp_calculation_date); 
+    assert_eq!(obj.users_id, tmp_users_id); 
+    assert_eq!(obj.department_id, tmp_department_id); 
+    assert_eq!(obj.feature_id, tmp_feature_id); 
+    assert_eq!(obj.ref_group_id, tmp_ref_group_id); 
+    assert_eq!(obj.ref_name, tmp_ref_name); 
   }

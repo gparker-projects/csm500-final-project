@@ -89,6 +89,8 @@ async fn test_route_to_intervention_detail_save() {
         language_model_file: "all-MiniLM-L6-v2.onnx".to_string(),
         tokenizer_file: "tokenizer.json".to_string(),
         data_sub_dir: "data".to_string(),
+        max_general_fastactions: "5".to_string(),
+        max_nle_fastactions: "3".to_string(),
     };
 
     let app_session = AppSession {

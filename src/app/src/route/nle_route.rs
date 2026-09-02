@@ -8,9 +8,11 @@
 
 use actix_web::{web, HttpResponse, Responder};
 use actix_session::{Session}; 
-use std::path::Path;
+
+use rand::rand_core::UnwrapErr;
 //use std::collections::{HashSet};
 use tracing;
+use std::path::Path;
 
 use crate::constants;
 use crate::nle::controller::CommandController;
@@ -21,9 +23,6 @@ use crate::nle::nle::*;
 use crate::ui::nle_command_fmt::NLECommandFormatter;
 use crate::dao::patient_dao::*; //common_dao::*, encounter_dao::*, intervention_dao::*,
 
-const NO_PATIENT_FOUND: i8 = 0;
-const UNKNOWN_PATIENT_FOUND: i8 = 1;
-const KNOWN_PATIENT_FOUND: i8 = 2;
 
 pub struct NLERoute{}
 
@@ -49,14 +48,15 @@ impl NLERoute{
         HttpResponse::Ok().body( "SUCCESS" )
     }*/
 
-    /// accepts a natural language prompt and processes it using the built in engine
-    /// 
-    pub async fn natural_language_prompt(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<NLPromptFormData>) -> impl Responder {
+       pub async fn natural_language_prompt(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<NLPromptFormData>) -> impl Responder {
         tracing::info!("-> /nlprompt Requested;  natural_language_prompt();  prompt: \"{}\"", req.prompt);
 
         let mut results_sbuf = String::with_capacity(500); // Single heap allocation
         let prompt = req.prompt.clone();
-        let userid = user_session.clone().get_userid_as_i64();
+
+        let cur_session: Option<UserSession> = user_session.get(constants::USER_SESSION).unwrap();
+
+        let userid = cur_session.unwrap().clone().get_userid_as_i64();
         //let patient_id = req.patient_id.clone();
 
         let base_model_dir = app_session.system_config.cargo_manifest_dir.clone();
@@ -81,45 +81,21 @@ impl NLERoute{
 
         let cur_session: UserSession = user_session.get(constants::USER_SESSION).unwrap().unwrap();
         let pdao = PatientDAO::new( app_session.get_db_connection() ).await;
-        let referenced_patient = self.get_referenced_patient(pdao, userid, prompt.clone());
+        let referenced_patient = cmd.get_referenced_patient(pdao, userid, prompt.clone());
 
        // if cur_session.user_authorizations.has_permission(p_id){
        // }
 
         //let classifer_results: Vec< (String, f32)> = cmd.get_classifier_rankings( prompt.clone() ).await;
-        let classifer_results: Vec< (String, f32)> = cmd.get_classifier_rankings_filtered_for_permissions( prompt.clone(), cur_session.user_authorizations ).await;
+        //let classifer_results: Vec< (String, f32)> = cmd.get_classifier_rankings_filtered_for_permissions( prompt.clone(), cur_session.user_authorizations ).await;
 
         //results_sbuf.push_str("<H1>natural language prompt</H1>\n");
-        results_sbuf.push_str( &NLECommandFormatter::get_nle_options_content(classifer_results, prompt, cmd) );
+        //results_sbuf.push_str( &NLECommandFormatter::get_nle_options_content(classifer_results, prompt, cmd) );
         
         HttpResponse::Ok().body( results_sbuf )
     }
 
-    ///
-    /// Checks if the user has access to any patients and if they were referenced in the prompt. If found, returns the basics of the record (Id, First and Last name).
-    /// 
-    /// Note: Rule is that oly a single patient may be referenced in a prompt, or more specifically, only one will be recognized and returned.
-    /// 
-    pub async fn get_referenced_patient(&self, pdao: PatientDAO, userid: i64, prompt: String) -> (i8, Option<Patient>){
-        let patients_list = pdao.get_patients_at_users_site_no_discharge(userid, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
-        let result_code: i8 = NO_PATIENT_FOUND;
-        let result: Option<Patient>;
 
-        for p in patients_list {
-            if prompt.contains(p.legal_first_name) && prompt.contains(p.legal_last_name){
-                result_code = KNOWN_PATIENT_FOUND;
-                results = Ok(p);
-                break;
-            }
-        }
-
-        // if there was no known patient found, check if there is a new patient
-        if result_code == NO_PATIENT_FOUND {
-            //if prompt.contains("admit") // TODO: replace this with an NLE check for "Admission"
-            result_code = UNKNOWN_PATIENT_FOUND;
-        }
-
-        ( result_code, results )
-    }
+    
 
 }

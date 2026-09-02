@@ -18,6 +18,7 @@
 use actix_web::cookie::Key;
 use serde::Deserialize;
 use std::sync::Arc;
+use std::path::Path;
 use sqlx::postgres::{PgPool};
 
 use crate::ui::tile_factory::{WebContentFactory}; 
@@ -83,6 +84,24 @@ impl AppSession {
   pub fn get_db_connection(&self) -> PgPool{
       return self.connection.clone();
   }
+
+  pub fn get_full_path_language_model_file(&self) -> String {
+      Path::new( &self.system_config.cargo_manifest_dir.clone()  )
+                .join(self.system_config.data_sub_dir.clone())
+                 .join(self.system_config.language_model_file.clone()).to_string_lossy().to_string()
+  }
+
+  pub fn get_full_path_tokenizer_file(&self) -> String {
+      Path::new(&self.system_config.cargo_manifest_dir.clone()  )
+                .join(self.system_config.data_sub_dir.clone())
+                 .join(self.system_config.tokenizer_file.clone()).to_string_lossy() .to_string()
+  }
+
+  pub fn get_full_path_command_mapping_file(&self) -> String {
+      Path::new( &self.system_config.cargo_manifest_dir.clone()  )
+                .join(self.system_config.data_sub_dir.clone())
+                .join(self.system_config.command_mapping_file.clone()).to_string_lossy().to_string()
+  }  
 
   /*
   ///

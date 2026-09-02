@@ -26,7 +26,6 @@ use tokenizers::Tokenizer;
 //   https://github.com/pykeio/ort/blob/main/examples/sentence-transformers/semantic-similarity.rs
 //   S. Lyu and A. Rzeznik, Practical Rust Projects: Build Serverless, AI, Machine Learning, Embedded, Game, and Web Applications. Berkeley, CA: Apress, 2023. doi: DOI:%2010.1007/978-1-4842-9331-7.
 //  
-
 pub struct NaturalLanguageEngine {
     session: ort::session::Session,
     tokenizer: tokenizers::Tokenizer,
