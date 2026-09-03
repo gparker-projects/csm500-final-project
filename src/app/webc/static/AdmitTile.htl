@@ -3,7 +3,6 @@
 <HEAD>
   <TITLE>Maple EMR</TITLE>
   <link rel="stylesheet" href="/webc/css/login.css">
-  <link rel="stylesheet" href="/webc/css/home.css">
   <link rel="stylesheet" href="/webc/css/dataentryform.css">
   <script>
 

@@ -65,6 +65,7 @@ pub struct InterventionDataFormLink {
 pub struct AdmitFormBasic {
     pub patient_id: String,
     pub action_flag: String,
+    pub user_prompt: String,
 }
 
 #[derive(Default, serde::Deserialize, Validate, Clone)]
@@ -108,6 +109,8 @@ pub struct AdmitDataForm {
     #[validate(length(min = 1, max = 2000))]
     pub admit_notes: String,
     pub form_errors: String,
+
+    pub user_prompt: String,   
 }
 
 impl AdmitDataForm {

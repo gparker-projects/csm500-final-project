@@ -1,5 +1,8 @@
 function submitDischargeForm() {
     if ( window.confirm("Are you sure you want to discharge the patient?") ) {
+        //const action_flag = document.getElementById('action_flag');
+        //action_flag.value = "discharge";
+
         dischargeForm.submit();
         return true;
     }

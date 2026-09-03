@@ -1,6 +1,6 @@
-//! # nlp (Natural Language Processing)
+//! # nle (Natural Language Engine)
 //! 
-//! Structs and functions within the nlp module
+//! Structs and functions within the nle module
 //!
 //!    CSM500 Project (April - October 2026)
 //!      Graham Parker (Student ID: 240120522)

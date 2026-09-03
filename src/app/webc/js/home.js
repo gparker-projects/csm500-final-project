@@ -18,28 +18,28 @@ async function validateNLPrompt() {
   let isValid = true;
 
   if (userPrompt == '') {
-	errLabel.textContent = "Please enter a prompt.";
-	errLabel.style = "clinical-emergency-red"; //"color: red";
-	isValid = false;
+    errLabel.textContent = "Please enter a prompt.";
+    errLabel.style = "clinical-emergency-red"; //"color: red";
+    isValid = false;
   }
 
   if (!isValid) {
-	event.preventDefault();       // Stop the form from submitting if there are errors
+	  event.preventDefault();       // Stop the form from submitting if there are errors
   }
   else{
-	console.log("Submitting prompt: " + userPrompt);
+	  console.log("Submitting prompt: " + userPrompt);
 
-	var newBody = null;
-	try {
-	  var newBody = await getData(userPrompt);
-	  console.log("New body: " + newBody);
-	}
-	catch (error){
-	  console.log("Error occurred: " + error);
-	  newBody = "Error occurred: " + error;
-	}
+    var newBody = null;
+    try {
+      var newBody = await getData(userPrompt);
+      console.log("New body: " + newBody);
+    }
+    catch (error){
+      console.log("Error occurred: " + error);
+      newBody = "Error occurred: " + error;
+    }
 
-	document.getElementById("MapleEMR::NLPCanvas").innerHTML = (newBody);
+    document.getElementById("MapleEMR::NLPCanvas").innerHTML = (newBody);
   }
 
   // If isValid remains true, the browser automatically proceeds to submit!
@@ -81,7 +81,7 @@ function getData(userPrompt){
   return results;
 }
 
-async function redirect_to_patient(p_id){
+async function redirect_to_patient( p_id ){
     const data = document.getElementById('target_id');
     data.value = p_id;
 
@@ -89,12 +89,25 @@ async function redirect_to_patient(p_id){
     frm.submit();
 }
 
-async function admit_patient(){
-	console.log('admit_patient');
-
+// submit form to admit patient; assumes no prompt provided
+async function admit_patient(){ 
+	  console.log('admit_patient()');
     const frm = document.getElementById('admitFrm');
+
     frm.submit();
 }
+
+// submit form to admit patient, using prompt provided by the NLE prompt box
+async function admit_patient_with_prompt( prompt ){
+	  console.log('admit_patient_with_prompt()');
+    const frm = document.getElementById('admitFrm');
+
+    // copy from "prompt" of the NLE form, to the admit form's "user_prompt"
+    const user_prompt = document.getElementById('prompt');
+    user_prompt.value = prompt;
+    frm.submit();
+}
+
 
 async function logout(){
     const data = document.getElementById('target_id');

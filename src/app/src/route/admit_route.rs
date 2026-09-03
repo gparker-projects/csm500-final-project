@@ -107,8 +107,8 @@ impl AdmitRoute{
                                 location_id: req_clone.location_id,
                                 admit_notes: req_clone.admit_notes,
                                 action_flag: req_clone.action_flag,
-                                form_errors: "An error occurred, please try again".to_string()
-                              // ..Default::default() 
+                                form_errors: "An error occurred, please try again".to_string(),
+                                ..Default::default() 
                             }
                     )).await
                 }
@@ -131,8 +131,8 @@ impl AdmitRoute{
                         location_id: req_clone.location_id,
                         admit_notes: req_clone.admit_notes,
                         action_flag: req_clone.action_flag,
-                        form_errors: "An error occurred, please try again".to_string()
-                      // ..Default::default() 
+                        form_errors: "An error occurred, please try again".to_string(),
+                       ..Default::default() 
                     }
             )).await
           }
@@ -144,11 +144,13 @@ impl AdmitRoute{
   /// 
   pub async fn route_to_admit_new_no_patient(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitFormBasic>) -> impl Responder {
        tracing::debug!("-> Route Requested: /route_to_admit_new_no_patient");
+       tracing::debug!("..user_prompt:{}", req.user_prompt.clone());
 
         AdmitRoute::route_to_admit_discharge(app_session, user_session, web::Form(
             AdmitDataForm {
                 patient_id: req.patient_id.clone(),
                 action_flag: "admit".to_string(),
+                user_prompt: req.user_prompt.clone(),
                 ..Default::default()
             }
         )).await
@@ -158,12 +160,14 @@ impl AdmitRoute{
   /// Wrapper route for the menu option to admit a patient without having any web form to pass data in from
   /// 
   pub async fn route_to_discharge_patient(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitFormBasic>) -> impl Responder {
-       tracing::debug!("-> Route Requested: /route_to_discharge_patient");
+        tracing::debug!("-> Route Requested: /route_to_discharge_patient");
+        tracing::debug!("..user_prompt:{}", req.user_prompt.clone());
 
         AdmitRoute::route_to_admit_discharge(app_session, user_session, web::Form(
             AdmitDataForm {
                 patient_id: req.patient_id.clone(),
                 action_flag: "discharge".to_string(),
+                user_prompt: req.user_prompt.clone(),
                 ..Default::default()
             }
         )).await

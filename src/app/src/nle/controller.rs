@@ -168,7 +168,7 @@ impl CommandController{
                 break;
             }
         }
-        if(result_code == Self::NO_PATIENT_FOUND){
+        if result_code == Self::NO_PATIENT_FOUND{
             tracing::debug!("..no patients found in prompt.");
         }
 
