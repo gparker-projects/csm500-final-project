@@ -20,6 +20,7 @@ use ort::{
 	value::TensorRef
 };
 use tokenizers::Tokenizer;
+use std::cmp::Reverse;
 
 // Refs for ML code:
 //   https://ort.pyke.io/#load-your-model
@@ -89,8 +90,7 @@ impl NaturalLanguageEngine {
       for (embeddings, sentence) in embeddings.axis_iter(Axis(0)).zip(inputs.iter()).skip(1) {
           // Calculate cosine similarity against the 'query' sentence.
           let dot_product: f32 = query.iter().zip(embeddings.iter()).map(|(a, b)| a * b).sum();
-          println!("\t'{}': {:.1}%", sentence, dot_product * 100.);
-          tracing::info!("\t'{}': {:.1}%", sentence, dot_product * 100.);
+          //tracing::info!("\t'{}': {:.1}%", sentence, dot_product * 100.);
 
           // push each result comparison into our results
           results.push( (sentence.to_string(), dot_product)  );
@@ -98,6 +98,13 @@ impl NaturalLanguageEngine {
 
       // https://rust-lang-nursery.github.io/rust-cookbook/algorithms/sorting.html
       results.sort_unstable_by(|a, b| b.1.total_cmp(&a.1));
+
+      tracing::info!("..Sorted results:");
+      println!("..Sorted results:");
+      for item in results.clone(){
+          tracing::info!("{} {} ", item.0, item.1 * 100.);
+          println!("{} {} ", item.0, item.1 * 100.);
+      }
 
       results
     }

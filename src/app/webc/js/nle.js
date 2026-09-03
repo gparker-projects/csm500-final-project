@@ -4,7 +4,7 @@ function performNLAction( action_id, patient_id ){
     console.log("nle.js::performNLAction(): action_id=" + action_id + ", patient_id=" + patient_id);
 
     const nl_prompt = document.getElementById('prompt');
-    console.log("..v3 prompt=" + nl_prompt.value);
+    console.log("..v4 prompt=" + nl_prompt.value);
 
     switch ( action_id ) {
         case 1: // Admit New Patient
@@ -18,10 +18,8 @@ function performNLAction( action_id, patient_id ){
                 else{
                     redirect_to_patient( patient_id, "" ); // needs a patient_id
                 }
-                //redirect_to_intv( 13 );
             }
             else {
-                
                 const cmd_frm = document.getElementById('nlpCommandForm');
                 cmd_frm.action = "/home";
                 cmd_frm.submit();
@@ -30,15 +28,60 @@ function performNLAction( action_id, patient_id ){
         case 3: // discharge patient
             quickDischarge( patient_id, nl_prompt.value );
             break;
-        default:
-            // home screen or do nothing
+        default: // all other action_ids are actually intervention_type_id numbers
+            console.log("..action_id=" + action_id);
+            if( patient_id != -1 ){
+                if (nl_prompt) {
+                    redirect_to_patient_new_intv( patient_id, action_id, nl_prompt.value ); // needs a patient_id
+                }
+                else{
+                    redirect_to_patient_new_intv( patient_id, action_id, "" ); // needs a patient_id
+                }
+            }
+            else {
+                const cmd_frm = document.getElementById('nlpCommandForm');
+                cmd_frm.action = "/home";
+                cmd_frm.submit();
+            }
     }
     return true;
 }
 
- //const user_prompt = document.getElementById('prompt');
-   // user_prompt.value = prompt;
-//    frm.submit();
+async function redirect_to_patient_new_intv(  patient_id, action_id, nl_prompt ){
+    console.log("redirect_to_patient_new_intv v2()");
+    console.log("..patient_id=" + patient_id + " ..intv_type_id=" + action_id +" ..nl_prompt=" + nl_prompt);
+
+    const cmd_frm = document.getElementById('nlpCommandForm');
+    cmd_frm.action = "/intvnew";
+
+    const enc_id = document.createElement('input'); 
+    enc_id.id = "encounter_id"; // we won't have this normally, but it is still required by the route
+    enc_id.name = "encounter_id";
+    enc_id.type = "hidden";
+    enc_id.value = -1;
+    cmd_frm.appendChild(enc_id);
+
+    const tmp_intv_type_id = document.createElement('input');
+    tmp_intv_type_id.id = "intervention_type_id";
+    tmp_intv_type_id.name = "intervention_type_id";
+    tmp_intv_type_id.value = action_id;
+    cmd_frm.appendChild(tmp_intv_type_id);
+
+    const tmp_patient_id = document.createElement('input');
+    tmp_patient_id.id = "patient_id";
+    tmp_patient_id.name = "patient_id";
+    tmp_patient_id.value = patient_id;
+    cmd_frm.appendChild(tmp_patient_id);
+
+    const tmp_user_prompt = document.createElement('input');
+    tmp_user_prompt.id = "user_prompt";
+    tmp_user_prompt.name = "user_prompt";
+    tmp_user_prompt.value = nl_prompt;
+    cmd_frm.appendChild(tmp_user_prompt);
+    console.log("..submitting");
+
+    cmd_frm.submit();
+}
 
 function quickDischarge( actual_patient_id, prompt ){   // highjack the nlCommand form; we're about to refresh the screen anyway
     console.log("nle.js::quickDischarge()");

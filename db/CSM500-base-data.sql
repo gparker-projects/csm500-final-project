@@ -296,10 +296,28 @@ INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
      OVERRIDING SYSTEM VALUE
- VALUES (100045, 1, 'Y', 'Immunizations', 'Immunizations');
+ VALUES (100044, 1, 'Y', 'Immunizations', 'Immunizations');
  
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
      OVERRIDING SYSTEM VALUE
- VALUES (100046, 1, 'Y', 'Documents', 'Documents');
- 
+ VALUES (100045, 1, 'Y', 'Documents', 'Documents');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+      OVERRIDING SYSTEM VALUE
+ VALUES (100047, 1, 'Y', 'Mental Health and Wellness', 'Mental Health and Wellness');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+      OVERRIDING SYSTEM VALUE
+ VALUES (100048, 1, 'Y', 'Physiotherapy', 'Physiotherapy');
+COMMIT;
+
+-- quick addition of new permissions that directly align to interventions being requested for creation
+-- via the NLE
+--
+INSERT INTO PERMISSION (ID, NAME, EXPIRY_DATETIME)
+OVERRIDING SYSTEM VALUE
+SELECT ID, NAME, (TIMESTAMP '2100-12-31')
+FROM PUBLIC.COMMON_REFERENCE_TYPE
+WHERE GROUP_ID = 1;
+
 COMMIT;

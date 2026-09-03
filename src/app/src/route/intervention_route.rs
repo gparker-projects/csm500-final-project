@@ -16,7 +16,7 @@ use crate::constants;
 use crate::dto::intervention::Intervention;
 use crate::dto::feature_preference::FeaturePreference;
 use crate::dao::feature_preference_dao::FeaturePreferenceDAO;
-use crate::dao::{patient_dao::*, intervention_dao::*, common_dao::*, auth_dao::*}; 
+use crate::dao::{patient_dao::*, intervention_dao::*, common_dao::*, auth_dao::*, encounter_dao::*}; 
 use crate::session::{AppSession, UserSession};
 use crate::ui::{data_forms::*, menu_fmt::*};
 use crate::ui::common::CommonFormatter;
@@ -63,13 +63,25 @@ impl InterventionRoute{
     /// 
     pub async fn route_to_add_new_intervention(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<InterventionDataFormBasic>)  -> impl Responder {
         tracing::debug!("-> Route Requested: /intvnew  route_to_add_new_intervention()");
+        let mut tmp_encounter_id = req.encounter_id.clone();
+        let tmp_patient_id = req.patient_id.clone();
+
+        // if there was no encounter provided, we can find the current one, based on the userid
+        if tmp_encounter_id == constants::INVALID_OTHER_ID.to_string() {
+            let edao = EncounterDAO::new( app_session.get_db_connection() ).await;
+            tmp_encounter_id = edao.get_current_encounter( req.get_patient_id_as_i64() ).await.to_string();
+            tracing::debug!("..encounter_id not provided. Found: id={}", tmp_encounter_id);
+        }
+        else{
+            tmp_encounter_id = req.encounter_id.clone();
+        }
 
         InterventionRoute::route_to_view_or_modify_intervention(app_session, user_session,web::Form(
             InterventionDataForm {
                 intervention_id: constants::INVALID_OTHER_ID.to_string(),
                 intervention_type_id: req.0.intervention_type_id.clone(),
-                encounter_id: req.0.encounter_id.clone(),
-                patient_id: req.0.patient_id.clone(),
+                encounter_id: tmp_encounter_id,
+                patient_id: tmp_patient_id,
                 ..Default::default()
             }
         )).await
@@ -90,6 +102,7 @@ impl InterventionRoute{
                 }
             )).await
     }
+
 
     ///
     /// Route for adding a new Intervention for a Patient-Encounter

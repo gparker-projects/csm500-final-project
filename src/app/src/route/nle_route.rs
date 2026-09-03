@@ -80,6 +80,9 @@ impl NLERoute{
             _ => prompt.clone(),
         };
 
+       // tracing::debug!("..obtain label, permission for: {} @ {}", item.0, item.1);
+      //      println!("..obtain label, permission for: {} @ {}", item.0, item.1);
+
         let classifer_results_final: Vec< (String, f32)> = cmd.get_classifier_rankings_filtered_for_permissions( prompt_final, cur_session.clone().user_authorizations ).await;
         //let classifer_results_final: Vec< (String, f32)> = cmd.filter_if_patient_identified( pdao, userid, prompt.clone(), classifer_results_level_1);
 

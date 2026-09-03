@@ -45,13 +45,15 @@ impl CommandController{
         // read in the command mapping config .CSV
         if let Ok(lines) = CommandController::read_lines( mapping_file_path ) {
             for line in lines.map_while(Result::ok) {
-                let parts: Vec<&str> = line.split(',').collect();
+                if !line.starts_with("#") { //ignore comment lines, identified as starting with #
+                    let parts: Vec<&str> = line.split(',').collect();
 
-                // convert to an i64, matching all other system data structures
-                // be sure to trim() first, otherwise the parse fails!
-                let tmp_index: i64 = parts[1].trim().parse::<i64>().unwrap_or(constants::INVALID_OTHER_ID); 
-                tmp_command_hashset.push( ( parts[0].to_string(), tmp_index ) ); // phrase, id
-                tmp_full_command_hashset.push( ( parts[0].to_string(), parts[2].to_string(), tmp_index ) ); // phrase, user control label, id
+                    // convert to an i64, matching all other system data structures
+                    // be sure to trim() first, otherwise the parse fails!
+                    let tmp_index: i64 = parts[1].trim().parse::<i64>().unwrap_or(constants::INVALID_OTHER_ID); 
+                    tmp_command_hashset.push( ( parts[0].to_string(), tmp_index ) ); // phrase, id
+                    tmp_full_command_hashset.push( ( parts[0].to_string(), parts[2].to_string(), tmp_index ) ); // phrase, user control label, id
+                }
             }
         }
 
@@ -85,8 +87,18 @@ impl CommandController{
         for c_result in classifer_results{
             let pid: i64 = self.get_permission_for_operation (c_result.clone().0);
             if user_auths.has_permission(pid){
+                tracing::debug!("..(+) adding permission ({}) for: {}", pid, c_result.clone().0);
+                //println!("..(+) adding permission ({}) for: {}", pid, c_result.clone().0);
                 results.push( c_result );
             }
+            else{
+                tracing::debug!("..(x) no permission found for: {}, excluding", c_result.clone().0);
+                //println!("..(x) no permission found for: {}, excluding", c_result.clone().0);
+            }
+        }
+
+        for item in results.clone(){
+            println!("..(+) added permission for '{}' ('{:.1}%')", item.1 *100., item.0);
         }
         results
     }

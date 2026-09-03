@@ -3,9 +3,92 @@ admit add new open patient, 1, Admit New Patient
 add patient, 1, Admit New Patient
 new open patient, 1, Admit New Patient
 create patient, 1, Admit New Patient
-add information, 2, Add to Patient Chart
-add medication, 2, Add Medication
-prescribe medication, 2, Add Medication
-move patient, 2, Transfer Patient
-update contact information, 2, Update Patient Information
 discharge patient, 3, Discharge Patient
+send patient home, 3, Discharge Patient
+release patient, 3, Discharge Patient
+close patient, 3, Discharge Patient
+get patient out of here, 3, Discharge Patient
+dismiss patient, 3, Discharge Patient
+add information, 2, Add to Patient Chart
+update contact information, 2, Update Patient Information
+apply a bandage, 100001, Bandage
+fix a wound, 100001, Bandage
+wound care, 100001, Bandage
+has a cut, 100001, Bandage
+has cuts, 100001, Bandage
+needs a bandaid, 100001, Bandage
+has a laceration, 100001, Bandage
+has an abrasion, 100001, Bandage
+is bleeding, 100001, Bandage
+area is swollen, 100001, Bandage
+has swelling, 100001, Bandage
+fell and has scraped, 100001, Bandage
+requires basic first aid, 100001, Bandage
+has a bite, 100001, Bandage
+was stabbed, 100001, Bandage
+blood work, 100002, Specimen/Bloodwork
+urine collect, 100002, Specimen/Bloodwork
+feeling faint, 100002, Specimen/Bloodwork
+has a headache, 100003, CT Scan
+major headache, 100003, CT Scan
+head impact, 100003, CT Scan
+hit head, 100003, CT Scan
+head injury, 100003, CT Scan
+stomach pain, 100004, Magnetic Resonance Imaging (MRI)
+liver pain, 100004, Magnetic Resonance Imaging (MRI)
+kidney pain, 100004, Magnetic Resonance Imaging (MRI)
+brain swelling, 100004, Magnetic Resonance Imaging (MRI)
+add medication, 100005, Administer Medication
+prescribe medication, 100005, Administer Medication
+move patient, 100006, Transfer Patient
+transfer patient, 100006, Transfer Patient
+send patient to another department, 100006, Transfer Patient
+send patient elsewhere, 100006, Transfer Patient
+put patient somewhere, 100006, Transfer Patient
+doctor referral, 100007, Physician Referral
+doctor consult, 100007, Physician Referral
+needs to see a physician, 100007, Physician Referral
+needs a specialist, 100007, Physician Referral
+heart surgery, 100008, Add Heart Surgery
+needs a stitch, 100009, General Suture
+blood transfusion, 100010, Blood Transfusion
+xray, 100011, Order X-Ray
+broken bone, 100011, Order X-Ray
+broken arm, 100011, Order X-Ray
+broken leg, 100011, Order X-Ray
+broken hand, 100011, Order X-Ray
+broken foot, 100011, Order X-Ray
+add information, 100012, Add to Patient Chart
+update information, 100012, Add to Patient Chart
+general update, 100012, Add to Patient Chart
+update, 100012, Add to Patient Chart
+add vitals, 100038, Collect Vitals
+update vitals, 100038, Collect Vitals
+baseline patient, 100038, Collect Vitals
+add warning, 100040, Alerts/CCI/SPI
+add alert, 100040, Alerts/CCI/SPI
+danger, 100040, Alerts/CCI/SPI
+schedule an appointment, 100041, Add Appointment
+add an appointment, 100041, Add Appointment
+add appointment, 100041, Add Appointment
+new appointment, 100041, Add Appointment
+perform a diagnosis, 100042, Record Diagnoses
+add diagnosis, 100042, Record Diagnoses
+describe diagnosis, 100042, Diagnoses
+has an allergy, 100043, Record Allergies
+is allergic to, 100043, Record Allergies
+needs an immunization, 100044, Add Immunization
+has an immunization, 100044, Add Immunization
+has a vaccination, 100044, Add Immunization
+needs a vaccination, 100044, Add Immunization
+needs a vaccine, 100044, Add Immunization
+#, 100045, Document
+danger to self, 100047, Mental Health/Wellness
+having delusions, 100047, Mental Health/Wellness
+sad, 100047, Mental Health/Wellness
+angry, 100047, Mental Health/Wellness
+mood swings, 100047, Mental Health/Wellness
+depressed, 100047, Mental Health/Wellness
+depression, 100047, Mental Health/Wellness
+can't sleep, 100047, Mental Health/Wellness
+#, 100048, Physiotherapy

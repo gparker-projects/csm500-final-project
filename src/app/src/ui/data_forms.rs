@@ -54,6 +54,13 @@ pub struct InterventionDataFormBasic {
     pub patient_id: String,
 }
 
+impl InterventionDataFormBasic {
+    pub fn get_patient_id_as_i64(&self) -> i64{
+        let result: i64 = self.patient_id.parse().unwrap();
+        return result;
+    }    
+}
+
 #[derive(serde::Deserialize)]
 pub struct InterventionDataFormLink {
     pub intervention_id: String,

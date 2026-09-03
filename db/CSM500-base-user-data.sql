@@ -141,3 +141,11 @@ INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permi
 INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 8, 4, 1, 12, 1);
 
 COMMIT;
+
+-- give Carol all the Intervention permissions
+insert into user_permission (active_flag, users_id, department_id, role_id, permission_id, site_id) 
+select 'Y', 2, 4, 3, id, 1 from permission where id > 100001;
+
+-- give Lisa all the Intervention permissions
+insert into user_permission (active_flag, users_id, department_id, role_id, permission_id, site_id) 
+select 'Y', 5, 4, 3, id, 1 from permission where id > 100001;
