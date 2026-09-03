@@ -32,6 +32,9 @@ impl EncounterDAO {
     /// Wrapper method that only requests the current encounter for the patient instead of all of them. This is to improve code clarity.
     /// 
     pub async fn get_current_encounter(&self, patient_id: i64) -> Encounter {
+        if patient_id == constants::INVALID_PATIENT_ID {
+            tracing::error!("EncounterDao::get_encounters(): Invalid Patient Id = -1 provided");
+        }
         let tmp : Vec<Encounter> = self.get_encounters(patient_id, true).await.unwrap().expect(constants::DATABASE_ERROR_NOT_FOUND);
 
         return tmp.first().unwrap().clone();
@@ -40,6 +43,7 @@ impl EncounterDAO {
     /// Finds and returns all encounters based on an encounter
     /// 
     pub async fn get_encounters(&self, patient_id: i64, current_only: bool) -> Result< Option< Vec<Encounter> >, std::io::Error> {
+        tracing::info!("EncounterDao::get_encounters({}, {})", patient_id, current_only);
         let tmp = match current_only {
             true => db_query::QRY_CURRENT_ENCOUNTER,
             false => db_query::QRY_ALL_ENCOUNTERS

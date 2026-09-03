@@ -37,3 +37,39 @@
         
         HttpResponse::Ok().body( results_sbuf )
     }
+
+
+------------------
+
+
+    
+    ///
+    /// # CommandController::filter_if_patient_identified()
+    /// 
+    ///  Given existing classifier results (and other params), checks if the prompt included a reference to a current patient. If it did, the results
+    ///   remain unchanged. If they did not, the results are further reduced to only those that target a specifically named patient.
+    /// 
+    /// ## Parameters:
+    /// 
+    /// * prompt (String): the user provided prompt
+    /// * pdao (PatientDAO): instantited PatientDAO object for querying the database
+    /// * userid (i64): the id (key) of the current user
+    /// * classifier_results (Vec< (String, f32)>): prior classification results
+    /// 
+    /// ## Returns: Vec<(String, f32)>, an amended vector of classifier rankings
+    /// 
+    /// * String: Sentence that was evaluated
+    /// * f32: Resulting percentage of success of the comparison against the prompt
+    /// 
+    pub async fn filter_if_patient_identified(pdao: PatientDAO, userid: i64, prompt: String, classifier_results: Vec< (String, f32)>) -> Vec< (String, f32)>
+    {
+        let referenced_patient = CommandController::get_referenced_patient(pdao, userid, prompt.clone()).await;
+
+        let results: Vec< (String, f32)> = match referenced_patient.0 {
+            Self::NO_PATIENT_FOUND => classifier_results, // just return the list unmodified
+            _ => { // otherwise reduce the list of results.
+
+            },
+
+        }
+    }

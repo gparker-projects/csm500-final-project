@@ -24,7 +24,7 @@ impl NLECommandFormatter {
     ///
     /// 
     /// 
-    pub fn get_nle_options_content( items: Vec< (String, f32)>, prompt: String, cmd: CommandController) -> String{
+    pub fn get_nle_options_content( items: Vec< (String, f32)>, prompt: String, cmd: CommandController, patient_id: i64) -> String{
         let mut results_sbuf = String::with_capacity(500); 
         let mut unique_ids: HashSet<i64> = HashSet::new();
         let mut user_options: Vec<(String, f32, i64)> = Vec::new();
@@ -60,6 +60,8 @@ impl NLECommandFormatter {
 
             results_sbuf.push_str("' onclick=\"performNLAction(");
             results_sbuf.push_str( &item.2.to_string() ); 
+            results_sbuf.push_str( ","); 
+            results_sbuf.push_str( &patient_id.to_string() ); 
             results_sbuf.push_str( "); return false;\" \\>" );
         }
         results_sbuf.push_str("</div></div></form><p>");

@@ -17,10 +17,11 @@ use crate::nle::nle::*;
 
 use crate::dao::patient_dao::*;
 use crate::dto::patient::*;
-///
-/// Provides logic and constraints around commands being executed by the NL model
-/// 
 
+///
+/// # CommandController
+/// ### Provides logic and constraints around commands being executed by the NL model
+/// 
 pub struct CommandController{
     command_hashset: Vec<(String, i64)>, 
     full_command_hashset: Vec<(String, String, i64)>,
@@ -29,9 +30,9 @@ pub struct CommandController{
 
 impl CommandController{
 
-    const NO_PATIENT_FOUND: i8 = 0;
-    const UNKNOWN_PATIENT_FOUND: i8 = 1;
-    const KNOWN_PATIENT_FOUND: i8 = 2;
+    pub const NO_PATIENT_FOUND: i8 = 0;
+    pub const UNKNOWN_PATIENT_FOUND: i8 = 1;
+    pub const KNOWN_PATIENT_FOUND: i8 = 2;
 
     ///
     /// Public constructor for the CommandController
@@ -62,7 +63,17 @@ impl CommandController{
     }
 
     ///
-    /// Obtains classifier rankings, only inlcuding items that the user has a permission for
+    /// # Obtains classifier rankings, only including items that the user has a permission for
+    /// 
+    /// ## Parameters:
+    /// 
+    /// * prompt (String): the user provided prompt
+    /// * user_auths (UserAuthorization): user authorization wrapper of permissions the user is allowed to execute
+    /// 
+    /// ## Returns: Vec<(String, f32)>, which is a list of classifier rankings
+    /// 
+    /// * String: Sentence that was evaluated
+    /// * f32: Resulting percentage of success of the comparison against the prompt
     /// 
     pub async fn get_classifier_rankings_filtered_for_permissions(&mut self, prompt: String, user_auths: UserAuthorization ) -> Vec<(String, f32)>{
         tracing::debug!("get_classifier_rankings_filtered_for_permissions()");
@@ -136,23 +147,29 @@ impl CommandController{
             Ok(io::BufReader::new(file).lines())
     }
 
-
     ///
     /// Checks if the user has access to any patients and if they were referenced in the prompt. If found, returns the basics of the record (Id, First and Last name).
     /// 
     /// Note: Rule is that oly a single patient may be referenced in a prompt, or more specifically, only one will be recognized and returned.
     /// 
-    pub async fn get_referenced_patient(&self, pdao: PatientDAO, userid: i64, prompt: String) -> (i8, Option<Patient>){
+    pub async fn get_referenced_patient(pdao: PatientDAO, userid: i64, prompt: String) -> (i8, Option<Patient>){
+        tracing::debug!("get_referenced_patient():prompt='{}'", prompt.clone());
         let patients_list = pdao.get_patients_at_users_site_no_discharge(userid, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
         let mut result_code: i8 = Self::NO_PATIENT_FOUND;
         let mut result: Option<Patient> = None;
+        let tmp_prompt = prompt.to_lowercase();
 
         for p in patients_list {
-            if prompt.contains(&p.legal_first_name) && prompt.contains(&p.legal_last_name){
+            tracing::debug!("..checking for: {}, {}", &p.legal_last_name, &p.legal_first_name);
+            if tmp_prompt.contains(&p.legal_first_name.to_lowercase()) || tmp_prompt.contains(&p.legal_last_name.to_lowercase()){
+                tracing::debug!("...> matched patient: {}, {}", &p.legal_last_name, &p.legal_first_name);
                 result_code = Self::KNOWN_PATIENT_FOUND;
                 result = Some(p);
                 break;
             }
+        }
+        if(result_code == Self::NO_PATIENT_FOUND){
+            tracing::debug!("..no patients found in prompt.");
         }
 
         // if there was no known patient found, check if there is a new patient
