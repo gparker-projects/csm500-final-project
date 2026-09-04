@@ -91,15 +91,17 @@ impl CommandController{
                 //println!("..(+) adding permission ({}) for: {}", pid, c_result.clone().0);
                 results.push( c_result );
             }
-            else{
-                tracing::debug!("..(x) no permission found for: {}, excluding", c_result.clone().0);
+            //else{
+            //    tracing::debug!("..(x) no permission found for: {}, excluding", c_result.clone().0);
                 //println!("..(x) no permission found for: {}, excluding", c_result.clone().0);
-            }
+            //}
         }
 
         for item in results.clone(){
-            println!("..(+) added permission for '{}' ('{:.1}%')", item.1 *100., item.0);
+            tracing::info!("..(+) added permission for '{}' ('{:.1}%')", item.0, item.1 *100.);
+            println!("..(+) added permission for '{}' ('{:.1}%')", item.0, item.1 *100.);
         }
+
         results
     }
 

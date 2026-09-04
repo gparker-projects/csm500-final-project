@@ -198,6 +198,7 @@ pub const QRY_GET_ALL_ACTIVE_FEATURE_PREFERENCE_FOR_USER: &str = r##"
                                                     JOIN common_reference_type crf on fp.feature_id = crf.id
                                                     where fp.active_flag = 'Y' and crf.active_flag = 'Y'
                                                     and users_id={users_id} 
+                                                    and crf.group_id = {group_id}
                                                     and calculation_date >= now() - INTERVAL '{limit_days} days'
                                                     order by calculation_date, weight desc 
                                                                      "##; 

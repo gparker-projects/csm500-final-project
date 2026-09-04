@@ -28,28 +28,6 @@ use crate::dto::patient::*;
 pub struct NLERoute{}
 
 impl NLERoute{
-
-
-    /* Reference Command mapping
-        admit patient, 1, Admit New Patient
-        admit add new open patient, 1, Admit New Patient
-        add patient, 1, Admit New Patient
-        new open patient, 1, Admit New Patient
-        create patient, 1, Admit New Patient
-        add information, 2, Add to Patient Chart
-        add medication, 2, Add Medication
-        prescribe medication, 2, Add Medication
-        move patient, 2, Transfer Patient
-        update contact information, 2, Update Patient Information
-        discharge patient, 3, Discharge Patient
-    */
-
-   /*   pub async fn natural_language_prompt_test2(&self, _app_session: web::Data<AppSession>, _user_session: Session, req: web::Form<NLPromptFormData>) -> impl Responder {
-        println!("-> /nlprompt Requested;  natural_language_prompt_test2();  prompt: \"{}\"", req.prompt);
-
-        HttpResponse::Ok().body( "SUCCESS" )
-    }*/
-
        pub async fn natural_language_prompt(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<NLPromptFormData>) -> impl Responder {
         tracing::info!("-> /nlprompt Requested;  natural_language_prompt();  prompt: \"{}\"", req.prompt);
 
@@ -80,12 +58,7 @@ impl NLERoute{
             _ => prompt.clone(),
         };
 
-       // tracing::debug!("..obtain label, permission for: {} @ {}", item.0, item.1);
-      //      println!("..obtain label, permission for: {} @ {}", item.0, item.1);
-
         let classifer_results_final: Vec< (String, f32)> = cmd.get_classifier_rankings_filtered_for_permissions( prompt_final, cur_session.clone().user_authorizations ).await;
-        //let classifer_results_final: Vec< (String, f32)> = cmd.filter_if_patient_identified( pdao, userid, prompt.clone(), classifer_results_level_1);
-
         let patient_id = match referenced_patient.clone().0 {
             CommandController::NO_PATIENT_FOUND => constants::INVALID_PATIENT_ID,
             _ => { // otherwise reduce the list of results.

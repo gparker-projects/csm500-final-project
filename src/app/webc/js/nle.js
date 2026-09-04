@@ -55,25 +55,28 @@ async function redirect_to_patient_new_intv(  patient_id, action_id, nl_prompt )
     cmd_frm.action = "/intvnew";
 
     const enc_id = document.createElement('input'); 
+    enc_id.type = "hidden";
     enc_id.id = "encounter_id"; // we won't have this normally, but it is still required by the route
     enc_id.name = "encounter_id";
-    enc_id.type = "hidden";
     enc_id.value = -1;
     cmd_frm.appendChild(enc_id);
 
     const tmp_intv_type_id = document.createElement('input');
+    tmp_intv_type_id.type = "hidden";
     tmp_intv_type_id.id = "intervention_type_id";
     tmp_intv_type_id.name = "intervention_type_id";
     tmp_intv_type_id.value = action_id;
     cmd_frm.appendChild(tmp_intv_type_id);
 
     const tmp_patient_id = document.createElement('input');
+    tmp_patient_id.type = "hidden";
     tmp_patient_id.id = "patient_id";
     tmp_patient_id.name = "patient_id";
     tmp_patient_id.value = patient_id;
     cmd_frm.appendChild(tmp_patient_id);
 
     const tmp_user_prompt = document.createElement('input');
+    tmp_user_prompt.type = "hidden";
     tmp_user_prompt.id = "user_prompt";
     tmp_user_prompt.name = "user_prompt";
     tmp_user_prompt.value = nl_prompt;

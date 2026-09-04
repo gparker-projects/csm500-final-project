@@ -176,6 +176,11 @@ a {
     color: inherit;
 }
 
+a:hover {
+    text-decoration: underline;
+    color: inherit;
+}
+
 table {
   border-collapse: collapse;
   border: 1px #559DD8;

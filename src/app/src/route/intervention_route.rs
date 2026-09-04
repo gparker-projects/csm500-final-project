@@ -176,8 +176,10 @@ impl InterventionRoute{
         };
 
         let fast_actions_upper_limit = app_session.clone().system_config.get_max_general_fastactions();
-        let pref_list: Option<Vec<FeaturePreference>> = {FeaturePreferenceDAO::new( app_session.get_db_connection() ).await}.get_active_feature_preferences_of_intervention_details_for_user(userid, fast_actions_upper_limit).await.unwrap();
-
+        let pref_list: Option<Vec<FeaturePreference>> = {FeaturePreferenceDAO::new( app_session.get_db_connection() ).await}
+                                                                                .get_active_feature_preferences_of_intervention_details_for_user(userid,
+                                                                                                                                                        intervention_type_id,
+                                                                                                                                                        fast_actions_upper_limit).await.unwrap();
         let content = wcf.get_modify_intervention_full_tile(user_session_details.user_display_name,
                                                                          cur_intv2,
                                                                          legacy_menu,

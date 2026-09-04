@@ -102,8 +102,8 @@ impl NaturalLanguageEngine {
       tracing::info!("..Sorted results:");
       println!("..Sorted results:");
       for item in results.clone(){
-          tracing::info!("{} {} ", item.0, item.1 * 100.);
-          println!("{} {} ", item.0, item.1 * 100.);
+          tracing::info!("{} ({:.1}%)", item.0, item.1 * 100.);
+          println!("{} ({:.1}%)", item.0, item.1 * 100.);
       }
 
       results

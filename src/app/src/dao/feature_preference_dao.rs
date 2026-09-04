@@ -33,12 +33,13 @@ impl FeaturePreferenceDAO {
     ///
     /// Obtains all active features preferences for a user. Disregards department, only includes active. Disregards department, only includes active preferences and active common_reference_types.
     /// 
-    pub async fn get_active_feature_preferences_for_user(&self, user_id: i64, upper_limit: usize, intervention_level_only: bool)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
+    pub async fn get_active_feature_preferences_for_user(&self, user_id: i64, intervention_type_id: i64, upper_limit: usize, intervention_level_only: bool)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
         tracing::debug!("get_active_feature_preferences_for_user()");
         let query_level_0 = db_query::QRY_GET_ALL_ACTIVE_FEATURE_PREFERENCE_FOR_USER;
         let query_level_1 = query_level_0.replace("{users_id}", &user_id.to_string());
         let query_level_2 = query_level_1.replace("{limit_days}", &"14".to_string());
-        let query = query_level_2.replace("{limit_rows}", &"3".to_string());
+        let query_level_3 = query_level_2.replace("{group_id}", &intervention_type_id.to_string());
+        let query = query_level_3.replace("{limit_rows}", &"3".to_string());
 
         tracing::debug!("..SELECT sql: {}", query);
 
@@ -127,7 +128,7 @@ impl FeaturePreferenceDAO {
     /// Disregards department, only includes active preferences and active common_reference_types.
     /// 
     pub async fn get_active_feature_preferences_of_interventions_for_user(&self, user_id: i64, upper_limit: usize)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
-        self.get_active_feature_preferences_for_user(user_id, upper_limit, true).await
+        self.get_active_feature_preferences_for_user(user_id, constants::COMMON_REF_TYPE_INTERVENTION_GROUP_ID, upper_limit, true).await
     }
 
     ///
@@ -136,8 +137,8 @@ impl FeaturePreferenceDAO {
     /// Obtains all active features preferences for a user, that are not at the intervention level only (common_reference_type.group_id <> 1).
     /// Disregards department, only includes active preferences and active common_reference_types.
     /// 
-    pub async fn get_active_feature_preferences_of_intervention_details_for_user(&self, user_id: i64, upper_limit: usize)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
-        self.get_active_feature_preferences_for_user(user_id, upper_limit, false).await
+    pub async fn get_active_feature_preferences_of_intervention_details_for_user(&self, user_id: i64, intervention_type_id: i64, upper_limit: usize)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
+        self.get_active_feature_preferences_for_user(user_id, intervention_type_id, upper_limit, false).await
     }
 
     //https://users.rust-lang.org/t/calling-stored-procedures-setting-parameters-and-returning-parameters-on-postgresql/91508/4
