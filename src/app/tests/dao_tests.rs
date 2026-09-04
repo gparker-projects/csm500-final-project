@@ -216,13 +216,13 @@ async fn test_ins_get_upd_feature_priority() {
 
   let mut new_fp: FeaturePreference = Default::default(); // use a dummy record to satify the compiler below
 
-  println!("..retreive created record");
-  // try to pull out that same that was created
-
-  let qry_results = fdao.get_active_feature_preferences_for_user(test_user_id, test_feature_id, 5, false).await;
+  // check we can get the Intervention-level feature preference back
+  let qry_results = fdao.get_active_feature_preferences_for_user(test_user_id, test_feature_id, 5, true).await;
   match qry_results.unwrap(){
         Some ( results ) => {
             let mut found: bool = false;
+
+            println!("....results.len()={}", results.len());
 
             for item in results{
                 println!("....check item.id {}={}", fp_id, item.id);
@@ -233,10 +233,10 @@ async fn test_ins_get_upd_feature_priority() {
                     new_fp = item.clone();
                 }
             }
-            assert!(found);  // if the id was not found, the insert failed
+            assert!( found );  // if the id was not found, the insert failed
         }
         None => {
-            assert!(false);
+            assert!( false );
         }
   }
 
@@ -254,7 +254,7 @@ async fn test_ins_get_upd_feature_priority() {
 
   println!("..retreive updated record");
   // try to pull out that same that was updated: this time, the updated timestamp should be different than the first time
-  let qry_results_updated = fdao.get_active_feature_preferences_for_user(test_user_id,test_feature_id, 5, false).await;
+  let qry_results_updated = fdao.get_active_feature_preferences_for_user(test_user_id,test_feature_id, 5, true).await;
   match qry_results_updated.unwrap(){
       Some ( results ) => {
         let mut updated: bool = false;

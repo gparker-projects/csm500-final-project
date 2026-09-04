@@ -39,10 +39,11 @@ impl FeaturePreferenceDAO {
         let query_level_0 = db_query::QRY_GET_ALL_ACTIVE_FEATURE_PREFERENCE_FOR_USER;
         let query_level_1 = query_level_0.replace("{users_id}", &user_id.to_string());
         let query_level_2 = query_level_1.replace("{limit_days}", &"14".to_string());
-        let query_level_3 = query_level_2.replace("{group_id}", &intervention_type_id.to_string());
+        let query_level_3 = query_level_2.replace("{feature_id}", &intervention_type_id.to_string());
         let query = query_level_3.replace("{limit_rows}", &"3".to_string());
 
         tracing::debug!("..SELECT sql: {}", query);
+          println!("..SELECT sql: {}", query);
 
                      //id, display_order, weight,
                      //  calculation_date, department_id, feature_id, ref_group_id, ref_name
@@ -53,7 +54,7 @@ impl FeaturePreferenceDAO {
                                                 .await
                                                 .unwrap_or_default();
         if rows.is_empty() {
-            tracing::warn!("..Feature Preference entries not found for user_id={}", user_id);
+            tracing::debug!("..Feature Preferences not found for user_id={}", user_id);
             //println!("..Feature Preference entries not found for user_id={}", user_id);
             return Ok( None );
         }
@@ -152,7 +153,7 @@ impl FeaturePreferenceDAO {
         //   However if it fails as well, we just carry on and do not interrupt the user with an error.
         //
         tracing::debug!("..UPDATE sql: {}", query);
-        //println!("..UPDATE sql: {}", query);  // tracing does not preserve formatting, making copy/paste useless
+        println!("..UPDATE sql: {}", query);  // tracing does not preserve formatting, making copy/paste useless
         let result = sqlx::query(&query)
                                                         .fetch_optional(&self.connection)
                                                         .await
@@ -168,7 +169,7 @@ impl FeaturePreferenceDAO {
                 let query = &query_level_1.replace("{feature_id}", &feature_id.to_string());
 
                 tracing::debug!("..INSERT sql: {}", query);
-                //println!("..INSERT sql: {}", query); // tracing does not preserve formatting, making copy/paste useless
+                println!("..INSERT sql: {}", query); // tracing does not preserve formatting, making copy/paste useless
 
                 let inner_result = sqlx::query(&query)
                                                 .fetch_optional(&self.connection)
