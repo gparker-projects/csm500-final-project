@@ -1,12 +1,20 @@
 ///
-/// Unit & Integration tests for the DTO module
+/// #Unit & Integration tests for the DTO module. Includes all DTO objects
+/// 
+/// * Encounter
+/// * FeeaturePreference
+/// * Intervention and InterventionDetails
+/// * Patient
+/// * Permission
+/// * UserAuthorization
+/// * User
 ///
 /// Ref: Unit Testing in Rust is actually easy! - Flo Woelki (https://youtu.be/6wAFdBVJbwc?si=KdJfqvRdcXi9-mqo) - LOL NOT easy
 /// 
 ///
 use chrono::{Utc, NaiveDateTime};
 use rand::{RngExt, rng};
-use maple_emr::{constants, dto::{encounter::*, intervention::*, intervention_detail::*, patient::*, user::*, feature_preference::*, encounter::*}};
+use maple_emr::{constants, dto::{encounter::*, intervention::*, intervention_detail::*, patient::*, user::*, feature_preference::*}};
 use maple_emr::dto::user_auth::*;
 
 mod common;
@@ -17,8 +25,8 @@ use common::test_utils::*;
 
 #[cfg(test)] 
 
-  #[test]
-  fn test_create_encounter_dto() {
+#[test]
+fn test_create_encounter_dto() {
     let current_time: NaiveDateTime = Utc::now().naive_utc();
     let mut rng = rng();
 
@@ -252,7 +260,7 @@ use common::test_utils::*;
     assert!(!result.has_permission_for_dept(999,1)); // should fail
   }
 
-
+    #[test]
   fn test_encounter_dto(){   
     let current_time: NaiveDateTime = Utc::now().naive_utc();
     let mut rng = rng();
@@ -290,9 +298,8 @@ use common::test_utils::*;
     assert_eq!(obj.is_current_encounter, tmp_is_current_encounter); 
   }
 
-
+    #[test]
   fn test_feature_preference_dto(){
-    let current_time: NaiveDateTime = Utc::now().naive_utc();
     let mut rng = rng();
 
     let tmp_id: i64 = rng.random();
