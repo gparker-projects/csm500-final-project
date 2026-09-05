@@ -26,10 +26,13 @@ pub const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500
 use common::test_utils::DataGenerator;
 
 #[cfg(test)]
-///
-/// Tests the ability for the DAO to retrieve Patients
-///
+
+/// ### test_get_patients_at_users_site_no_discharge()
 /// 
+/// Tests the ability for the DAO to retrieve Patients
+/// 
+///   Specifically tests: PatientDAO::test_get_patients_at_users_site_no_discharge() 
+///
 #[tokio::test]
 async fn test_get_patients_at_users_site_no_discharge() {
     let test_user_id = 2;
@@ -65,9 +68,11 @@ async fn test_get_patients_at_users_site_no_discharge() {
   }
 }
 
-
-///
+/// ### test_get_patient_details()
+/// 
 /// Tests the ability for the DAO to retrieve Patient details
+/// 
+///   Specifically tests: PatientDAO::get_patient_details() 
 ///
 #[tokio::test]
 async fn test_get_patient_details() {
@@ -91,7 +96,7 @@ async fn test_get_patient_details() {
     // we can not test if the DAO itself is instantiated as the only content is a PgPool, which does not allow assert_eq!. If the object
     // does not instantiate however, the remainder of this test will fail.
     let pdao = PatientDAO::new( db_pool ).await;
-    let qry_results: Option< Patient> = pdao.get_patient_details(test_user_id, test_patient_id).await.unwrap();
+    let qry_results: Option<Patient> = pdao.get_patient_details(test_user_id, test_patient_id).await.unwrap();
     match qry_results{
         Some (_p) => {
             assert!(true);
@@ -103,10 +108,30 @@ async fn test_get_patient_details() {
     }
 }
 
-///
-/// Tests the ability for the DAO to insert/update an encounter, based on an admit form
-///
+
+
 #[tokio::test]
+/// ### test_wrapper_patient_dao()
+/// 
+/// Calls subordindate tests that MUST be executed in a specific order
+///
+async fn test_wrapper_patient_dao() {
+
+    // these both create new encounters and during parallel thread execution mess up the discharge
+    // which is determistic on its ID.
+    test_upsert_patient_from_admit_form();
+    test_upsert_encounter_from_admit_form();
+
+    // must perform discharge last, otherwise the other items running in parallel mess up the id sequencing
+    test_update_encounter_from_discharge_form();
+}
+
+/// ### test_upsert_patient_from_admit_form()
+/// 
+/// Tests the ability for the DAO to insert/update an encounter, based on an admit form
+/// 
+///   Specifically tests: PatientDAO::upsert_patient_from_admit_form() 
+///
 async fn test_upsert_patient_from_admit_form() {
     let db_url = DB_CONN_STR;
     let db_pool = match PgPoolOptions::new()
@@ -158,12 +183,15 @@ async fn test_upsert_patient_from_admit_form() {
     }
 }
 
-///
+
+/// ### test_upsert_encounter_from_admit_form()
+/// 
 /// Tests the ability for the DAO to insert/update an encounter, based on an admit form
+/// 
+///   Specifically tests: PatientDAO::upsert_encounter_from_admit_form() 
 ///
-#[tokio::test]
 async fn test_upsert_encounter_from_admit_form() {
- let db_url = DB_CONN_STR;
+    let db_url = DB_CONN_STR;
     let db_pool = match PgPoolOptions::new()
         .max_connections(5)
         .connect(db_url)
@@ -177,15 +205,6 @@ async fn test_upsert_encounter_from_admit_form() {
         },
     };  // Done: setting up the connection for the DAO test
 
-/*
-    UPDATE encounter
-        SET admit_notes = '{admit_notes}',
-            discharge_timestamp = to_timestamp('{discharge_timestamp}', 'YYYY/MM/DD HH24:MI:SS'),
-            discharge_notes = '{discharge_notes}',
-            patient_id = {patient_id},
-            location_id = {location_id}
-        WHERE id = {encounter_id} RETURNING ID;
-*/
     let test_user_id = 2;
     let test_patient_id = 34;               // <-------------------------- these might need to be changed, if the data changes
     let mut tmp_encounter_id = constants::INVALID_OTHER_ID;
@@ -248,11 +267,87 @@ async fn test_upsert_encounter_from_admit_form() {
     }
 }
 
-///
+/// ### test_update_encounter_from_discharge_form()
+/// 
 /// Tests the ability for the DAO to update an encounter, based on a discharge form
+/// 
+///   Specifically tests: PatientDAO::update_encounter_from_discharge_form() 
 ///
-#[tokio::test]
 async fn test_update_encounter_from_discharge_form() {
+    let db_url = DB_CONN_STR;
+    let db_pool = match PgPoolOptions::new()
+        .max_connections(5)
+        .connect(db_url)
+        .await
+    {
+        Ok(pool) => pool,
+        Err(e) => {
+            tracing::debug!("{}", e);
+            assert!(false);
+            panic!("{}", e)
+        },
+    };  // Done: setting up the connection for the DAO test
 
+    let test_user_id: i64 = 2;
+    let mut test_patient_id = 34;               // <-------------------------- these might need to be changed, if the data changes
+    let mut tmp_encounter_id = 17;
+
+    // start by getting the current patient and encounter ids
+    let pdao = PatientDAO::new( db_pool ).await;
+    let qry_results: Option<Patient> = pdao.get_patient_details(test_user_id, test_patient_id).await.unwrap();
+    match qry_results{
+        Some (p) => {
+            test_patient_id = p.id;
+            tmp_encounter_id = p.encounter_id;
+        }
+        None => {
+            assert!(false)
+        }
+    }
+
+    println!("Received: tmp_encounter_id = {} ", tmp_encounter_id);
+
+    let mut tmp_frm = DischargeDataForm{
+        patient_id: test_patient_id.to_string(), // <-------------------------- these might need to be changed, if the data changes
+        encounter_id: tmp_encounter_id.to_string(),                      // this field and others are not actually set/used by upsert_patient_from_admit_form() 
+        discharge_notes: DataGenerator::get_lorem_ipsum(100)
+    };
+
+    // first create a new encounter (id = -1)
+    let results = pdao.update_encounter_from_discharge_form(tmp_frm.clone(), test_user_id).await;
+    match results {
+        Ok ( enc_id ) => {
+            if enc_id != constants::INVALID_OTHER_ID{
+
+                // if the update actually worked, the data should have changed
+                let qry_results: Option<Patient> = pdao.get_patient_details(test_user_id, test_patient_id).await.unwrap();
+                match qry_results{
+                    Some (p) => {
+                        println!("tmp_encounter_id = {} ", tmp_encounter_id);
+                        println!("p.encounter_id = {} ", p.encounter_id);
+
+                        println!("p.discharge_notes = {} ", p.discharge_notes);
+                        println!("tmp_frm.discharge_notes = {} ", tmp_frm.discharge_notes);
+
+                        assert_eq!( p.discharge_notes, tmp_frm.discharge_notes );        // discharge notes should be the same as what was sent in
+                        assert_ne!( p.discharge_timestamp.unwrap(), p.admit_timestamp ); // update timestamp should be different
+                        assert!(true)
+                    }
+                    None => {
+                        tracing::debug!("Patient expected, no patient returned");
+                        assert!(false)
+                    }
+                }
+            }
+            else{
+                println!("New encounter id expected, (id=-1) returned");
+                assert!(false)
+            }
+        }
+        Err(e) => {
+            println!("Error encounterred: {}", e);
+            assert!(false)
+        }
+    }
 }
 
