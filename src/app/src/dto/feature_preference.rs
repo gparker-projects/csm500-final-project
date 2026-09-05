@@ -34,6 +34,7 @@ pub struct FeaturePreference {
 }		
 
 impl FeaturePreference {
+    #[allow(dead_code)]
     pub fn new(id: i64,
                display_order: i64,
                weight: i64,

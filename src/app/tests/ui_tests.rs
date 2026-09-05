@@ -29,11 +29,8 @@ mod ui_tests {
     let tmp_tile = wcf.get_tile(WebContentItem::WCTypeLoginTile);
     assert!(tmp_tile.len() > 0);
 
-    let tmp_tile2 = wcf.get_home_tile();
+    let tmp_tile2 = wcf.get_home_tile_with_user_identity("gparker-test".to_string());
     assert!(tmp_tile2.len() > 0);
-
-    let tmp_tile3 = wcf.get_home_tile_with_user_identity("gparker-test".to_string());
-    assert!(tmp_tile3.len() > 0);
-    assert!( tmp_tile3.contains( &"gparker-test".to_string() ) );
+    assert!( tmp_tile2.contains( &"gparker-test".to_string() ) );
   }
 }

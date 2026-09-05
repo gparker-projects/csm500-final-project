@@ -17,7 +17,7 @@ use crate::dto::feature_preference::FeaturePreference;
 
 use crate::ui::feat_preference_fmt::FeaturePreferenceFormatter;
 use crate::dao::{common_dao::*, encounter_dao::*, intervention_dao::*, patient_dao::*};
-use crate::ui::{tile_factory::*, data_forms::*, menu_fmt::*, simple_fmt::*};
+use crate::ui::{data_forms::*, menu_fmt::*, simple_fmt::*};
 use crate::session::{AppSession, UserSession};
 
 pub struct PatientRoute{}
@@ -41,10 +41,7 @@ impl PatientRoute{
 
     //todo: this should direct to a standard error or login screen when session is lost
     let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
-    let userid = user_session_details.clone().get_userid_as_i64();
-    let user_display_name = user_session_details.clone().user_display_name;
-    let wcf: &WebContentFactory = &app_session.get_web_content_factory(); 
-
+    let userid = user_session_details.get_userid_as_i64();
     let patient_id: i64 = req.get_uid_as_i64();
 
     // get base patient data
@@ -58,7 +55,7 @@ impl PatientRoute{
     let cur_enc_id = cur_enc.clone().id.to_string(); // must be copied here before it moves below
 
     // pull out the most recent vitals (Intervention of type = "Vitals") and generate summary tile for it
-    let cur_intv = idao.get_most_recent_vitals(cur_enc.id.clone()).await.expect(constants::DATABASE_ERROR_NOT_FOUND); 
+    let cur_intv = idao.get_most_recent_vitals(cur_enc.id).await.expect(constants::DATABASE_ERROR_NOT_FOUND); 
 
     // get encounters for the patient
     let enc_results = edao.get_encounters(patient_id, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
@@ -75,7 +72,7 @@ impl PatientRoute{
     };
 
     // get patient encounter history
-    let patient_results = pdao.get_patient_details( userid.clone(), patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+    let patient_results = pdao.get_patient_details( userid, patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
     let patient_header = match patient_results {
         Some (patient_details) => {
             //println!("Patient details obtained"); //: {}", &tile_content);
@@ -92,10 +89,10 @@ impl PatientRoute{
     };
 
     // refresh the patients in the menu (only)
-    let legacy_menu_results = pdao.get_patients_at_users_site_no_discharge(userid.clone()).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+    let legacy_menu_results = pdao.get_patients_at_users_site_no_discharge(userid).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
     let legacy_menu = match legacy_menu_results {
         Some (patients_for_menu_lst) => {
-            {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id, user_session_details)
+            {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id, user_session_details.clone())
         }
         None => {
             tracing::debug!("No patients found for legacy menu");
@@ -106,18 +103,18 @@ impl PatientRoute{
     // no user should be able to get into the system without a location assigned, so we will not worry about an exception here
     let item_list = {CommonDAO::new( app_session.get_db_connection() ).await}.get_intervention_types().await.unwrap();
     let fast_actions_upper_limit = app_session.clone().system_config.get_max_general_fastactions();
-    let pref_list: Option<Vec<FeaturePreference>> = {FeaturePreferenceDAO::new( app_session.get_db_connection() ).await}.get_active_feature_preferences_of_interventions_for_user(userid.clone(), fast_actions_upper_limit).await.unwrap();
+    let pref_list: Option<Vec<FeaturePreference>> = {FeaturePreferenceDAO::new( app_session.get_db_connection() ).await}.get_active_feature_preferences_of_interventions_for_user(userid, fast_actions_upper_limit).await.unwrap();
 
-    let consolidated_content = wcf.get_patient_details_full_tile(patient_header,
-                                                                         cur_enc_section,
-                                                                         enc_section,
-                                                                         user_display_name.clone(),
-                                                                         legacy_menu,
-                                                                         intv_section,
-                                                                         item_list.unwrap(), 
-                                                                         FeaturePreferenceFormatter::get_feature_preference_section(pref_list),
-                                                                         patient_id.to_string(),
-                                                                         cur_enc_id);
+    let consolidated_content = app_session.get_web_content_factory().get_patient_details_full_tile(patient_header,
+                                                                                                           cur_enc_section,
+                                                                                                           enc_section,
+                                                                                                           user_session_details,
+                                                                                                           legacy_menu,
+                                                                                                           intv_section,
+                                                                                                           item_list.unwrap(), 
+                                                                                                           FeaturePreferenceFormatter::get_feature_preference_section(pref_list),
+                                                                                                           patient_id.to_string(),
+                                                                                                           cur_enc_id);
 
     HttpResponse::Ok().body( consolidated_content )
     }

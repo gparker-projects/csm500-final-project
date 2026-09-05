@@ -53,8 +53,10 @@ impl Permission {
     ///  mapping between a database entry and the application code.
     /// 
     /// Note: These values MUST match database PERMISSION table entries, in order for CRUD to function with the application.
-    /// 
+    ///
+
     pub const ALLOW_LOGIN: i64 = 1;
+    #[allow(dead_code)]
     pub const ALLOW_CREATE_CLINICAL_INTERVENTION : i64 = 2;
     pub const ALLOW_CREATE_NON_CLINICAL_INTERVENTION : i64 = 3;
     pub const ALLOW_CREATE_UPDATE_ADMIT : i64 = 4;

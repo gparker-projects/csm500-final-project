@@ -71,25 +71,21 @@ function validateItvDtlsForm(itemId) {
     formErrors.textContent = '';
     let isValid = true;		
 
-    //console.log("..GOT HERE 1: "+ field_value.value);
     if ( field_value.value.trim() == '') {
         formErrors.textContent = "Value is required.";
         isValid = false;
     }
 
-    //console.log("..GOT HERE 2: "+ field_value.value);
     if ( field_value.value.length > 100 || field_value.value.length < 1) {
         formErrors.textContent = "Value must be between 1 and 100 characters.";
         isValid = false;
     }
     
-    //console.log("..GOT HERE 3: "+ field_notes.value);
     if (field_notes.value.length > 2000) {
         formErrors.textContent = "Notes must be less than 2000 characters.";
         isValid = false;
     }
 
-    //console.log("..GOT HERE 4");
     if (!isValid) {
         formErrors.style = "color: red";
         event.preventDefault(); // Stop the form from submitting if there are errors
@@ -111,7 +107,6 @@ function validateItvDtlsForm(itemId) {
 function fast_action_add_measure(itemId){
     console.log("prep_add_measure");
     const divaddNewMeasure = document.getElementById('divaddNewMeasure');
-    //const addMeasureForm = document.getElementById('addMeasureForm');
     const addFrm_intv_dtls_id = document.getElementById('addFrm_intv_dtls_id');
 
     divaddNewMeasure.classList.remove('hidden');

@@ -139,6 +139,17 @@ impl UserSession {
         return result;
     }
 
+    /// ### get_user_display_name()
+    ///    Accessor returns the user_display_name field as a cloned String. This saves other methods
+    ///    from having to later clone the session.
+    /// 
+    /// #### Returns:
+    /// * String: the content of the user_display_name attribute
+    /// 
+    pub fn get_user_display_name(&self) -> String{
+        return self.user_display_name.clone();
+    }
+
     /// ### has_permission()
     ///    Shortcut extended accessor method gives more direct access to the has_permission() method
     ///    of the (UserAuthoriation) struct being held.

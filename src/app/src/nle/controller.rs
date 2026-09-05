@@ -31,7 +31,7 @@ pub struct CommandController{
 impl CommandController{
 
     pub const NO_PATIENT_FOUND: i8 = 0;
-    pub const UNKNOWN_PATIENT_FOUND: i8 = 1;
+    //pub const UNKNOWN_PATIENT_FOUND: i8 = 1;
     pub const KNOWN_PATIENT_FOUND: i8 = 2;
 
     ///

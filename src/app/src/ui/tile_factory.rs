@@ -21,7 +21,9 @@ use std::collections::HashMap;
 use tracing;
 
 use crate::constants;
-use crate::dto::{patient::*, intervention::*, intervention_detail::*, feature_preference::*};
+use crate::dto::user_auth::Permission;
+use crate::dto::{patient::*, intervention::*, intervention_detail::*};
+use crate::session::UserSession;
 
 use crate::ui::common::CommonFormatter;
 use crate::ui::intervention_fmt::InterventionFormatter;
@@ -110,13 +112,6 @@ impl WebContentFactory {
     ///
     /// Wrapper method to return the main home page tile.
     /// 
-    pub fn get_home_tile(&self) -> String {
-        return self.tile_hashmap[&WebContentItem::WCTypeHomePage].clone();
-    }
-
-    ///
-    /// Wrapper method to return the main home page tile.
-    /// 
     pub fn get_home_tile_with_user_identity(&self, user_identity_label: String) -> String {
         let results = self.tile_hashmap[&WebContentItem::WCTypeHomePage].clone();
 
@@ -128,7 +123,7 @@ impl WebContentFactory {
     /// Provide (deep) summary details of a patient
     /// 
     pub fn get_patient_details_full_tile(&self, patient_header: String, current_encounter: String, encounter_section: String,
-                                                user_identity_label: String, legacy_menu: String, intv_section: String, 
+                                                active_user_session: UserSession, legacy_menu: String, intv_section: String, 
                                                 intervention_type_list: Vec<(i64, String, String)>,
                                                 feature_pref_section: String,
                                                 patient_id: String,
@@ -137,7 +132,7 @@ impl WebContentFactory {
         let layout = self.get_tile(WebContentItem::WCTypePatientListTile);
 
         // base content
-        let ht2 = &self.get_home_tile_with_user_identity(user_identity_label).replace(constants::BODY_TILE_CONTENT_TAG, &layout); // build the individual sections
+        let ht2 = &self.get_home_tile_with_user_identity(active_user_session.get_user_display_name()).replace(constants::BODY_TILE_CONTENT_TAG, &layout); // build the individual sections
 
         // page body content
         let ht3 = &ht2.replace(constants::PATIENT_HEADER_TILE_TAG, &patient_header);
@@ -151,7 +146,20 @@ impl WebContentFactory {
                                                                                                                                   constants::NOT_SPECIFIED_ID));
         let ht10 = &ht9.replace(constants::FEATURE_PREFERENCE_TILE_TAG, &feature_pref_section);
 
-        let ht_final = &ht10.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
+        // hide the discharge form & button (<div>) if the user does not have access to the feature
+        let visible_tag = match active_user_session.has_permission(Permission::ALLOW_CREATE_UPDATE_DISCHARGE) {
+            true => String::new(),
+            false => " class='hidden' ".to_string(),
+        };
+        let ht11 = &ht10.replace(constants::SECTION_1_VISIBLE_TAG, &visible_tag);
+
+        let visible_tag = match active_user_session.has_permission(Permission::ALLOW_CREATE_CLINICAL_INTERVENTION) {
+            true => String::new(),
+            false => " class='hidden' ".to_string(),
+        };
+        let ht12 = &ht11.replace(constants::SECTION_2_VISIBLE_TAG, &visible_tag);
+
+        let ht_final = &ht12.replace(constants::LEGACY_MENU_TILE_TAG, &legacy_menu);
 
         return ht_final.clone();
     }

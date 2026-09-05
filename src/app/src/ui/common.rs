@@ -10,8 +10,6 @@
 //! 
 //! -------------------------------------------------------------------
 
-use crate::dto::feature_preference::FeaturePreference;
-
 pub struct CommonFormatter{}
 
 impl CommonFormatter {

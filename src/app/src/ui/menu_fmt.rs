@@ -9,6 +9,7 @@
 //! 
 use crate::session::UserSession;
 use crate::constants;
+use crate::dto::user_auth::Permission;
 use crate::dto::patient::*;
 
 pub struct MenuFormatter{}
@@ -26,12 +27,6 @@ impl MenuFormatter {
     /// 
     pub fn get_legacy_menu_with_patient(&self, patient_list: Vec<Patient>, patient_id: i64, active_user_session: UserSession) -> String {
         let mut results_sbuf = String::with_capacity(100); 
-
-        let admit_menu_item = r##"<form action="/admitnew" method="post" id="admitFrm" name="admitFrm">
-                                          <input type="hidden" id="patient_id" name="patient_id" value="-1">
-                                          <input type="hidden" id="action_flag" name="action_flag" value="admit">
-                                          <input type="hidden" id="user_prompt" name="user_prompt" value="">
-                                        </form>"##;
         let mut first_entry: bool = true;
 
         results_sbuf.push_str("<div id=\"legacyMenu\" align=\"left\"><ul><li><a class=\"menuNotCurrent\" href=\"\\home\">Current Patients</li>");
@@ -54,9 +49,19 @@ impl MenuFormatter {
                 results_sbuf.push_str("</a></li>\n");
             }
         }
-        results_sbuf.push_str(admit_menu_item);
-        results_sbuf.push_str("<li><a class=\"menuOther\" href=\"javascript:admit_patient();\">Admit New Patient</a></li>"); // does not actually pass in a prompt from this method
-        results_sbuf.push_str("<li><p><p><p><p></li>");
+
+        // user must have admit permission to admit a Patient
+        if active_user_session.has_permission(Permission::ALLOW_CREATE_UPDATE_ADMIT) {
+            let admit_form = r##"<form action="/admitnew" method="post" id="admitFrm" name="admitFrm">
+                                        <input type="hidden" id="patient_id" name="patient_id" value="-1">
+                                        <input type="hidden" id="action_flag" name="action_flag" value="admit">
+                                        <input type="hidden" id="user_prompt" name="user_prompt" value="">
+                                    </form>"##;
+            results_sbuf.push_str(admit_form);
+            results_sbuf.push_str("<li><a class=\"menuOther\" href=\"javascript:admit_patient();\">Admit New Patient</a></li>"); // does not actually pass in a prompt from this method
+        }
+        
+        results_sbuf.push_str("<li><p><p><p><p></li>"); // spacer
         results_sbuf.push_str("<li><a class=\"menuOther\" href=\"\\\">Log Out</a></li>");
         results_sbuf.push_str("<li><p></p><div class='userIdentity'>&nbsp;&nbsp;");
         results_sbuf.push_str(&active_user_session.user_display_name.clone());
