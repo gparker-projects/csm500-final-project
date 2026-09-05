@@ -22,12 +22,21 @@ pub struct LoginRoute{}
 
 impl LoginRoute{
 
-    /// performs a connect to the database
+    /// ### LoginRoute::login()
+    ///   Route used to log a user into the application, authenticating and authorizing them, then 
+    ///   redirecting to the home page.
     /// 
-    /// REF: https://stackoverflow.com/questions/75369137/rust-actix-web-how-to-change-method-when-using-actix-webwebredirecttou
-    ///      https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Redirections#temporary_redirections
-    ///      
-    /// check by going to: http://127.0.0.1:8000/db
+    /// #### Parameters:
+    /// * app_session (web::Data<session::AppSession>): the application session
+    /// * req: web::Form<LoginFormData>: the request data for the user's login (userid and password)
+    /// * user_session (actix_session::Session): the user's session
+    /// 
+    /// #### Returns:
+    /// * Responder (actix_web::response::responder): the HTTP responder (response) for the request
+    /// 
+    /// #### Refs
+    /// * https://stackoverflow.com/questions/75369137/rust-actix-web-how-to-change-method-when-using-actix-webwebredirecttou
+    /// * https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Redirections#temporary_redirections
     /// 
     pub async fn login(user_session: Session, req: web::Form<LoginFormData>, app_session: web::Data<session::AppSession>, ) -> impl Responder { // Box<dyn Responder<>> { //
         tracing::debug!("-> /login Requested");
@@ -41,7 +50,6 @@ impl LoginRoute{
 
             let uid: i64 = current_user.id;
             let user_perms = cur_db_conn.get_user_permissions( uid ).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
-            // TODO: catch this for users without data
 
             // initialize user session (this is the only location it can occur), for an authenticated user
             //  ref: https://docs.rs/actix-admin/latest/actix_admin/prelude/struct.Session.html
@@ -65,8 +73,18 @@ impl LoginRoute{
         }
     }
 
-    ///
-    /// Provides a means for the user to exit the system
+    /// ### LoginRoute::logout()
+    ///   Route provides a means for the user to exit the system, discarding the user session and redirecting to the login page.
+    /// 
+    /// #### Parameters:
+    /// * user_session (actix_session::Session): the user's session
+    /// 
+    /// #### Returns:
+    /// * Responder (actix_web::response::responder): the HTTP responder (response) for the request
+    /// 
+    /// #### Refs
+    /// * https://stackoverflow.com/questions/75369137/rust-actix-web-how-to-change-method-when-using-actix-webwebredirecttou
+    /// * https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Redirections#temporary_redirections
     /// 
     pub async fn logout(user_session: Session ) -> impl Responder { // Box<dyn Responder<>> { //
         let _ignore = user_session.insert(constants::VALIDATION_ERRORS, "Invalid user or password. Please try again.");

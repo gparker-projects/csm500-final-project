@@ -9,6 +9,25 @@
 //! REFERENCES
 //! 
 
+// Note: query is entirely dependant on Permission Id=1 being the login record Id
+//
+pub const QRY_USER_LOGIN: &str = r##"SELECT u.id, name, username, email, created_timestamp, password
+                                     FROM USERS u
+                                     WHERE USERNAME = '{user_name}'
+                                       AND PASSWORD = '{user_password}'
+                                       AND EXISTS (
+                                         SELECT up.id FROM USER_PERMISSION up
+                                         WHERE up.active_flag = 'Y' and up.permission_id = 1
+                                           AND up.users_id = u.id)
+                                       "##;
+
+pub const QRY_USER_PERMISSIONS_ALL_ACTIVE: &str = r##"SELECT department_id, permission_id
+                                                      FROM user_permission
+                                                      where active_flag = 'Y'
+                                                      and users_id = {user_id}
+                                                      group by department_id, permission_id
+                                                      order by permission_id"##;
+
 // all patients at the current site of the user (per their permissions), where the patient has not been discharged
 pub const QRY_ALL_PATIENTS_AT_USERS_SITE_NO_DISCHARGE: &str = r##"SELECT p.id, e.id, e.location_id, legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as "legal_middle_names",
                                         COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",

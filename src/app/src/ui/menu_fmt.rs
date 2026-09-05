@@ -7,9 +7,9 @@
 //! 
 //! REFERENCES
 //! 
-
+use crate::session::UserSession;
 use crate::constants;
-use crate::dto::{patient::*};
+use crate::dto::patient::*;
 
 pub struct MenuFormatter{}
 
@@ -17,14 +17,14 @@ impl MenuFormatter {
     ///
     /// Provide HTML for the main system menu; replaces tag: <!--MapleEMR::LegacyMenu-->
     /// 
-    pub fn get_legacy_menu(&self, patient_list: Vec<Patient>, user_identity: String) -> String {
-       return self.get_legacy_menu_with_patient(patient_list, constants::INVALID_PATIENT_ID, user_identity.clone());
+    pub fn get_legacy_menu(&self, patient_list: Vec<Patient>, active_user_session: UserSession) -> String {
+       return self.get_legacy_menu_with_patient(patient_list, constants::INVALID_PATIENT_ID, active_user_session);
     }
 
     ///
     /// Provide HTML for the main system menu; replaces tag: <!--MapleEMR::LegacyMenu-->
     /// 
-    pub fn get_legacy_menu_with_patient(&self, patient_list: Vec<Patient>, patient_id: i64, user_identity: String) -> String {
+    pub fn get_legacy_menu_with_patient(&self, patient_list: Vec<Patient>, patient_id: i64, active_user_session: UserSession) -> String {
         let mut results_sbuf = String::with_capacity(100); 
 
         let admit_menu_item = r##"<form action="/admitnew" method="post" id="admitFrm" name="admitFrm">
@@ -59,7 +59,7 @@ impl MenuFormatter {
         results_sbuf.push_str("<li><p><p><p><p></li>");
         results_sbuf.push_str("<li><a class=\"menuOther\" href=\"\\\">Log Out</a></li>");
         results_sbuf.push_str("<li><p></p><div class='userIdentity'>&nbsp;&nbsp;");
-        results_sbuf.push_str(&user_identity);
+        results_sbuf.push_str(&active_user_session.user_display_name.clone());
         results_sbuf.push_str("</div></li></ul></div>");
 
         return results_sbuf;

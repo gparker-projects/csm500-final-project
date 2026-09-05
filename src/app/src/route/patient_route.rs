@@ -18,16 +18,26 @@ use crate::dto::feature_preference::FeaturePreference;
 use crate::ui::feat_preference_fmt::FeaturePreferenceFormatter;
 use crate::dao::{common_dao::*, encounter_dao::*, intervention_dao::*, patient_dao::*};
 use crate::ui::{tile_factory::*, data_forms::*, menu_fmt::*, simple_fmt::*};
-use crate::session::{AppSession, SysConfig, UserSession};
+use crate::session::{AppSession, UserSession};
 
 pub struct PatientRoute{}
 
 impl PatientRoute{
-    ///
-    /// Route to View Patient details; expects a GenerialWebFormData to have been submitted to reach the route
-    ///
+
+    /// ### PatientRoute::route_to_patient_details()
+    ///   Route to View Patient details; expects a GenerialWebFormData to have been submitted to reach the route
+    /// 
+    /// #### Parameters:
+    /// * app_session (web::Data<session::AppSession>): the application session
+    /// * req: web::Form<GenericWebFormData>: the request data to obtain the patient's data using a GenericWebFormData struct
+    /// * user_session (actix_session::Session): the user's session
+    /// 
+    /// #### Returns:
+    /// * Responder (actix_web::response::responder): the HTTP responder (response) for the request
+    /// 
     pub async fn route_to_patient_details(user_session: Session, app_session: web::Data<AppSession>, req: web::Form<GenericWebFormData>) -> impl Responder {
     tracing::debug!("-> /patientdtls Route Requested");
+    println!("-> /patientdtls Route Requested");
 
     //todo: this should direct to a standard error or login screen when session is lost
     let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
@@ -85,7 +95,7 @@ impl PatientRoute{
     let legacy_menu_results = pdao.get_patients_at_users_site_no_discharge(userid.clone()).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
     let legacy_menu = match legacy_menu_results {
         Some (patients_for_menu_lst) => {
-            {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id, user_session_details.user_display_name)
+            {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id, user_session_details)
         }
         None => {
             tracing::debug!("No patients found for legacy menu");

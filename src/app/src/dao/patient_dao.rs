@@ -53,7 +53,7 @@ impl PatientDAO {
         let query = tmp.replace("{}", &patient_id.to_string());
 
         tracing::debug!("get_patient_details Query: {}", query);
-        println!("get_patient_details Query: {}", query);
+        //println!("get_patient_details Query: {}", query);
 
         match sqlx::query(&query)
         .fetch_optional(&self.connection)
@@ -131,7 +131,7 @@ impl PatientDAO {
         let query_level_2 = &query_level_1.replace("{encounter_id}", &form.encounter_id.clone().trim());
 
         tracing::debug!(" >> Encounter Update from discharge: {}", query_level_2);
-        println!("..SQL query:\n{}", query_level_2);
+        //println!("..SQL query:\n{}", query_level_2);
 
         let result = sqlx::query(&query_level_2)
                                                         .fetch_one(&self.connection)
@@ -174,7 +174,7 @@ impl PatientDAO {
         let query = &query_level_2.replace("{location_id}", &form.location_id.clone().trim());
 
         tracing::debug!(" >> Encounter Upsert: {}", query);
-        println!(" >> Encounter Upsert: {}", query);
+        //println!(" >> Encounter Upsert: {}", query);
 
         let result = sqlx::query(&query)
                                                         .fetch_one(&self.connection)

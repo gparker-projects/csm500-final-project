@@ -126,8 +126,32 @@ pub struct UserSession {
 }
 
 impl UserSession {
-  pub fn get_userid_as_i64(&self) -> i64{
-      let result: i64 = self.user_id.parse().unwrap();
-      return result;
-  }
+
+    /// ### get_userid_as_i64()
+    ///    Accessor helper method returns the user_id of the UserSession, as an i64 (default is string). 
+    ///    This comes up a lot in the code, as we are using ids as keys to reference our entities.
+    /// 
+    /// #### Returns:
+    /// * i64: the id of the user (from the self.user_id attribute), as an i64
+    /// 
+    pub fn get_userid_as_i64(&self) -> i64{
+        let result: i64 = self.user_id.parse().unwrap();
+        return result;
+    }
+
+    /// ### has_permission()
+    ///    Shortcut extended accessor method gives more direct access to the has_permission() method
+    ///    of the (UserAuthoriation) struct being held.
+    /// 
+    /// #### Parameters:
+    /// * permission_id (i64): the id of the Permission which were are checking for the user to have
+    /// 
+    /// #### Returns:
+    /// * bool: true/false for if the user does/does not have the permission
+    /// 
+    pub fn has_permission(&self, permission_id: i64) -> bool{
+        let ua = self.user_authorizations.clone();
+
+        return ua.has_permission( permission_id );
+    }
 }

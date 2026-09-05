@@ -18,9 +18,19 @@ pub struct DefaultRoute{}
 
 impl DefaultRoute{
 
-    ///
-    /// default route when nothing else is specified by the user
-    ///
+    /// ### DefaultRoute::default_route()
+    ///   The default route when nothing else is specified by the user
+    /// 
+    /// #### Parameters:
+    /// * app_session (web::Data<session::AppSession>): the application session
+    /// * user_session (actix_session::Session): the user's session
+    /// 
+    /// #### Returns:
+    /// * Responder (actix_web::response::responder): the HTTP responder (response) for the request
+    /// 
+    /// #### Refs
+    ///  https://actix.rs/docs/application/
+    /// 
     pub async fn default_route(app_session: web::Data<session::AppSession>, user_session: Session) -> impl Responder {
         tracing::debug!("-> /default_route Requested");
         

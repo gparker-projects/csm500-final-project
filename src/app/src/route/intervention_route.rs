@@ -14,6 +14,7 @@ use tracing;
 
 use crate::constants;
 use crate::dto::intervention::Intervention;
+
 use crate::dto::feature_preference::FeaturePreference;
 use crate::dao::feature_preference_dao::FeaturePreferenceDAO;
 use crate::dao::{patient_dao::*, intervention_dao::*, common_dao::*, auth_dao::*, encounter_dao::*}; 
@@ -31,28 +32,28 @@ impl InterventionRoute{
   /// Route that will update the intervention and then redirect back to the modify screen
   /// 
   pub async fn route_to_intervention_save(app_session: web::Data<AppSession>, user_session: Session, mut req: web::Form<InterventionDataForm>) -> impl Responder {
-      tracing::debug!("-> Route Requested: /route_to_discharge_patient_save ");
+        tracing::debug!("-> Route Requested: /route_to_discharge_patient_save ");
 
-      let req_clone0 = req.clone();
-      let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
-      let idao = InterventionDAO::new( app_session.get_db_connection() ).await;
+        let req_clone0 = req.clone();
+        let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+        let idao = InterventionDAO::new( app_session.get_db_connection() ).await;
 
-      let results = idao.upsert_intervention_from_intv_form(req_clone0.clone(), user_session_details.get_userid_as_i64()).await;
-      match results {
-            Ok(intv_id) => {
-                tracing::debug!("  >Intervention (id={intv_id})] created/updated");
-                req.0.intervention_id = intv_id.clone().to_string();
+        let results = idao.upsert_intervention_from_intv_form(req_clone0.clone(), user_session_details.get_userid_as_i64()).await;
+        match results {
+                Ok(intv_id) => {
+                    tracing::debug!("  >Intervention (id={intv_id})] created/updated");
+                    req.0.intervention_id = intv_id.clone().to_string();
 
-                let type_id: i64 = req_clone0.clone().get_intervention_type_as_i64();
-                // if save successful, record a feature preference as well
-                let fpdao = FeaturePreferenceDAO::new( app_session.get_db_connection() ).await;
-                let _ignore = fpdao.upsert_feature_preference( user_session_details.clone().get_userid_as_i64(), 
-                                                                            type_id).await.unwrap();
-            },
-            Err(e) => {
-                tracing::debug!("  >Intervention not created/updated: {e}");
-            }
-      }
+                    let type_id: i64 = req_clone0.clone().get_intervention_type_as_i64();
+                    // if save successful, record a feature preference as well
+                    let fpdao = FeaturePreferenceDAO::new( app_session.get_db_connection() ).await;
+                    let _ignore = fpdao.upsert_feature_preference( user_session_details.clone().get_userid_as_i64(), 
+                                                                                type_id).await.unwrap();
+                },
+                Err(e) => {
+                    tracing::debug!("  >Intervention not created/updated: {e}");
+                }
+        }
 
       // route back to main form again
       InterventionRoute::route_to_view_or_modify_intervention( app_session, user_session, req ).await
@@ -141,7 +142,7 @@ impl InterventionRoute{
         let legacy_menu_results = pdao.get_patients_at_users_site_no_discharge(userid).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
         let legacy_menu = match legacy_menu_results {
             Some (patients_for_menu_lst) => {
-                {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), req.get_patient_id_as_i64(), user_session_details.user_display_name.clone())
+                {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), req.get_patient_id_as_i64(), user_session_details.clone())
             }
             None => {
                 tracing::debug!("No patients found for legacy menu");

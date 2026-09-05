@@ -43,7 +43,7 @@ impl FeaturePreferenceDAO {
         let query = query_level_3.replace("{limit_rows}", &"3".to_string());
 
         tracing::debug!("..SELECT sql: {}", query);
-          println!("..SELECT sql: {}", query);
+        //println!("..SELECT sql: {}", query);
 
                      //id, display_order, weight,
                      //  calculation_date, department_id, feature_id, ref_group_id, ref_name

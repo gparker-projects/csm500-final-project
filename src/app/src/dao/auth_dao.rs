@@ -41,9 +41,11 @@ impl AuthDAO {
 
         // query the database for a user that matches the username and password
         // columns MUST be lowercase and mapped as such below, Rust can not translate them
-        let query = format!("SELECT id, name, username, email, created_timestamp, password FROM USERS WHERE USERNAME = '{}' AND PASSWORD = '{}'", user_name, user_password);
+        let query_level_0 = db_query::QRY_USER_LOGIN.replace("{user_name}", &user_name);
+        let query = query_level_0.replace("{user_password}", &user_password);
 
         tracing::debug!("Query: {}", query);
+        //println!("Query: {}", query);
 
         match sqlx::query(&query)
         .fetch_optional(&self.connection)
@@ -51,6 +53,11 @@ impl AuthDAO {
         {
             Ok( Some(row) ) => {
                 tracing::debug!("Successful login (results found) for: {}", user_name);
+
+                // we would perform a permissions check here, but as it is login on, we already have access to the user_id and their
+                // permissions directly in the database. Let's use that (above) instead of trying to hit the internal UserAuthentication
+                // structure, which has not actually been assembled at this point.
+
                 Ok( Some (   {
                         let tmp_new_id: i64 = row.get("id");  // Rust to Postgresql mappings: https://docs.rs/sqlx/latest/sqlx/postgres/types/index.html
                         let tmp_created_at: chrono::NaiveDateTime = row.get("created_timestamp");
@@ -82,8 +89,9 @@ impl AuthDAO {
     /// 
     pub async fn get_user_permissions(&self, user_id: i64 ) -> Result< Option<UserAuthorization>, std::io::Error> {
         // construct query - we have a denormalized data structure here to save joins, so the table has all the Id's someone would ever need
-        let query = format!("SELECT department_id, permission_id FROM public.user_permission where active_flag = 'Y' and users_id = {} group by department_id, permission_id order by permission_id", user_id);
+        let query = db_query::QRY_USER_PERMISSIONS_ALL_ACTIVE.replace("{user_id}", &user_id.to_string());
         tracing::debug!("get_user_permissions Query: {}", query);
+        //println!("get_user_permissions Query: {}", query);
 
         // https://docs.rs/sqlx/latest/sqlx/fn.query_as.html
         // https://stackoverflow.com/questions/67243108/mapping-nm-relations-into-vec-using-sqlx
@@ -126,10 +134,8 @@ impl AuthDAO {
     ///          describing the location.
     ///
     pub async fn get_user_and_departments_at_current_user_sites(&self, user_id: i64)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
-        let query_level_0: String = db_query::QRY_ALL_USERS_AND_DEPARTMENT_NAME.to_owned();
-        let query = query_level_0.replace("{user_id}", &user_id.to_string());
-
         tracing::debug!("get_user_and_departments_at_current_user_sites()");
+        let query = db_query::QRY_ALL_USERS_AND_DEPARTMENT_NAME.replace("{user_id}", &user_id.to_string());
 
         let rows: Vec<( i64, String, String )> = sqlx::query_as(&query)
                                                 .fetch_all(&self.connection) 

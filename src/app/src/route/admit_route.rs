@@ -207,7 +207,7 @@ impl AdmitRoute{
       let legacy_menu_results = dao.get_patients_at_users_site_no_discharge(userid.clone()).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
       let legacy_menu = match legacy_menu_results {
           Some (patients_for_menu_lst) => {
-            {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id, user_display_name.clone())
+            {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id, user_session_details.clone())
           }
           None => {
               tracing::debug!("No patients found for legacy menu. [Userid:{}]", userid.clone());
