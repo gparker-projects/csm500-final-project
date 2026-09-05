@@ -13,7 +13,6 @@ pub struct PatientWrapper {
     pub patient: Patient,
     pub current_encounter: Encounter,
     pub most_recent_intervention: Option<Intervention>//,
-    //pub intervention_detail: Option<Vec<InterventionDetail>>
 }
 
 #[derive(Debug, Clone)]
@@ -22,7 +21,15 @@ pub struct PatientDAO {
 }
 
 impl PatientDAO {
-    /// Creates a new Patient Data Access Object, with a database pool for use by other calls
+
+    /// ### PatientDAO::new()
+    ///    Creates a new Patient Data Access Object, with a database pool for use by other calls
+    /// 
+    /// #### Parameters:
+    /// * db_connection (PgPool): a PgPool for establishing a database connection
+    /// 
+    /// #### Returns:
+    /// * PatientDAO: the PatientDAO object that was created
     /// 
     pub async fn new(db_connection: PgPool) -> Self {
         PatientDAO {
@@ -30,13 +37,23 @@ impl PatientDAO {
         }
     }
 
-    /// Finds and returns the data for a specific patient
+    /// ### get_patient_details()
+    ///    Finds and returns the data for a specific patient, as a Patient struct
     /// 
-    pub async fn get_patient_details(&self, _user_id: i64, patient_id: i64) -> Result< Option<Patient>, std::io::Error> {
+    /// #### Parameters:
+    /// * _audit_user_id (i64): the id of the user making the data request, for audit purposes
+    /// * patient_id (i64): the id of the patient to be obtained
+    /// 
+    /// #### Returns:
+    /// * Option<Patient>: the Patient, if found
+    /// * sqlx::Error: An error, if applicable
+    /// 
+    pub async fn get_patient_details(&self, _audit_user_id: i64, patient_id: i64) -> Result< Option<Patient>, std::io::Error> {
         let tmp: String = db_query::QRY_SINGLE_PATIENT_DETAILS.to_owned();
         let query = tmp.replace("{}", &patient_id.to_string());
 
         tracing::debug!("get_patient_details Query: {}", query);
+        println!("get_patient_details Query: {}", query);
 
         match sqlx::query(&query)
         .fetch_optional(&self.connection)
@@ -71,13 +88,13 @@ impl PatientDAO {
                             legal_last_name: tmp_legal_last_name,//"DUMMY".to_string(), 
                             legal_middle_names: tmp_legal_middle_names, //"DUMMY".to_string(),
                             phn: tmp_phn,
-                            birth_date: tmp_birthdate, //Utc::now().naive_utc(), 
+                            birth_date: tmp_birthdate,
                             location_id: tmp_loc_id,
                             location_short_name: tmp_location_short_name,
-                            admit_timestamp:tmp_admit_timestamp, //Utc::now().naive_utc(), 
-                            admit_notes: tmp_admit_notes,//"DUMMY".to_string(), 
-                            discharge_timestamp: tmp_discharge_timestamp,//Utc::now().naive_utc(), 
-                            discharge_notes: tmp_discharge_notes,//"DUMMY".to_string(), 
+                            admit_timestamp:tmp_admit_timestamp, 
+                            admit_notes: tmp_admit_notes,
+                            discharge_timestamp: tmp_discharge_timestamp,
+                            discharge_notes: tmp_discharge_notes,
                         }
                     )
                 )
@@ -95,41 +112,26 @@ impl PatientDAO {
         }
     }
 
-
-
-    ///
-    /// Given an AdmitFormData, create a new Patient reocrd, or update an eisting one
-    /// RETURNS: (i64, i64): the id of the Patient and the id of the Encounter record that were created 
+    /// ### update_encounter_from_discharge_form()
+    ///    Given an AdmitFormData, create a new Encounter reocrd, or update an existing one
     /// 
-    /// REF: https://medium.com/@francis.stephan/developing-a-web-app-with-rust-part-4-sqlx-data-validation-deployment-final-remarks-303e78c2a546
+    /// #### Parameters:
+    /// * form (DischargeDataForm): a DischargeDataForm object describing the data to be used for the update
+    /// * _audit_user_id (i64): the id of the user making the data request, for audit purposes
     /// 
-    /*pub async fn upsert_from_admit_form(&self, form: AdmitDataForm, audit_user_id: i64)-> Result<(i64, i64), sqlx::Error> {
-        let patient_results = self.upsert_patient_from_admit_form(form.clone(), audit_user_id).await;
-        match patient_results {
-            Ok(p_id) => {
-                let enc_results = self.upsert_encounter_from_admit_form(form.clone(), audit_user_id).await;
-
-                match enc_results {
-                    Ok(e_id) =>  Ok((p_id, e_id)),
-                    Err(_e) =>  Ok((p_id, constants::INVALID_OTHER_ID))
-                }
-            },
-            Err(_e) =>  Ok((constants::INVALID_PATIENT_ID, constants::INVALID_OTHER_ID))
-        }
-    }*/
-
-    ///
-    /// Given an AdmitFormData, create a new Encounter reocrd, or update an existing one
-    /// RETURNS: i64: the id of the Encounter record that is created, if applicable
+    /// #### Returns:
+    /// * i64: the id of the Encounter record that is created, if applicable
+    /// * sqlx::Error: An error, if applicable
     /// 
     pub async fn update_encounter_from_discharge_form(&self, form: DischargeDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
-        tracing::debug!("> update_encounter_from_discharge_form");
+        tracing::debug!("update_encounter_from_discharge_form()");
 
         let query_level_0 = db_query::UPDATE_ENCOUNTER_FOR_DISCHARGE.to_string();
         let query_level_1 = &query_level_0.replace("{discharge_notes}", &form.discharge_notes.clone().trim());
         let query_level_2 = &query_level_1.replace("{encounter_id}", &form.encounter_id.clone().trim());
 
         tracing::debug!(" >> Encounter Update from discharge: {}", query_level_2);
+        println!("..SQL query:\n{}", query_level_2);
 
         let result = sqlx::query(&query_level_2)
                                                         .fetch_one(&self.connection)
@@ -142,27 +144,37 @@ impl PatientDAO {
         Ok(inserted_id)
     }
 
-    ///
-    /// Given an AdmitFormData, create a new Encounter reocrd, or update an existing one
-    /// RETURNS: i64: the id of the Encounter record that is created, if applicable
+    /// ### upsert_encounter_from_admit_form()
+    ///    Given an AdmitFormData, create a new Encounter rcocrd, or update an existing one
+    /// 
+    /// #### Parameters:
+    /// * form (AdmitDataForm): an AdmitDataForm object describing the data to be used for the update
+    /// * _audit_user_id (i64): the id of the user making the data request, for audit purposes
+    /// 
+    /// #### Returns:
+    /// * i64: the id of the Encounter record that is created or updated, as applicable
+    /// * sqlx::Error: An error, if applicable
     /// 
     pub async fn upsert_encounter_from_admit_form(&self, form: AdmitDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
         tracing::debug!("> upsert_encounter_from_admit_form");
+        println!("> upsert_encounter_from_admit_form");
 
-        let mut query_level_0 = db_query::UPDATE_ENCOUNTER.to_string();
+        let query_level_0: String;
 
         // if encounter id is not specified, we INSERT
         if &form.encounter_id == &constants::NOT_SPECIFIED_ID.to_string() {
             query_level_0 = db_query::INSERT_ENCOUNTER.to_string();
         }
+        else{
+            query_level_0 = db_query::UPDATE_ENCOUNTER.to_string().replace("{encounter_id}", &form.encounter_id.clone().trim());
+        }
 
         let query_level_1 = &query_level_0.replace("{admit_notes}", &form.admit_notes.clone().trim());
         let query_level_2 = &query_level_1.replace("{patient_id}", &form.patient_id.clone().trim());
-        //let query_level_3 = &query_level_2.replace("{discharge_timestamp}", &form.discharge_timestamp.clone().trim());
-        //let query_level_4 = &query_level_3.replace("{discharge_notes}", &form.discharge_notes.clone().trim());
         let query = &query_level_2.replace("{location_id}", &form.location_id.clone().trim());
 
         tracing::debug!(" >> Encounter Upsert: {}", query);
+        println!(" >> Encounter Upsert: {}", query);
 
         let result = sqlx::query(&query)
                                                         .fetch_one(&self.connection)
@@ -174,12 +186,20 @@ impl PatientDAO {
 
         Ok(inserted_id)
     }
-
-    ///
-    /// Given an AdmitFormData, create a new Patient reocrd, or update an eisting one
-    /// RETURNS: i64: the id of the Patient record that is created
+    
+    /// ### upsert_patient_from_admit_form()
+    ///    Given an AdmitFormData, create a new Encounter rcocrd, or update an existing one
     /// 
-    /// REF: https://medium.com/@francis.stephan/developing-a-web-app-with-rust-part-4-sqlx-data-validation-deployment-final-remarks-303e78c2a546
+    /// #### Parameters:
+    /// * form (AdmitDataForm): an AdmitDataForm object describing the data to be used for the update
+    /// * _audit_user_id (i64): the id of the user making the data request, for audit purposes
+    /// 
+    /// #### Returns:
+    /// * i64: the id of the Encounter record that is created or updated, as applicable
+    /// * sqlx::Error: An error, if applicable
+    /// 
+    /// #### Refs
+    /// * https://medium.com/@francis.stephan/developing-a-web-app-with-rust-part-4-sqlx-data-validation-deployment-final-remarks-303e78c2a546
     /// 
     pub async fn upsert_patient_from_admit_form(&self, form: AdmitDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
         tracing::debug!("> upsert_patient_from_admit_form");
@@ -205,15 +225,23 @@ impl PatientDAO {
         Ok(inserted_id)
     }
 
-
-
-    /// Finds and returns any patients that are currently assigned to the user
+  
+    /// ### get_patients_at_users_site_no_discharge()
+    ///    Finds and returns any patients that are currently assigned to the user
     /// 
-    /// REFs: https://docs.rs/sqlx/latest/sqlx/fn.query_as.html
-    ///       https://stackoverflow.com/questions/67243108/mapping-nm-relations-into-vec-using-sqlx
-    ///       https://doc.rust-lang.org/std/io/struct.Error.html - for return Error
-    /// get_patients_at_users_site_no_discharge
-    pub async fn get_patients_at_users_site_no_discharge(&self, user_id: i64, _include_discharged: bool) -> Result< Option< Vec<Patient> >, std::io::Error> {
+    /// #### Parameters:
+    /// * user_id (i64): the id of the user that will be used to identify the department, in the lookup
+    /// 
+    /// #### Returns:
+    /// * Option< Vec<Patient>: a vector of Patients, if found
+    /// * sqlx::Error: An error, if applicable
+    /// 
+    /// #### Refs
+    /// * https://docs.rs/sqlx/latest/sqlx/fn.query_as.html
+    /// * https://stackoverflow.com/questions/67243108/mapping-nm-relations-into-vec-using-sqlx
+    /// * https://doc.rust-lang.org/std/io/struct.Error.html - for return Error
+    /// 
+    pub async fn get_patients_at_users_site_no_discharge(&self, user_id: i64) -> Result< Option< Vec<Patient> >, std::io::Error> {
         let tmp: String = db_query::QRY_ALL_PATIENTS_AT_USERS_SITE_NO_DISCHARGE.to_owned();
         let query = tmp.replace("{}", &user_id.to_string());
 

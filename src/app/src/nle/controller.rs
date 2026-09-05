@@ -168,7 +168,7 @@ impl CommandController{
     /// 
     pub async fn get_referenced_patient(pdao: PatientDAO, userid: i64, prompt: String) -> (i8, Option<Patient>){
         tracing::debug!("get_referenced_patient():prompt='{}'", prompt.clone());
-        let patients_list = pdao.get_patients_at_users_site_no_discharge(userid, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
+        let patients_list = pdao.get_patients_at_users_site_no_discharge(userid).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
         let mut result_code: i8 = Self::NO_PATIENT_FOUND;
         let mut result: Option<Patient> = None;
         let tmp_prompt = prompt.to_lowercase();

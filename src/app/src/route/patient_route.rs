@@ -82,7 +82,7 @@ impl PatientRoute{
     };
 
     // refresh the patients in the menu (only)
-    let legacy_menu_results = pdao.get_patients_at_users_site_no_discharge(userid.clone(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+    let legacy_menu_results = pdao.get_patients_at_users_site_no_discharge(userid.clone()).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
     let legacy_menu = match legacy_menu_results {
         Some (patients_for_menu_lst) => {
             {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id, user_session_details.user_display_name)

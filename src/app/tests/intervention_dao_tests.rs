@@ -29,6 +29,10 @@ pub const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500
 
 ///
 /// Tests the ability for the DAO to CREATE, SELECT and UPDATE Intervention Detail records
+///  * InterventionDAO::new()
+///  * upsert_intervention_details_from_intv_form()
+///  * get_all_intervention_details_for_an_intervention()
+/// 
 /// 
 #[tokio::test]
 async fn test_ins_get_upd_intervention_details(){
@@ -48,7 +52,7 @@ async fn test_ins_get_upd_intervention_details(){
     let test_user_id = 2;
     let mut tmp_id: i64 = constants::INVALID_OTHER_ID;
 
-    println!("Testing: upsert_intervention_details_from_intv_form(): first insertion");
+    //println!("Testing: upsert_intervention_details_from_intv_form(): first insertion");
 
     // instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
     // we can not test if the DAO itself is instantiated as the only content is a PgPool, which does not allow assert_eq!. If the object
@@ -132,5 +136,117 @@ async fn test_ins_get_upd_intervention_details(){
         None => {
             assert!(false);
         }
+    }
+
+    #[tokio::test]
+    async fn test_get_intervention(){
+        let db_url = DB_CONN_STR;
+        let db_pool = match PgPoolOptions::new()
+            .max_connections(5)
+            .connect(db_url)
+            .await
+        {
+            Ok(pool) => pool,
+            Err(e) => {
+            tracing::warn!("{}", e);
+            panic!("{}", e)
+            },
+        };
+        // instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
+        // we can not test if the DAO itself is instantiated as the only content is a PgPool, which does not allow assert_eq!. If the object
+        // does not instantiate however, the remainder of this test will fail.
+        let idao = InterventionDAO::new( db_pool.clone() ).await;
+
+        let test_user_id = 2;
+        let mut tmp_id: i64 = constants::INVALID_OTHER_ID;
+
+        
+
+        
+        assert!(false);
+    }
+
+    #[tokio::test]
+    async fn test_get_interventions_plural(){
+        let db_url = DB_CONN_STR;
+        let db_pool = match PgPoolOptions::new()
+            .max_connections(5)
+            .connect(db_url)
+            .await
+        {
+            Ok(pool) => pool,
+            Err(e) => {
+            tracing::warn!("{}", e);
+            panic!("{}", e)
+            },
+        };
+        // instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
+        // we can not test if the DAO itself is instantiated as the only content is a PgPool, which does not allow assert_eq!. If the object
+        // does not instantiate however, the remainder of this test will fail.
+        let idao = InterventionDAO::new( db_pool.clone() ).await;
+
+        let test_user_id = 2;
+        let mut tmp_id: i64 = constants::INVALID_OTHER_ID;
+
+        
+
+        
+        assert!(false);
+    }
+
+    #[tokio::test]
+    async fn test_get_most_recent_vitals(){
+        let db_url = DB_CONN_STR;
+        let db_pool = match PgPoolOptions::new()
+            .max_connections(5)
+            .connect(db_url)
+            .await
+        {
+            Ok(pool) => pool,
+            Err(e) => {
+            tracing::warn!("{}", e);
+            panic!("{}", e)
+            },
+        };
+        // instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
+        // we can not test if the DAO itself is instantiated as the only content is a PgPool, which does not allow assert_eq!. If the object
+        // does not instantiate however, the remainder of this test will fail.
+        let idao = InterventionDAO::new( db_pool.clone() ).await;
+
+        let test_user_id = 2;
+        let mut tmp_id: i64 = constants::INVALID_OTHER_ID;
+
+        
+
+        
+        assert!(false);
+    }
+
+    #[tokio::test]
+    async fn test_upsert_intervention_from_intv_form(){
+        let db_url = DB_CONN_STR;
+        let db_pool = match PgPoolOptions::new()
+            .max_connections(5)
+            .connect(db_url)
+            .await
+        {
+            Ok(pool) => pool,
+            Err(e) => {
+            tracing::warn!("{}", e);
+            panic!("{}", e)
+            },
+        };
+        // instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
+        // we can not test if the DAO itself is instantiated as the only content is a PgPool, which does not allow assert_eq!. If the object
+        // does not instantiate however, the remainder of this test will fail.
+        let idao = InterventionDAO::new( db_pool.clone() ).await;
+
+        let test_user_id = 2;
+        let mut tmp_id: i64 = constants::INVALID_OTHER_ID;
+
+        
+
+
+        assert!(false);
     }
 }

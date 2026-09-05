@@ -122,8 +122,11 @@ pub const QRY_SINGLE_PATIENT_DETAILS: &str =  r##"SELECT p.id "patient_id", e.id
                                             FROM patient p
                                             join encounter e on p.id = e.patient_id
 											join location l2 on l2.id = e.location_id
-                                            where patient_id = {}"##;
-
+                                            where patient_id = {}
+											  and e.admit_timestamp = (
+											    select max(admit_timestamp)
+												from encounter e2 where e2.patient_id = p.id )
+                                            "##;
 
 pub const QRY_ALL_INTERVENTION_DETAILS_FOR_AN_INTERVENTION: &str =  r##"
                                                     SELECT i.id "intervention_details_id", value, notes, entry_timestamp, ref1.name "intervention_type", intervention_id, type_id
@@ -132,14 +135,6 @@ pub const QRY_ALL_INTERVENTION_DETAILS_FOR_AN_INTERVENTION: &str =  r##"
                                                         WHERE i.intervention_id = {}
                                                         order by i.id desc
                                                 "##;
-
-                                                /*
-pub const QRY_GET_SINGLE_INTERVENTION_DETAIL: &str =  r##"
-                                                    SELECT i.id "intervention_details_id", value, notes, entry_timestamp, ref1.name "intervention_type", intervention_id, type_id
-                                                        FROM intervention_details i
-                                                        JOIN common_reference_type ref1 on i.type_id = ref1.id 
-                                                        WHERE i.id = {}
-                                                "##; */
 
 pub const QRY_ALL_INTERVENTION_DETAILS_FOR_INTV_AND_TYPE: &str = r##"
                                                     SELECT i.id "intervention_details_id", value, notes,
@@ -235,8 +230,6 @@ pub const INSERT_ENCOUNTER: &str = r##"
 pub const UPDATE_ENCOUNTER: &str = r##"
     UPDATE encounter
         SET admit_notes = '{admit_notes}',
-            discharge_timestamp = to_timestamp('{discharge_timestamp}', 'YYYY/MM/DD HH24:MI:SS'),
-            discharge_notes = '{discharge_notes}',
             patient_id = {patient_id},
             location_id = {location_id}
         WHERE id = {encounter_id} RETURNING ID;

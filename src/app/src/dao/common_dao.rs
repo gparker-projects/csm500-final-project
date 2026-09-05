@@ -20,9 +20,6 @@ impl CommonDAO {
 
 pub const REF_TYPE_GROUP_1_INTERVENTION_TYPES: i64 = 1;
 pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
-//pub const REF_TYPE_GROUP_3_CARE_TYPES: i64 = 3;
-//pub const REF_TYPE_GROUP_4_INTERVENTION_META_DATA: i64 = 4;
-pub const REF_TYPE_GROUP_5_STANDARD_MEASURES: i64 = 5;
 
     /// Creates a new AuthObjects object, with a database pool for use by other calls
     /// 
@@ -191,18 +188,6 @@ pub const REF_TYPE_GROUP_5_STANDARD_MEASURES: i64 = 5;
     /// 
     pub async fn get_intervention_types(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
         self.get_common_references(Self::REF_TYPE_GROUP_1_INTERVENTION_TYPES, true).await
-    }
-
-    ///
-    /// Shortcut method to obtain Standard Measure group (id=5) entries from the COMMON REFERENCE TYPE table
-    ///
-    /// Returns: a tuple (i64, String, String) containing:
-    ///          - id of the reference list item
-    ///          - short name of the reference list item
-    ///          - long name of the reference list item
-    /// 
-    pub async fn get_standard_measure_types(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
-        self.get_common_references(Self::REF_TYPE_GROUP_5_STANDARD_MEASURES, true).await
     }
 
     ///

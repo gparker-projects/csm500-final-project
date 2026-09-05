@@ -38,7 +38,7 @@ impl HomeRoute{
         let idao = InterventionDAO::new( app_session.get_db_connection() ).await;
         let edao = EncounterDAO::new( app_session.get_db_connection() ).await;
 
-        let qry_results = dao.get_patients_at_users_site_no_discharge(user_session.get_userid_as_i64(), false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+        let qry_results = dao.get_patients_at_users_site_no_discharge(user_session.get_userid_as_i64()).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
         match qry_results {
             Some (patient_list) => {
             tracing::debug!("Retrieved {} patients:", patient_list.len());

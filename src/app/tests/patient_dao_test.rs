@@ -108,8 +108,6 @@ async fn test_get_patient_details() {
     }
 }
 
-
-
 #[tokio::test]
 /// ### test_wrapper_patient_dao()
 /// 
@@ -119,11 +117,11 @@ async fn test_wrapper_patient_dao() {
 
     // these both create new encounters and during parallel thread execution mess up the discharge
     // which is determistic on its ID.
-    test_upsert_patient_from_admit_form();
-    test_upsert_encounter_from_admit_form();
+    test_upsert_patient_from_admit_form().await;
+    test_upsert_encounter_from_admit_form().await;
 
     // must perform discharge last, otherwise the other items running in parallel mess up the id sequencing
-    test_update_encounter_from_discharge_form();
+    test_update_encounter_from_discharge_form().await;
 }
 
 /// ### test_upsert_patient_from_admit_form()
@@ -305,9 +303,7 @@ async fn test_update_encounter_from_discharge_form() {
         }
     }
 
-    println!("Received: tmp_encounter_id = {} ", tmp_encounter_id);
-
-    let mut tmp_frm = DischargeDataForm{
+    let tmp_frm = DischargeDataForm{
         patient_id: test_patient_id.to_string(), // <-------------------------- these might need to be changed, if the data changes
         encounter_id: tmp_encounter_id.to_string(),                      // this field and others are not actually set/used by upsert_patient_from_admit_form() 
         discharge_notes: DataGenerator::get_lorem_ipsum(100)
@@ -323,12 +319,6 @@ async fn test_update_encounter_from_discharge_form() {
                 let qry_results: Option<Patient> = pdao.get_patient_details(test_user_id, test_patient_id).await.unwrap();
                 match qry_results{
                     Some (p) => {
-                        println!("tmp_encounter_id = {} ", tmp_encounter_id);
-                        println!("p.encounter_id = {} ", p.encounter_id);
-
-                        println!("p.discharge_notes = {} ", p.discharge_notes);
-                        println!("tmp_frm.discharge_notes = {} ", tmp_frm.discharge_notes);
-
                         assert_eq!( p.discharge_notes, tmp_frm.discharge_notes );        // discharge notes should be the same as what was sent in
                         assert_ne!( p.discharge_timestamp.unwrap(), p.admit_timestamp ); // update timestamp should be different
                         assert!(true)
