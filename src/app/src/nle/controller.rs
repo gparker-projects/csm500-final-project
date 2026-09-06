@@ -9,6 +9,7 @@
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
+use sqlx::types::uuid::timestamp::context;
 use tracing;
 
 use crate::constants;
@@ -33,6 +34,11 @@ impl CommandController{
     pub const NO_PATIENT_FOUND: i8 = 0;
     //pub const UNKNOWN_PATIENT_FOUND: i8 = 1;
     pub const KNOWN_PATIENT_FOUND: i8 = 2;
+
+    pub const CONTEXT_LEVEL_ANY_PATIENT: i8 = 0; //context level: either no patient (0), within a patient/encounter (1) or within a patient's intervention (2)
+    pub const CONTEXT_LEVEL_PATIENT: i8 = 1;
+    pub const CONTEXT_LEVEL_PATIENT_INTERVENTION: i8 = 2;
+
 
     ///
     /// Public constructor for the CommandController
@@ -64,8 +70,31 @@ impl CommandController{
         }
     }
 
+    
+    // given the id of a permission (command), return the context it is allowed to operate in
+    pub fn get_command_context_level (permission_id: i64, target_level: i8) -> bool{
+        let required_level: i8;
+
+        if permission_id >= 100000 { // the permissions above 100000 are currently undefined, but reserved for intervention-level calls
+            required_level = CommandController::CONTEXT_LEVEL_PATIENT_INTERVENTION ;
+        }
+        else if permission_id <= 12 { // we'll ignore Login as there is no Login (id=1) available when you're already in the system
+            required_level = CommandController::CONTEXT_LEVEL_PATIENT;
+        }
+        else { // the permissions between 13 - 99999 are currently undefined
+            required_level = CommandController::CONTEXT_LEVEL_ANY_PATIENT;
+        }
+
+        if required_level == target_level {
+            return true;
+        }
+        return false;
+    }
+
     ///
-    /// # Obtains classifier rankings, only including items that the user has a permission for
+    /// # Obtains classifier rankings, only including items that the user has a permission for, and appropriate for the context level.
+    ///   E.g. Some users can not access certain permissions AND the system should not allow some functions to be performed at different
+    ///        context levels (e.g. Add a request for Bloodwork, when there is no Patient selected)
     /// 
     /// ## Parameters:
     /// 
@@ -77,62 +106,37 @@ impl CommandController{
     /// * String: Sentence that was evaluated
     /// * f32: Resulting percentage of success of the comparison against the prompt
     /// 
-    pub async fn get_classifier_rankings_filtered_for_permissions(&mut self, prompt: String, user_auths: UserAuthorization ) -> Vec<(String, f32)>{
-        tracing::debug!("get_classifier_rankings_filtered_for_permissions()");
-        let ops_add_prompt: Vec<String> = self.get_all_operations_and_add_prompt( prompt.clone() );
-        let mut results: Vec<(String, f32)> = vec![]; 
-        let classifer_results: Vec<(String, f32)> = self.nl_engine.get_classifier_rankings(ops_add_prompt ).await;
+    pub async fn get_filtered_classifier_rankings(&mut self, prompt: String, user_auths: UserAuthorization, context_level: i8 ) -> Vec<(String, f32)>{
+        tracing::debug!("get_filtered_classifier_rankings()");
+        let mut user_restricted_options: Vec<String> = Vec::new();
 
-        // check that the user has the permission before adding it 
-        for c_result in classifer_results{
-            let pid: i64 = self.get_permission_for_operation (c_result.clone().0);
-            if user_auths.has_permission(pid){
-                tracing::debug!("..(+) adding permission ({}) for: {}", pid, c_result.clone().0);
-                //println!("..(+) adding permission ({}) for: {}", pid, c_result.clone().0);
-                results.push( c_result );
+        let mut rejected_counter = 0;
+        for item in self.command_hashset.clone() { // check if the user has a permission (as identified in the command mapping) before allowing it to be used in the prompt lookup
+            if user_auths.has_permission(item.1){
+
+                // if the command has the required context level, the user will receive it as an option
+                //if CommandController::get_command_context_level( item.1, context_level) {
+                    user_restricted_options.push(item.0);
+                //}
             }
-            //else{
-            //    tracing::debug!("..(x) no permission found for: {}, excluding", c_result.clone().0);
-                //println!("..(x) no permission found for: {}, excluding", c_result.clone().0);
-            //}
+            else{
+                rejected_counter = rejected_counter + 1;
+            }
         }
+        
+        user_restricted_options.insert(0, prompt.clone() );        // the NLE wants the prompt we're checking against to be the first element of the list, so prepend it to the vector
+        
+        // get the classification rankings from the NL engine
+        let classifer_results: Vec<(String, f32)> = self.nl_engine.get_classifier_rankings(user_restricted_options.clone() ).await;
 
-        for item in results.clone(){
-            tracing::info!("..(+) added permission for '{}' ('{:.1}%')", item.0, item.1 *100.);
+        for item in classifer_results.clone(){
+        //    tracing::info!("..(+) added permission for '{}' ('{:.1}%')", item.0, item.1 *100.);
             println!("..(+) added permission for '{}' ('{:.1}%')", item.0, item.1 *100.);
         }
 
-        results
-    }
+        println!("....added {} permissions, rejected {}", user_restricted_options.len(), rejected_counter);
 
-    ///
-    /// Constructs a list of strings ( Vec<String> ) from the previously loaded command mapping file, and adds the user's prompt as the first element
-    /// This required by the NL model we are using ATM, for its comparison routine.
-    /// 
-    pub fn get_all_operations_and_add_prompt (&self, prompt: String) -> Vec<String> {
-        // take the list we loaded, cut it into separate vectors by the columns
-        // https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.unzip
-        //
-        let  (mut sentences, _ignore_command_id): (Vec::<String>, Vec::<i64>) = self.command_hashset.clone().into_iter().unzip();
-        sentences.insert(0, prompt.clone() );
-
-        return sentences;
-    }
-
-    ///
-    /// Retrieves the id of the permission associated with the operation (column 0 from the command mapping)
-    ///  that matches the prompt_string.
-    /// 
-    pub fn get_permission_for_operation (&self, prompt_string: String) -> i64 {
-        tracing::debug!("get_permission_for_operation(): Compare to prompt: '{}'", prompt_string);
-        let mut results: i64 = constants::INVALID_OTHER_ID;
-        for item in self.command_hashset.clone().iter(){
-           if item.0 == prompt_string{
-                results = item.1;
-                break; // terminate early if we find a match
-           }
-        }
-        results
+        classifer_results
     }
 
     ///

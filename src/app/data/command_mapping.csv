@@ -1,27 +1,20 @@
-admit patient, 1, Admit New Patient
-admit add new open patient, 1, Admit New Patient
-add patient, 1, Admit New Patient
-new open patient, 1, Admit New Patient
-create patient, 1, Admit New Patient
-discharge patient, 3, Discharge Patient
-send patient home, 3, Discharge Patient
-release patient, 3, Discharge Patient
-close patient, 3, Discharge Patient
-get patient out of here, 3, Discharge Patient
-dismiss patient, 3, Discharge Patient
-add information, 2, Add to Patient Chart
+admit patient, 4, Admit New Patient
+admit add new open patient, 4, Admit New Patient
+add patient, 4, Admit New Patient
+discharge patient, 5, Discharge Patient
+send patient home, 5, Discharge Patient
+release patient, 5, Discharge Patient
+add information, 100012, Add to Patient Chart
 update contact information, 2, Update Patient Information
 apply a bandage, 100001, Bandage
 fix a wound, 100001, Bandage
 wound care, 100001, Bandage
 has a cut, 100001, Bandage
-has cuts, 100001, Bandage
 needs a bandaid, 100001, Bandage
 has a laceration, 100001, Bandage
 has an abrasion, 100001, Bandage
 is bleeding, 100001, Bandage
 area is swollen, 100001, Bandage
-has swelling, 100001, Bandage
 fell and has scraped, 100001, Bandage
 requires basic first aid, 100001, Bandage
 has a bite, 100001, Bandage

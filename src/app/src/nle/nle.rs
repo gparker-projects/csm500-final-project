@@ -20,7 +20,6 @@ use ort::{
 	value::TensorRef
 };
 use tokenizers::Tokenizer;
-use std::cmp::Reverse;
 
 // Refs for ML code:
 //   https://ort.pyke.io/#load-your-model
@@ -100,11 +99,11 @@ impl NaturalLanguageEngine {
       results.sort_unstable_by(|a, b| b.1.total_cmp(&a.1));
 
       tracing::info!("..Sorted results:");
-      println!("..Sorted results:");
-      for item in results.clone(){
-          tracing::info!("{} ({:.1}%)", item.0, item.1 * 100.);
-          println!("{} ({:.1}%)", item.0, item.1 * 100.);
-      }
+      //println!("..Sorted results:");
+      //for item in results.clone(){
+      //    tracing::info!("{} ({:.1}%)", item.0, item.1 * 100.);
+      //    println!("{} ({:.1}%)", item.0, item.1 * 100.);
+      //}
 
       results
     }

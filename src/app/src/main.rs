@@ -19,6 +19,8 @@
 //! 
 //! ---------------------------------------------------------------------------------
 
+use actix_web::http::StatusCode;
+
 use actix_cors::Cors;
 use actix_files::*;
 use actix_session::{storage::CookieSessionStore, SessionMiddleware}; //, storage::RedisSessionStore}
@@ -163,6 +165,20 @@ fn init_config() -> SysConfig {
     final_config
 }
 
+/// ### NLERoute::route_to_not_found()
+///   Route for processing resource not found / 404 errors
+/// 
+/// #### Parameters: None
+/// 
+/// #### Returns:
+/// * Responder (actix_web::response::responder): the HTTP responder (response) for the request
+/// 
+async fn route_to_not_found() -> impl Responder {
+    //HttpResponse::NotFound().body("Sorry, Page not found")
+     actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SEE_OTHER)
+}
+
+ 
 /// # Main program
 /// 
 /// Loads the NLP engine and adds handlers for key paths of the web application
@@ -246,6 +262,7 @@ async fn main() -> std::io::Result<()> {
       .route("/intvdtlsave", web::post().to( InterventionDetailsRoute::route_to_intervention_detail_save ))
       .route("/isItUp", web::get().to( is_it_up ))
       .route("/logout", web::get().to( LoginRoute::logout ))
+      .default_service(web::to(route_to_not_found))
       .service(Files::new("/webc/", "./webc"))  // ref: ttps://actix.rs/docs/static-files/
   })
   .bind("127.0.0.1:8000")?

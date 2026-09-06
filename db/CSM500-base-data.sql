@@ -150,7 +150,7 @@ INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
 
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
-  VALUES (100012, 1, 'Y', 'Other', 'Other');
+  VALUES (100012, 3, 'Y', 'Other', 'Other');
 
 COMMIT;
 
@@ -284,7 +284,7 @@ INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
  
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
     OVERRIDING SYSTEM VALUE
- VALUES (100041, 1, 'Y', 'Appointments', 'Appointments');
+ VALUES (100041, 3, 'Y', 'Appointments', 'Appointments');
  
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
      OVERRIDING SYSTEM VALUE
@@ -300,7 +300,7 @@ INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
  
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
      OVERRIDING SYSTEM VALUE
- VALUES (100045, 1, 'Y', 'Documents', 'Documents');
+ VALUES (100045, 3, 'Y', 'Documents', 'Documents');
 
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
       OVERRIDING SYSTEM VALUE
@@ -314,10 +314,27 @@ COMMIT;
 -- quick addition of new permissions that directly align to interventions being requested for creation
 -- via the NLE
 --
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (100049, 3, 'Y', 'Next of Kin/Contacts', 'Next of Kin/Contacts');
+
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (100050, 3, 'Y', 'Primary Address', 'Primary Address');
+  
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (100051, 1, 'Y', 'Clinical Discharge', 'Clinical Discharge');
+  
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (100052, 3, 'Y', 'Medical Insurance', 'Medical Insurance');
+
 INSERT INTO PERMISSION (ID, NAME, EXPIRY_DATETIME)
 OVERRIDING SYSTEM VALUE
 SELECT ID, NAME, (TIMESTAMP '2100-12-31')
-FROM PUBLIC.COMMON_REFERENCE_TYPE
-WHERE GROUP_ID = 1;
+FROM COMMON_REFERENCE_TYPE
+WHERE GROUP_ID in (1,3);
 
 COMMIT;

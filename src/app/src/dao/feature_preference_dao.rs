@@ -37,7 +37,7 @@ impl FeaturePreferenceDAO {
                                                                 upper_limit: usize,
                                                                 intervention_level_only: bool)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
         tracing::debug!("get_active_feature_preferences_for_user()");
-        println!("get_active_feature_preferences_for_user()");
+        //println!("get_active_feature_preferences_for_user()");
         let query_level_0 = db_query::QRY_GET_ALL_ACTIVE_FEATURE_PREFERENCE_FOR_USER;
         let query_level_1 = query_level_0.replace("{users_id}", &user_id.to_string());
         let query_level_2 = query_level_1.replace("{limit_days}", &"14".to_string());
@@ -53,7 +53,7 @@ impl FeaturePreferenceDAO {
         let query = query_level_3.replace("{limit_rows}", &"3".to_string());
 
         //tracing::debug!("..SELECT sql: {}", query);
-        println!("..SELECT sql: {}", query);
+        //println!("..SELECT sql: {}", query);
 
                      //id, display_order, weight,
                      //  calculation_date, department_id, feature_id, ref_group_id, ref_name
@@ -152,7 +152,7 @@ impl FeaturePreferenceDAO {
     /// 
     pub async fn upsert_feature_preference(&self, user_id: i64, feature_id: i64) ->  Result< Option< i64 >, std::io::Error> {
         tracing::debug!("upsert_feature_preference()");
-        println!("upsert_feature_preference()");
+        //println!("upsert_feature_preference()");
 
         let query_level_0 = db_query::UPDATE_FEATURE_PREFERENCE.to_string();
     

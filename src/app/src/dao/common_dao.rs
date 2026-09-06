@@ -100,7 +100,7 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
     /// 
     pub async fn get_common_references(&self, group_ids: String, active_only: bool)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
         tracing::debug!("get_common_references()");
-        println!("get_common_references()");
+        //println!("get_common_references()");
 
         let query_level_0: String = match active_only {
 		    true => db_query::QRY_COMMON_REF_TYPES_FOR_GROUP.to_owned(),
@@ -108,7 +108,7 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
         };
         
         let query = query_level_0.replace("{group_ids}", &group_ids.to_string());
-        println!("..SQL query: {}", query);
+        //println!("..SQL query: {}", query);
 
         let rows: Vec<( i64, String, String )> = sqlx::query_as(&query)
                                                 .fetch_all(&self.connection) 
