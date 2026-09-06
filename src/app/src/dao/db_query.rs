@@ -167,9 +167,9 @@ pub const QRY_ALL_INTERVENTION_DETAILS_FOR_INTV_AND_TYPE: &str = r##"
                                                 "##;
 
 
-pub const QRY_COMMON_REF_TYPES_FOR_GROUP: &str = r##"select id, name, description from common_reference_type where group_id = {group_id} ORDER BY NAME"##;
+pub const QRY_COMMON_REF_TYPES_FOR_GROUP: &str = r##"select id, name, description from common_reference_type where group_id in ({group_ids}) ORDER BY NAME"##;
 
-pub const QRY_COMMON_REF_TYPES_FOR_GROUP_ACTIVE_ONLY: &str = r##"select id, name, description from common_reference_type where group_id = {group_id} and active_flag = 'Y' ORDER BY NAME"##;
+pub const QRY_COMMON_REF_TYPES_FOR_GROUP_ACTIVE_ONLY: &str = r##"select id, name, description from common_reference_type where group_id in({group_ids}) and active_flag = 'Y' ORDER BY NAME"##;
 
 #[allow(dead_code)]
 pub const QRY_ACTIVE_LOCATIONS: &str = r##"select id, name ||' (' || short_name|| ')' from location where active_flag = 'Y'"##; // used by CommonDAO... not sure why the IDE keeps flagging as unused
@@ -177,7 +177,7 @@ pub const QRY_ACTIVE_LOCATIONS: &str = r##"select id, name ||' (' || short_name|
 #[allow(dead_code)]
 pub const QRY_ACTIVE_DEPARTMENTS: &str = r##"select id, name, name "description" from department where expiry_timestamp > now()"##;
 
-pub const QRY_COMMON_REF_TYPES_SINGLE_FOR_A_GROUP_AND_TYPE: &str = r##"SELECT id, name, description FROM common_reference_type WHERE ID = {common_ref_id} LIMIT 1"##;
+pub const QRY_SINGLE_COMMON_REF_TYPE_BY_ID: &str = r##"SELECT id, name, description FROM common_reference_type WHERE ID = {common_ref_id} LIMIT 1"##;
 
 
 pub const QRY_CURRENT_USER_LOCATIONS: &str = r##"
@@ -212,7 +212,7 @@ pub const QRY_GET_ALL_ACTIVE_FEATURE_PREFERENCE_FOR_USER: &str = r##"
                                                     JOIN common_reference_type crf on fp.feature_id = crf.id
                                                     where fp.active_flag = 'Y' and crf.active_flag = 'Y'
                                                     and users_id={users_id} 
-                                                    and fp.feature_id = {feature_id}
+                                                    and crf.Group_id in ({feature_ids})
                                                     and calculation_date >= now() - INTERVAL '{limit_days} days'
                                                     order by calculation_date, weight desc 
                                                                      "##; 

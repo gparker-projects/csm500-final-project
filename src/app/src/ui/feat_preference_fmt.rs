@@ -48,7 +48,10 @@ impl FeaturePreferenceFormatter{
                     // when the item is referring to an Intervention level feature/action to execute, provide different text
                     // these are different because this code is actually executing on completely *different tiles*
                     let javascript_action = match item.ref_group_id {
-                        constants::COMMON_REF_TYPE_INTERVENTION_GROUP_ID => {
+                        constants::CRT_CLINICAL_INTERVENTION_GRP_ID => {
+                            "fast_action_add_intv" //  Interventions; on the InterventionTile.htl tile. This javascript function is in: patientListTile.js
+                        },
+                        constants::CRT_NON_CLINICAL_INTERVENTION_GRP_ID => {
                             "fast_action_add_intv" //  Interventions; on the InterventionTile.htl tile. This javascript function is in: patientListTile.js
                         },
                         _ => {

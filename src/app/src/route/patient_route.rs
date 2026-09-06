@@ -102,6 +102,10 @@ impl PatientRoute{
     
     // no user should be able to get into the system without a location assigned, so we will not worry about an exception here
     let item_list = {CommonDAO::new( app_session.get_db_connection() ).await}.get_intervention_types().await.unwrap();
+    // limit the list to intervention types that the user is allowed to use (clinical, non clinical or none)
+
+    
+
     let fast_actions_upper_limit = app_session.clone().system_config.get_max_general_fastactions();
     let pref_list: Option<Vec<FeaturePreference>> = {FeaturePreferenceDAO::new( app_session.get_db_connection() ).await}.get_active_feature_preferences_of_interventions_for_user(userid, fast_actions_upper_limit).await.unwrap();
 

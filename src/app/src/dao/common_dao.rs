@@ -98,22 +98,24 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
     ///          - short name of the reference list item
     ///          - long name of the reference list item
     /// 
-    pub async fn get_common_references(&self, group_id: i64, active_only: bool)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
+    pub async fn get_common_references(&self, group_ids: String, active_only: bool)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
         tracing::debug!("get_common_references()");
+        println!("get_common_references()");
 
         let query_level_0: String = match active_only {
 		    true => db_query::QRY_COMMON_REF_TYPES_FOR_GROUP.to_owned(),
 		    false => db_query::QRY_COMMON_REF_TYPES_FOR_GROUP_ACTIVE_ONLY.to_owned(),
         };
         
-        let query = query_level_0.replace("{group_id}", &group_id.to_string());
+        let query = query_level_0.replace("{group_ids}", &group_ids.to_string());
+        println!("..SQL query: {}", query);
 
         let rows: Vec<( i64, String, String )> = sqlx::query_as(&query)
                                                 .fetch_all(&self.connection) 
                                                 .await
                                                 .unwrap_or_default();
         if rows.is_empty() {
-            tracing::error!("Reference entries not found for group_id={}", group_id);
+            tracing::error!("Reference entries not found for group_id={}", group_ids);
             return Ok( Some( Vec::new() ) );
         }
         else{
@@ -129,7 +131,7 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
         }
     }
 
-        ///
+    ///
     /// Accessor to retreive a single COMMON REFERENCE TYPE entries from the database into a tuple.
     ///
     /// Returns: a tuple (i64, String, String) containing:
@@ -139,7 +141,7 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
     /// 
     pub async fn get_common_reference(&self, ref_type_id: i64)-> Result< Option< (i64, String, String) > , std::io::Error> {
         tracing::debug!("get_common_reference()");
-        let query_level_0 = db_query::QRY_COMMON_REF_TYPES_SINGLE_FOR_A_GROUP_AND_TYPE;
+        let query_level_0 = db_query::QRY_SINGLE_COMMON_REF_TYPE_BY_ID;
         let query = query_level_0.replace("{common_ref_id}", &ref_type_id.to_string());
 
         let rows: Vec<( i64, String, String )> = sqlx::query_as(&query)
@@ -175,7 +177,7 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
     ///          - long name of the reference list item
     /// 
     pub async fn get_intervention_statuses(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
-        self.get_common_references(Self::REF_TYPE_GROUP_2_INTERVENTION_STATUS, true).await
+        self.get_common_references(Self::REF_TYPE_GROUP_2_INTERVENTION_STATUS.to_string(), true).await
     }
 
     ///
@@ -187,7 +189,9 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
     ///          - long name of the reference list item
     /// 
     pub async fn get_intervention_types(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
-        self.get_common_references(Self::REF_TYPE_GROUP_1_INTERVENTION_TYPES, true).await
+        let intv_types = "1, 3".to_string();
+
+        self.get_common_references(intv_types, true).await
     }
 
     ///
@@ -201,4 +205,22 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
     pub async fn get_intervention_type(&self, type_id: i64)-> Result< Option< (i64, String, String) >, std::io::Error> {
         self.get_common_reference(type_id).await
     }
+
+    ///
+    /// ### CommonDAO::is_intervention_group_type()
+    ///   Confirms that the Reference Type Code Id provided is in one of the two types of Intervention groups:
+    ///    - Clinical or Non-Clinical
+    /// 
+    /// #### Parameters:
+    /// * common_ref_type_group_id (i64): the id to be checked
+    /// 
+    /// #### Returns:
+    /// * bool: true if the id matches one of the groups of Intervention Types
+    /// 
+    pub fn is_intervention_group_type(common_ref_type_group_id: i64) -> bool {
+        let mut result: bool = common_ref_type_group_id == constants::CRT_CLINICAL_INTERVENTION_GRP_ID;
+        result = result || (common_ref_type_group_id == constants::CRT_NON_CLINICAL_INTERVENTION_GRP_ID);
+        return result;
+    }
+
 }

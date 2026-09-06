@@ -13,6 +13,7 @@ use tracing;
 
 use crate::{constants, dao::db_query};
 use crate::dto::feature_preference::FeaturePreference;
+use crate::dao::common_dao::CommonDAO;
 
 #[derive(Debug, Clone)]
 pub struct FeaturePreferenceDAO {
@@ -36,14 +37,23 @@ impl FeaturePreferenceDAO {
                                                                 upper_limit: usize,
                                                                 intervention_level_only: bool)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
         tracing::debug!("get_active_feature_preferences_for_user()");
+        println!("get_active_feature_preferences_for_user()");
         let query_level_0 = db_query::QRY_GET_ALL_ACTIVE_FEATURE_PREFERENCE_FOR_USER;
         let query_level_1 = query_level_0.replace("{users_id}", &user_id.to_string());
         let query_level_2 = query_level_1.replace("{limit_days}", &"14".to_string());
-        let query_level_3 = query_level_2.replace("{feature_id}", &intervention_type_id.to_string());
+
+
+        // TODO
+
+        let tmp_intv_types = match intervention_type_id {
+            constants::CRT_ANY_INTERVENTION_GROUP => "1, 3".to_string(), // groups 1 and 3 are Clinical, non-Clinical intervention types
+            _ => intervention_type_id.to_string()
+        };
+        let query_level_3 = query_level_2.replace("{feature_ids}", &tmp_intv_types);
         let query = query_level_3.replace("{limit_rows}", &"3".to_string());
 
-        tracing::debug!("..SELECT sql: {}", query);
-        //println!("..SELECT sql: {}", query);
+        //tracing::debug!("..SELECT sql: {}", query);
+        println!("..SELECT sql: {}", query);
 
                      //id, display_order, weight,
                      //  calculation_date, department_id, feature_id, ref_group_id, ref_name
@@ -69,8 +79,8 @@ impl FeaturePreferenceDAO {
 
                 // only collect items that are a) an intervention, when only interventions are requested
                 //  or b) everything other than intervention-level, when no interventions are wanted
-                if (!intervention_level_only && tmp_ref_group_id != constants::COMMON_REF_TYPE_INTERVENTION_GROUP_ID) ||
-                    (intervention_level_only && tmp_ref_group_id == constants::COMMON_REF_TYPE_INTERVENTION_GROUP_ID){
+                let is_intv = CommonDAO::is_intervention_group_type(tmp_ref_group_id);
+                if (!intervention_level_only && !is_intv) || (intervention_level_only && is_intv){
 
                     //println!("....> Adding" ); 
                     let tmp_id: i64 = row.0; // id
@@ -112,6 +122,7 @@ impl FeaturePreferenceDAO {
         }
     }
 
+
     ///
     /// Specialized wrapper for get_active_feature_preferences_for_user(user, TRUE)
     /// 
@@ -120,7 +131,7 @@ impl FeaturePreferenceDAO {
     /// Disregards department, only includes active preferences and active common_reference_types.
     /// 
     pub async fn get_active_feature_preferences_of_interventions_for_user(&self, user_id: i64, upper_limit: usize)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
-        self.get_active_feature_preferences_for_user(user_id, constants::COMMON_REF_TYPE_INTERVENTION_GROUP_ID, upper_limit, true).await
+        self.get_active_feature_preferences_for_user(user_id, constants::CRT_ANY_INTERVENTION_GROUP, upper_limit, true).await
     }
 
     ///

@@ -38,7 +38,9 @@ pub const NOT_SPECIFIED_ID: i64 = -1;
 
 pub const DEFAULT_INTERVENTION_STATUS_NEW: i64 = 13;
 
-pub const COMMON_REF_TYPE_INTERVENTION_GROUP_ID: i64 = 1;
+pub const CRT_ANY_INTERVENTION_GROUP: i64 = -1;
+pub const CRT_CLINICAL_INTERVENTION_GRP_ID: i64 = 1;
+pub const CRT_NON_CLINICAL_INTERVENTION_GRP_ID: i64 = 3;
 
 /// ------------------   ------------------   ------------------   ------------------
 //  Externalized HTML tags that will be present in the static tile files (*.htl)
