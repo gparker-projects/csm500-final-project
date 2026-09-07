@@ -9,7 +9,7 @@
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
-use sqlx::types::uuid::timestamp::context;
+//use sqlx::types::uuid::timestamp::context;
 use tracing;
 
 use crate::constants;
@@ -106,7 +106,7 @@ impl CommandController{
     /// * String: Sentence that was evaluated
     /// * f32: Resulting percentage of success of the comparison against the prompt
     /// 
-    pub async fn get_filtered_classifier_rankings(&mut self, prompt: String, user_auths: UserAuthorization, context_level: i8 ) -> Vec<(String, f32)>{
+    pub async fn get_filtered_classifier_rankings(&mut self, prompt: String, user_auths: UserAuthorization, _context_level: i8 ) -> Vec<(String, f32)>{
         tracing::debug!("get_filtered_classifier_rankings()");
         let mut user_restricted_options: Vec<String> = Vec::new();
 

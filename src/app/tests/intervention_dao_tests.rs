@@ -14,14 +14,15 @@
 
 mod common;
 
-use maple_emr::dao::intervention_dao::InterventionDAO;
-
+use chrono::{Utc, NaiveDateTime};
 use sqlx::postgres::{PgPoolOptions}; 
 use tracing;
 
 use maple_emr::constants;
-use maple_emr::ui::data_forms::*;
+use maple_emr::dao::intervention_dao::InterventionDAO;
+use maple_emr::dto::intervention::Intervention;
 use maple_emr::dto::intervention_detail::InterventionDetail;
+use maple_emr::ui::data_forms::*;
 
 pub const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500";
 
@@ -137,116 +138,136 @@ async fn test_ins_get_upd_intervention_details(){
             assert!(false);
         }
     }
+}
 
-    #[tokio::test]
-    async fn test_get_intervention(){
-        let db_url = DB_CONN_STR;
-        let db_pool = match PgPoolOptions::new()
-            .max_connections(5)
-            .connect(db_url)
-            .await
-        {
-            Ok(pool) => pool,
+#[tokio::test]
+async fn test_get_intervention(){
+    let db_url = DB_CONN_STR;
+    let db_pool = match PgPoolOptions::new()
+        .max_connections(5)
+        .connect(db_url)
+        .await
+    {
+        Ok(pool) => pool,
             Err(e) => {
             tracing::warn!("{}", e);
             panic!("{}", e)
-            },
-        };
-        // instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
-        // we can not test if the DAO itself is instantiated as the only content is a PgPool, which does not allow assert_eq!. If the object
-        // does not instantiate however, the remainder of this test will fail.
-        let idao = InterventionDAO::new( db_pool.clone() ).await;
+        },
+    };
 
-        let test_user_id = 2;
-        let mut tmp_id: i64 = constants::INVALID_OTHER_ID;
+    let temp_intv = {InterventionDAO::new( db_pool.clone() ).await}.get_intervention( 1 ).await.unwrap();
+    let results =  match temp_intv {
+        Some(i) => {
+            let tmp_scheduled_timestamp = match NaiveDateTime::parse_from_str(&"2026-08-08 12:05:00".to_string(), &"%Y-%m-%d %H:%M:%S".to_string()){
+                Ok(result) => Some(result),
+                Err(e) => {
+                    println!("Error parsing datetime: {}", e);
+                    Some(Utc::now().naive_utc())
+                }
+            };
 
-        
+            let tmp_intv = Intervention {
+                id: 1, // intervention_id: i64 = rng.random();
+                encounter_id: 1, // let encounter_id: i64 = rng.random();
+                description: "broken foot from tree climbing".to_string(),
+                notes: "".to_string(),
+                location_id: 9,
+                users_id: 2,
+                intervention_type_id: 100038,
+                status_id: 19,
+                status_code: "Admit".to_string(),
+                intervention_type: "Procedure: Collect Vitals".to_string(),
+                room_identifier: "Exam Room 1".to_string(),
+                scheduled_timestamp: tmp_scheduled_timestamp, 
+                performed_timestamp: tmp_scheduled_timestamp
+            };
 
-        
-        assert!(false);
-    }
+            // if the key fields match, the DAO has successfully pulled the right record.
+            // Some fields are subject to frequent change and not worth testing.
+            assert!(tmp_intv.id == i.id, "ids do not match");
+            assert!(tmp_intv.encounter_id == i.encounter_id, "encounter_id do not match");
+            assert!(tmp_intv.description == i.description , "description do not match");
+            assert!(tmp_intv.notes == i.notes , "notes do not match");
+            assert!(tmp_intv.location_id == i.location_id , "location_id do not match");
+            assert!(tmp_intv.users_id == i.users_id , "users_id do not match");
+            assert!(tmp_intv.intervention_type_id == i.intervention_type_id , "intervention_type_id do not match");
+            assert!(tmp_intv.status_id == i.status_id, "status_id do not match");
+            true
+        },
+        None => {
+            assert!(false, "No intervention was returned for the test");
+            false
+        },
+    } ;
+    assert!(results)
+}
 
-    #[tokio::test]
-    async fn test_get_interventions_plural(){
-        let db_url = DB_CONN_STR;
-        let db_pool = match PgPoolOptions::new()
-            .max_connections(5)
-            .connect(db_url)
-            .await
-        {
-            Ok(pool) => pool,
-            Err(e) => {
-            tracing::warn!("{}", e);
-            panic!("{}", e)
-            },
-        };
-        // instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
-        // we can not test if the DAO itself is instantiated as the only content is a PgPool, which does not allow assert_eq!. If the object
-        // does not instantiate however, the remainder of this test will fail.
-        let idao = InterventionDAO::new( db_pool.clone() ).await;
+#[tokio::test]
+async fn test_get_interventions_plural(){
+    let db_url = DB_CONN_STR;
+    let db_pool = match PgPoolOptions::new()
+        .max_connections(5)
+        .connect(db_url)
+        .await
+    {
+        Ok(pool) => pool,
+        Err(e) => {
+        tracing::warn!("{}", e);
+        panic!("{}", e)
+        },
+    };
 
-        let test_user_id = 2;
-        let mut tmp_id: i64 = constants::INVALID_OTHER_ID;
+    
 
-        
+    
+    assert!(false);
+}
 
-        
-        assert!(false);
-    }
+#[tokio::test]
+async fn test_get_most_recent_vitals(){
+    let db_url = DB_CONN_STR;
+    let db_pool = match PgPoolOptions::new()
+        .max_connections(5)
+        .connect(db_url)
+        .await
+    {
+        Ok(pool) => pool,
+        Err(e) => {
+        tracing::warn!("{}", e);
+        panic!("{}", e)
+        },
+    };
 
-    #[tokio::test]
-    async fn test_get_most_recent_vitals(){
-        let db_url = DB_CONN_STR;
-        let db_pool = match PgPoolOptions::new()
-            .max_connections(5)
-            .connect(db_url)
-            .await
-        {
-            Ok(pool) => pool,
-            Err(e) => {
-            tracing::warn!("{}", e);
-            panic!("{}", e)
-            },
-        };
-        // instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
-        // we can not test if the DAO itself is instantiated as the only content is a PgPool, which does not allow assert_eq!. If the object
-        // does not instantiate however, the remainder of this test will fail.
-        let idao = InterventionDAO::new( db_pool.clone() ).await;
+    let temp_intv = {InterventionDAO::new( db_pool.clone() ).await}.get_most_recent_vitals( 4 ).await.unwrap();
+    let results =  match temp_intv {
+        Some(i) => {
+            match i.id {
+                4 => true, // Encounter id=4 and Intervention id=4
+                _ => false,
+            }
+        },
+        None => false,
+    } ;
+    assert!(results)
+}
 
-        let test_user_id = 2;
-        let mut tmp_id: i64 = constants::INVALID_OTHER_ID;
-
-        
-
-        
-        assert!(false);
-    }
-
-    #[tokio::test]
-    async fn test_upsert_intervention_from_intv_form(){
-        let db_url = DB_CONN_STR;
-        let db_pool = match PgPoolOptions::new()
-            .max_connections(5)
-            .connect(db_url)
-            .await
-        {
-            Ok(pool) => pool,
-            Err(e) => {
-            tracing::warn!("{}", e);
-            panic!("{}", e)
-            },
-        };
-        // instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
-        // we can not test if the DAO itself is instantiated as the only content is a PgPool, which does not allow assert_eq!. If the object
-        // does not instantiate however, the remainder of this test will fail.
-        let idao = InterventionDAO::new( db_pool.clone() ).await;
-
-        let test_user_id = 2;
-        let mut tmp_id: i64 = constants::INVALID_OTHER_ID;
-
-        
+#[tokio::test]
+async fn test_upsert_intervention_from_intv_form(){
+    let db_url = DB_CONN_STR;
+    let db_pool = match PgPoolOptions::new()
+        .max_connections(5)
+        .connect(db_url)
+        .await
+    {
+        Ok(pool) => pool,
+        Err(e) => {
+        tracing::warn!("{}", e);
+        panic!("{}", e)
+        },
+    };
 
 
-        assert!(false);
-    }
+    
+
+    assert!(false);
 }
