@@ -71,7 +71,7 @@ pub struct InterventionDataFormLink {
 #[derive(serde::Deserialize)]
 pub struct AdmitFormBasic {
     pub patient_id: String,
-    pub action_flag: String,
+    //pub action_flag: String,
     pub user_prompt: String,
 }
 
@@ -122,52 +122,72 @@ pub struct AdmitDataForm {
 impl AdmitDataForm {
 
     pub fn validate_fields(&self) -> Result<(), ValidationError> {
+        let mut error = ValidationError::new("AdmitDataFormError");
+
+        //error.message = Some("DEBUGGING ERROR".into()); // TODO REMOVE THIS
+        //return Err(error);
 
         if ! (self.patient_id.len() > 0) || ! self.patient_id.parse::<i64>().is_ok() {
-            return Err(ValidationError::new("Patient Id invalid"));
+            error.message = Some("Patient Id invalid".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
-        if ! (self.patient_first_name.len() > 0) {
-            return Err(ValidationError::new("Patient First Name is invalid"));
+        if ! (self.patient_first_name.len() > 1) && (self.patient_first_name.len() < 200){
+            error.message = Some("Patient First Name is invalid".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
-        if ! (self.patient_last_name.len() > 0) {
-            return Err(ValidationError::new("Patient Last Name is invalid"));
+        if ! (self.patient_last_name.len() > 1) && (self.patient_last_name.len() < 200){
+            error.message = Some("Patient Last Name is invalid".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
-        //if ! (self.patient_middle_name.len() > 0) {
-        //    return Err(ValidationError::new("Patient Middle Names invalid"));
-        //}
+        // can't really validate the presence of a middle name, as some people do not have them
+        if ! (self.patient_middle_name.len() > 1) && (self.patient_middle_name.len() < 200){
+            error.message = Some("Patient Middle Names invalid".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
+        }        
 
         if ! (self.phn.len() > 0) || ! self.phn.parse::<i32>().is_ok() {
-            return Err(ValidationError::new("PHN must be a 10 digit number"));
+            error.message = Some("PHN must be a 10 digit number".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
         
         if ! (self.birthdate.len() > 0) {
-            return Err(ValidationError::new("Birthdate must be in YYYY/MM/DD format"));
+            error.message = Some("Birthdate must be in YYYY/MM/DD format".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
        
         if ! (self.encounter_id.len() > 0) || ! self.encounter_id.parse::<i64>().is_ok() {
-            return Err(ValidationError::new("Encounter Id invalid"));
+            error.message = Some("Encounter Id invalid".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
         if ! (self.location_id.len() > 0) || ! self.location_id.parse::<i64>().is_ok() {
-            return Err(ValidationError::new("location Id invalid"));
+            error.message = Some("Location Id invalid".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
-        if ! (self.admit_notes.len() > 0) {
-            return Err(ValidationError::new("Admit notes is invalid"));
+        if ! (self.admit_notes.len() > 1) && (self.admit_notes.len() < 2000){
+            error.message = Some("Admit notes is invalid".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
         match self.validate() {
-            Ok(_) => {
-                //println!("All validations passed perfectly!");
-                Ok(())
-            }
-            Err( e ) => {
-                println!("Validation failed with errors:\n{}", e);
-
-                Err(ValidationError::new("contains_forbidden_word"))
+            Ok(_) => Ok(()),  //println!("All validations passed perfectly!");
+            Err( _e ) => {
+                error.message = Some("AdmitDataForm validation failed".into());
+                println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+                Err(error)
             }
         }
     }
@@ -234,59 +254,84 @@ impl InterventionDataForm {
     }
 */
     pub fn validate_fields(&self) -> Result<(), ValidationError> {
+        let mut error = ValidationError::new("InterventionDataForm Error");
+
+        //error.message = Some("DEBUGGING ERROR".into()); // TODO REMOVE THIS
+        //return Err(error);
+
         if ! (self.intervention_id.len() > 0) || ! self.intervention_id.parse::<i64>().is_ok() {
-            return Err(ValidationError::new("Intervention Id invalid"));
+            error.message = Some("Intervention Id invalid".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
-        if ! (self.description.len() > 2000) ||  (self.description.len() < 1){
-            return Err(ValidationError::new("Description is required and must be less than 2000 characters."));
+        if ! (self.description.len() > 1) && (self.description.len() < 2000){
+            error.message = Some("Description is required and must be less than 2000 characters.".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            println!("...value={}", self.description);
+            return Err(error);
         }
 
-        if ! (self.notes.len() > 2000) ||  (self.notes.len() < 1){
-            return Err(ValidationError::new("Notes are required and must be less than 2000 characters."));
+        if ! (self.notes.len() > 0) && (self.notes.len() < 2000){
+            error.message = Some("Notes are required and must be less than 2000 characters.".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
         if ! (self.location_id.len() > 0) || ! self.location_id.parse::<i64>().is_ok() {
-            return Err(ValidationError::new("Location Id invalid"));
+            error.message = Some("Location Id invalid".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
         if ! (self.users_id.len() > 0) || ! self.users_id.parse::<i64>().is_ok() {
-            return Err(ValidationError::new("User Id invalid"));
+            error.message = Some("User Id invalid".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
         if ! (self.encounter_id.len() > 0) || ! self.encounter_id.parse::<i64>().is_ok() {
-            return Err(ValidationError::new("Encounter Id invalid"));
+            error.message = Some("Encounter Id invalid".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
         if ! (self.intervention_type_id.len() > 0) || ! self.intervention_type_id.parse::<i64>().is_ok() {
-            return Err(ValidationError::new("Intervention Type invalid"));
+            error.message = Some("Intervention Type invalid".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
         if ! (self.status_id.len() > 0) || ! self.status_id.parse::<i64>().is_ok() {
-            return Err(ValidationError::new("Status Id invalid"));
+            error.message = Some("Status Id invalid".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
         if ! (self.patient_id.len() > 0) || ! self.patient_id.parse::<i64>().is_ok() {
-            return Err(ValidationError::new("Patient Id invalid"));
+            error.message = Some("Patient Id invalid".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
         if ! (self.scheduled_timestamp.len() == 0) && (self.scheduled_timestamp.len() == 16)   {
-            return Err(ValidationError::new("Schedule date/time, when provided, must be in YYYY/MM/DD HH:MM format"));
+            error.message = Some("Schedule date/time, when provided, must be in YYYY/MM/DD HH:MM format".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
         if ! (self.performed_timestamp.len() == 0) && (self.performed_timestamp.len() == 16)   {
-            return Err(ValidationError::new("Performed date/time, when provided, must be in YYYY/MM/DD HH:MM format"));
+            error.message = Some("Performed date/time, when provided, must be in YYYY/MM/DD HH:MM format".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
         match self.validate() {
-            Ok(_) => {
-                //println!("All validations passed perfectly!");
-                Ok(())
-            }
-            Err( e ) => {
-                println!("InterventionDataForm validation failed:\n{}", e);
-
-                Err( ValidationError::new("InterventionDataForm validation failed") )
+            Ok(_) => Ok(()),  //println!("All validations passed perfectly!");
+            Err( _e ) => {
+                error.message = Some("InterventionDataForm validation failed".into());
+                println!("Final InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+                Err(error)
             }
         }
     }
@@ -329,46 +374,67 @@ impl InterventionDetailsDataForm {
 impl InterventionDetailsDataForm {
 
     pub fn validate_fields(&self) -> Result<(), ValidationError> {
+        let mut error = ValidationError::new("InterventionDetailsDataForm Error");
+
+       //error.message = Some("DEBUGGING ERROR".into()); // TODO REMOVE THIS
+       //return Err(error);
+
+        if ! (self.intervention_id.len() > 0) || ! self.intervention_id.parse::<i64>().is_ok() {
+            error.message = Some("Intervention Id invalid".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
+        }
 
         if ! (self.intervention_details_id.len() > 0) || ! self.intervention_details_id.parse::<i64>().is_ok() {
-            return Err(ValidationError::new("Intervention -Details Id invalid"));
+            error.message = Some("Intervention Details Id invalid".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
         if ! (self.intervention_id.len() > 0) || ! self.intervention_id.parse::<i64>().is_ok() {
-            return Err(ValidationError::new("Intervention Id invalid"));
+            error.message = Some("Intervention Id invalid".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
         if ! (self.type_id.len() > 0) || ! self.type_id.parse::<i64>().is_ok() {
-            return Err(ValidationError::new("Type Id is invalid"));
+            error.message = Some("Type Id invalid".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
-        if ! (self.value.len() > 200) ||  (self.value.len() < 1){
-            return Err(ValidationError::new("Description is required and must be less than 200 characters."));
+        if ! (self.value.len() > 1) && (self.value.len() < 200){
+            error.message = Some("Value is required and must be less than 200 characters.".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
-        if ! (self.notes.len() > 200) ||  (self.notes.len() < 1){
-            return Err(ValidationError::new("Notes are required and must be less than 200 characters."));
+        if ! (self.notes.len() > 1) && (self.notes.len() < 2000){
+            error.message = Some("Notes are required and must be less than 200 characters.".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
 
         if ! (self.entry_timestamp.len() > 0) {
-            return Err(ValidationError::new("Entry Timestamp invalid"));
+            error.message = Some("Entry Timestamp invalid".into());
+            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            return Err(error);
         }
-
+        
         match self.validate() {
-            Ok(_) => {
-                //println!("All validations passed perfectly!");
-                Ok(())
-            }
-            Err( e ) => {
-                println!("InterventionDetailsDataForm validation failed:\n{}", e);
-
-                Err( ValidationError::new("InterventionDetailsDataForm validation failed") )
+            Ok(_) => Ok(()),  //println!("All validations passed perfectly!");
+            Err( _e ) => {
+                error.message = Some("InterventionDetailsDataForm validation failed".into());
+                println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+                Err(error)
             }
         }
     }
 }
 
+#[allow(non_snake_case)]
 #[derive(serde::Deserialize)]
+ // these are the names in the forms in Javascript; not worth the time to correct from a warning, given it is dynamically generated and hard to debug
 pub struct InterventionDetailsAddFormBasic {
     pub addFrm_intv_id: String,
     pub addFrm_intv_dtls_id: String,

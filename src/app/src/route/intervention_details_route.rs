@@ -63,25 +63,24 @@ impl InterventionDetailsRoute{
     pub async fn route_to_intervention_detail_save(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<InterventionDetailsDataForm>) -> impl Responder {
         tracing::debug!("-> Route Requested: /route_to_intervention_detail_save ");
         let mut results: String = constants::INVALID_OTHER_ID.to_string();
-
-        //let req_clone0 = req.clone();
         let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
-        let idao = InterventionDAO::new( app_session.get_db_connection() ).await;
 
+
+        let idao = InterventionDAO::new( app_session.get_db_connection() ).await;
         let insert_ivdtls_results = idao.upsert_intervention_details_from_intv_form(req.clone(), user_session_details.get_userid_as_i64()).await;
         match insert_ivdtls_results {
-                Ok(intv_dtls_id) => {
-                    tracing::debug!("..Intervention Details (id={intv_dtls_id})] created/updated");
-                    results = intv_dtls_id.to_string();
-                    let type_id = req.clone().get_type_id_as_i64(); // extract type for updating the user's feature preference
+            Ok(intv_dtls_id) => {
+                tracing::debug!("..Intervention Details (id={intv_dtls_id})] created/updated");
+                results = intv_dtls_id.to_string();
+                let type_id = req.clone().get_type_id_as_i64(); // extract type for updating the user's feature preference
 
-                    // if save successful, record a feature preference as well
-                    let fpdao = FeaturePreferenceDAO::new( app_session.get_db_connection() ).await;
-                    let _ignore = fpdao.upsert_feature_preference( user_session_details.clone().get_userid_as_i64() , type_id).await.unwrap();
-                },
-                Err(e) => {
-                    tracing::debug!("..!Intervention Details not created/updated: {e}");
-                }
+                // if save successful, record a feature preference as well
+                let fpdao = FeaturePreferenceDAO::new( app_session.get_db_connection() ).await;
+                let _ignore = fpdao.upsert_feature_preference( user_session_details.clone().get_userid_as_i64() , type_id).await.unwrap();
+            },
+            Err(e) => {
+                tracing::debug!("..!Intervention Details not created/updated: {e}");
+            }
         }
 
         // route back to main form again

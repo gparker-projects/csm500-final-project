@@ -47,6 +47,9 @@ pub const CRT_INTERVENTION_ALERT_TYPE: i64 = 100040;
 /// ------------------   ------------------   ------------------   ------------------
 //  Externalized HTML tags that will be present in the static tile files (*.htl)
 /// ------------------   ------------------   ------------------   ------------------
+/// 
+pub const ERR_LABEL_NO_ERROR_TAG: &str = r##"<label id="errLabel"></label>"##;
+pub const ERR_LABEL_WITH_ERROR_TAG: &str = r##"<label id="errLabel" style="color: red">{form_errors}</label><br>"##;
 
 pub const RELEASE_NUMBER: &str = r##"<div id="MapleEMR::ReleaseNumber"></div>"##;
 pub const LEGACY_MENU_TILE_TAG : &str = r##"<div id="MapleEMR::LegacyMenu"></div>"##;
@@ -62,8 +65,6 @@ pub const ENCOUNTER_HISTORY_TILE_TAG : &str =r##"<div id="MapleEMR::EncounterHis
 
 pub const SECTION_1_VISIBLE_TAG : &str = r##"<div id="MapleEMR::SectionVisible_1"></div>"##;
 pub const SECTION_2_VISIBLE_TAG : &str = r##"<div id="MapleEMR::SectionVisible_2"></div>"##;
-pub const SECTION_3_VISIBLE_TAG : &str = r##"<div id="MapleEMR::SectionVisible_3"></div>"##;
-pub const SECTION_4_VISIBLE_TAG : &str = r##"<div id="MapleEMR::SectionVisible_4"></div>"##;
 
 pub const INTERVENTION_TYPE_DROP_DOWN_CONTROL_TAG : &str = r##"<div id="MapleEMR::InterventionTypeDropDownControl"></div>"##;
 

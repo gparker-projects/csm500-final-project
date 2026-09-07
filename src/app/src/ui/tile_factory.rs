@@ -24,7 +24,7 @@ use crate::constants;
 use crate::dto::user_auth::Permission;
 use crate::dto::{patient::*, intervention::*, intervention_detail::*};
 use crate::session::UserSession;
-
+use crate::ui::data_forms::*;
 use crate::ui::common::CommonFormatter;
 use crate::ui::intervention_fmt::InterventionFormatter;
 
@@ -254,9 +254,7 @@ impl WebContentFactory {
                                                   status_dropdown_list: Vec<(i64, String, String)>,
                                                   location_menu: String,
                                                   intv_type: (i64, String, String),
-                                                  patient_id: String,
-                                                  intervention_type_id: String,
-                                                  encounter_id: String,
+                                                  req: InterventionDataForm,
                                                   intv_details_list: Option<Vec<InterventionDetail>>,
                                                   measures_dropdown_list: Vec<(i64, String, String)>,
                                                   feature_pref_section: String
@@ -275,7 +273,7 @@ impl WebContentFactory {
                                 "{notes}",
                                 "{encounter_id}",
                                 "{patient_id}",
-                                "{form_errors}",
+                                constants::ERR_LABEL_NO_ERROR_TAG,
                                 "<div id=\"MapleEMR::InterventionDetailsList\">",
                                 constants::FEATURE_PREFERENCE_TILE_TAG,
                                 "{hide_add_new_measure}"];
@@ -299,7 +297,7 @@ impl WebContentFactory {
 
                 let tmp_data_items = [constants::NOT_SPECIFIED_ID.to_string(), //"{intervention_id}",
                                                   intv_type.1, //"{intervention_type}",
-                                                  intervention_type_id.to_string(), //"{intervention_type_id}",  //TODO
+                                                  req.intervention_type_id.to_string(), //"{intervention_type_id}",  //TODO
                                                   scheduled_timestamp, //"{scheduled_timestamp}",
                                                   performed_timestamp, //"{performed_timestamp}",
                                                   location_menu , //"{location_id}", 
@@ -307,9 +305,9 @@ impl WebContentFactory {
                                                   dd_intv_status, //"<div id=\"MapleEMR::StatusIdDropDownControl\">",
                                                   String::new(), //"{description}",
                                                   String::new(), //"{notes}",
-                                                  encounter_id.to_string(), // "{encounter_id}",  //TODO
-                                                  patient_id.clone(),
-                                                  String::new(), //"{form_errors}"];
+                                                  req.encounter_id.to_string(), // "{encounter_id}",  //TODO
+                                                  req.patient_id.to_string(),
+                                                  String::new(), // no error to display
                                                   String::new(),  //"<div id=\"MapleEMR::InterventionDetailsList\">"
                                                   String::new(), // feature_pref_section // if the intervention has not been saved, do not allow preference additions
                                                   " class='hidden'".to_string()
@@ -325,7 +323,7 @@ impl WebContentFactory {
                                                   self.get_tile(WebContentItem::WCTypeIntvDetailItemTile),
                                                                    intv_details_list,
                                                                                   measures_dropdown_list.clone(),
-                                                                                  patient_id.clone());
+                                                                                  req.patient_id.to_string());
 
                 id = intv.id.to_string();
                 intervention_type = intv.clone().intervention_type; // intv_type.1
@@ -336,6 +334,16 @@ impl WebContentFactory {
                 description = intv.description.to_string();
                 notes = intv.notes.to_string();
                 tmp_encounter_id = intv.encounter_id.to_string();
+
+                let form_errors = match req.clone().form_errors.as_str() {
+                    "" => constants::ERR_LABEL_NO_ERROR_TAG.to_string(), 
+                    _ => {
+                        let mut tmp_error = constants::ERR_LABEL_WITH_ERROR_TAG.to_string();
+                        let error_msg = req.clone().form_errors;
+                        tmp_error = tmp_error.replace ("{form_errors}",&error_msg);
+                        tmp_error
+                    },
+                };
 
                 let tmp_data_items = [id,
                                                     intervention_type,
@@ -348,8 +356,8 @@ impl WebContentFactory {
                                                     description,
                                                     notes,
                                                     tmp_encounter_id,
-                                                    patient_id.clone(),
-                                                    "{form_errors}".to_string(),
+                                                    req.patient_id.to_string(),
+                                                    form_errors,
                                                     intv_details_html,
                                                     feature_pref_section,
                                                     String::new()
@@ -379,6 +387,4 @@ impl WebContentFactory {
 
         return home_tile_level_final.clone();
     }
-
- 
 }

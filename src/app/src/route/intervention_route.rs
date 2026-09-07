@@ -27,37 +27,57 @@ pub struct InterventionRoute{}
 
 impl InterventionRoute{
 
-
-  ///
-  /// Route that will update the intervention and then redirect back to the modify screen
-  /// 
-  pub async fn route_to_intervention_save(app_session: web::Data<AppSession>, user_session: Session, mut req: web::Form<InterventionDataForm>) -> impl Responder {
+    ///
+    /// Route that will update the intervention and then redirect back to the modify screen
+    /// 
+    pub async fn route_to_intervention_save(app_session: web::Data<AppSession>, user_session: Session, mut req: web::Form<InterventionDataForm>) -> impl Responder {
         tracing::debug!("-> Route Requested: /route_to_discharge_patient_save ");
 
         let req_clone0 = req.clone();
         let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
-        let idao = InterventionDAO::new( app_session.get_db_connection() ).await;
+        
+        // perform server-side form validation. If not successful, send the user back with some form errors
+        let frm_errors = req.validate_fields();
+        match frm_errors {
+            Err(e) => {
+                tracing::error!("!InterventionDataForm > Form errors detected");
+                println!("!InterventionDataForm > Form errors detected");
+                Self::route_to_view_or_modify_intervention(
+                    app_session.clone(), user_session.clone(), web::Form(
+                        {
+                            let mut tmp_frm = req.clone();
+                            tmp_frm.form_errors = e.message.unwrap().to_string();
+                            tmp_frm // return the form with the updated error message (above)
+                        }
+                    )
+                ).await;
+            },
+            _ => { // "do nothing, because form was valid"
+                tracing::debug!("Form validation successful (InterventionDataForm)");
 
-        let results = idao.upsert_intervention_from_intv_form(req_clone0.clone(), user_session_details.get_userid_as_i64()).await;
-        match results {
-                Ok(intv_id) => {
-                    tracing::debug!("  >Intervention (id={intv_id})] created/updated");
-                    req.0.intervention_id = intv_id.clone().to_string();
+                let idao = InterventionDAO::new( app_session.get_db_connection() ).await;
+                let results = idao.upsert_intervention_from_intv_form(req_clone0.clone(), user_session_details.get_userid_as_i64()).await;
+                match results {
+                    Ok(intv_id) => {
+                        tracing::debug!("  >Intervention (id={intv_id})] created/updated");
+                        req.0.intervention_id = intv_id.clone().to_string();
 
-                    let type_id: i64 = req_clone0.clone().get_intervention_type_as_i64();
-                    // if save successful, record a feature preference as well
-                    let fpdao = FeaturePreferenceDAO::new( app_session.get_db_connection() ).await;
-                    let _ignore = fpdao.upsert_feature_preference( user_session_details.clone().get_userid_as_i64(), 
-                                                                                type_id).await.unwrap();
-                },
-                Err(e) => {
-                    tracing::debug!("  >Intervention not created/updated: {e}");
+                        let type_id: i64 = req_clone0.clone().get_intervention_type_as_i64();
+                        // if save successful, record a feature preference as well
+                        let fpdao = FeaturePreferenceDAO::new( app_session.get_db_connection() ).await;
+                        let _ignore = fpdao.upsert_feature_preference( user_session_details.clone().get_userid_as_i64(), 
+                                                                                    type_id).await.unwrap();
+                    },
+                    Err(e) => {
+                        tracing::debug!("  >Intervention not created/updated: {e}");
+                    }
                 }
-        }
+            },
+        };
 
-      // route back to main form again
-      InterventionRoute::route_to_view_or_modify_intervention( app_session, user_session, req ).await
-  }
+        // route back to main form again
+        InterventionRoute::route_to_view_or_modify_intervention( app_session, user_session, req ).await
+    }
 
     ///
     /// Wrapper route for the adding new, or modifying existing Interventions of a patient, without having any web form to pass data in from
@@ -188,12 +208,11 @@ impl InterventionRoute{
                                                                          status_dropdown_list.unwrap(),
                                                                          location_menu,
                                                                          intv_type.unwrap(),
-                                                                         req.patient_id.clone(),
-                                                                         req.intervention_type_id.clone() ,
-                                                                         req.encounter_id.clone(),
+                                                                         req.clone(),
                                                                          intv_dtls.clone(),
                                                                          intv_details_type.unwrap(),
-                                                                         FeaturePreferenceFormatter::get_feature_preference_section( pref_list ));
+                                                                         FeaturePreferenceFormatter::get_feature_preference_section( pref_list ),
+                                                                         );
         HttpResponse::Ok().body(  content )
     }
 }
