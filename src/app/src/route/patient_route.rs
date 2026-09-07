@@ -10,6 +10,8 @@ use actix_web::{web, HttpResponse, Responder};
 use actix_session::{Session}; 
 use tracing;
 
+use crate::dto::user_auth::Permission;
+
 use crate::constants;
 use crate::dao::feature_preference_dao::FeaturePreferenceDAO;
 use crate::dto::encounter::Encounter;
@@ -36,12 +38,12 @@ impl PatientRoute{
     /// * Responder (actix_web::response::responder): the HTTP responder (response) for the request
     /// 
     pub async fn route_to_patient_details(user_session: Session, app_session: web::Data<AppSession>, req: web::Form<GenericWebFormData>) -> impl Responder {
-    tracing::debug!("-> /patientdtls Route Requested");
-    println!("-> /patientdtls Route Requested");
+    tracing::debug!("-> /patientdtls Route Requested: PatientRoute::route_to_patient_details()");
+    println!("-> /patientdtls Route Requested: PatientRoute::route_to_patient_details()");
 
     //todo: this should direct to a standard error or login screen when session is lost
-    let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
-    let userid = user_session_details.get_userid_as_i64();
+    let active_user_session: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+    let userid = active_user_session.get_userid_as_i64();
     let patient_id: i64 = req.get_uid_as_i64();
 
     // get base patient data
@@ -64,10 +66,13 @@ impl PatientRoute{
         None => "No Encounters found".to_owned()
     };
 
+    // if the user is allowed to view more details, allow it
+    let can_view_clinical_intvs = active_user_session.has_permission(Permission::ALLOW_VIEW_ANY_CLINICAL_DATA) || active_user_session.has_permission(Permission::ALLOW_VIEW_CLINICAL_INTERVENTION);
+
     // get all interventions for the patient
     let intv_results = idao.get_interventions(cur_enc.id, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
     let intv_section = match intv_results {
-        Some (intvs) =>  SimpleFormatter::get_intervention_list_for_patient_details_tile(intvs),
+        Some (intvs) =>  SimpleFormatter::get_intervention_list_for_patient_details_tile(intvs, can_view_clinical_intvs),
         None => "No Interventions found".to_owned(),
     };
 
@@ -92,7 +97,7 @@ impl PatientRoute{
     let legacy_menu_results = pdao.get_patients_at_users_site_no_discharge(userid).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
     let legacy_menu = match legacy_menu_results {
         Some (patients_for_menu_lst) => {
-            {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id, user_session_details.clone())
+            {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id, active_user_session.clone())
         }
         None => {
             tracing::debug!("No patients found for legacy menu");
@@ -101,10 +106,19 @@ impl PatientRoute{
     };
     
     // no user should be able to get into the system without a location assigned, so we will not worry about an exception here
-    let item_list = {CommonDAO::new( app_session.get_db_connection() ).await}.get_intervention_types().await.unwrap();
+    let item_list: Option<Vec<(i64, String, String)>>;
+
     // limit the list to intervention types that the user is allowed to use (clinical, non clinical or none)
 
-    
+    if active_user_session.has_permission(Permission::ALLOW_CREATE_CLINICAL_INTERVENTION) && active_user_session.has_permission(Permission::ALLOW_CREATE_NON_CLINICAL_INTERVENTION) { // if user has both, do both
+        item_list = {CommonDAO::new( app_session.get_db_connection() ).await}.get_clinical_intervention_types().await.unwrap();
+    }
+    else if active_user_session.has_permission(Permission::ALLOW_CREATE_CLINICAL_INTERVENTION) {
+        item_list = {CommonDAO::new( app_session.get_db_connection() ).await}.get_clinical_intervention_types().await.unwrap();
+    }
+    else{ // otherwise only non-Clinical
+        item_list = {CommonDAO::new( app_session.get_db_connection() ).await}.get_non_clinical_intervention_types().await.unwrap();
+    }    
 
     let fast_actions_upper_limit = app_session.clone().system_config.get_max_general_fastactions();
     let pref_list: Option<Vec<FeaturePreference>> = {FeaturePreferenceDAO::new( app_session.get_db_connection() ).await}.get_active_feature_preferences_of_interventions_for_user(userid, fast_actions_upper_limit).await.unwrap();
@@ -112,7 +126,7 @@ impl PatientRoute{
     let consolidated_content = app_session.get_web_content_factory().get_patient_details_full_tile(patient_header,
                                                                                                            cur_enc_section,
                                                                                                            enc_section,
-                                                                                                           user_session_details,
+                                                                                                           active_user_session,
                                                                                                            legacy_menu,
                                                                                                            intv_section,
                                                                                                            item_list.unwrap(), 

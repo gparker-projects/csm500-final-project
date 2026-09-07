@@ -116,7 +116,6 @@ pub struct AdmitDataForm {
     #[validate(length(min = 1, max = 2000))]
     pub admit_notes: String,
     pub form_errors: String,
-
     pub user_prompt: String,   
 }
 

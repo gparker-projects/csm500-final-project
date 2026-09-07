@@ -187,7 +187,8 @@ pub const QRY_CURRENT_USER_LOCATIONS: &str = r##"
                                             select site_id
                                             from user_permission
                                             where users_id = {}
-                                                and active_flag = 'Y' )"##;
+                                                and active_flag = 'Y' )
+                                        order by name"##;
 
 
 pub const QRY_ALL_USERS_AND_DEPARTMENT_NAME: &str = r##"

@@ -42,6 +42,8 @@ pub const CRT_ANY_INTERVENTION_GROUP: i64 = -1;
 pub const CRT_CLINICAL_INTERVENTION_GRP_ID: i64 = 1;
 pub const CRT_NON_CLINICAL_INTERVENTION_GRP_ID: i64 = 3;
 
+pub const CRT_INTERVENTION_ALERT_TYPE: i64 = 100040;
+
 /// ------------------   ------------------   ------------------   ------------------
 //  Externalized HTML tags that will be present in the static tile files (*.htl)
 /// ------------------   ------------------   ------------------   ------------------

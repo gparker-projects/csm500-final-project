@@ -35,36 +35,6 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
     /// Returns: a tuple (i64, String) containing the id of the location and an aggregated string
     ///          describing the location.
     /// 
-    /*pub async fn get_locations(&self)-> Result< Option< Vec<(i64, String)> >, std::io::Error> {
-        let query: String = db_query::QRY_ACTIVE_LOCATIONS.to_owned();
-        tracing::debug!("get_locations()");
-
-        let rows: Vec<( i64, String )> = sqlx::query_as(&query)
-                                                .fetch_all(&self.connection) 
-                                                .await
-                                                .unwrap_or_default();
-        if rows.is_empty() {
-            tracing::error!("No Locations defined in system");
-            return Ok( Some( Vec::new() ) );
-        }
-        else{
-            let mut results: Vec<(i64, String)> = Vec::with_capacity(rows.len());
-            for row in rows {
-                let tmp_loc_id: i64 = row.0; // location_id
-                let tmp_aggregate_name = row.1; // aggregated name
-
-                results.push( (tmp_loc_id, tmp_aggregate_name) );
-            }
-            return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
-        }
-    }*/
-
-    ///
-    /// Accessor to retrieve locations from the database into a tuple. 
-    ///
-    /// Returns: a tuple (i64, String) containing the id of the location and an aggregated string
-    ///          describing the location.
-    /// 
     pub async fn get_locations_for_user(&self, user_id: i64)-> Result< Option< Vec<(i64, String)> >, std::io::Error> {
         let query_level_0: String = db_query::QRY_CURRENT_USER_LOCATIONS.to_owned();
         let query = query_level_0.replace("{}", &user_id.to_string());
@@ -107,7 +77,7 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
 		    false => db_query::QRY_COMMON_REF_TYPES_FOR_GROUP_ACTIVE_ONLY.to_owned(),
         };
         
-        let query = query_level_0.replace("{group_ids}", &group_ids.to_string());
+        let query = query_level_0.replace("{group_ids}", &group_ids.to_string()); // this goes into an IN () clause in the SQL and can take multiple comma-separated values, or a single
         //println!("..SQL query: {}", query);
 
         let rows: Vec<( i64, String, String )> = sqlx::query_as(&query)
@@ -181,7 +151,7 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
     }
 
     ///
-    /// Shortcut method to obtain Intervention Type group (id=1) entries from the COMMON REFERENCE TYPE table
+    /// Shortcut method to obtain Clinical and Non-Clinical Intervention Type group (id=1) entries from the COMMON REFERENCE TYPE table
     ///
     /// Returns: a tuple (i64, String, String) containing:
     ///          - id of the reference list item
@@ -190,6 +160,34 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
     /// 
     pub async fn get_intervention_types(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
         let intv_types = "1, 3".to_string();
+
+        self.get_common_references(intv_types, true).await
+    }
+
+    ///
+    /// Shortcut method to obtain Clinical Intervention Type group (id=1) entries from the COMMON REFERENCE TYPE table
+    ///
+    /// Returns: a tuple (i64, String, String) containing:
+    ///          - id of the reference list item
+    ///          - short name of the reference list item
+    ///          - long name of the reference list item
+    /// 
+    pub async fn get_clinical_intervention_types(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
+        let intv_types = "1".to_string();
+
+        self.get_common_references(intv_types, true).await
+    }
+
+    ///
+    /// Shortcut method to obtain Non-Clinical Intervention Type group (id=3) entries from the COMMON REFERENCE TYPE table
+    ///
+    /// Returns: a tuple (i64, String, String) containing:
+    ///          - id of the reference list item
+    ///          - short name of the reference list item
+    ///          - long name of the reference list item
+    /// 
+    pub async fn get_non_clinical_intervention_types(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
+        let intv_types = "3".to_string();
 
         self.get_common_references(intv_types, true).await
     }

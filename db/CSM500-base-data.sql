@@ -51,6 +51,7 @@ VALUES
 ('Surgery and Medicine', 'Main', 'West', '2', 'W2A', 'ERH SURG W2A', '', 1),
 ('Monitored Care', 'Main', 'Central','2', 'MCU', 'ERH MCU C2', '', 1),
 ('Pharmacy', 'Main', 'Central','2', 'Pharmacy', 'ERH PHM C2', '', 1),
+('Psychiatry', 'Main', 'East','2', 'PSY E2 181', 'ERH PSY E2', '', 1),
 ('Path Unit', 'Main', 'Central','2', 'C2A', 'ERH PATU C2A', '', 1);
 COMMIT;
 
@@ -69,6 +70,7 @@ VALUES
 ('Outpatient Rehab', '2050-01-01 23:59:59-00'),
 ('Pathology',        '2050-01-01 23:59:59-00'),
 ('Pharmacy',         '2050-01-01 23:59:59-00'),
+('Psychiatry',       '2050-01-01 23:59:59-00'),
 ('Surgical Daycare', '2050-01-01 23:59:59-00'),
 ('Surgical Unit',    '2050-01-01 23:59:59-00');
 COMMIT;
@@ -180,6 +182,10 @@ INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   OVERRIDING SYSTEM VALUE
   VALUES (18, 2, 'Y', 'Archived', 'Archived');
   
+INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
+  OVERRIDING SYSTEM VALUE
+  VALUES (400, 2, 'Y', 'Cancelled', 'Cancelled');
+  
 COMMIT;
 
 -- group 3: Care Types
@@ -280,7 +286,7 @@ INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
   
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
     OVERRIDING SYSTEM VALUE
- VALUES (100040, 1, 'Y', 'Alerts/CCI/SPI', 'Alerts/CCI/SPI');
+ VALUES (100040, 3 'Y', 'Alerts/CCI/SPI', 'Alerts/CCI/SPI');
  
 INSERT INTO common_reference_type(id, group_id, active_flag, name, description)
     OVERRIDING SYSTEM VALUE

@@ -114,6 +114,27 @@ impl Intervention {
             None => "".to_string()
         }        
     }
+
+    
+    ///
+    /// Helper method identifies if the Intervention is of a known type of "clinical" ones. This must be useable by logic within the application, so
+    /// it makes sense to have it in the DTO for easy access
+    /// 
+    pub fn is_clinical(&self) -> bool{
+        let clinical_intv_ids: Vec<i64> = vec![100006, 100040, 100041, 100046, 100049, 100050, 100052];
+
+        return ! clinical_intv_ids.contains(&self.intervention_type_id)
+    }
+
+
+    ///
+    /// Helper method identifies if the Intervention is the "danger/warning" type that is of special concern to users and thus the application.
+    /// This must be useable by logic within the application, so it makes sense to have it in the DTO for quick access.
+    /// 
+    pub fn is_alert(&self) -> bool {
+        self.intervention_type_id == constants::CRT_INTERVENTION_ALERT_TYPE 
+    }
+
 }
 
 /// Implements a .to_string() for the Intervention 
