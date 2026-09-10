@@ -23,7 +23,7 @@ async function validateNLPrompt() {
         patient_id = patient_id_ctrl.value;
     }
 
-    let userPrompt = "{patient_id=" +patient_id + "}" + document.getElementById('prompt').value.trim();
+    let userPrompt = "{patient_id=" + patient_id + "}" + document.getElementById('prompt').value.trim();
     let isValid = true;
 
     if (userPrompt == '') {
@@ -92,7 +92,7 @@ function getData(userPrompt){
 function performNLAction( action_id, patient_id ){
     const nl_prompt = document.getElementById('prompt');
     switch ( action_id ) {
-        case 1: // Admit New Patient
+        case 4: // Admit New Patient
             //alert ("case 1 + prompt");
             admit_patient_with_prompt( nl_prompt.value );
             break;
@@ -114,9 +114,10 @@ function performNLAction( action_id, patient_id ){
                 cmd_frm.submit();
             }
             break;
-        case 3: // discharge patient
-            //alert ("case 3 + prompt");
-            quickDischarge( patient_id, nl_prompt.value );
+        case 5: // discharge patient
+            if( patient_id != -1 ){
+                quickDischarge( patient_id, nl_prompt.value );
+            }
             break;
         default: // all other action_ids are actually intervention_type_id numbers
             //alert("performNLAction(): action_id=" + action_id + " patient_id=" + patient_id);

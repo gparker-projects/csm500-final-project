@@ -50,7 +50,7 @@ impl NLERoute{
                 if let Some(remaining_prompt_body) = req.prompt.clone().strip_prefix("{patient_id=") {
                     if let Some((raw_patient_id, remaining_prompt_body_1)) = remaining_prompt_body.split_once('}') {
                         default_patient = raw_patient_id.parse().unwrap();
-                        remaining_prompt_body_1.to_string()
+                        remaining_prompt_body_1.to_string().replace("}", "") //we are left with a "}" prefix, which we don't really care about. It will not affect the classification algorithm (currently).
                     }
                     else{
                         remaining_prompt_body.to_string() // if we must, we just proceed with the prompt, stripped of most of its prefix.
@@ -68,19 +68,19 @@ impl NLERoute{
         // next extract the context level: either no patient (0), within a patient/encounter (1) or within a patient's intervention (2)
         if prompt_level_0.contains("{ctxtlvl=1}"){ // within a patient/encounter (1)
             prompt_level_1 = prompt_level_0.replace("{ctxtlvl=1}", "");
-            context_level = CommandController::CONTEXT_LEVEL_PATIENT;
+            context_level = CommandController::CONTEXT_LEVEL_REQUIRES_PATIENT;
         }
         else if prompt_level_0.contains("{ctxtlvl=2}"){ //within a patient's intervention (2)
             prompt_level_1 = prompt_level_0.replace("{ctxtlvl=2}", "");
-            context_level = CommandController::CONTEXT_LEVEL_PATIENT_INTERVENTION;
+            context_level = CommandController::CONTEXT_LEVEL_REQUIRES_PATIENT_INTERVENTION;
         }
         else{ // otherwise assume level 0, no params
             prompt_level_1 = prompt_level_0.replace("{ctxtlvl=0}", "");
-            context_level = CommandController::CONTEXT_LEVEL_ANY_PATIENT; // redundant, but better for code clarity
+            context_level = CommandController::CONTEXT_LEVEL_NO_PATIENT_REQUIRED; // redundant, but better for code clarity - conversely "patient unknown, may or may not be present"
         }
         prompt = prompt_level_1;
 
-        println!("Revised prompt: \"{}\"", prompt.clone());
+        println!("Revised prompt and context level: '{}', ({})", prompt.clone(), context_level);
         println!("Default_patient: id={}", default_patient.clone());        
 
         let cur_session: Option<UserSession> = user_session.get(constants::USER_SESSION).unwrap();
@@ -98,40 +98,41 @@ impl NLERoute{
         let pdao = PatientDAO::new( app_session.get_db_connection() ).await;
         let referenced_patient = CommandController::get_referenced_patient(pdao, userid, prompt.clone()).await; // perform a basic search within the prompt for any of the current patients
 
-        let prompt_final = match referenced_patient.0 {
+        let mut prompt_final = prompt.clone();
+
+        let patient_id = match referenced_patient.clone().0 {
+            CommandController::NO_PATIENT_FOUND => {
+                if default_patient != constants::INVALID_PATIENT_ID {
+                    default_patient // if the patient is still invalid, but we have a value patient from the context, provide that instead
+                }
+                else{
+                    constants::INVALID_PATIENT_ID
+                }
+            },
             CommandController::KNOWN_PATIENT_FOUND =>{
                 let p: Patient = referenced_patient.clone().1.unwrap(); // pull out the patient's name and adjust the prompt prior to matching
-                prompt.clone().replace(&p.legal_first_name, "patient").replace(&p.legal_last_name, "patient")
+                prompt_final = prompt.clone().replace(&p.legal_first_name, "patient").replace(&p.legal_last_name, "patient");
+                p.id
             },
-            _ => prompt.clone(),
-        };
-        
-        let mut patient_id = match referenced_patient.clone().0 {
-            CommandController::NO_PATIENT_FOUND => constants::INVALID_PATIENT_ID,
             _ => { // otherwise reduce the list of results.
-                match referenced_patient.1 {
+                match referenced_patient.clone().1 {
                     Some(rp) => rp.id,
                     None => default_patient,// if there was a default patient in the prompt, we return it. Otherwse it gets constants::INVALID_PATIENT_ID by default
                 }
             },
         };
 
-        // if after all that, the patient is still invalid, but we have a value patient from the context, provide that instead
-        if patient_id == constants::INVALID_PATIENT_ID && default_patient != constants::INVALID_PATIENT_ID{
-            patient_id = default_patient;
-        }
-
-        tracing::debug!("...NLERoute evaluation: patient_id={} ", patient_id);
-        tracing::debug!("...                     prompt={} ", prompt.clone());
+        tracing::debug!("..revised prompt: {}", prompt_final.clone());
+        tracing::debug!("..revised patient_id: {}", patient_id);
+        tracing::debug!("..context_level: {}", context_level);
+        println!("..revised prompt: {}", prompt_final.clone());
+        println!("..revised patient_id: {}", patient_id);
+        println!("..context_level: {}", context_level);
 
         let classifer_results_final: Vec< (String, f32)> = cmd.get_filtered_classifier_rankings( prompt_final, cur_session.clone().user_authorizations, context_level).await;
 
-        //results_sbuf.push_str("<H1>natural language prompt</H1>\n");
-        results_sbuf.push_str( &NLECommandFormatter::get_nle_options_content(classifer_results_final, cmd, patient_id) );
+        results_sbuf.push_str( &NLECommandFormatter::get_nle_options_content(classifer_results_final, cmd, patient_id, referenced_patient.1 ));
         
         HttpResponse::Ok().body( results_sbuf )
     }
-
-
-
 }

@@ -35,9 +35,9 @@ impl CommandController{
     //pub const UNKNOWN_PATIENT_FOUND: i8 = 1;
     pub const KNOWN_PATIENT_FOUND: i8 = 2;
 
-    pub const CONTEXT_LEVEL_ANY_PATIENT: i8 = 0; //context level: either no patient (0), within a patient/encounter (1) or within a patient's intervention (2)
-    pub const CONTEXT_LEVEL_PATIENT: i8 = 1;
-    pub const CONTEXT_LEVEL_PATIENT_INTERVENTION: i8 = 2;
+    pub const CONTEXT_LEVEL_NO_PATIENT_REQUIRED: i8 = 0; //context level: either no patient (0), within a patient/encounter (1) or within a patient's intervention (2)
+    pub const CONTEXT_LEVEL_REQUIRES_PATIENT: i8 = 1;
+    pub const CONTEXT_LEVEL_REQUIRES_PATIENT_INTERVENTION: i8 = 2;
 
 
     ///
@@ -72,20 +72,28 @@ impl CommandController{
 
     
     // given the id of a permission (command), return the context it is allowed to operate in
-    pub fn get_command_context_level (permission_id: i64, target_level: i8) -> bool{
+    pub fn is_command_allowed_at_context_level (permission_id: i64, current_context_level: i8) -> bool{
         let required_level: i8;
 
         if permission_id >= 100000 { // the permissions above 100000 are currently undefined, but reserved for intervention-level calls
-            required_level = CommandController::CONTEXT_LEVEL_PATIENT_INTERVENTION ;
+            required_level = CommandController::CONTEXT_LEVEL_REQUIRES_PATIENT_INTERVENTION ;
+        }
+        else if permission_id == 4 { // // admit new patient
+            required_level = CommandController::CONTEXT_LEVEL_NO_PATIENT_REQUIRED;
         }
         else if permission_id <= 12 { // we'll ignore Login as there is no Login (id=1) available when you're already in the system
-            required_level = CommandController::CONTEXT_LEVEL_PATIENT;
+            required_level = CommandController::CONTEXT_LEVEL_REQUIRES_PATIENT;
         }
         else { // the permissions between 13 - 99999 are currently undefined
-            required_level = CommandController::CONTEXT_LEVEL_ANY_PATIENT;
+            required_level = CommandController::CONTEXT_LEVEL_NO_PATIENT_REQUIRED; 
         }
 
-        if required_level == target_level {
+        println!("command_allowed_at_context_level({})", permission_id);
+        println!("..current_context_level {} == {} required_level ", current_context_level, required_level);
+
+        // either meets the required level, or is "no patient context required"
+        if required_level >= current_context_level || required_level == CommandController::CONTEXT_LEVEL_NO_PATIENT_REQUIRED {
+            println!("....allowed");
             return true;
         }
         return false;
@@ -106,7 +114,7 @@ impl CommandController{
     /// * String: Sentence that was evaluated
     /// * f32: Resulting percentage of success of the comparison against the prompt
     /// 
-    pub async fn get_filtered_classifier_rankings(&mut self, prompt: String, user_auths: UserAuthorization, _context_level: i8 ) -> Vec<(String, f32)>{
+    pub async fn get_filtered_classifier_rankings(&mut self, prompt: String, user_auths: UserAuthorization, context_level: i8 ) -> Vec<(String, f32)>{
         tracing::debug!("get_filtered_classifier_rankings()");
         let mut user_restricted_options: Vec<String> = Vec::new();
 
@@ -115,9 +123,9 @@ impl CommandController{
             if user_auths.has_permission(item.1){
 
                 // if the command has the required context level, the user will receive it as an option
-                //if CommandController::get_command_context_level( item.1, context_level) {
+                if CommandController::is_command_allowed_at_context_level( item.1, context_level) {
                     user_restricted_options.push(item.0);
-                //}
+                }
             }
             else{
                 rejected_counter = rejected_counter + 1;
