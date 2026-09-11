@@ -36,7 +36,7 @@
 	      <td colspan=3>
 	    	  <div class="data-field-ro">Location:&nbsp;{location_id}</div>
 	      </td>
-            </tr>
+        </tr>
 
 	    <tr class="data-label">
 	      <td colspan=2>
@@ -78,6 +78,12 @@
 <tr>
 <td>
 <input type="button" value="+" id="btnShowHideNewMeasure" {hide_add_new_measure}>
+</td>
+</tr>
+
+<div align="left">
+<tr>
+<td>
 
 <div id="divaddNewMeasure" class="hidden">
 <form action="/intvdtlnew" method="post" id="addMeasureForm" name="addMeasureForm" onsubmit="event.preventDefault(); return validateAddMeasureForm(0);">
@@ -105,14 +111,21 @@
 
 </td>
 </tr>
-</div>
+
 
 <tr>
-	<td>
-		<div id="MapleEMR::FeaturePreference"></div>
-	</td>
+<td>
+<div id="MapleEMR::FeaturePreference"></div>
+</td>
 </tr>
+
 </table>
 
+</div>
+
+<!--div align="left">
+  <div id="MapleEMR::FeaturePreference"></div>
+</div-->
+</div>
 </BODY>
 </HTML>

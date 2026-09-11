@@ -16,7 +16,7 @@ use crate::dto::patient;
 use crate::dao::{ patient_dao::*, common_dao::*}; 
 use crate::ui::{data_forms::*, menu_fmt::*};
 use crate::session::{AppSession, UserSession};
-use crate::ui::common::CommonFormatter;
+use crate::ui::common_fmt::CommonFormatter;
 
 pub struct AdmitRoute{}
 

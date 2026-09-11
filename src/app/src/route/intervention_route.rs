@@ -20,7 +20,7 @@ use crate::dao::feature_preference_dao::FeaturePreferenceDAO;
 use crate::dao::{patient_dao::*, intervention_dao::*, common_dao::*, auth_dao::*, encounter_dao::*}; 
 use crate::session::{AppSession, UserSession};
 use crate::ui::{data_forms::*, menu_fmt::*};
-use crate::ui::common::CommonFormatter;
+use crate::ui::common_fmt::CommonFormatter;
 use crate::ui::feat_preference_fmt::FeaturePreferenceFormatter;
 
 pub struct InterventionRoute{}

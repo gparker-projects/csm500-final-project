@@ -42,11 +42,12 @@ impl CommonFormatter {
         for row in item_list{
             results_sbuf.push_str("<option value='" );
             results_sbuf.push_str(&row.0.to_string()); // location_id here
-            results_sbuf.push_str("'" );
             if row.0 == default_item_id {
-                results_sbuf.push_str(" selected ");
+                results_sbuf.push_str("' selected >");
             }
-            results_sbuf.push_str(">");
+            else{
+                results_sbuf.push_str("' >");
+            }
             results_sbuf.push_str(&row.1); // description here
             results_sbuf.push_str("</option>");
         }
@@ -80,15 +81,16 @@ impl CommonFormatter {
         for row in location_list{
             results_sbuf.push_str("<option value='" );
             results_sbuf.push_str(&row.0.to_string()); // location_id here
-            results_sbuf.push_str("'" );
             if row.0 == default_location_id {
-                results_sbuf.push_str(" selected ");
+                results_sbuf.push_str("' selected >");
             }
-            results_sbuf.push_str(">");
+            else{
+                results_sbuf.push_str("' >");
+            }
             results_sbuf.push_str(&row.1); // description here
             results_sbuf.push_str("</option>");
         }
-        results_sbuf.push_str("</table>");
+        results_sbuf.push_str("</select>");
 
         return results_sbuf;
     }

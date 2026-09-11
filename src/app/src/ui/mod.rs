@@ -6,7 +6,7 @@
 //!  translates them into a human-readable HTML format.
 //! 
 //! -------------------------------------------------------------------
-pub mod common;
+pub mod common_fmt;
 pub mod data_forms;
 pub mod feat_preference_fmt;
 pub mod intervention_fmt;

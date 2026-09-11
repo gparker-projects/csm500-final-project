@@ -11,7 +11,7 @@
 use crate::constants;
 
 use crate::dto::intervention_detail::InterventionDetail;
-use crate::ui::common::CommonFormatter;
+use crate::ui::common_fmt::CommonFormatter;
 
 pub struct InterventionFormatter{}
 

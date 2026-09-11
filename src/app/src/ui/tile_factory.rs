@@ -25,7 +25,7 @@ use crate::dto::user_auth::Permission;
 use crate::dto::{patient::*, intervention::*, intervention_detail::*};
 use crate::session::UserSession;
 use crate::ui::data_forms::*;
-use crate::ui::common::CommonFormatter;
+use crate::ui::common_fmt::CommonFormatter;
 use crate::ui::intervention_fmt::InterventionFormatter;
 
 /// Enumeration for Web Content Tiles, each representing a tile of information
@@ -260,6 +260,7 @@ impl WebContentFactory {
                                                   feature_pref_section: String
                                                   ) -> String {
         tracing::debug!(">get_modify_intervention_full_page_tile()");
+        println!(">get_modify_intervention_full_page_tile()");
 
         let tags = ["{intervention_id}",
                                 "{intervention_type}",
@@ -291,7 +292,8 @@ impl WebContentFactory {
 
         let data_items = match current_intervention{
             None =>{ // Create new Intervention path
-                tracing::debug!("  Create new Intervention");
+                tracing::debug!("..Create new Intervention");
+                println!("..Create new Intervention");
                 dd_user = CommonFormatter::get_dropdown_user_with_department(user_dropdown_list,constants::NOT_SPECIFIED_ID); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
                 dd_intv_status =  CommonFormatter::get_dropdown_intervention_status(status_dropdown_list, constants::DEFAULT_INTERVENTION_STATUS_NEW); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
 
@@ -315,7 +317,8 @@ impl WebContentFactory {
                 tmp_data_items
             } 
             Some (intv) => {
-                tracing::debug!("  Update existing Intervention");
+                tracing::debug!("..Update existing Intervention");
+                println!("..Update existing Intervention");
                 dd_user = CommonFormatter::get_dropdown_user_with_department(user_dropdown_list,intv.users_id); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
                 dd_intv_status =  CommonFormatter::get_dropdown_intervention_status(status_dropdown_list, intv.status_id); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
 
@@ -360,7 +363,7 @@ impl WebContentFactory {
                                                     form_errors,
                                                     intv_details_html,
                                                     feature_pref_section,
-                                                    String::new()
+                                                    String::new() // by not hiding {hide_add_new_measure}, we show the section
                                                 ];
                 tmp_data_items
             }

@@ -13,7 +13,7 @@
 use crate::dto::{encounter::*, intervention::*};
 use crate::dao::patient_dao::PatientWrapper;
 
-use crate::ui::common::CommonFormatter;
+use crate::ui::common_fmt::CommonFormatter;
 
 pub struct SimpleFormatter{}
 
