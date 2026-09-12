@@ -6,6 +6,15 @@
   <link rel="stylesheet" href="/webc/css/home.css">
   <link rel="stylesheet" href="/webc/css/dataentryform.css">
   <script>
+  
+
+  // checks if a string is an alphanumeric or basic punctuation
+  // https://www.tutorialspoint.com/article/how-to-validate-an-input-is-alphanumeric-or-not-using-javascript
+  //
+  function hasAcceptableChars(str) {
+    const regex = /^[a-zA-Z0-9\s!"#$%^&*()_+=,\-./:;?[\\\]|]+$/;  
+    return regex.test(str);
+  }
 
   function validateForm() {
     const errLabel = document.getElementById('errLabel');
@@ -14,8 +23,8 @@
 
     console.log("in validateForm();");
     
-    if (document.getElementById('discharge_notes').value.trim() == '') {
-        errLabel.textContent = "Discharge notes are required";
+    if (document.getElementById('discharge_notes').value.trim() == ''|| !hasAcceptableChars(document.getElementById('discharge_notes').value)) {
+        errLabel.textContent = "Discharge notes are required, and can only contain letters, numbers and basic punctuation.";
         errLabel.style = "color: red";
         isValid = false;
         return false;
@@ -102,8 +111,9 @@
 	
 	<input type="hidden" name="patient_id" id="patient_id" value="{patient_id}">
 	<input type="hidden" name="encounter_id" id="encounter_id" value="{encounter_id}">
-        <input type="hidden" name="form_errors" id="form_errors" value="">
+  <input type="hidden" name="form_errors" id="form_errors" value="">
 	<input type="hidden" name="action_flag" id="action_flag" value="discharge">
+  <input type="hidden" name="user_prompt" id="user_prompt" value="{user_prompt}">
 </td></tr>
 
 <tr><td>

@@ -118,6 +118,12 @@ function performNLAction( action_id, patient_id ){
             if( patient_id != -1 ){
                 quickDischarge( patient_id, nl_prompt.value );
             }
+            else{
+                const errLabelNL = document.getElementById('errLabelNL');
+                errLabelNL.textContent = "Discharge from a prompt requires a named patient.";
+                errLabelNL.className = "clinical-emergency-red"; 
+                return false;
+            }
             break;
         default: // all other action_ids are actually intervention_type_id numbers
             //alert("performNLAction(): action_id=" + action_id + " patient_id=" + patient_id);
@@ -183,9 +189,6 @@ async function redirect_to_patient_new_intv( patient_id, intervention_type_id, n
         cmd_frm.appendChild(tmp_user_prompt);
     }
     tmp_user_prompt.value = nl_prompt;
-
-    //alert("redirect_to_patient_new_intv().v_Sep_06_1628:\n..submitting nlpCommandForm to "+ cmd_frm.action + " " + enc_id.id + "=" +enc_id.value+ " " + tmp_intv_type_id.id + " =" +tmp_intv_type_id.value);
-    //console.log("..submitting nlpCommandForm to "+ cmd_frm.action + " enc_id=" +enc_id.value);
     cmd_frm.submit();
 }
 

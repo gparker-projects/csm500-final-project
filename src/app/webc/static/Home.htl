@@ -27,8 +27,8 @@
   <form action="/nlprompt" method="post" id="nlpCommandForm" name="nlpCommandForm" onSubmit="event.preventDefault(); return validateNLPrompt()" align="left" class="nlpCommandAreaCls">
 	
 	<div align="right"><textarea id="prompt" name="prompt" rows="3" cols="20" class="data-field-rw" placeholder="How can I help?"></textarea>
-	<input type="submit" value=">>"></div><br>
-	<label id="errLabelNL">
+	<input type="submit" value=">>"></div>
+	<label id="errLabelNL" name="errLabelNL" class="data"></label>
   </form>
 </div>
 

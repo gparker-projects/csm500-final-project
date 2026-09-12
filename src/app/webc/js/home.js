@@ -18,11 +18,14 @@ async function admit_patient(){
 
 // submit form to admit patient, using prompt provided by the NLE prompt box
 async function admit_patient_with_prompt( prompt ){
-	  console.log('admit_patient_with_prompt()');
+	console.log('admit_patient_with_prompt()');
     const frm = document.getElementById('admitFrm');
 
     // copy from "prompt" of the NLE form, to the admit form's "user_prompt"
-    const user_prompt = document.getElementById('prompt');
+    const prompt_ctrl = document.getElementById('prompt');
+    prompt_ctrl.value = prompt;
+
+    const user_prompt = document.getElementById('user_prompt');
     user_prompt.value = prompt;
     frm.submit();
 }

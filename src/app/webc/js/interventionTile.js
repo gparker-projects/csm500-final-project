@@ -127,11 +127,10 @@ function fast_action_add_measure(itemId){
     addFrm_type_id.value = itemId;
 }
 
-
+// checks if a string is an alphanumeric or basic punctuation
+// https://www.tutorialspoint.com/article/how-to-validate-an-input-is-alphanumeric-or-not-using-javascript
+//
 function hasAcceptableChars(str) {
- // https://www.tutorialspoint.com/article/how-to-validate-an-input-is-alphanumeric-or-not-using-javascript
- // checks if a string is an alphanumeric or basic punctuation
- //
   const regex = /^[a-zA-Z0-9\s!"#$%^&*()_+=,\-./:;?[\\\]|]+$/;  
   return regex.test(str);
 }

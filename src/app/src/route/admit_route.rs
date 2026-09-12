@@ -170,13 +170,14 @@ impl AdmitRoute{
                 patient_id: req.patient_id.clone(),
                 action_flag: "admit".to_string(),
                 user_prompt: req.user_prompt.clone(),
+                admit_notes: req.user_prompt.clone(),
                 ..Default::default()
             }
         )).await
   }
 
-    ///
-  /// Wrapper route for the menu option to admit a patient without having any web form to pass data in from
+  ///
+  /// Wrapper route for the menu option to discharge a patient without having any web form to pass data in from
   /// 
   pub async fn route_to_discharge_patient(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitFormBasic>) -> impl Responder {
         tracing::debug!("-> Route Requested: /route_to_discharge_patient");
@@ -196,7 +197,7 @@ impl AdmitRoute{
   /// Route for New patient admit, or existing patient discharge page
   /// 
   pub async fn route_to_admit_discharge(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitDataForm>) -> impl Responder {
-      tracing::debug!("-> Route Requested: /admit_discharge");
+      tracing::debug!("-> Route Requested: /admit_discharge  route_to_admit_discharge()");
 
       let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
       let userid = user_session_details.clone().get_userid_as_i64();
@@ -209,8 +210,6 @@ impl AdmitRoute{
 
       let discharge: bool = req.action_flag.eq("discharge");
 
-      tracing::debug!(">> route_to_admit_discharge() called");
-
       let existing_patient: Option<patient::Patient>
         = if patient_id == constants::NOT_SPECIFIED_ID {
               tracing::debug!("   No Patient specified: create a new Patient and Encounter");
@@ -218,9 +217,23 @@ impl AdmitRoute{
           }
           else{
               tracing::debug!("   Patient exists: view existing Patient and Encounter");
-              dao.get_patient_details( userid.clone(), patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND ) 
+              let tmp_patent = dao.get_patient_details( userid.clone(), patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+              
+              match tmp_patent {
+                Some(mut p) => {
+                    if req.clone().user_prompt.len() > 0 {
+                        if discharge && p.discharge_notes.len() == 0 {
+                            p.discharge_notes = req.clone().user_prompt; // if discharging and arriving via prompt, prompt will populate the empty discharge notes
+                        }
+                        else if !discharge && p.admit_notes.len() == 0 {
+                            p.admit_notes = req.clone().user_prompt; // if admitting and arriving via prompt, prompt will populate the empty admit notes
+                        }
+                    }                    
+                    Some(p)
+                }, 
+                None => None,
+              }
           };
-
 
       // construct the legacy menu based on the user's patients and site
       let legacy_menu_results = dao.get_patients_at_users_site_no_discharge(userid.clone()).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
@@ -251,7 +264,8 @@ impl AdmitRoute{
                                          existing_patient,
                                          legacy_menu,
                                          location_menu,
-                                         discharge); // retrieve the page base content
+                                         discharge,
+                                         req.clone().user_prompt); // retrieve the page base content
 
       HttpResponse::Ok().body( content )
   }

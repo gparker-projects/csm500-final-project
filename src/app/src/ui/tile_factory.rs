@@ -49,8 +49,6 @@ pub enum WebContentItem {
     WCTypeInterventionFullPageTile,
     #[display("Intervention-Detail Item Tile")]
     WCTypeIntvDetailItemTile,
-    #[display("Fast Action Tile")]
-    WCTypeFastActionTile,
 }
 
 /// -------------------------------------------------------------------
@@ -78,8 +76,7 @@ impl WebContentFactory {
                                 ("AdmitTile.htl", WebContentItem::WCTypeAdmitTile),
                                 ("DischargeTile.htl", WebContentItem::WCTypeDischargeTile), 
                                 ("InterventionTile.htl", WebContentItem::WCTypeInterventionFullPageTile),
-                                ("IntvDetailItemTile.htl", WebContentItem::WCTypeIntvDetailItemTile),
-                                ("FastActionTile.htl", WebContentItem::WCTypeFastActionTile)        ];
+                                ("IntvDetailItemTile.htl", WebContentItem::WCTypeIntvDetailItemTile)       ];
 
         // load tiles from pre-defined files, assigning to known constants so that the application can reliably load them later
         for item in tile_files{
@@ -168,49 +165,64 @@ impl WebContentFactory {
     /// Provide HTML for creating a new patient admit, or completing it as a discharge for an existing patient
     /// It is the same table (Encounter), so one route should suffice
     /// 
-    pub fn get_admit_discharge_full_tile(&self, user_identity_label: String, current_patient: Option<Patient>, legacy_menu: String, location_menu: String, is_discharge_flag: bool) -> String {
+    pub fn get_admit_discharge_full_tile(&self, user_identity_label: String,
+                                                current_patient: Option<Patient>,
+                                                legacy_menu: String,
+                                                location_menu: String,
+                                                is_discharge_flag: bool,
+                                                user_prompt: String) -> String {
+
         tracing::debug!(">get_admit_discharge_tile()");
+        println!(">get_admit_discharge_tile()");
 
         let labels = ["{patient_first_name}","{patient_last_name}", "{middle_name}",
-                                  "{phn}","{birthdate}", "{admit_notes}", "{encounter_id}", "{patient_id}"];
+                                  "{phn}","{birthdate}",  "{encounter_id}", "{patient_id}"];
 
         let base_tile_level_1 = match is_discharge_flag{
             true => self.get_tile(WebContentItem::WCTypeDischargeTile),
             false => self.get_tile(WebContentItem::WCTypeAdmitTile),
         };
 
+        println!("..prompt: {}", user_prompt);
+
         // warning: match is on an Option<Patient>, NOT a tile
         let inner_content = match current_patient{ // get basic static tile loaded, make edits depending on type
 
             None =>{ // new patient (Admit) patH
                 if is_discharge_flag {
-                    tracing::debug!("  Discharge without Patient => INVALID");
+                    tracing::debug!("..Discharge without Patient => INVALID");
+                    println!("..Discharge without Patient => INVALID");
                 }
                 else{
-                    tracing::debug!("  Admit New Patient");
+                    tracing::debug!("..Admit New Patient");
+                    println!("..Admit New Patient");
                 }                
 
                 // admitting a new patient with no data => wipe out the tags
                 let mut result = base_tile_level_1.clone();
                 for i in 0..labels.len() {
                     result = result.replace(labels[i], &"".to_string());
-                }
+                }           
 
                 // ...except for admit_timestamp which will be Now()
                 let result_2 = result.replace("{admit_timestamp}", &chrono::Utc::now().format("%Y-%b-%d %H:%M:%S").to_string());
                 let result_3 = result_2.replace("{location_id}", &location_menu);
-
-                result_3
+                let result_4 = result_3.replace("{user_prompt}", &user_prompt);
+                let result_5 = result_4.replace("{admit_notes}", &user_prompt);
+                
+                result_5
             } 
             Some (p) => {
                 if is_discharge_flag {
                     tracing::debug!("  Discharge existing Patient");
+                    println!("..Discharge existing Patient");
                 }
                 else{
                     tracing::debug!("  Admit update: existing Patient");
+                    println!("..Admit update: existing Patient");
                 }         
                 let data_items = [&p.legal_first_name, &p.legal_last_name, &p.legal_middle_names,
-                                                &p.phn_to_string(), &p.birth_date_for_display(),  &p.admit_notes,
+                                                &p.phn_to_string(), &p.birth_date_for_display(),        
                                                 &p.encounter_id.to_string(),
                                                 &p.id.to_string()];
 
@@ -219,19 +231,29 @@ impl WebContentFactory {
                     result = result.replace(labels[i], data_items[i]);
                 }
                
-                let result_2 = result.replace("{admit_timestamp}", &p.admit_timestamp_for_display());      
-
+                let result_2 = result.replace("{admit_timestamp}", &p.admit_timestamp_for_display());
+                let result_3 = result_2.replace("{user_prompt}", &user_prompt);
+                                
                 if is_discharge_flag {
-                    let result_3 = result_2.replace("{discharge_timestamp}", &chrono::Utc::now().format("%Y-%b-%d %H:%M:%S").to_string());
-                    let result_4 = result_3.replace("{discharge_notes}", &p.discharge_notes);
-                    let result_5 = result_4.replace("{location_short_name}", &p.location_short_name);
-                    let result_6 = result_5.replace("{location_id}", &p.location_id.to_string());
-                    result_6
+                    let result_4 = result_3.replace("{discharge_timestamp}", &chrono::Utc::now().format("%Y-%b-%d %H:%M:%S").to_string());
+                    let result_5 = match p.discharge_notes.len() == 0 && user_prompt.len() > 0 {
+                        true => result_4.replace("{discharge_notes}", &user_prompt),
+                        false => result_4.replace("{discharge_notes}", &p.discharge_notes),
+                    };
+
+                    let result_6 = result_5.replace("{location_short_name}", &p.location_short_name);
+                    let result_7 = result_6.replace("{location_id}", &p.location_id.to_string());
+                    result_7
                 }
                 else{
-                    let result_3 = result_2.replace("{discharge_notes}", &p.discharge_notes);
-                    let result_4 = result_3.replace("{location_id}", &location_menu);
-                    result_4
+                    let result_4 = match p.admit_notes.len() == 0 && user_prompt.len() > 0 {
+                        true => result_3.replace("{admit_notes}", &user_prompt),
+                        false => result_3.replace("{admit_notes}", &p.admit_notes),
+                    };
+                    
+                    let result_5 = result_4.replace("{discharge_notes}", &p.discharge_notes);
+                    let result_6 = result_5.replace("{location_id}", &location_menu);
+                    result_6
                 }
             }
         };

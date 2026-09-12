@@ -6,6 +6,14 @@
   <link rel="stylesheet" href="/webc/css/dataentryform.css">
   <script>
 
+  // checks if a string is an alphanumeric or basic punctuation
+  // https://www.tutorialspoint.com/article/how-to-validate-an-input-is-alphanumeric-or-not-using-javascript
+  //
+  function hasAcceptableChars(str) {
+    const regex = /^[a-zA-Z0-9\s!"#$%^&*()_+=,\-./:;?[\\\]|]+$/;  
+    return regex.test(str);
+  }
+
   function validateForm() {
     const errLabel = document.getElementById('errLabel');
     errLabel.textContent = '';
@@ -13,36 +21,36 @@
     
     console.log("in validateForm();");
 
-    if (document.getElementById('patient_first_name').value.trim() == '') {
-        errLabel.textContent = "First Name is required";
+    if (document.getElementById('patient_first_name').value.trim() == '' || !hasAcceptableChars(document.getElementById('patient_first_name').value)) {
+        errLabel.textContent = "First Name is required, and can only contain letters, numbers and basic punctuation.";
         errLabel.style = "color: red";
         isValid = false;
     }
 
     // middle name not required
     
-    if (document.getElementById('patient_last_name').value.trim() == '') {
-	  errLabel.textContent = "Last Name is required";
-	  errLabel.style = "color: red";
-	  isValid = false;
+    if (document.getElementById('patient_last_name').value.trim() == ''|| !hasAcceptableChars(document.getElementById('patient_last_name').value)) {
+      errLabel.textContent = "Last Name is required, and can only contain letters, numbers and basic punctuation.";
+      errLabel.style = "color: red";
+      isValid = false;
     }
     
-    if (document.getElementById('phn').value.trim() == '') {
-	  errLabel.textContent = "Personal Health Number (PHN) must be provided in the format: 9#########";
-	  errLabel.style = "color: red";
-	  isValid = false;
+    if (document.getElementById('phn').value.trim() == ''|| !hasAcceptableChars(document.getElementById('phn').value)) {
+      errLabel.textContent = "Personal Health Number (PHN) must be provided in the format: 9#########";
+      errLabel.style = "color: red";
+      isValid = false;
     }
 
-    if (document.getElementById('birthdate').value.trim() == '') {
-	  errLabel.textContent = "Birthdate must be provided in YYYY/MM/DD format.";
-	  errLabel.style = "color: red";
-	  isValid = false;
+    if (document.getElementById('birthdate').value.trim() == ''|| !hasAcceptableChars(document.getElementById('birthdate').value)) {
+      errLabel.textContent = "Birthdate must be provided in YYYY/MM/DD format.";
+      errLabel.style = "color: red";
+      isValid = false;
     }
     
-    if (document.getElementById('admit_notes').value.trim() == '') {
-	  errLabel.textContent = "Reason for Visit is required";
-	  errLabel.style = "color: red";
-	  isValid = false;
+    if (document.getElementById('admit_notes').value.trim() == ''|| !hasAcceptableChars(document.getElementById('admit_notes').value)) {
+      errLabel.textContent = "Reason for Visit is required, and can only contain letters, numbers and basic punctuation.";
+      errLabel.style = "color: red";
+      isValid = false;
     }
     
         
@@ -112,6 +120,7 @@
 	<input type="hidden" name="encounter_id" id="encounter_id" value="{encounter_id}">
 	<input type="hidden" name="form_errors" id="form_errors" value="">
 	<input type="hidden" name="action_flag" id="action_flag" value="{action_flag}">
+  <input type="hidden" name="user_prompt" id="user_prompt" value="{user_prompt}">
 </td></tr>
 
 <tr><td>
