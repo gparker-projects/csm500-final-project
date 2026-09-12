@@ -199,48 +199,31 @@ COMMIT;
 -- Alerts/CCI/SPI (100040)
 -- Ref: https://policy.nshealth.ca/site_published/nsha/document_render.aspx?documentRender.IdType=6&documentRender.GenericField=&documentRender.Id=108815
 
-
-
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'Alert: Malignant Hyperthermia','Alert: Malignant Hyperthermia', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'Alert: Pescription Alert', 'Alert: Pescription Alert', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043,'Alert: Palliative Care', 'Alert: Palliative Care', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'Alert: MRSA Contact', 'Alert: MRSA Contact', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'Alert: MRSA Positive','Alert: MRSA Positive', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'Alert: VRE Contact','Alert: VRE Contact', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'Alert: VRE Positive','Alert: VRE Positive', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043,  'Alert: Difficult Intubation','Alert: Difficult Intubation', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043,  'Alert: Community Rx Order','Alert: Community Rx Order', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'Alert: Certificate of Leave',  'Alert: Certificate of Leave', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'Alert: Previous History of Banned Substance', 'Alert: Previous History of Banned Substance', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'Alert: IWK Emergency Care Plan', 'Alert: IWK Emergency Care Plan', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'Alert: Required Irradiated Blood Product','Alert: Required Irradiated Blood Product', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'Research', 'Research', 'Y');
-
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'Alert: Advance Directives/Personal Directive', 'Alert: Advance Directives/Personal Directive', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'Alert: Potential Aggressive Behavior - Family', 'Alert: Potential Aggressive Behavior - Family', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'Alert: Bleeding Disorder', 'Alert: Bleeding Disorder', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'Alert: Custody Order', 'Alert: Custody Order', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'Alert: Active Chemotherapy', 'Alert: Active Chemotherapy', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'Alert: Hearing Impaired', 'Alert: Hearing Impaired', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'Alert: Immunosuppressed', 'Alert: Immunosuppressed', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'Alert: Language Interpreter', 'Alert: Language Interpreter', 'Y');
-
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'CCI: Palliative Care', 'CCI: Palliative Care', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'CCI: Do Not Resuscitate (DNR)', 'CCI: Do Not Resuscitate (DNR', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100043, 'Drug Interactions', 'Drug Interactions', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Heart rate', 'Heart rate', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Blood pressure (systolic/diastolic)', 'Blood pressure (systolic/diastolic)', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Body Temperature (C)', 'Body Temperature (C)', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Respiratory rate', 'Respiratory rate', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Oxygen saturation', 'Oxygen saturation', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'GCS: [E]ye Opening (1-4)', 'Glasgow Coma Score (GCS): [E]ye Opening (1-4)', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'GCS: [V]erbal Response (1-5)', 'Glasgow Coma Score (GCS): [V]erbal Response (1-5)', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'GCS: [M]otor Response (1-6)', 'Glasgow Coma Score (GCS): [M]otor Response (1-6)', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Blood Glucose', 'Blood Glucose', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Height (cm)', 'Height (cm)', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Weight (kg)', 'Weight (kg)', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Fall risk score (0-50+)', 'Fall risk score: Low Risk (0–24), Moderate (25–50), High Risk (50+)', 'Y');
-INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Pain level (1-10)', 'Pain level (1-10)', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: Malignant Hyperthermia','Alert: Malignant Hyperthermia', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: Pescription Alert', 'Alert: Pescription Alert', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: Palliative Care', 'Alert: Palliative Care', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: MRSA Contact', 'Alert: MRSA Contact', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: MRSA Positive','Alert: MRSA Positive', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: VRE Contact','Alert: VRE Contact', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: VRE Positive','Alert: VRE Positive', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: Difficult Intubation','Alert: Difficult Intubation', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: Community Rx Order','Alert: Community Rx Order', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: Certificate of Leave',  'Alert: Certificate of Leave', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: Previous History of Banned Substance', 'Alert: Previous History of Banned Substance', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: IWK Emergency Care Plan', 'Alert: IWK Emergency Care Plan', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: Required Irradiated Blood Product','Alert: Required Irradiated Blood Product', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Research', 'Research', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: Advance Directives/Personal Directive', 'Alert: Advance Directives/Personal Directive', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: Potential Aggressive Behavior - Family', 'Alert: Potential Aggressive Behavior - Family', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: Bleeding Disorder', 'Alert: Bleeding Disorder', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: Custody Order', 'Alert: Custody Order', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: Active Chemotherapy', 'Alert: Active Chemotherapy', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: Hearing Impaired', 'Alert: Hearing Impaired', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: Immunosuppressed', 'Alert: Immunosuppressed', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Alert: Language Interpreter', 'Alert: Language Interpreter', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'CCI: Palliative Care', 'CCI: Palliative Care', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'CCI: Do Not Resuscitate (DNR)', 'CCI: Do Not Resuscitate (DNR', 'Y');
+INSERT INTO common_reference_type(group_id, name, description, active_flag) VALUES (100040, 'Drug Interactions', 'Drug Interactions', 'Y');
 
 COMMIT;
 

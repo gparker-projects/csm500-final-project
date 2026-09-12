@@ -12,7 +12,7 @@
 //
 
 async function validateNLPrompt() {
-    const errLabel = document.getElementById('errLabel');
+    const errLabel = document.getElementById('errLabelNL');
     errLabel.textContent = '';
 
     // pre-pend the context of the prompt before submission. This can be needed when a prompt does not specify a patient, but is

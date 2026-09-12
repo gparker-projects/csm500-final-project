@@ -23,8 +23,13 @@
 <input type="hidden" name="target_id" id="target_id" value="{patient_id}">
 
 <td>
-	<label id="errLabel"></label>
+	
 	<table>
+		<tr>
+			<td colspan=3>
+	    	  <label id="errLabel"></label>
+	        </td>
+        </tr>
 
 	    <tr class="data-label">
 	       <td><div>Type</div><div class="data-field-ro">{intervention_type}</div></td>
@@ -69,73 +74,44 @@
 </td>
 </tr>
 </form>
-
-
-
-
-
-
-
 <div align="left">
 <tr>
 <td>
-
 <div id="divaddNewMeasure" class="hidden">
-<form action="/intvdtlnew" method="post" id="addMeasureForm" name="addMeasureForm" onsubmit="event.preventDefault(); return validateAddMeasureForm(0);">
-    <input type="hidden" name="addFrm_patient_id" id="addFrm_patient_id" value="{patient_id}">
-	<table>
-		 <tr class="data-label">
-		   <td><div class="data-field-ro"><div id="MapleEMR::InterventionDetailsTypeDropDownControl"></div></td>
-		   <input type="hidden" name="addFrm_intv_id" id="addFrm_intv_id" value="{intervention_id}">
-		   <input type="hidden" name="addFrm_intv_dtls_id" id="addFrm_intv_dtls_id" value="-1">
-		   <td><div>Value</div><input type="text" name="addFrm_value" id="addFrm_value" class="data-field-rw" value=""></td>
-		   <td><div>Note</div><textarea id="addFrm_notes" name="addFrm_notes" rows="2" cols="50" class="data-field-rw"></textarea></td>
-		   <td>
-		       <input type="submit" value="Add" onclick="event.preventDefault(); return validateAddMeasureForm(0);">
-		       <input type="button" id="itemCancel_0" value="Cancel" onClick="event.preventDefault(); btnShowHideNewMeasure.click();">
-		   </td>
-		</tr>
-		<tr class="data-field-ro">
-			<td colspan="4">
-				<label id="addFrm_errors" class="hidden"></label>
+	<form action="/intvdtlnew" method="post" id="addMeasureForm" name="addMeasureForm" onsubmit="event.preventDefault(); return validateAddMeasureForm(0);">
+		<input type="hidden" name="addFrm_patient_id" id="addFrm_patient_id" value="{patient_id}">
+		<table>
+			<tr class="data-label">
+			<td><div class="data-field-ro"><div id="MapleEMR::InterventionDetailsTypeDropDownControl"></div></td>
+			<input type="hidden" name="addFrm_intv_id" id="addFrm_intv_id" value="{intervention_id}">
+			<input type="hidden" name="addFrm_intv_dtls_id" id="addFrm_intv_dtls_id" value="-1">
+			<td><div>Value</div><input type="text" name="addFrm_value" id="addFrm_value" class="data-field-rw" value=""></td>
+			<td><div>Note</div><textarea id="addFrm_notes" name="addFrm_notes" rows="2" cols="50" class="data-field-rw"></textarea></td>
+			<td>
+				<input type="submit" value="Add" onclick="event.preventDefault(); return validateAddMeasureForm(0);">
+				<input type="button" id="itemCancel_0" value="Cancel" onClick="event.preventDefault(); btnShowHideNewMeasure.click();">
 			</td>
-	    </tr>
-	</table>
+			</tr>
+			<tr class="data-field-ro">
+				<td colspan="4">
+					<label id="addFrm_errors" class="hidden"></label>
+				</td>
+			</tr>
+		</table>
 
-</form>
-
+	</form>
 </td>
 </tr>
-
 <tr>
-<td>
-<div id="MapleEMR::FeaturePreference"></div>
-
-<div id="MapleEMR::InterventionDetailsList"></div>
-<p>
-
-</td>
+	<td>
+		<div id="MapleEMR::FeaturePreference"></div>
+		<div id="MapleEMR::InterventionDetailsList"></div>
+	</td>
 </tr>
-
-
-
-
-
-
-
 <tr>
-<td>
-
-
-</div>
-</div>
-<!--div align="left"-->
-  <!--div id="MapleEMR::FeaturePreference"></div-->
-<!--/div-->
+	<td></div></div>
 </td>
 </tr>
-
 </table>
-
 </BODY>
 </HTML>

@@ -169,7 +169,7 @@ pub const QRY_ALL_INTERVENTION_DETAILS_FOR_INTV_AND_TYPE: &str = r##"
 
 pub const QRY_COMMON_REF_TYPES_FOR_GROUP: &str = r##"select id, name, description from common_reference_type where group_id in ({group_ids}) ORDER BY NAME"##;
 
-pub const QRY_COMMON_REF_TYPES_FOR_GROUP_ACTIVE_ONLY: &str = r##"select id, name, description from common_reference_type where group_id in({group_ids}) and active_flag = 'Y' ORDER BY NAME"##;
+pub const QRY_COMMON_REF_TYPES_FOR_GROUP_ACTIVE_ONLY: &str = r##"select id, name, description from common_reference_type where group_id in ({group_ids}) and active_flag = 'Y' ORDER BY NAME"##;
 
 #[allow(dead_code)]
 pub const QRY_ACTIVE_LOCATIONS: &str = r##"select id, name ||' (' || short_name|| ')' from location where active_flag = 'Y'"##; // used by CommonDAO... not sure why the IDE keeps flagging as unused

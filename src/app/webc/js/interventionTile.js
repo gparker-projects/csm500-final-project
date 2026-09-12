@@ -1,18 +1,24 @@
 
 function validateForm() {
     const errLabel = document.getElementById('errLabel');
+    const desc_field = document.getElementById('description');
     errLabel.textContent = '';
     let isValid = true;
     
     console.log("in validateForm();");
 
-    if (document.getElementById('description').value.trim() == '') {
+    if (desc_field.value.trim() == '') {
         errLabel.textContent = "Description must be provided";
-        errLabel.style = "color: red";
+        isValid = false;
+    }
+
+    if ( !hasAcceptableChars( desc_field.value ) ) {
+        errLabel.textContent = "Description must only contain letters, numbers or basic punctuation.";
         isValid = false;
     }
     
     if (!isValid) {
+        errLabel.style = "color: red";
         event.preventDefault();       // Stop the form from submitting if there are errors
     }
     else{
@@ -41,11 +47,18 @@ function validateAddMeasureForm() {
     console.log("validateAddMeasureForm()");
     const addFrm_errors = document.getElementById('addFrm_errors');
     const addMeasureForm = document.getElementById('addMeasureForm');
+    const value_field = document.getElementById('addFrm_value');
+
     addFrm_errors.textContent = '';
     let isValid = true;		
 
-    if (document.getElementById('addFrm_value').value.trim() == '') {
+    if ( value_field.value.trim() == '' ) {
         addFrm_errors.textContent = "Value is required.";
+        isValid = false;
+    }
+
+    if ( !hasAcceptableChars( value_field.value ) ) {
+        addFrm_errors.textContent = "Value must only contain letters, numbers or basic punctuation.";
         isValid = false;
     }
 
@@ -71,18 +84,18 @@ function validateItvDtlsForm(itemId) {
     formErrors.textContent = '';
     let isValid = true;		
 
-    if ( field_value.value.trim() == '') {
-        formErrors.textContent = "Value is required.";
+    if ( field_value.value.trim() == '' || !hasAcceptableChars( field_value.value )) {
+        formErrors.textContent = "Value is required and can only contain letters, numbers and basic punctuation.";
         isValid = false;
     }
 
-    if ( field_value.value.length > 100 || field_value.value.length < 1) {
-        formErrors.textContent = "Value must be between 1 and 100 characters.";
+    if  (field_value.value.length > 100 || field_value.value.length < 1 || !hasAcceptableChars( field_value.value )) {
+        formErrors.textContent = "Value must be between 1 and 100 characters, and can only contain letters, numbers and basic punctuation.";
         isValid = false;
     }
     
-    if (field_notes.value.length > 2000) {
-        formErrors.textContent = "Notes must be less than 2000 characters.";
+    if (field_notes.value.length > 2000 || !hasAcceptableChars( field_notes.value )) {
+        formErrors.textContent = "Notes must be less than 2000 characters, and can only contain letters, numbers and basic punctuation.";
         isValid = false;
     }
 
@@ -112,4 +125,13 @@ function fast_action_add_measure(itemId){
     divaddNewMeasure.classList.remove('hidden');
     addFrm_intv_dtls_id.value = -1;
     addFrm_type_id.value = itemId;
+}
+
+
+function hasAcceptableChars(str) {
+ // https://www.tutorialspoint.com/article/how-to-validate-an-input-is-alphanumeric-or-not-using-javascript
+ // checks if a string is an alphanumeric or basic punctuation
+ //
+  const regex = /^[a-zA-Z0-9\s!"#$%^&*()_+=,\-./:;?[\\\]|]+$/;  
+  return regex.test(str);
 }
