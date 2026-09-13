@@ -12,7 +12,7 @@ use actix_web::http::StatusCode;
 use tracing;
 
 use crate::constants;
-use crate::dto::patient;
+use crate::dto::patient::*;
 use crate::dao::{ patient_dao::*, common_dao::*}; 
 use crate::ui::{data_forms::*, menu_fmt::*};
 use crate::session::{AppSession, UserSession};
@@ -27,6 +27,7 @@ impl AdmitRoute{
   /// 
   pub async fn route_to_discharge_patient_save(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<DischargeDataForm>) -> impl Responder {
       tracing::debug!("-> Route Requested: /route_to_discharge_patient_save ");
+      println!("-> Route Requested: /route_to_discharge_patient_save ");
 
       let req_clone0 = req.clone();
       let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
@@ -53,6 +54,8 @@ impl AdmitRoute{
   /// 
   pub async fn route_to_admit_save(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitDataForm>) -> impl Responder {
         tracing::debug!("-> Route Requested: /route_to_admit_SAVE ");
+        println!("-> Route Requested: /route_to_admit_SAVE ");
+         println!("..patient_id:{}", req.patient_id.clone());
 
         let req_clone0 = req.clone();
         let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
@@ -62,56 +65,101 @@ impl AdmitRoute{
         match frm_errors {
             Err(e) => {
                 tracing::error!("!AdmitDataForm > Form errors detected");
-                println!("!AdmitDataForm > Form errors detected");
-                Self::route_to_admit_discharge(
-                    app_session.clone(), user_session.clone(), web::Form(
-                        {
-                            let mut tmp_frm = req.clone();
-                            tmp_frm.form_errors = e.message.unwrap().to_string();
-                            tmp_frm // return the form with the updated error message (above)
+                println!("!AdmitDataForm > Form errors detected. Redirect out");
+
+                let req_clone = req.clone(); // local clone to avoid borrowing issues
+    
+                Self::route_to_admit_discharge(app_session, user_session, web::Form(
+                        AdmitDataForm {
+                            patient_id: constants::INVALID_PATIENT_ID.to_string(), // no patient_id in this variation
+                            encounter_id: req_clone.encounter_id,
+                            patient_first_name: req_clone.patient_first_name,
+                            patient_last_name: req_clone.patient_last_name,
+                            patient_middle_name: req_clone.patient_middle_name,
+                            phn: req_clone.phn,
+                            birthdate: req_clone.birthdate,
+                            location_id: req_clone.location_id,
+                            admit_notes: req_clone.admit_notes,
+                            action_flag: req_clone.action_flag,
+                            form_errors: e.message.unwrap().to_string(),
+                            ..Default::default() 
                         }
-                    )
-                ).await;
+                )).await
             },
-            _ => {  tracing::debug!("Form validation successful (AdmitDataForm)"); }, // "do nothing, because form was valid"
-        };
+            _ => {
+                tracing::debug!("..Form validation successful, Saving Patient");
+                println!("..Form validation successful, Saving Patient");
 
-        let dao = PatientDAO::new( app_session.get_db_connection() ).await;
-        let results = dao.upsert_patient_from_admit_form(req_clone0, user_session_details.clone().get_userid_as_i64()).await;
-        match results {
-            Ok(p_id) => {
-                tracing::debug!("  >(Step 1/2): Patient saved successfully, patient (id={p_id}) added/updated");
-                let mut req_clone2 = req.clone();
-                req_clone2.patient_id = p_id.to_string();
+                let dao = PatientDAO::new( app_session.get_db_connection() ).await;
+                let results = dao.upsert_patient_from_admit_form(req_clone0, user_session_details.clone().get_userid_as_i64()).await;
+                match results {
+                    Ok(p_id) => {
+                        tracing::debug!("  >(Step 1/2): Patient saved successfully, patient (id={p_id}) added/updated");
+                        println!("  >(Step 1/2): Patient saved successfully, patient (id={p_id}) added/updated");
+                        let mut req_clone2 = req.clone();
+                        req_clone2.patient_id = p_id.to_string();
 
-                // if patient was successful, we need the Encounter as well
-                let enc_results = dao.upsert_encounter_from_admit_form(req_clone2, user_session_details.clone().get_userid_as_i64()).await;
-                match enc_results {
-                    Ok(e_id) => {
-                    tracing::debug!("  >(Step 2/2): Encounter saved successfully, patient (id={p_id}) and encounter (id={e_id}) added/updated");
+                        // if patient was successful, we need the Encounter as well
+                        let enc_results = dao.upsert_encounter_from_admit_form(req_clone2, user_session_details.clone().get_userid_as_i64()).await;
+                        match enc_results {
+                            Ok(e_id) => {
+                            tracing::debug!("  >(Step 2/2): Encounter saved successfully, patient (id={p_id}) and encounter (id={e_id}) added/updated");
+                            println!("  >(Step 2/2): Encounter saved successfully, patient (id={p_id}) and encounter (id={e_id}) added/updated");
 
-                    tracing::debug!("<--- Redirect back to : /route_to_admit_discharge (001)");
-                    let req_clone = req.clone(); // local clone to avoid borrowing issues
+                            tracing::debug!("<--- Redirect back to : /route_to_admit_discharge (001)");
+                            println!("  <--- Redirect back to : /route_to_admit_discharge (001)");
+                            let req_clone = req.clone(); // local clone to avoid borrowing issues
 
-                    Self::route_to_admit_discharge(app_session, user_session, web::Form(
-                            AdmitDataForm {
-                                patient_id: p_id.to_string(),
-                                encounter_id: e_id.to_string(),
-                                patient_first_name: req_clone.patient_first_name,
-                                patient_last_name: req_clone.patient_last_name,
-                                patient_middle_name: req_clone.patient_middle_name,
-                                phn: req_clone.phn,
-                                birthdate: req_clone.birthdate,
-                                location_id: req_clone.location_id,
-                                admit_notes: req_clone.admit_notes,
-                                action_flag: req_clone.action_flag,
-                                ..Default::default() // no form errors in this variation
+                            // should redirect to the patient details
+                            Self::route_to_admit_discharge(app_session, user_session, web::Form(
+                                AdmitDataForm {
+                                    patient_id: p_id.to_string(),
+                                    encounter_id: e_id.to_string(),
+                                    patient_first_name: req_clone.patient_first_name,
+                                    patient_last_name: req_clone.patient_last_name,
+                                    patient_middle_name: req_clone.patient_middle_name,
+                                    phn: req_clone.phn,
+                                    birthdate: req_clone.birthdate,
+                                    location_id: req_clone.location_id,
+                                    admit_notes: req_clone.admit_notes,
+                                    action_flag: req_clone.action_flag,
+                                    ..Default::default() // no form errors in this variation
+                                }
+                            )).await
+
+                            },
+                            Err(e) => {
+                                tracing::debug!("  >(Step 2/2): FAILED - Admit form did not save: {e}");
+                                tracing::debug!("<--- Redirect back to : /route_to_admit_discharge (002)");
+                                println!("  >(Step 2/2): FAILED - Admit form did not save: {e}");
+                                println!("<--- Redirect back to : /route_to_admit_discharge (002)");
+                                let req_clone = req.clone(); // local clone to avoid borrowing issues
+
+                                AdmitRoute::route_to_admit_discharge(app_session, user_session, web::Form(
+                                        AdmitDataForm {
+                                            patient_id: constants::INVALID_PATIENT_ID.to_string(), // no patient_id in this variation
+                                            encounter_id: req_clone.encounter_id,
+                                            patient_first_name: req_clone.patient_first_name,
+                                            patient_last_name: req_clone.patient_last_name,
+                                            patient_middle_name: req_clone.patient_middle_name,
+                                            phn: req_clone.phn,
+                                            birthdate: req_clone.birthdate,
+                                            location_id: req_clone.location_id,
+                                            admit_notes: req_clone.admit_notes,
+                                            action_flag: req_clone.action_flag,
+                                            form_errors: "An error occurred, please try again".to_string(),
+                                            ..Default::default() 
+                                        }
+                                )).await
                             }
-                    )).await
+                        }
                     },
                     Err(e) => {
-                        tracing::debug!("  >(Step 2/2): FAILED - Admit form did not save: {e}");
-                        tracing::debug!("<--- Redirect back to : /route_to_admit_discharge (002)");
+                        tracing::debug!("  >(Step 1/2): FAILED Admit form did not save: {e}");
+                        tracing::debug!("<--- Redirect back to : /route_to_admit_discharge (003)");
+                        println!("  >(Step 1/2): FAILED Admit form did not save: {e}");
+                        println!("<--- Redirect back to : /route_to_admit_discharge (003)");
+
                         let req_clone = req.clone(); // local clone to avoid borrowing issues
 
                         Self::route_to_admit_discharge(app_session, user_session, web::Form(
@@ -127,34 +175,12 @@ impl AdmitRoute{
                                     admit_notes: req_clone.admit_notes,
                                     action_flag: req_clone.action_flag,
                                     form_errors: "An error occurred, please try again".to_string(),
-                                    ..Default::default() 
+                                ..Default::default() 
                                 }
                         )).await
                     }
                 }
-            },
-            Err(e) => {
-                tracing::debug!("  >(Step 1/2): FAILED Admit form did not save: {e}");
-                tracing::debug!("<--- Redirect back to : /route_to_admit_discharge (003)");
-                let req_clone = req.clone(); // local clone to avoid borrowing issues
-
-                Self::route_to_admit_discharge(app_session, user_session, web::Form(
-                        AdmitDataForm {
-                            patient_id: constants::INVALID_PATIENT_ID.to_string(), // no patient_id in this variation
-                            encounter_id: req_clone.encounter_id,
-                            patient_first_name: req_clone.patient_first_name,
-                            patient_last_name: req_clone.patient_last_name,
-                            patient_middle_name: req_clone.patient_middle_name,
-                            phn: req_clone.phn,
-                            birthdate: req_clone.birthdate,
-                            location_id: req_clone.location_id,
-                            admit_notes: req_clone.admit_notes,
-                            action_flag: req_clone.action_flag,
-                            form_errors: "An error occurred, please try again".to_string(),
-                        ..Default::default() 
-                        }
-                )).await
-            }
+            }, // "do nothing, because form was valid"
         }
   }
 
@@ -164,6 +190,10 @@ impl AdmitRoute{
   pub async fn route_to_admit_new_no_patient(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitFormBasic>) -> impl Responder {
        tracing::debug!("-> Route Requested: /route_to_admit_new_no_patient");
        tracing::debug!("..user_prompt:{}", req.user_prompt.clone());
+       println!("-> Route Requested: /route_to_admit_new_no_patient");
+       println!("..user_prompt:{}", req.user_prompt.clone());
+       println!("..patient_id:{}", req.patient_id.clone());
+
 
         AdmitRoute::route_to_admit_discharge(app_session, user_session, web::Form(
             AdmitDataForm {
@@ -182,6 +212,8 @@ impl AdmitRoute{
   pub async fn route_to_discharge_patient(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitFormBasic>) -> impl Responder {
         tracing::debug!("-> Route Requested: /route_to_discharge_patient");
         tracing::debug!("..user_prompt:{}", req.user_prompt.clone());
+        println!("-> Route Requested: /route_to_discharge_patient");
+        println!("..user_prompt:{}", req.user_prompt.clone());
 
         AdmitRoute::route_to_admit_discharge(app_session, user_session, web::Form(
             AdmitDataForm {
@@ -198,6 +230,7 @@ impl AdmitRoute{
   /// 
   pub async fn route_to_admit_discharge(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitDataForm>) -> impl Responder {
       tracing::debug!("-> Route Requested: /admit_discharge  route_to_admit_discharge()");
+      println!("-> Route Requested: /admit_discharge  route_to_admit_discharge()");
 
       let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
       let userid = user_session_details.clone().get_userid_as_i64();
@@ -210,13 +243,16 @@ impl AdmitRoute{
 
       let discharge: bool = req.action_flag.eq("discharge");
 
-      let existing_patient: Option<patient::Patient>
+      let existing_patient: Option<Patient>
         = if patient_id == constants::NOT_SPECIFIED_ID {
-              tracing::debug!("   No Patient specified: create a new Patient and Encounter");
-              None
+              tracing::debug!("..No Patient specified: create a new Patient and Encounter");
+                     println!("..No Patient specified: create a new Patient and Encounter");
+
+              Some( Patient::to_patient(req.clone()) )
           }
           else{
-              tracing::debug!("   Patient exists: view existing Patient and Encounter");
+              tracing::debug!("..Patient exists: view existing Patient and Encounter");
+              println!("..Patient exists: view existing Patient and Encounter");
               let tmp_patent = dao.get_patient_details( userid.clone(), patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
               
               match tmp_patent {

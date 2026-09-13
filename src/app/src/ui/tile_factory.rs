@@ -172,8 +172,8 @@ impl WebContentFactory {
                                                 is_discharge_flag: bool,
                                                 user_prompt: String) -> String {
 
-        tracing::debug!(">get_admit_discharge_tile()");
-        println!(">get_admit_discharge_tile()");
+        tracing::debug!(">get_admit_discharge_full_tile()");
+        println!(">get_admit_discharge_full_tile()");
 
         let labels = ["{patient_first_name}","{patient_last_name}", "{middle_name}",
                                   "{phn}","{birthdate}",  "{encounter_id}", "{patient_id}"];
@@ -196,13 +196,20 @@ impl WebContentFactory {
                 else{
                     tracing::debug!("..Admit New Patient");
                     println!("..Admit New Patient");
-                }                
+                }
 
-                // admitting a new patient with no data => wipe out the tags
+                let data_items = [&String::new(),
+                                                &String::new(),
+                                                &String::new(),
+                                                &String::new(),
+                                                &String::new(),    
+                                                &String::new(),
+                                                &"-1".to_string()];
+
                 let mut result = base_tile_level_1.clone();
                 for i in 0..labels.len() {
-                    result = result.replace(labels[i], &"".to_string());
-                }           
+                    result = result.replace(labels[i], data_items[i]);
+                } 
 
                 // ...except for admit_timestamp which will be Now()
                 let result_2 = result.replace("{admit_timestamp}", &chrono::Utc::now().format("%Y-%b-%d %H:%M:%S").to_string());
@@ -241,9 +248,14 @@ impl WebContentFactory {
                         false => result_4.replace("{discharge_notes}", &p.discharge_notes),
                     };
 
-                    let result_6 = result_5.replace("{location_short_name}", &p.location_short_name);
-                    let result_7 = result_6.replace("{location_id}", &p.location_id.to_string());
-                    result_7
+                    let result_6 = match p.admit_notes.len() == 0 && user_prompt.len() > 0 { // discharge also includes the admission details
+                        true => result_5.replace("{admit_notes}", &user_prompt),
+                        false => result_5.replace("{admit_notes}", &p.admit_notes),
+                    };
+
+                    let result_7 = result_6.replace("{location_short_name}", &p.location_short_name);
+                    let result_8 = result_7.replace("{location_id}", &p.location_id.to_string());
+                    result_8
                 }
                 else{
                     let result_4 = match p.admit_notes.len() == 0 && user_prompt.len() > 0 {
@@ -331,7 +343,7 @@ impl WebContentFactory {
                                                   String::new(), //"{notes}",
                                                   req.encounter_id.to_string(), // "{encounter_id}",  //TODO
                                                   req.patient_id.to_string(),
-                                                  String::new(), // no error to display
+                                                  constants::ERR_LABEL_NO_ERROR_TAG.to_string(), // **preserve the tag** .. no error to display
                                                   String::new(),  //"<div id=\"MapleEMR::InterventionDetailsList\">"
                                                   String::new(), // feature_pref_section // if the intervention has not been saved, do not allow preference additions
                                                   " class='hidden'".to_string()

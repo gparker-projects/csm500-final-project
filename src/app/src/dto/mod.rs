@@ -6,6 +6,7 @@
 //! This module provides struts and classes that wrap basic data of the application as it is retrieved from or prepared for
 //! system use. These allow consistency of use across the system and protect against errant use.
 //! 
+pub mod convert_utils;
 pub mod encounter;
 pub mod feature_preference;
 pub mod intervention;

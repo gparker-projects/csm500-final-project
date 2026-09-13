@@ -11,6 +11,7 @@
 //! -------------------------------------------------------------------
 
 use crate::dto::{encounter::*, intervention::*};
+use crate::dto::convert_utils::ConvertUtils;
 use crate::dao::patient_dao::PatientWrapper;
 
 use crate::ui::common_fmt::CommonFormatter;
@@ -129,9 +130,16 @@ impl SimpleFormatter {
 	    results_sbuf.push_str( &e.room_identifier );
 	    results_sbuf.push_str("</td></tr>");
 
-	    results_sbuf.push_str("<tr><td>");
-	    results_sbuf.push_str("Admitted: ");
-	    results_sbuf.push_str(&p.admit_timestamp_for_display() );
+        results_sbuf.push_str("<tr><td>Admission Concern: <i>");
+        results_sbuf.push_str( &e.admit_notes );
+	    results_sbuf.push_str("</i></td></tr>");
+        
+        results_sbuf.push_str("<tr><td>Admitted: ");
+        results_sbuf.push_str(&p.admit_timestamp_for_display() );
+
+        if ConvertUtils::is_aged( p.admit_timestamp, 4){
+            results_sbuf.push_str("<div class='clinical-emergency-red'>&nbsp;(>4hrs)</div>");
+        }
 
 	    if i.is_some() {
 	       let tmp_intv = i.unwrap();

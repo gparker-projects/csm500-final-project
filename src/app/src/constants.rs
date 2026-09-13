@@ -49,7 +49,7 @@ pub const CRT_INTERVENTION_ALERT_TYPE: i64 = 100040;
 /// ------------------   ------------------   ------------------   ------------------
 /// 
 pub const ERR_LABEL_NO_ERROR_TAG: &str = r##"<label id="errLabel"></label>"##;
-pub const ERR_LABEL_WITH_ERROR_TAG: &str = r##"<label id="errLabel" style="color: red">{form_errors}</label><br>"##;
+pub const ERR_LABEL_WITH_ERROR_TAG: &str = r##"<label id="errLabel" class='clinical-emergency-red'>{form_errors}</label><br>"##; //  style="color: red"
 
 pub const RELEASE_NUMBER: &str = r##"<div id="MapleEMR::ReleaseNumber"></div>"##;
 pub const LEGACY_MENU_TILE_TAG : &str = r##"<div id="MapleEMR::LegacyMenu"></div>"##;

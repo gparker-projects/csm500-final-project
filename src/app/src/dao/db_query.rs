@@ -77,6 +77,7 @@ pub const QRY_CURRENT_ENCOUNTER: &str = r##"
                                     join site s on s.id = l.site_id
                                     where patient_id = {}
                                       and discharge_timestamp is null
+                                    order by admit_timestamp desc
                                       limit 1
                                     "##;
 
@@ -144,7 +145,9 @@ pub const QRY_SINGLE_PATIENT_DETAILS: &str =  r##"SELECT p.id "patient_id", e.id
                                             where patient_id = {}
 											  and e.admit_timestamp = (
 											    select max(admit_timestamp)
-												from encounter e2 where e2.patient_id = p.id )
+												from encounter e2 where e2.patient_id = p.id
+                                                 and discharge_timestamp is null
+                                                 )
                                             "##;
 
 pub const QRY_ALL_INTERVENTION_DETAILS_FOR_AN_INTERVENTION: &str =  r##"
@@ -226,7 +229,7 @@ pub const QRY_GET_ALL_ACTIVE_FEATURE_PREFERENCE_FOR_USER: &str = r##"
 // 
 pub const UPSERT_PATIENT: &str = r##"
     INSERT INTO patient (legal_last_name, legal_first_name, legal_middle_names, birthdate, phn)
-    VALUES ('{legal_last_name}', '{legal_first_name}', '{legal_middle_names}', to_timestamp('{birthdate}', 'YYYY/MM/DD'), {phn})
+    VALUES ('{legal_last_name}', '{legal_first_name}', '{legal_middle_names}', to_timestamp('{birthdate}', 'YYYY-MON-DD'), {phn})
     ON CONFLICT (phn)
     DO UPDATE SET
         legal_first_name   = EXCLUDED.legal_first_name,

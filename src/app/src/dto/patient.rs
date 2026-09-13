@@ -9,6 +9,9 @@
 use serde::{Deserialize, Serialize};
 use chrono::{NaiveDateTime, Utc}; 
 use std::fmt;
+use crate::constants;
+use crate::ui::data_forms::AdmitDataForm;
+use crate::dto::convert_utils::ConvertUtils;
 
 #[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct Patient {
@@ -93,7 +96,10 @@ impl Patient {
     /// accessor method to return the birth date (date portion only) in a format that can be easily displayed
     /// 
     pub fn phn_to_string(&self) -> String{
-        self.phn.to_string()
+        match self.phn {
+            constants::INVALID_OTHER_ID => String::new(),
+            _ => self.phn.to_string(),
+        }
     }
 
     ///
@@ -110,6 +116,25 @@ impl Patient {
       ((Utc::now().naive_utc() - self.birth_date).num_days() / 365).to_string()
     }
 
+ 
+
+    pub fn to_patient(frm: AdmitDataForm) -> Patient{
+        Patient {
+                id: ConvertUtils::to_i64(frm.patient_id),
+                encounter_id: ConvertUtils::to_i64(frm.encounter_id),
+                legal_first_name: frm.patient_first_name,
+                legal_last_name: frm.patient_last_name,
+                legal_middle_names: frm.patient_middle_name,
+                phn: ConvertUtils::to_i64(frm.phn),
+                birth_date: ConvertUtils::to_naivedatetime( frm.birthdate ),
+                location_id: ConvertUtils::to_i64(frm.location_id),
+                location_short_name: String::new(), // this is a derived value and will never be present
+                admit_timestamp: Utc::now().naive_utc(),
+                admit_notes: frm.admit_notes,
+                discharge_timestamp: Some( ConvertUtils::to_naivedatetime( String::new() ) ),
+                discharge_notes: String::new()
+        }
+    }
 }
 
 /// Implements a .to_string() for the Patient 

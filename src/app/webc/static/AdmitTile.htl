@@ -35,14 +35,14 @@
       isValid = false;
     }
     
-    if (document.getElementById('phn').value.trim() == ''|| !hasAcceptableChars(document.getElementById('phn').value)) {
+    if (document.getElementById('phn').value.trim() == ''|| document.getElementById('phn').value.length != 10 || !hasAcceptableChars(document.getElementById('phn').value)) {
       errLabel.textContent = "Personal Health Number (PHN) must be provided in the format: 9#########";
       errLabel.style = "color: red";
       isValid = false;
     }
 
-    if (document.getElementById('birthdate').value.trim() == ''|| !hasAcceptableChars(document.getElementById('birthdate').value)) {
-      errLabel.textContent = "Birthdate must be provided in YYYY/MM/DD format.";
+    if (document.getElementById('birthdate').value.trim() == ''|| document.getElementById('birthdate').value.length != 11|| !hasAcceptableChars(document.getElementById('birthdate').value)) {
+      errLabel.textContent = "Birthdate must be provided in YYYY-MON-DD format.";
       errLabel.style = "color: red";
       isValid = false;
     }
