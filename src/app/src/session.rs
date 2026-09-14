@@ -48,13 +48,6 @@ impl SysConfig{
     pub fn get_max_general_fastactions(&self) -> usize{
         self.max_general_fastactions.parse().unwrap()
     }
-
-    ///
-    /// Basic accessor that converts the max_nle_fastactions to a usize (generic integer)
-    /// 
-    pub fn get_max_nle_fastactions(&self) -> usize{
-        self.max_nle_fastactions.parse().unwrap()
-    }
 }
 
 ///

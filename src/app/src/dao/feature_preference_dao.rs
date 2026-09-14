@@ -21,7 +21,15 @@ pub struct FeaturePreferenceDAO {
 }
 
 impl FeaturePreferenceDAO {
-    /// Creates a new AuthObjects object, with a database pool for use by other calls
+
+    /// ### FeaturePreferenceDAO::new()
+    ///    Creates a new Feature Preference Data Access Object, with a database pool for use by other calls
+    /// 
+    /// #### Parameters:
+    /// * db_connection (PgPool): a PgPool for establishing a database connection
+    /// 
+    /// #### Returns:
+    /// * FeaturePreferenceDAO: the FeaturePreferenceDAO object that was created
     /// 
     pub async fn new(db_connection: PgPool) -> Self {
         FeaturePreferenceDAO {
@@ -29,8 +37,18 @@ impl FeaturePreferenceDAO {
         }
     }
 
-    ///
-    /// Obtains all active features preferences for a user. Disregards department, only includes active preferences and active common_reference_types.
+    /// ### get_active_feature_preferences_for_user()
+    ///    Obtains all active features preferences for a user. Disregards department, only includes active preferences and active common_reference_types.
+    /// 
+    /// #### Parameters:
+    /// * user_id (i64): the id of the user for which the feature preferences are to be obtains
+    /// * intervention_type_id (i64): type of intervention that will be used to limit the set of feature preferences retrieved
+    /// * upper_limit (usize): number of preferences (upper limit) to be returned
+    /// * intervention_level_only (bool): when true, only retrives intervention-level preferences
+    /// 
+    /// #### Returns:
+    /// * Option< Vec<FeaturePreference> >: the Feature Preferences for the user, if found
+    /// * std::io::Error: An error, if applicable
     /// 
     pub async fn get_active_feature_preferences_for_user(&self, user_id: i64,
                                                                 intervention_type_id: i64,
@@ -41,9 +59,6 @@ impl FeaturePreferenceDAO {
         let query_level_0 = db_query::QRY_GET_ALL_ACTIVE_FEATURE_PREFERENCE_FOR_USER;
         let query_level_1 = query_level_0.replace("{users_id}", &user_id.to_string());
         let query_level_2 = query_level_1.replace("{limit_days}", &"14".to_string());
-
-
-        // TODO
 
         let tmp_intv_types = match intervention_type_id {
             constants::CRT_ANY_INTERVENTION_GROUP => "1, 3".to_string(), // groups 1 and 3 are Clinical, non-Clinical intervention types
@@ -122,33 +137,53 @@ impl FeaturePreferenceDAO {
         }
     }
 
-
+    /// ### get_active_feature_preferences_of_interventions_for_user()
     ///
     /// Specialized wrapper for get_active_feature_preferences_for_user(user, TRUE)
+    ///   Obtains all active features preferences for a user, that are at the intervention level only (common_reference_type.group_id=1).
+    ///   Disregards department, only includes active preferences and active common_reference_types.
     /// 
+    /// #### Parameters:
+    /// * user_id (i64): the id of the user making the data request, for audit purposes
+    /// * upper_limit (usize): number of preferences (upper limit) to be returned
     /// 
-    /// Obtains all active features preferences for a user, that are at the intervention level only (common_reference_type.group_id=1).
-    /// Disregards department, only includes active preferences and active common_reference_types.
+    /// #### Returns:
+    /// * Option< Vec<FeaturePreference> >: the Feature Preferences for the user, if found
+    /// * std::io::Error: An error, if applicable
     /// 
     pub async fn get_active_feature_preferences_of_interventions_for_user(&self, user_id: i64, upper_limit: usize)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
         self.get_active_feature_preferences_for_user(user_id, constants::CRT_ANY_INTERVENTION_GROUP, upper_limit, true).await
     }
 
+    /// ### get_active_feature_preferences_of_intervention_details_for_user()
     ///
     /// Specialized wrapper for get_active_feature_preferences_for_user(user, FALSE)
+    ///   Obtains all active features preferences for a user, that are not at the intervention level only (common_reference_type.group_id <> 1).
+    ///   Disregards department, only includes active preferences and active common_reference_types.
     /// 
-    /// Obtains all active features preferences for a user, that are not at the intervention level only (common_reference_type.group_id <> 1).
-    /// Disregards department, only includes active preferences and active common_reference_types.
+    /// #### Parameters:
+    /// * user_id (i64): the id of the user making the data request, for audit purposes
+    /// * upper_limit (usize): number of preferences (upper limit) to be returned
+    /// 
+    /// #### Returns:
+    /// * Option< Vec<FeaturePreference> >: the Feature Preferences for the user, if found
+    /// * std::io::Error: An error, if applicable
     /// 
     pub async fn get_active_feature_preferences_of_intervention_details_for_user(&self, user_id: i64, intervention_type_id: i64, upper_limit: usize)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
         self.get_active_feature_preferences_for_user(user_id, intervention_type_id, upper_limit, false).await
     }
 
-    //https://users.rust-lang.org/t/calling-stored-procedures-setting-parameters-and-returning-parameters-on-postgresql/91508/4
-
+    /// ### upsert_feature_preference()
     ///
     /// Given an user_id and feature_id, create a new Feature Preference record, or update an existing one
-    /// RETURNS: i64: the id of the Intervention record that is created, if applicable
+    /// 
+    /// #### Parameters:
+    /// * user_id (i64): the id of the user for which the feature preference is being updated
+    /// * feature_id (i64): id of the feature preference to be updated
+    /// 
+    /// #### Returns:
+    /// * Option< i64 >: the id of the Feature Preferences that was updated, if found
+    /// * std::io::Error: An error, if applicable
     /// 
     pub async fn upsert_feature_preference(&self, user_id: i64, feature_id: i64) ->  Result< Option< i64 >, std::io::Error> {
         tracing::debug!("upsert_feature_preference()");

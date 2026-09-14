@@ -11,7 +11,7 @@
 
 use ort::{	session::{Session, builder::GraphOptimizationLevel} };
 
-use maple_emr::nle::BERTEngine;
+//use maple_emr::nle::BERTEngine;
 
 
 mod common;
@@ -27,7 +27,7 @@ fn test_nle() {
 
 fn test_bert() {
    // let answers = ERTEngine::QAExample();
-    println!(answers); 
+    //println!(answers); 
 
 
     assert!(true); 

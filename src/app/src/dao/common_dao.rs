@@ -21,7 +21,14 @@ impl CommonDAO {
 pub const REF_TYPE_GROUP_1_INTERVENTION_TYPES: i64 = 1;
 pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
 
-    /// Creates a new AuthObjects object, with a database pool for use by other calls
+    /// ### CommonDAO::new()
+    ///    Creates a new Common Access Object, with a database pool for use by other calls
+    /// 
+    /// #### Parameters:
+    /// * db_connection (PgPool): a PgPool for establishing a database connection
+    /// 
+    /// #### Returns:
+    /// * CommonDAO: the CommonDAO object that was created
     /// 
     pub async fn new(db_connection: PgPool) -> Self {
         CommonDAO {
@@ -29,11 +36,17 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
         }
     }
 
-    ///
-    /// Accessor to retrieve locations from the database into a tuple. 
-    ///
-    /// Returns: a tuple (i64, String) containing the id of the location and an aggregated string
-    ///          describing the location.
+    /// ### get_locations_for_user()
+    ///   Accessor to retrieve locations from the database into a tuple. 
+    /// 
+    /// #### Parameters:
+    /// * user_id (i64): the id of the user for which locations are to be retrieved
+    /// 
+    /// #### Returns:
+    /// * Option< Vec<(i64, String)> >: a vector of tuples, if found
+    ///    - location_id (i64): id of the location
+    ///    - location name (String): an aggregated name for the location, including the site name
+    /// * sqlx::Error: An error, if applicable
     /// 
     pub async fn get_locations_for_user(&self, user_id: i64)-> Result< Option< Vec<(i64, String)> >, std::io::Error> {
         let query_level_0: String = db_query::QRY_CURRENT_USER_LOCATIONS.to_owned();
@@ -60,13 +73,19 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
         }
     }
 
-    ///
-    /// Accessor to retrive COMMON REFERENCE TYPE entries from the database into a tuple.
-    ///
-    /// Returns: a tuple (i64, String, String) containing:
-    ///          - id of the reference list item
-    ///          - short name of the reference list item
-    ///          - long name of the reference list item
+    /// ### get_common_references()
+    ///   Accessor to retrive COMMON REFERENCE TYPE entries from the database into a tuple.
+    /// 
+    /// #### Parameters:
+    /// * group_ids (i64): the id of the groups for which references are to be retrieved
+    /// * active_only (bool): true/false flag to indicate if results should include active records only.
+    /// 
+    /// #### Returns:
+    /// * Option< Vec<(i64, String, String)> >: a vector of tuples, if found
+    ///    - (i64): id of the reference list item
+    ///    - (String): short name of the reference list item
+    ///    - (String): long name of the reference list item
+    /// * sqlx::Error: An error, if applicable
     /// 
     pub async fn get_common_references(&self, group_ids: String, active_only: bool)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
         tracing::debug!("get_common_references()");
@@ -101,13 +120,16 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
         }
     }
 
+    /// ### get_common_references()
+    ///   Accessor to retreive a single COMMON REFERENCE TYPE entries from the database, into a tuple.
+    /// 
+    /// #### Parameters:
+    /// * ref_type_id (i64): the id of the common reference type for which a common reference is to be retrieved
     ///
-    /// Accessor to retreive a single COMMON REFERENCE TYPE entries from the database into a tuple.
-    ///
-    /// Returns: a tuple (i64, String, String) containing:
-    ///          - id of the reference list item
-    ///          - short name of the reference list item
-    ///          - long name of the reference list item
+    /// #### Returns: a tuple (i64, String, String) containing:
+    ///  * (i64): id of the reference list item
+    ///  * (String): short name of the reference list item
+    ///  * (String): long name of the reference list item
     /// 
     pub async fn get_common_reference(&self, ref_type_id: i64)-> Result< Option< (i64, String, String) > , std::io::Error> {
         tracing::debug!("get_common_reference()");
@@ -138,25 +160,29 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
         }
     }
 
+    /// ### get_intervention_statuses()
+    ///   Shortcut method to obtain Intervention Status group (id=2) entries from the COMMON REFERENCE TYPE table
+    /// 
+    /// #### Parameters: n/a
     ///
-    /// Shortcut method to obtain Intervention Status group (id=2) entries from the COMMON REFERENCE TYPE table
-    ///
-    /// Returns: a tuple (i64, String, String) containing:
-    ///          - id of the reference list item
-    ///          - short name of the reference list item
-    ///          - long name of the reference list item
+    /// #### Returns: a tuple (i64, String, String) containing:
+    ///   * (i64): id of the reference list item
+    ///   * (String): short name of the reference list item
+    ///   * (String): long name of the reference list item
     /// 
     pub async fn get_intervention_statuses(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
         self.get_common_references(Self::REF_TYPE_GROUP_2_INTERVENTION_STATUS.to_string(), true).await
     }
 
+    /// ### get_intervention_types()
+    ///   Shortcut method to obtain Clinical and Non-Clinical Intervention Type group (id=1) entries from the COMMON REFERENCE TYPE table
+    /// 
+    /// #### Parameters: n/a
     ///
-    /// Shortcut method to obtain Clinical and Non-Clinical Intervention Type group (id=1) entries from the COMMON REFERENCE TYPE table
-    ///
-    /// Returns: a tuple (i64, String, String) containing:
-    ///          - id of the reference list item
-    ///          - short name of the reference list item
-    ///          - long name of the reference list item
+    /// #### Returns: a tuple (i64, String, String) containing:
+    ///   * (i64): id of the reference list item
+    ///   * (String): short name of the reference list item
+    ///   * (String): long name of the reference list item
     /// 
     pub async fn get_intervention_types(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
         let intv_types = "1, 3".to_string();
@@ -164,13 +190,15 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
         self.get_common_references(intv_types, true).await
     }
 
+    /// ### get_clinical_intervention_types()
+    ///   Shortcut method to obtain Clinical Intervention Type group (id=1) entries from the COMMON REFERENCE TYPE table
+    /// 
+    /// #### Parameters: n/a
     ///
-    /// Shortcut method to obtain Clinical Intervention Type group (id=1) entries from the COMMON REFERENCE TYPE table
-    ///
-    /// Returns: a tuple (i64, String, String) containing:
-    ///          - id of the reference list item
-    ///          - short name of the reference list item
-    ///          - long name of the reference list item
+    /// #### Returns: a tuple (i64, String, String) containing:
+    ///   * (i64): id of the reference list item
+    ///   * (String): short name of the reference list item
+    ///   * (String): long name of the reference list item
     /// 
     pub async fn get_clinical_intervention_types(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
         let intv_types = "1".to_string();
@@ -178,13 +206,16 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
         self.get_common_references(intv_types, true).await
     }
 
+ 
+    /// ### get_non_clinical_intervention_types()
+    ///   Shortcut method to obtain Non-Clinical Intervention Type group (id=3) entries from the COMMON REFERENCE TYPE table
+    /// 
+    /// #### Parameters: n/a
     ///
-    /// Shortcut method to obtain Non-Clinical Intervention Type group (id=3) entries from the COMMON REFERENCE TYPE table
-    ///
-    /// Returns: a tuple (i64, String, String) containing:
-    ///          - id of the reference list item
-    ///          - short name of the reference list item
-    ///          - long name of the reference list item
+    /// #### Returns: a tuple (i64, String, String) containing:
+    ///   * (i64): id of the reference list item
+    ///   * (String): short name of the reference list item
+    ///   * (String): long name of the reference list item
     /// 
     pub async fn get_non_clinical_intervention_types(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
         let intv_types = "3".to_string();
@@ -192,19 +223,23 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
         self.get_common_references(intv_types, true).await
     }
 
+
+    /// ### get_intervention_type()
+    ///    Shortcut method to obtain the details for a single Intervention Type group (id=1), from the COMMON REFERENCE TYPE table
+    /// 
+    /// #### Parameters:
+    ///  * type_id (i64): the id of the intervention type to be retrieved
     ///
-    /// Shortcut method to obtain the details for a single Intervention Type group (id=1), from the COMMON REFERENCE TYPE table
-    ///
-    /// Returns: a tuple (i64, String, String) containing:
-    ///          - id of the reference list item
-    ///          - short name of the reference list item
-    ///          - long name of the reference list item
+    /// #### Returns: a tuple (i64, String, String) containing:
+    ///    * (i64): id of the reference list item
+    ///    * (String): short name of the reference list item
+    ///    * (String): long name of the reference list item
+    ///  * sqlx::Error: An error, if applicable
     /// 
     pub async fn get_intervention_type(&self, type_id: i64)-> Result< Option< (i64, String, String) >, std::io::Error> {
         self.get_common_reference(type_id).await
     }
 
-    ///
     /// ### CommonDAO::is_intervention_group_type()
     ///   Confirms that the Reference Type Code Id provided is in one of the two types of Intervention groups:
     ///    - Clinical or Non-Clinical

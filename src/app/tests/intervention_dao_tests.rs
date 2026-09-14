@@ -204,10 +204,9 @@ async fn test_get_intervention(){
 
 #[tokio::test]
 async fn test_get_interventions_plural(){
-    let db_url = DB_CONN_STR;
     let db_pool = match PgPoolOptions::new()
         .max_connections(5)
-        .connect(db_url)
+        .connect(DB_CONN_STR)
         .await
     {
         Ok(pool) => pool,
@@ -217,18 +216,40 @@ async fn test_get_interventions_plural(){
         },
     };
 
-    
+    let idao = InterventionDAO::new( db_pool.clone() ).await;
 
-    
-    assert!(false);
+    // ensure the calls are valid and return a result. Inspection of every field is too much
+    let temp_intv = idao.get_interventions( 1, true ).await.unwrap();
+    let results =  match temp_intv {
+        Some(i) => {
+            assert!(i.iter().count() == 1, "More or less than 1 intervention returned from InterventionDAO::get_interventions(, true)");
+            true
+        },
+        None => {
+            assert!(false, "No intervention was returned for the test");
+            false
+        },
+    } ;
+
+    // ensure the calls are valid and return a result. Inspection of every field is too much
+    let temp_intv2 = idao.get_interventions( 1, false ).await.unwrap();
+    let results =  match temp_intv2 {
+        Some(i) => {
+            assert!(i.iter().count() != 1, "Expected more than 1 intervention to be returned from InterventionDAO::get_interventions(n, false)");
+            true
+        },
+        None => {
+            assert!(false, "Expected more than 1 intervention to be returned from InterventionDAO::get_interventions(n, false). No intervention was returned.");
+            false
+        },
+    } ;
 }
 
 #[tokio::test]
 async fn test_get_most_recent_vitals(){
-    let db_url = DB_CONN_STR;
     let db_pool = match PgPoolOptions::new()
         .max_connections(5)
-        .connect(db_url)
+        .connect(DB_CONN_STR)
         .await
     {
         Ok(pool) => pool,

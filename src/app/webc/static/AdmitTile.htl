@@ -14,6 +14,14 @@
     return regex.test(str);
   }
 
+  
+  // checks if a string is a ten digit number, starting with a 9, which is the PHN format
+  //
+  function isValidPHN(str) {
+      const regex = /^9\d{9}$/;  
+      return regex.test(str);
+  }
+
   function validateForm() {
     const errLabel = document.getElementById('errLabel');
     errLabel.textContent = '';
@@ -35,7 +43,7 @@
       isValid = false;
     }
     
-    if (document.getElementById('phn').value.trim() == ''|| document.getElementById('phn').value.length != 10 || !hasAcceptableChars(document.getElementById('phn').value)) {
+    if (document.getElementById('phn').value.trim() == ''|| document.getElementById('phn').value.length != 10 || ! isValidPHN(document.getElementById('phn').value)) {
       errLabel.textContent = "Personal Health Number (PHN) must be provided in the format: 9#########";
       errLabel.style = "color: red";
       isValid = false;
@@ -73,9 +81,11 @@
   }
 
   function cancelForm(){
-    if(confirm('Are you sure you want to cancel admitting this patient?')){
-        window.location.href = "\home";
-    }
+    //if document.getElementById('encounter_id').value == "-1" {
+      if( confirm('Are you sure you are done with admitting this patient? Unsaved changes will be lost.') ){
+          window.location.href = "\home";
+      }
+    //}
     return;
   }
   </script>
@@ -132,7 +142,7 @@
 <tr>
 <td>
 <input type="submit" value="Save">
-<input type="button" value="Cancel" onclick="cancelForm()">
+<input type="button" value="Close" onclick="cancelForm()">
 </td>
 </tr>
 

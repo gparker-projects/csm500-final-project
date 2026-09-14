@@ -26,4 +26,10 @@ impl ConvertUtils {
         }
         false
     }
+
+    /*fn valid_date(value: &str) -> Result<(), ValidationError> {
+        NaiveDateTime::parse_from_str(value, "%Y-%m-%d")
+          .map_err(|_| ValidationError::new("invalid_date_format"))?;
+        Ok(())
+    }*/
 }

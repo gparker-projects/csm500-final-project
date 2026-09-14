@@ -19,8 +19,15 @@ pub struct EncounterDAO {
 }
 
 impl EncounterDAO {
-    /// Creates a new Encounter Data Access Object, with a database pool for use by other calls
-    /// todo: centralize the db pool connection instead of creating it here
+    
+    /// ### EncounterDAO::new()
+    ///    Creates a new Encounter Data Access Object, with a database pool for use by other calls
+    /// 
+    /// #### Parameters:
+    /// * db_connection (PgPool): a PgPool for establishing a database connection
+    /// 
+    /// #### Returns:
+    /// * EncounterDAO: the EncounterDAO object that was created
     /// 
     pub async fn new(db_connection: PgPool) -> Self {
         EncounterDAO {

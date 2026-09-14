@@ -9,6 +9,7 @@
 use std::collections::{HashSet};
 use tracing;
 
+use crate::constants;
 use crate::dto::patient::*;
 use crate::nle::controller::CommandController;
 
@@ -24,12 +25,22 @@ impl NLECommandFormatter {
         let mut results_sbuf = String::with_capacity(500); 
         let mut unique_ids: HashSet<i64> = HashSet::new();
         let mut user_options: Vec<(String, f32, i64)> = Vec::new();
+        let mut alt_patient_id: i64 = constants::INVALID_OTHER_ID;
 
         results_sbuf.push_str( "<div id=\"MapleEMR::NLPCanvas\">" );
   
-        let patient_name = match referred_patient {
-            Some(p) => p.legal_first_name.to_owned()  + " " + &p.legal_last_name,
-            None => String::new(),
+        let patient_name: String; // if the prompt did not infer a patient id, we will use the forced one
+        match referred_patient {
+            Some(p) =>{
+                patient_name = p.legal_first_name.to_owned()  + " " + &p.legal_last_name;
+                alt_patient_id = p.id;
+            },
+            None =>{
+                patient_name = String::new();
+                if patient_id != constants::INVALID_OTHER_ID {
+                    alt_patient_id = patient_id;
+                } 
+            },
         }; 
 
         if items.len() > 0 {
@@ -73,7 +84,7 @@ impl NLECommandFormatter {
                 results_sbuf.push_str("' onclick=\"performNLAction(");
                 results_sbuf.push_str( &item.2.to_string() ); // command action id (also the permission)
                 results_sbuf.push_str( ","); 
-                results_sbuf.push_str( &patient_id.to_string() ); // patient id
+                results_sbuf.push_str( &alt_patient_id.to_string() ); // patient id
                 results_sbuf.push_str( "); return false;\" \\>\n" );
             }
         }

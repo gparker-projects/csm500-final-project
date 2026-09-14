@@ -183,6 +183,7 @@ impl CommandController{
         let patients_list = pdao.get_patients_at_users_site_no_discharge(userid).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
         let mut result_code: i8 = Self::NO_PATIENT_FOUND;
         let mut result: Option<Patient> = None;
+        let mut first_patient: Option<Patient> = None;
         let tmp_prompt = prompt.to_lowercase();
 
         for p in patients_list {
@@ -193,10 +194,19 @@ impl CommandController{
                 result = Some(p);
                 break;
             }
+            first_patient = match first_patient {
+                None => Some (p),
+                Some(p) => Some (p)
+            };
         }
         if result_code == Self::NO_PATIENT_FOUND{
             tracing::debug!("..no patients found in prompt.");
         }
+
+        result = match result {
+            None =>  first_patient ,
+            Some(p) => first_patient 
+        };
 
         // if there was no known patient found, check if there is a new patient
         /* if result_code == Self::NO_PATIENT_FOUND {

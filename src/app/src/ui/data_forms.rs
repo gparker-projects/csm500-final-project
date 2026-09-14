@@ -15,9 +15,6 @@
 
 use validator::{Validate, ValidationError};
 
-//use chrono::NaiveDateTime;
-//use crate::constants;
-
 #[derive(serde::Deserialize)]
 pub struct LoginFormData {
     #[serde(rename = "mplUsername")]
@@ -29,8 +26,7 @@ pub struct LoginFormData {
 #[derive(serde::Deserialize)]
 pub struct NLPromptFormData {
     #[serde(rename = "prompt")]
-    pub prompt: String//,
-    //pub patient_id: String,
+    pub prompt: String
 }
 
 ///
@@ -103,7 +99,7 @@ pub struct AdmitDataForm {
     #[validate(length(min = 10, max = 10, message = "PHN must be a 10 digit number"))]
     pub phn: String,
 
-    #[validate(length(min = 10, max = 10, message = "Birthdate must be in YYYY/MM/DD format"))]
+    #[validate(length(min = 10, max = 10, message = "Birthdate must be in YYYY-MON-DD format"))]
     pub birthdate: String,
 
     //admit_timestamp -> not actually taken as an input
@@ -147,7 +143,7 @@ impl AdmitDataForm {
         }
 
         // can't really validate the presence of a middle name, as some people do not have them
-        if ! (self.patient_middle_name.len() >=0) && (self.patient_middle_name.len() <= 200){
+        if ! (self.patient_middle_name.len() > 200){
             println!("AdmitDataForm::validate_fields()");
             println!(".. patient_middle_name >{}<", self.patient_middle_name);
             error.message = Some("Patient Middle Names invalid".into());
@@ -247,18 +243,8 @@ impl InterventionDataForm {
         return result;
     }
 
-    /*
-    fn valid_date(value: &str) -> Result<(), ValidationError> {
-        NaiveDateTime::parse_from_str(value, "%Y-%m-%d")
-          .map_err(|_| ValidationError::new("invalid_date_format"))?;
-        Ok(())
-    }
-*/
     pub fn validate_fields(&self) -> Result<(), ValidationError> {
         let mut error = ValidationError::new("InterventionDataForm Error");
-
-        //error.message = Some("DEBUGGING ERROR".into()); // TODO REMOVE THIS
-        //return Err(error);
 
         if ! (self.intervention_id.len() > 0) || ! self.intervention_id.parse::<i64>().is_ok() {
             error.message = Some("Intervention Id invalid".into());
@@ -273,8 +259,8 @@ impl InterventionDataForm {
             return Err(error);
         }
 
-        if (! (self.notes.len() > 0) && (self.notes.len() < 2000)) || self.notes.len() > 2000 {
-            error.message = Some("Notes are required and must be less than 2000 characters.".into());
+        if  self.notes.len() != 0 && self.notes.len() > 2000 {
+            error.message = Some("Notes must be less than 2000 characters.".into());
             println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
             return Err(error);
         }
@@ -370,9 +356,6 @@ impl InterventionDetailsDataForm {
     pub fn validate_fields(&self) -> Result<(), ValidationError> {
         let mut error = ValidationError::new("InterventionDetailsDataForm Error");
 
-       //error.message = Some("DEBUGGING ERROR".into()); // TODO REMOVE THIS
-       //return Err(error);
-
         if ! (self.intervention_id.len() > 0) || ! self.intervention_id.parse::<i64>().is_ok() {
             error.message = Some("Intervention Id invalid".into());
             println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
@@ -414,15 +397,8 @@ impl InterventionDetailsDataForm {
             println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
             return Err(error);
         }
-        
-        match self.validate() {
-            Ok(_) => Ok(()),  //println!("All validations passed perfectly!");
-            Err( _e ) => {
-                error.message = Some("InterventionDetailsDataForm validation failed".into());
-                println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
-                Err(error)
-            }
-        }
+
+        Ok(())
     }
 }
 

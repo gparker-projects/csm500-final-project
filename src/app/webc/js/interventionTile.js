@@ -1,4 +1,3 @@
-
 function validateForm() {
     const errLabel = document.getElementById('errLabel');
     const desc_field = document.getElementById('description');
@@ -131,6 +130,6 @@ function fast_action_add_measure(itemId){
 // https://www.tutorialspoint.com/article/how-to-validate-an-input-is-alphanumeric-or-not-using-javascript
 //
 function hasAcceptableChars(str) {
-  const regex = /^[a-zA-Z0-9\s!"#$%^&*()_+=,\-./:;?[\\\]|]+$/;  
-  return regex.test(str);
+    const regex = /^[a-zA-Z0-9\s!"#$%^&*()_+=,\-./:;?[\\\]|]+$/;  
+    return regex.test(str);
 }

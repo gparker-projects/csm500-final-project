@@ -23,7 +23,15 @@ pub struct AuthDAO {
 }
 
 impl AuthDAO {
-    /// Creates a new AuthObjects object, with a database pool for use by other calls
+
+    /// ### AuthDAO::new()
+    ///   Creates a new AuthObjects object, with a database pool for use by other calls
+    /// 
+    /// #### Parameters:
+    /// * db_connection (PgPool): a PgPool for establishing a database connection
+    /// 
+    /// #### Returns:
+    /// * AuthDAO: the AuthDAO object that was created
     /// 
     pub async fn new(db_connection: PgPool) -> Self {
         AuthDAO {
@@ -31,8 +39,17 @@ impl AuthDAO {
         }
     }
 
-    /// Checks the user is in the database, and that the password matches (TODO)
-    /// Returns a true/false value
+
+    /// ### can_user_login()
+    ///   Checks the user is in the database, and that the password matches
+    /// 
+    /// #### Parameters:
+    /// * user_name (i64): the name of the user which is being authenticated
+    /// * user_password (i64): the password of the user which is being authenticated
+    /// 
+    /// #### Returns:
+    /// * Option<User>: the User, if found
+    /// * sqlx::Error: An error, if applicable
     /// 
     pub async fn can_user_login(&self,
                             user_name: String, 
@@ -84,8 +101,16 @@ impl AuthDAO {
         }
     }   
 
-    ///
-    /// Given a user id, obtain all the user permissions that user has. Contains the linkages between the department, permission and user.
+
+    /// ### get_user_permissions()
+    ///   Given a user id, obtain all the user permissions that user has. Contains the linkages between the department, permission and user.
+    /// 
+    /// #### Parameters:
+    /// * user_id (i64): the id of the user for which permissions are being retrieved
+    /// 
+    /// #### Returns:
+    /// * Option<UserAuthorization>: a vector of UserAuthorizations, if found
+    /// * std::io::Error: An error, if applicable
     /// 
     pub async fn get_user_permissions(&self, user_id: i64 ) -> Result< Option<UserAuthorization>, std::io::Error> {
         // construct query - we have a denormalized data structure here to save joins, so the table has all the Id's someone would ever need
@@ -127,11 +152,17 @@ impl AuthDAO {
         
     }  
 
-    ///
-    /// Accessor to retrive User and Description entries from the database into a tuple.
-    ///
-    /// Returns: a tuple (i64, String) containing the id of the location and an aggregated string
-    ///          describing the location.
+    /// ### get_user_and_departments_at_current_user_sites()
+    ///   Accessor to retrive User and Description entries from the database into a tuple.
+    /// 
+    /// #### Parameters:
+    /// * user_id (i64): the id of the user, which will be used to locate the department and related users for the list
+    /// 
+    /// #### Returns:
+    /// * Option< Vec<(i64, String, String)> >: a vector of tuples containing:
+    ///        - user_id (i64): id number of the user in the list
+    ///        - name (String): name of the user in the list
+    ///        - department_name (String): name of the department in the list 
     ///
     pub async fn get_user_and_departments_at_current_user_sites(&self, user_id: i64)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
         tracing::debug!("get_user_and_departments_at_current_user_sites()");

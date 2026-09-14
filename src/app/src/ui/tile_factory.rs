@@ -328,6 +328,7 @@ impl WebContentFactory {
             None =>{ // Create new Intervention path
                 tracing::debug!("..Create new Intervention");
                 println!("..Create new Intervention");
+                println!("..(debug001)encounter_id: {}", req.encounter_id.to_string());
                 dd_user = CommonFormatter::get_dropdown_user_with_department(user_dropdown_list,constants::NOT_SPECIFIED_ID); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
                 dd_intv_status =  CommonFormatter::get_dropdown_intervention_status(status_dropdown_list, constants::DEFAULT_INTERVENTION_STATUS_NEW); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
 
@@ -371,6 +372,7 @@ impl WebContentFactory {
                 description = intv.description.to_string();
                 notes = intv.notes.to_string();
                 tmp_encounter_id = intv.encounter_id.to_string();
+                println!("..(debug002)encounter_id: {}", intv.encounter_id.to_string());
 
                 let form_errors = match req.clone().form_errors.as_str() {
                     "" => constants::ERR_LABEL_NO_ERROR_TAG.to_string(), 
