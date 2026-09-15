@@ -21,15 +21,17 @@ use sqlx::postgres::{PgPoolOptions};
 use tracing;
 use maple_emr::dao::common_dao::CommonDAO;
 
+use maple_emr::constants;
+
 pub const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500";
 
 #[cfg(test)]
 
-/// ### get_locations_for_user()
+/// ### test_get_locations_for_user()
 /// 
 /// Tests the ability for the DAO to retrieve the locations for a user
 /// 
-///   Specifically tests: CommonDAO::get_current_encounter() 
+///   Specifically tests: CommonDAO::get_locations_for_user() 
 ///
 #[tokio::test]
 async fn test_get_locations_for_user() {
@@ -62,4 +64,168 @@ async fn test_get_locations_for_user() {
         },
         None => assert!( false, "No locations returned; expected 35" ),
     };
+}
+
+
+/*
+/// ### test_get_common_reference()
+/// 
+/// Tests the ability for the DAO to retrieve 
+/// 
+///   Specifically tests: CommonDAO::get_common_reference() 
+///
+#[tokio::test]
+async fn test_get_common_reference() {
+    let db_pool = match PgPoolOptions::new()
+        .max_connections(5)
+        .connect(DB_CONN_STR)
+        .await
+    {
+        Ok(pool) => pool,
+        Err(e) => {
+            tracing::debug!("{}", e);
+            assert!(false);
+            panic!("{}", e)
+        },
+    };
+
+    TODO();
+}
+
+/// ### test_get_common_references()
+/// 
+/// Tests the ability for the DAO to retrieve 
+/// 
+///   Specifically tests: CommonDAO::get_common_reference() 
+///
+#[tokio::test]
+async fn test_get_common_references() {
+    let db_pool = match PgPoolOptions::new()
+        .max_connections(5)
+        .connect(DB_CONN_STR)
+        .await
+    {
+        Ok(pool) => pool,
+        Err(e) => {
+            tracing::debug!("{}", e);
+            assert!(false);
+            panic!("{}", e)
+        },
+    };
+
+    TODO();
+}
+
+/// ### test_get_intervention_statuses()
+/// 
+/// Tests the ability for the DAO to retrieve 
+///     -- just calls get_common_references with a specific type 
+/// 
+///   Specifically tests: CommonDAO::get_intervention_statuses() 
+///
+#[tokio::test]
+async fn test_get_intervention_statuses() {
+    let db_pool = match PgPoolOptions::new()
+        .max_connections(5)
+        .connect(DB_CONN_STR)
+        .await
+    {
+        Ok(pool) => pool,
+        Err(e) => {
+            tracing::debug!("{}", e);
+            assert!(false);
+            panic!("{}", e)
+        },
+    };
+
+    TODO();
+}
+
+
+/// ### test_get_clinical_intervention_types()
+/// 
+/// Tests the ability for the DAO to retrieve 
+///     -- just calls get_common_references with a specific type 
+/// 
+///   Specifically tests: CommonDAO::get_clinical_intervention_types() 
+///
+#[tokio::test]
+async fn test_get_clinical_intervention_types() {
+    let db_pool = match PgPoolOptions::new()
+        .max_connections(5)
+        .connect(DB_CONN_STR)
+        .await
+    {
+        Ok(pool) => pool,
+        Err(e) => {
+            tracing::debug!("{}", e);
+            assert!(false);
+            panic!("{}", e)
+        },
+    };
+
+    TODO();
+}
+
+
+/// ### test_get_non_clinical_intervention_types()
+/// 
+/// Tests the ability for the DAO to retrieve 
+///     -- just calls get_common_references with a specific type 
+/// 
+///   Specifically tests: CommonDAO::get_non_clinical_intervention_types() 
+///
+#[tokio::test]
+async fn test_get_non_clinical_intervention_types() {
+    let db_pool = match PgPoolOptions::new()
+        .max_connections(5)
+        .connect(DB_CONN_STR)
+        .await
+    {
+        Ok(pool) => pool,
+        Err(e) => {
+            tracing::debug!("{}", e);
+            assert!(false);
+            panic!("{}", e)
+        },
+    };
+
+    TODO();
+}
+
+/// ### test_get_intervention_type()
+/// 
+/// Tests the ability for the DAO to retrieve 
+///     -- just calls get_common_reference with a specific type 
+/// 
+///   Specifically tests: CommonDAO::get_intervention_type() 
+///
+#[tokio::test]
+async fn test_get_intervention_type() {
+    let db_pool = match PgPoolOptions::new()
+        .max_connections(5)
+        .connect(DB_CONN_STR)
+        .await
+    {
+        Ok(pool) => pool,
+        Err(e) => {
+            tracing::debug!("{}", e);
+            assert!(false);
+            panic!("{}", e)
+        },
+    };
+
+    TODO();
+}*/
+
+/// ### test_is_intervention_group_type()
+/// 
+/// Tests the ability for the DAO to identify if a group is an intervention type or not
+/// 
+///   Specifically tests: CommonDAO::is_intervention_group_type() 
+///
+#[tokio::test]
+async fn test_is_intervention_group_type() {
+    assert!(CommonDAO::is_intervention_group_type(constants::CRT_CLINICAL_INTERVENTION_GRP_ID) == true, "Group was clinical intervention, should have returned true");
+    assert!(CommonDAO::is_intervention_group_type(constants::CRT_NON_CLINICAL_INTERVENTION_GRP_ID) == true, "Group was non-clinical intervention, should have returned true");
 }
