@@ -204,8 +204,8 @@ impl CommandController{
         }
 
         result = match result {
-            None =>  first_patient ,
-            Some(p) => first_patient 
+            None =>  first_patient ,  // basically this is just an override for if the above logic still resulted in a None
+            Some(_p) => first_patient 
         };
 
         // if there was no known patient found, check if there is a new patient
