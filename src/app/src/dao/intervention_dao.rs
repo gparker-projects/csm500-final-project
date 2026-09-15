@@ -21,8 +21,15 @@ pub struct InterventionDAO {
 }
 
 impl InterventionDAO {
-    /// Creates a new Patient Data Access Object, with a database pool for use by other calls
-    /// todo: centralize the db pool connection instead of creating it here
+
+    /// ### InterventionDAO::new()
+    ///    Creates a new Intervention Data Access Object, with a database pool for use by other calls
+    /// 
+    /// #### Parameters:
+    /// * db_connection (PgPool): a PgPool for establishing a database connection
+    /// 
+    /// #### Returns:
+    /// * InterventionDAO: the InterventionDAO object that was created
     /// 
     pub async fn new(db_connection: PgPool) -> Self {
         InterventionDAO {
@@ -287,7 +294,7 @@ impl InterventionDAO {
         let query = &query_level_5.replace("{intervention_id}", &form.intervention_id); // INSERT does not include this field, only the UPDATE
 
         tracing::debug!("..UPSERT query: {}", query);
-        println!("..UPSERT query: {}", query);
+        //println!("..UPSERT query: {}", query);
 
         let result = sqlx::query(&query)
                                                         .fetch_one(&self.connection)

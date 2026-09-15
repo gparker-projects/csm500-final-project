@@ -34,7 +34,6 @@ pub const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500
 ///  * upsert_intervention_details_from_intv_form()
 ///  * get_all_intervention_details_for_an_intervention()
 /// 
-/// 
 #[tokio::test]
 async fn test_ins_get_upd_intervention_details(){
     let db_url = DB_CONN_STR;
@@ -140,6 +139,11 @@ async fn test_ins_get_upd_intervention_details(){
     }
 }
 
+///
+/// Tests the ability for the DAO to SELECT Intervention records
+///  * InterventionDAO::new()
+///  * get_intervention()
+/// 
 #[tokio::test]
 async fn test_get_intervention(){
     let db_url = DB_CONN_STR;
@@ -202,6 +206,11 @@ async fn test_get_intervention(){
     assert!(results)
 }
 
+///
+/// Tests the ability for the DAO to SELECT Interventions records
+///  * InterventionDAO::new()
+///  * get_interventions()
+/// 
 #[tokio::test]
 async fn test_get_interventions_plural(){
     let db_pool = match PgPoolOptions::new()
@@ -220,31 +229,24 @@ async fn test_get_interventions_plural(){
 
     // ensure the calls are valid and return a result. Inspection of every field is too much
     let temp_intv = idao.get_interventions( 1, true ).await.unwrap();
-    let results =  match temp_intv {
-        Some(i) => {
-            assert!(i.iter().count() == 1, "More or less than 1 intervention returned from InterventionDAO::get_interventions(, true)");
-            true
-        },
-        None => {
-            assert!(false, "No intervention was returned for the test");
-            false
-        },
-    } ;
+    match temp_intv {
+        Some(i) => assert!(i.iter().count() == 1, "More or less than 1 intervention returned from InterventionDAO::get_interventions(, true)"),
+        None => assert!(false, "No intervention was returned for the test"),
+    };
 
     // ensure the calls are valid and return a result. Inspection of every field is too much
-    let temp_intv2 = idao.get_interventions( 1, false ).await.unwrap();
-    let results =  match temp_intv2 {
-        Some(i) => {
-            assert!(i.iter().count() != 1, "Expected more than 1 intervention to be returned from InterventionDAO::get_interventions(n, false)");
-            true
-        },
-        None => {
-            assert!(false, "Expected more than 1 intervention to be returned from InterventionDAO::get_interventions(n, false). No intervention was returned.");
-            false
-        },
-    } ;
+    let temp_obj = idao.get_interventions( 1, false ).await.unwrap();
+    match temp_obj {
+        Some(i) => assert!(i.iter().count() != 1, "Expected more than 1 intervention to be returned from InterventionDAO::get_interventions(n, false)"),
+        None =>  assert!(false, "Expected more than 1 intervention to be returned from InterventionDAO::get_interventions(n, false). No intervention was returned."),
+    };
 }
 
+///
+/// Tests the ability for the DAO to SELECT the most recent vitals-Intervention record
+///  * InterventionDAO::new()
+///  * get_most_recent_vitals()
+/// 
 #[tokio::test]
 async fn test_get_most_recent_vitals(){
     let db_pool = match PgPoolOptions::new()
@@ -254,13 +256,13 @@ async fn test_get_most_recent_vitals(){
     {
         Ok(pool) => pool,
         Err(e) => {
-        tracing::warn!("{}", e);
-        panic!("{}", e)
+            tracing::warn!("{}", e);
+            panic!("{}", e)
         },
     };
 
-    let temp_intv = {InterventionDAO::new( db_pool.clone() ).await}.get_most_recent_vitals( 4 ).await.unwrap();
-    let results =  match temp_intv {
+    let temp_obj = {InterventionDAO::new( db_pool.clone() ).await}.get_most_recent_vitals( 4 ).await.unwrap();
+    let results =  match temp_obj {
         Some(i) => {
             match i.id {
                 4 => true, // Encounter id=4 and Intervention id=4
@@ -272,23 +274,35 @@ async fn test_get_most_recent_vitals(){
     assert!(results)
 }
 
+///
+/// Tests the ability for the DAO to INSERT or UPDATE an Intervention Details record
+///  * InterventionDAO::new()
+///  * upsert_intervention_details_from_intv_form()
+/// 
 #[tokio::test]
 async fn test_upsert_intervention_from_intv_form(){
-    let db_url = DB_CONN_STR;
     let db_pool = match PgPoolOptions::new()
         .max_connections(5)
-        .connect(db_url)
+        .connect(DB_CONN_STR)
         .await
     {
         Ok(pool) => pool,
         Err(e) => {
-        tracing::warn!("{}", e);
-        panic!("{}", e)
+            tracing::warn!("{}", e);
+            panic!("{}", e)
         },
     };
 
+    let tmp_frm = InterventionDetailsDataForm {
+        intervention_details_id: constants::NOT_SPECIFIED_ID.to_string(),
+        intervention_id: "1".to_string(),
+        type_id: "1".to_string(),
+        form_errors: "UNIT TEST RECORD".to_string(),
+         ..Default::default() 
+    };
 
-    
-
-    assert!(false);
+    // if the key fields match, the DAO has successfully pulled the right record.
+    // Some fields are subject to frequent change and not worth testing.
+    let obj_id = {InterventionDAO::new( db_pool.clone() ).await}.upsert_intervention_details_from_intv_form( tmp_frm, constants::INVALID_OTHER_ID ).await.unwrap();
+    assert!(obj_id != constants::INVALID_OTHER_ID, "New ID was not returned, update did not occur");
 }
