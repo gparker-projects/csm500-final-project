@@ -202,7 +202,11 @@ pub const QRY_ALL_USERS_AND_DEPARTMENT_NAME: &str = r##"
                                                 join users u on up.users_id = u.id
                                                 join department d on up.department_id = d.id
                                                 where up.active_flag = 'Y'
-                                                and site_id is not null
+                                                and exists (
+		                                          select up2.site_id
+												  from user_permission up2
+												  where up2.users_id = {user_id}
+												   and up2.site_id = up.site_id )
 												order by  d.name || ' ('|| u.name||')'
                                                 "##;    // Removed clause --and users_id = {user_id}
 

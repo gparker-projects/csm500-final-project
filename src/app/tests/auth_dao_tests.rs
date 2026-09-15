@@ -11,7 +11,7 @@ mod common;
 
 use sqlx::postgres::PgPoolOptions; 
 use tracing;
-use maple_emr::dao::auth_dao::AuthDAO;
+use maple_emr::{constants, dao::auth_dao::AuthDAO};
 use chrono::NaiveDateTime;
 
 //use maple_emr::constants;
@@ -43,7 +43,6 @@ async fn test_can_user_login() {
 
     let test_user_name = "mma2".to_string();
     let test_password = "csm500".to_string();
-
     let expected_date_time: NaiveDateTime = NaiveDateTime::parse_from_str(&"2026-08-04 13:23:41".to_string(), &"%Y-%m-%d %H:%M:%S".to_string()).unwrap();
 
     // instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
@@ -96,13 +95,49 @@ async fn test_can_user_login() {
 
 /// ### test_get_user_permissions()
 /// 
-/// Tests the ability for the DAO to obtain user permissions
+/// Tests the ability for the DAO to obtain user permissions based on a userid
 /// 
 ///   Specifically tests: AuthDAO::get_user_permissions() 
 ///
 #[tokio::test]
 async fn test_get_user_permissions() {
+    let db_pool = match PgPoolOptions::new()
+        .max_connections(5)
+        .connect(DB_CONN_STR)
+        .await
+    {
+        Ok(pool) => pool,
+        Err(e) => {
+            tracing::debug!("{}", e);
+            assert!(false);
+            panic!("{}", e)
+        },
+    };
+    let test_user_id: i64 = 4; // Mattie Medical AssistantTwo
+    let adao = AuthDAO::new( db_pool.clone() );
+    
+    // Test 1: valid userid
+    let results = adao.await.clone().get_user_permissions( test_user_id ).await.unwrap();
+    match results {
+        Some( obj ) => {
+            assert!( obj.granted_permissions.len() == 8, "More/less permissions {} than expected (8)", obj.granted_permissions.len());
+        },
+        None => assert!( false, "UserAuthorization (permission set) not returned as expected" ),
+    };
 
+    // Test 2: invalid userid
+    let results = {AuthDAO::new( db_pool.clone() )}.await.clone().get_user_permissions( constants::INVALID_OTHER_ID ).await;
+    match results {
+        Ok( item) => {
+            match item {
+                Some( _obj ) => {
+                    assert!( false, "UserAuthorization (permission set) was returned, when not expected" )
+                },
+                None => assert!( true, "No permissions returned, as expected" ),
+            };
+        },
+        Err( _ ) => assert!( true, "No permissions returned, as expected" ),
+    }
 }
 
 /// ### test_get_user_and_departments_at_current_user_sites()
@@ -113,5 +148,38 @@ async fn test_get_user_permissions() {
 ///
 #[tokio::test]
 async fn test_get_user_and_departments_at_current_user_sites() {
+    let db_pool = match PgPoolOptions::new()
+        .max_connections(5)
+        .connect(DB_CONN_STR)
+        .await
+    {
+        Ok(pool) => pool,
+        Err(e) => {
+            tracing::debug!("{}", e);
+            assert!(false);
+            panic!("{}", e)
+        },
+    };
+    let test_user_id: i64 = 4; // Mattie Medical AssistantTwo
+    
+    // Test 1: valid userid, exact number of expected rows
+    let results = {AuthDAO::new( db_pool.clone() )}.await.clone().get_user_and_departments_at_current_user_sites( test_user_id ).await.unwrap();
+    match results {
+        Some( items ) => assert!( items.len() == 10, "Expected 10 Departments, retrieved {} ", items.len()),
+        None => assert!( false, "No Departments returned; expected 10" ),
+    };
 
+    // Test 2: invalid userid
+    let results = {AuthDAO::new( db_pool.clone() )}.await.clone().get_user_and_departments_at_current_user_sites( constants::INVALID_OTHER_ID ).await.unwrap();
+    match results {
+        Some( items ) => {
+            if items.len() != 0{ 
+                assert!( false, "Departments were returned, when none were expected" )
+            }
+            else {
+                assert!( true, "No Departments were returned, as expected")
+            }
+        },
+        None => assert!( true, "No Departments were returned, as expected"),
+    };
 }
