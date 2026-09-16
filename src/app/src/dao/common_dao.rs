@@ -73,11 +73,12 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
         }
     }
 
-    /// ### get_common_references()
-    ///   Accessor to retrive COMMON REFERENCE TYPE entries from the database into a tuple.
+
+    /// ### get_common_references_by_id()
+    ///   Accessor to retrive COMMON REFERENCE TYPE entries from the database into a tuple, using a provided id.
     /// 
     /// #### Parameters:
-    /// * group_ids (i64): the id of the groups for which references are to be retrieved
+    /// * group_id (i64): the id of the group for which references are to be retrieved
     /// * active_only (bool): true/false flag to indicate if results should include active records only.
     /// 
     /// #### Returns:
@@ -87,9 +88,29 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
     ///    - (String): long name of the reference list item
     /// * sqlx::Error: An error, if applicable
     /// 
-    pub async fn get_common_references(&self, group_ids: String, active_only: bool)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
+    pub async fn get_common_references_by_id(&self, group_id: i64, active_only: bool)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
+        return self.get_common_references( group_id.to_string(), active_only ).await;
+    }
+
+
+    /// ### get_common_references()
+    ///  Private Accessor to retrive COMMON REFERENCE TYPE entries from the database into a tuple.
+    ///    As the accessor is private, only internal class callers can invoke it with the group_id string.
+    ///    Any external caller must use one of the public methods which constrain/protect its possible values.
+    /// 
+    /// #### Parameters:
+    /// * group_ids (Stsring): the ids of the groups for which references are to be retrieved. CAn be a comma-delimited list. Private use only.
+    /// * active_only (bool): true/false flag to indicate if results should include active records only.
+    /// 
+    /// #### Returns:
+    /// * Option< Vec<(i64, String, String)> >: a vector of tuples, if found
+    ///    - (i64): id of the reference list item
+    ///    - (String): short name of the reference list item
+    ///    - (String): long name of the reference list item
+    /// * sqlx::Error: An error, if applicable
+    /// 
+    async fn get_common_references(&self, group_ids: String, active_only: bool)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
         tracing::debug!("get_common_references()");
-        //println!("get_common_references()");
 
         let query_level_0: String = match active_only {
 		    true => db_query::QRY_COMMON_REF_TYPES_FOR_GROUP.to_owned(),

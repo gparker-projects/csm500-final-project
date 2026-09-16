@@ -177,8 +177,9 @@ impl InterventionRoute{
         let intv_type=  cdao.get_intervention_type( intervention_type_id ).await.unwrap();
 
         // obtain the dropdown of measures
-        println!("..get measures (common ref type) for group_id={}", intervention_type_id);
-        let intv_details_type=  cdao.get_common_references(intervention_type_id.to_string(), true).await.unwrap();
+        //println!("..get measures (common ref type) for group_id={}", intervention_type_id);
+
+        let intv_details_type=  cdao.get_common_references_by_id(intervention_type_id, true).await.unwrap();
       
         let status_dropdown_list=  cdao.get_intervention_statuses().await.unwrap();
         let location_results = cdao.get_locations_for_user(userid).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
