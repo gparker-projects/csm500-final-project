@@ -272,9 +272,10 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
     /// * bool: true if the id matches one of the groups of Intervention Types
     /// 
     pub fn is_intervention_group_type(common_ref_type_group_id: i64) -> bool {
-        let mut result: bool = common_ref_type_group_id == constants::CRT_CLINICAL_INTERVENTION_GRP_ID;
-        result = result || (common_ref_type_group_id == constants::CRT_NON_CLINICAL_INTERVENTION_GRP_ID);
-        return result;
+        return match  common_ref_type_group_id{
+            constants::CRT_CLINICAL_INTERVENTION_GRP_ID => true,
+            constants::CRT_NON_CLINICAL_INTERVENTION_GRP_ID => true,
+            _ => false,
+        }
     }
-
 }

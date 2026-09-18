@@ -38,7 +38,7 @@ pub struct SysConfig {
     pub tokenizer_file: String,
     pub data_sub_dir: String,
     pub max_general_fastactions: String,
-    pub _max_nle_fastactions: String, // not implemented for use at this time
+    pub max_nle_fastactions: String, // not implemented for use at this time
 }
 
 impl SysConfig{

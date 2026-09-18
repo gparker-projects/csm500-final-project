@@ -213,15 +213,31 @@ pub const QRY_ALL_USERS_AND_DEPARTMENT_NAME: &str = r##"
 
 // Note: can not limit rows here because it will cause the results to drop one of the Interventions or Intervention Details, 
 //       which are really separate classes of data.
-pub const QRY_GET_ALL_ACTIVE_FEATURE_PREFERENCE_FOR_USER: &str = r##"
+pub const QRY_ACTIVE_FEATURE_PREFERENCES_FOR_USER_INTERVENTION_LEVEL_ONLY: &str = r##"
                                                     SELECT fp.id, display_order, weight, calculation_date, department_id, feature_id,
                                                         crf.group_id "ref_group_id", crf.name "ref_name"
                                                     FROM feature_preference fp
                                                     JOIN common_reference_type crf on fp.feature_id = crf.id
-                                                    where fp.active_flag = 'Y' and crf.active_flag = 'Y'
-                                                    and users_id={users_id} 
-                                                    and crf.Group_id in ({feature_ids})
-                                                    and calculation_date >= now() - INTERVAL '{limit_days} days'
+                                                    where users_id={users_id} 
+                                                      and fp.active_flag = 'Y'
+                                                      and crf.active_flag = 'Y'
+                                                      and crf.Group_id in ({feature_ids})
+                                                      and calculation_date >= now() - INTERVAL '{limit_days} days'
+                                                    order by calculation_date, weight desc 
+                                                                     "##; 
+
+// Note: can not limit rows here because it will cause the results to drop one of the Interventions or Intervention Details, 
+//       which are really separate classes of data.
+pub const QRY_ACTIVE_FEATURE_PREFERENCES_FOR_USER_INTERVENTION_DETAILS_LEVEL: &str = r##"
+                                                    SELECT fp.id, display_order, weight, calculation_date, department_id, feature_id,
+                                                        crf.group_id "ref_group_id", crf.name "ref_name"
+                                                    FROM feature_preference fp
+                                                    JOIN common_reference_type crf on fp.feature_id = crf.id
+                                                    where users_id={users_id} 
+                                                      and fp.active_flag = 'Y'
+                                                      and crf.active_flag = 'Y'
+                                                      and crf.group_id in ({feature_ids})
+                                                      and calculation_date >= now() - INTERVAL '{limit_days} days'
                                                     order by calculation_date, weight desc 
                                                                      "##; 
 
