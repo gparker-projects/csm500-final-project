@@ -1,3 +1,5 @@
+//! # Defines a Data Access Object (DAO) for a Common/basic data, which enables retrieval
+//!   and assembly of a variety of minor objects, based on data in the database.
 //!
 //!    CSM500 Project (April - October 2026)
 //!      Graham Parker (Student ID: 240120522)

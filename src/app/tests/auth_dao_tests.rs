@@ -90,6 +90,13 @@ async fn test_can_user_login() {
         Some( _obj ) => assert!( false, "User was incorrectly returned, which should not have occurred" ),
         None => assert!( true, "User was NOT returned, as expected" ),
     };
+
+    // Test 6: invalid username, invalid combo - pw exceeds column length for username (50 chars)
+    let results = {AuthDAO::new( db_pool.clone() )}.await.can_user_login( "; SELECT * FROM INVALID;".to_string(), "; SELECT * FROM INVALID;".to_string() ).await.unwrap();
+    match results {
+        Some( _obj ) => assert!( false, "(Error Expected) User was incorrectly returned, which should not have occurred" ),
+        None => assert!( true, "(Error Expected) User was NOT returned, as expected" ),
+    };
 }
 
 

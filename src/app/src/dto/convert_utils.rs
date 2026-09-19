@@ -7,7 +7,7 @@
 //! 
 //! 
 
-use chrono::{Duration, NaiveDateTime, Timelike, Utc}; 
+use chrono::{Duration, NaiveDateTime, Timelike}; 
 use crate::constants;
 
 pub struct ConvertUtils;
@@ -53,7 +53,7 @@ impl ConvertUtils {
     /// is_equal_to_yyyy_mm_dd_hh_mm_ss()
     /// 
     ///  NaiveDateTime records the milliseconds and nanoseconds, making comparison of them awkward. This utility function
-    ///  strips those portions of two objects and performs a true/false equivalency comparison
+    ///  strips those portions of two objects and performs a true/false equivalency comparison. Only used in testing, so it needs the #[allow(dead_code)] directive.
     /// 
     /// References:
     ///  * https://docs.rs/chrono-wasi/latest/chrono/naive/struct.NaiveDateTime.html
@@ -64,6 +64,7 @@ impl ConvertUtils {
     /// Returns:
     ///   bool: True if the two NaiveDateTime match, after excluding their milli and nano seconds
     /// 
+    #[allow(dead_code)]
     pub fn is_equal_to_yyyy_mm_dd_hh_mm_ss(a: NaiveDateTime, b: NaiveDateTime) -> bool {
         let a_no_milliseconds = a.with_nanosecond(0).unwrap();
         let b_no_milliseconds = b.with_nanosecond(0).unwrap();

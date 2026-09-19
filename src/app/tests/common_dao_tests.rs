@@ -173,6 +173,19 @@ async fn test_get_common_references() {
         },
         None => assert!( false, "No common references returned; expected 18" ),
     };
+
+    // Test 3: invalid grouping
+    match {CommonDAO::new( db_pool.clone() )}.await.get_common_references_by_id( constants::INVALID_OTHER_ID, false ).await.unwrap() {
+        Some( items ) => {
+            if items.len() > 0 {
+                assert!( false, "No common references expected returned; retrieved {} rows", items.len())
+            }
+            else{ 
+                assert!( true, "Retrieved 0 rows, as expected")
+            }
+        },
+        None => assert!( true, "Retrieved 0 rows, as expected"),
+    };
 }
 
 
@@ -321,4 +334,5 @@ async fn test_get_intervention_type() {
 async fn test_is_intervention_group_type() {
     assert!(CommonDAO::is_intervention_group_type(constants::CRT_CLINICAL_INTERVENTION_GRP_ID) == true, "Group was clinical intervention, should have returned true");
     assert!(CommonDAO::is_intervention_group_type(constants::CRT_NON_CLINICAL_INTERVENTION_GRP_ID) == true, "Group was non-clinical intervention, should have returned true");
+    assert!(CommonDAO::is_intervention_group_type(constants::INVALID_OTHER_ID) == false, "Group was invalid, should have returned false");
 }

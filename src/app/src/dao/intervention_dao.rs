@@ -1,3 +1,6 @@
+//! # Defines a Data Access Object (DAO) for a (Patient) Intervention entity, which enables retrieval
+//!   and assembly of an Intervention object, based on data in the database. Intervetions represent
+//!   orders, procedures, medication, etc for a real-world Patient.
 //!
 //!    CSM500 Project (April - October 2026)
 //!      Graham Parker (Student ID: 240120522)
@@ -23,7 +26,7 @@ pub struct InterventionDAO {
 impl InterventionDAO {
 
     /// ### InterventionDAO::new()
-    ///    Creates a new Intervention Data Access Object, with a database pool for use by other calls
+    ///   Creates a new Intervention Data Access Object, with a database pool for use by other calls
     /// 
     /// #### Parameters:
     /// * db_connection (PgPool): a PgPool for establishing a database connection
@@ -37,9 +40,16 @@ impl InterventionDAO {
         }
     }
 
-    ///
-    /// Finds and returns an intervention based on an intervention/id => should never be more than one. 
-    /// For simplicity with the code, we'll still use fetch_all.
+    /// ### get_intervention()
+    ///   Finds and returns an intervention based on an intervention/id => should never be more than one. 
+    ///   For simplicity with the code, we'll still use fetch_all.
+    /// 
+    /// #### Parameters:
+    /// * intervention_id (i64): the id of the intervention to be retrieved
+    /// 
+    /// #### Returns:
+    /// * Option< Intervention >: the (Option-wrapped) Intervention, if found
+    /// * std::io::Error: the error that occured, if applicable
     /// 
     pub async fn get_intervention(&self, intervention_id: i64) -> Result< Option< Intervention >, std::io::Error> {
         let query = db_query::QRY_INTERVENTION_FOR_ID.replace("{}", &intervention_id.to_string());
@@ -100,7 +110,16 @@ impl InterventionDAO {
         }
     }
 
-    /// Finds and returns all interventions based on an encounter
+    /// ### get_interventions()
+    ///   Finds and returns all interventions based on an encounter
+    /// 
+    /// #### Parameters:
+    /// * encounter_id (i64): the id of the intervention to be retrieved
+    /// * current_only (bool): boolean flag indicating if only the most current intervention should be included
+    /// 
+    /// #### Returns:
+    /// * Option< Vec<Intervention> >: the (Option-wrapped) Intervention vector, if found. If none, an empty vector is returned.
+    /// * std::io::Error: the error that occured, if applicable
     /// 
     pub async fn get_interventions(&self, encounter_id: i64, current_only: bool) -> Result< Option< Vec<Intervention> >, std::io::Error> {
 
@@ -167,7 +186,16 @@ impl InterventionDAO {
     }
 
     
-    /// Finds and returns all Intervention Details, based on an Intervention
+    /// ### get_all_intervention_details_for_an_intervention()
+    ///   Finds and returns all Intervention Details, based on an Intervention
+    /// 
+    /// #### Parameters:
+    /// * intervention_id (i64): the id of the intervention for which Intervention Details are to be retrieved
+    /// * type_id: i64: type of the interventions to be retreived
+    /// 
+    /// #### Returns:
+    /// * Option< Vec<InterventionDetail> >: the (Option-wrapped) InterventionDetail vector, if found. If none, an empty vector is returned.
+    /// * std::io::Error: the error that occured, if applicable
     /// 
     pub async fn get_all_intervention_details_for_an_intervention(&self, intervention_id: i64, type_id: i64) -> Result< Option< Vec<InterventionDetail> >, std::io::Error> {
         println!("get_all_intervention_details_for_an_intervention()");
@@ -222,8 +250,15 @@ impl InterventionDAO {
         }
     }
 
-    ///
-    /// get the most recent intervention for the Encounter that is of a vitals type
+    /// ### get_most_recent_vitals()
+    ///   get the most recent intervention for the Encounter that is of a vitals type
+    /// 
+    /// #### Parameters:
+    /// * encounter_id (i64): the id of the Encounter for which most recent vital (Intervention) is to be retrieved
+    /// 
+    /// #### Returns:
+    /// * Option< Intervention >: the (Option-wrapped) Intervention, if found
+    /// * std::io::Error: the error that occured, if applicable
     /// 
     pub async fn get_most_recent_vitals(&self, encounter_id: i64) -> Result< Option< Intervention >, std::io::Error> {
         let results = self.get_interventions(encounter_id, true).await.expect(constants::DATABASE_ERROR_NOT_FOUND);
@@ -231,10 +266,17 @@ impl InterventionDAO {
         Ok( results.expect(constants::DATABASE_ERROR_NOT_FOUND).first().cloned() )
     }
 
-    ///
-    /// Given an InterventionDataForm, create a new Encounter reocrd, or update an existing one
-    /// RETURNS: i64: the id of the Intervention record that is created, if applicable
+    /// ### upsert_intervention_from_intv_form()
+    ///   Given an InterventionDataForm, creates a new Intervention record, or updates an existing one
     /// 
+    /// #### Parameters:
+    /// * form: InterventionDataForm - the form that represents the Intervention to be inserted/updated
+    /// * _audit_user_id: i64 - id of the user which is to be audited (potential feature only)
+    /// 
+    /// #### Returns:
+    /// * i64: the id of the Intervention record that is created, if applicable
+    /// * std::io::Error: the error that occured, if applicable
+    ///
     pub async fn upsert_intervention_from_intv_form(&self, form: InterventionDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
         tracing::debug!("  > upsert_intervention_from_intv_form (Intervention id={})", &form.intervention_id);
 
@@ -271,10 +313,17 @@ impl InterventionDAO {
     }
 
 
-    ///
-    /// Given an InterventionDetailsDataForm, create a new Encounter reocrd, or update an existing one
-    /// RETURNS: i64: the id of the Intervention record that is created, if applicable
+    /// ### upsert_intervention_details_from_intv_form()
+    ///   Given an InterventionDetailsDataForm, creates a new Intervention Details record, or updates an existing one
     /// 
+    /// #### Parameters:
+    /// * form: InterventionDetailsDataForm - the form that represents the Intervention Details to be inserted/updated
+    /// * _audit_user_id: i64 - id of the user which is to be audited (potential feature only)
+    /// 
+    /// #### Returns:
+    /// * i64: the id of the Intervention Details record that is created, if applicable
+    /// * std::io::Error: the error that occured, if applicable
+    ///
     pub async fn upsert_intervention_details_from_intv_form(&self, form: InterventionDetailsDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
         tracing::debug!("upsert_intervention_from_intv_form (Intv Dtls id={})", &form.intervention_details_id);
        // println!("upsert_intervention_from_intv_form (Intv Dtls id={})", &form.intervention_details_id);

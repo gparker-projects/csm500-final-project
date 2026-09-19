@@ -1,3 +1,5 @@
+//! # Defines a Data Access Object (DAO) for a (Patient) Encounter entity, which enables retrieval
+//!   and assembly of an Encounter object, based on data in the database.
 //!
 //!    CSM500 Project (April - October 2026)
 //!      Graham Parker (Student ID: 240120522)
@@ -35,19 +37,46 @@ impl EncounterDAO {
         }
     }
 
-    ///
-    /// Wrapper method that only requests the current encounter for the patient instead of all of them. This is to improve code clarity.
+    /// ### get_encounters()
+    ///  Wrapper method that only requests the current encounter for the patient instead of all of them. This is to improve code clarity.
+    /// 
+    /// #### Parameters:
+    ///  * patient_id: i64 - the id of the patient for which to retrieve the Encounter
+    /// 
+    /// #### Returns:
+    ///  * Encounter - the Encounter(s) that was found, if any. If none, a shell Encounter is assembled and returned
     /// 
     pub async fn get_current_encounter(&self, patient_id: i64) -> Encounter {
         if patient_id == constants::INVALID_PATIENT_ID {
             tracing::error!("EncounterDao::get_encounters(): Invalid Patient Id = -1 provided");
         }
+
         let tmp : Vec<Encounter> = self.get_encounters(patient_id, true).await.unwrap().expect(constants::DATABASE_ERROR_NOT_FOUND);
 
-        return tmp.first().unwrap().clone();
+        return match tmp.first() {
+            Some( e ) =>{
+                e.clone()
+            },
+            None => {
+                tracing::error!("EncounterDao::get_encounters(): No Encounter returned for patient_id = {}", patient_id);
+                Encounter {
+                    patient_id: patient_id,
+                    ..Default::default() 
+                }
+            },
+        }
     }
-    
-    /// Finds and returns all encounters based on an encounter
+
+    /// ### get_encounters()
+    ///  Finds and returns all encounters based on an encounter
+    /// 
+    /// #### Parameters:
+    ///  * patient_id: i64 - the id of the patient for which to retirieve the Encounters
+    ///  * current_only: bool - boolean flag for if the encounter result set should include only the most current Encounter
+    /// 
+    /// #### Returns:
+    ///  * Option< Vec<Encounter> > - a vector of the Encounter(s) that were found, if any. If none, an empty Vector is assembled and returned
+    ///  * std::io::Error - Any error that occured
     /// 
     pub async fn get_encounters(&self, patient_id: i64, current_only: bool) -> Result< Option< Vec<Encounter> >, std::io::Error> {
         tracing::info!("EncounterDao::get_encounters({}, {})", patient_id, current_only);

@@ -1,3 +1,5 @@
+//! # Defines a Data Access Object (DAO) for a Feature Preference entity, which enables retrieval
+//!   and assembly of an Feature Preference object, based on data in the database.
 //!
 //!    CSM500 Project (April - October 2026)
 //!      Graham Parker (Student ID: 240120522)
@@ -137,7 +139,7 @@ impl FeaturePreferenceDAO {
     }
 
 
-     /// ### get_active_feature_preferences_for_user_intervention_details_level()
+    /// ### get_active_feature_preferences_for_user_intervention_details_level()
     ///    Obtains all active features preferences for a user. Disregards department, only includes active preferences and active common_reference_types.
     /// 
     /// #### Parameters:

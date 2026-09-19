@@ -23,7 +23,7 @@ mod ui_tests {
     let wcf = WebContentFactory::new(&newpath, "fake user".to_string());
     // content factor should have two entries currently
 
-    tracing::debug!("As of Sept 19 , there are [7] tiles being loaded");
+    tracing::debug!("As of Sept 19, there are [7] tiles being loaded");
     assert_eq!(wcf.get_tile_count(), 7); 
 
     let tmp_tile = wcf.get_tile(WebContentItem::WCTypeLoginTile);

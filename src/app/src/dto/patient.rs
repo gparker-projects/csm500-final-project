@@ -161,7 +161,7 @@ impl Patient {
         // convert birthdate, if possible
         let tmp_birthdate = match NaiveDateTime::parse_from_str(&frm.birthdate, "%Y-%m-%d %H:%M:%S"){
             Ok(p) => p,
-            Err(e) => {
+            Err(_e) => {
                 //println!("ConvertUtils::to_naivedatetime()"); 
                 //println!("..String provided: {}", frm.birthdate.clone()); 
                 //println!("..Date format error: {}", e); 

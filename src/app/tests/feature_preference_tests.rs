@@ -152,7 +152,7 @@ async fn test_ins_get_upd_feature_priority_intv_details_level() {
 
   let test_user_id = 2; // we will use user #2, which is admin user and has lots of data (permissions)
   let test_feature_id: i64 = 100002;
-  let mut fp_id: i64 = constants::INVALID_OTHER_ID;
+  let fp_id: i64;
   let test_upper_limit = 5;
 
   println!("Testing: get_all_active_feature_preferences_for_user(): first insertion");

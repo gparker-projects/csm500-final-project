@@ -62,13 +62,13 @@ fn test_create_encounter_dto() {
     assert_eq!(obj.encounter_site_name, encounter_site_name);
     assert_eq!(obj.room_identifier, room_identifier);
     assert_eq!(obj.is_current_encounter, is_current_encounter);
-  }
+}
 
-  ///
-  /// Prove the Intervention DTO works/continues to work
-  /// 
-  #[test]
-  fn test_create_intervention_dto() {
+///
+/// Prove the Intervention DTO works/continues to work
+/// 
+#[test]
+fn test_create_intervention_dto() {
     let mut rng = rng();
 
     let intervention_id: i64 = rng.random();
@@ -115,10 +115,10 @@ fn test_create_encounter_dto() {
 
     assert_eq!(obj.scheduled_timestamp, Some(current_time));
     assert_eq!(obj.performed_timestamp, Some(current_time));
-  }
+}
 
-  #[test]
-  fn test_create_intervention_details_dto() {
+#[test]
+fn test_create_intervention_details_dto() {
     let mut rng = rng();
     let current_time: NaiveDateTime = Utc::now().naive_utc();
 
@@ -148,15 +148,15 @@ fn test_create_encounter_dto() {
     assert_eq!(obj.notes, notes); 
     assert_eq!(obj.entry_timestamp, entry_timestamp); 
     assert_eq!(obj.intervention_type, intervention_type); 
-  }
+}
 
-  ///
-  /// Prove the Patient DTO works/continues to work; includes the Encounter table details
-  /// 
-  /// REF: Random number gerneration for tests: Zero-to-prod, page 159; now deprecated apparently.
-  /// 
-  #[test]
-  fn test_create_patient_dto() {
+ ///
+ /// Prove the Patient DTO works/continues to work; includes the Encounter table details
+ /// 
+ // REF: Random number gerneration for tests: Zero-to-prod, page 159; now deprecated apparently.
+ /// 
+ #[test]
+ fn test_create_patient_dto() {
       let current_time: NaiveDateTime = Utc::now().naive_utc();
       let mut rng = rng();
 
@@ -305,16 +305,13 @@ fn test_create_encounter_dto() {
       obj.legal_last_name = "UNIT TEST".to_string();
       let tmp_patient_to_string = "(patient Id: 1\nlegal_first_name: UNIT TEST\nlegal_last_name: UNIT TEST)".to_string(); 
       assert_eq!(obj.to_string(), tmp_patient_to_string);
-
-
-
-  }
+}
 
 
 
 
-  #[test]
-  fn test_create_user_dto() {
+#[test]
+fn test_create_user_dto() {
       let current_time: NaiveDateTime = Utc::now().naive_utc();
       let mut rng = rng();
 
@@ -340,10 +337,10 @@ fn test_create_encounter_dto() {
       assert_eq!(obj.email, email); 
       assert_eq!(obj.created_timestamp, created_timestamp); 
       assert_eq!(obj.password, password); 
-  }
+}
 
-    #[test]
-  fn test_create_user_auth_and_permission_dto() {
+#[test]
+fn test_create_user_auth_and_permission_dto() {
     let basic_perms= [(1, 2), (2, 1)];
 
     let mut perms: Vec<Permission> = Vec::with_capacity( basic_perms.len() );
@@ -369,10 +366,10 @@ fn test_create_encounter_dto() {
     assert!(result.has_permission_for_dept(1,2));    // should succeed
     assert!(!result.has_permission_for_dept(1,999)); // should fail
     assert!(!result.has_permission_for_dept(999,1)); // should fail
-  }
+}
 
-    #[test]
-  fn test_encounter_dto(){   
+#[test]
+fn test_encounter_dto(){   
     let current_time: NaiveDateTime = Utc::now().naive_utc();
     let mut rng = rng();
     let tmp_id: i64 = rng.random();
@@ -409,54 +406,54 @@ fn test_create_encounter_dto() {
     assert_eq!(obj.is_current_encounter, tmp_is_current_encounter); 
   }
 
-    #[test]
-  fn test_feature_preference_dto(){
+  #[test]
+fn test_feature_preference_dto(){
+let mut rng = rng();
+
+let tmp_id: i64 = rng.random();
+let tmp_display_order: i64 = 99999999;
+let tmp_weight: i64 = 0;
+let tmp_calculation_date: NaiveDateTime = Utc::now().naive_utc();
+let tmp_users_id: i64 = rng.random();
+let tmp_department_id: i64 = rng.random();
+let tmp_feature_id: i64 = rng.random();
+let tmp_ref_group_id: i64 = rng.random();
+let tmp_ref_name: String = "REFERENCE NAME".to_string();
+
+let obj = FeaturePreference {
+    id: tmp_id, 
+    display_order: tmp_display_order,
+    weight: tmp_weight,
+    calculation_date: tmp_calculation_date,
+    users_id: tmp_users_id,
+    department_id: tmp_department_id,
+    feature_id: tmp_feature_id,
+    ref_group_id: tmp_ref_group_id,
+    ref_name: tmp_ref_name.clone()
+};
+
+assert_eq!(obj.id, tmp_id); 
+assert_eq!(obj.display_order, tmp_display_order); 
+assert_eq!(obj.weight, tmp_weight); 
+assert_eq!(obj.calculation_date, tmp_calculation_date); 
+assert_eq!(obj.users_id, tmp_users_id); 
+assert_eq!(obj.department_id, tmp_department_id); 
+assert_eq!(obj.feature_id, tmp_feature_id); 
+assert_eq!(obj.ref_group_id, tmp_ref_group_id); 
+assert_eq!(obj.ref_name, tmp_ref_name); 
+}
+
+ #[test]
+fn test_permissions_dto() {
     let mut rng = rng();
-
-    let tmp_id: i64 = rng.random();
-    let tmp_display_order: i64 = 99999999;
-    let tmp_weight: i64 = 0;
-    let tmp_calculation_date: NaiveDateTime = Utc::now().naive_utc();
-    let tmp_users_id: i64 = rng.random();
     let tmp_department_id: i64 = rng.random();
-    let tmp_feature_id: i64 = rng.random();
-    let tmp_ref_group_id: i64 = rng.random();
-    let tmp_ref_name: String = "REFERENCE NAME".to_string();
+    let tmp_permission_id: i64 = rng.random();
 
-    let obj = FeaturePreference {
-        id: tmp_id, 
-        display_order: tmp_display_order,
-        weight: tmp_weight,
-        calculation_date: tmp_calculation_date,
-        users_id: tmp_users_id,
+    let obj = Permission {
         department_id: tmp_department_id,
-        feature_id: tmp_feature_id,
-        ref_group_id: tmp_ref_group_id,
-        ref_name: tmp_ref_name.clone()
+        permission_id: tmp_permission_id
     };
 
-    assert_eq!(obj.id, tmp_id); 
-    assert_eq!(obj.display_order, tmp_display_order); 
-    assert_eq!(obj.weight, tmp_weight); 
-    assert_eq!(obj.calculation_date, tmp_calculation_date); 
-    assert_eq!(obj.users_id, tmp_users_id); 
     assert_eq!(obj.department_id, tmp_department_id); 
-    assert_eq!(obj.feature_id, tmp_feature_id); 
-    assert_eq!(obj.ref_group_id, tmp_ref_group_id); 
-    assert_eq!(obj.ref_name, tmp_ref_name); 
-  }
-
-
-  fn test_permissions_dto() {
-      let mut rng = rng();
-      let tmp_department_id: i64 = rng.random();
-      let tmp_permission_id: i64 = rng.random();
-
-      let obj = Permission {
-          department_id: tmp_department_id,
-          permission_id: tmp_permission_id
-      };
-
-      assert_eq!(obj.department_id, tmp_department_id); 
-      assert_eq!(obj.permission_id, tmp_permission_id); 
-  }
+    assert_eq!(obj.permission_id, tmp_permission_id); 
+}

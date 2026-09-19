@@ -1,3 +1,11 @@
+//! # Defines a Data Access Object (DAO) for a Patient entity, which enables retrieval
+//!   and assembly of a Patient object, based on data in the database.
+//!
+//!    CSM500 Project (April - October 2026)
+//!      Graham Parker (Student ID: 240120522)
+//! 
+//! REFERENCES
+//! 
 use sqlx::postgres::{PgPool}; 
 use sqlx::Row;
 use chrono::NaiveDateTime;
@@ -35,10 +43,7 @@ impl PatientDAO {
         PatientDAO {
             connection: db_connection,
         }
-    }
-
-
-  
+    }  
 
     /// ### get_patient_details_optional_discharged()
     ///    Finds and returns the data for a specific patient, as a Patient struct, who may or may not have been discharged
