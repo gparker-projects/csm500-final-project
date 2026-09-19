@@ -12,14 +12,15 @@
 /// Ref: Unit Testing in Rust is actually easy! - Flo Woelki (https://youtu.be/6wAFdBVJbwc?si=KdJfqvRdcXi9-mqo) - LOL NOT easy
 /// 
 ///
-use chrono::{Utc, NaiveDateTime};
+use chrono::{Utc, NaiveDateTime, NaiveDate};
 use rand::{RngExt, rng};
-use maple_emr::{constants, dto::{encounter::*, intervention::*, intervention_detail::*, patient::*, user::*, feature_preference::*}};
-use maple_emr::dto::user_auth::*;
-
-mod common;
 
 use common::test_utils::*; 
+use maple_emr::{constants, dto::{encounter::*, intervention::*, intervention_detail::*, patient::*, user::*, feature_preference::*}};
+use maple_emr::dto::{user_auth::*, convert_utils::*};
+use maple_emr::ui::data_forms::AdmitDataForm;
+
+mod common;
 
 // set up per: https://doc.rust-lang.org/book/ch11-03-test-organization.html
 
@@ -156,81 +157,189 @@ fn test_create_encounter_dto() {
   /// 
   #[test]
   fn test_create_patient_dto() {
-    let current_time: NaiveDateTime = Utc::now().naive_utc();
-    let mut rng = rng();
+      let current_time: NaiveDateTime = Utc::now().naive_utc();
+      let mut rng = rng();
 
-    let patient_id: i64 = rng.random();
-    let legal_first_name: String = DataGenerator::get_first_name(100);
-    let legal_last_name: String = DataGenerator::get_last_name(100);
-    let legal_middle_names: String = DataGenerator::get_middle_names(100);
-    let phn: i64 = DataGenerator::get_phn();
-    let birth_date: NaiveDateTime = DataGenerator::get_date();
-    let location_id: i64 = rng.random();
-    let location_short_name: String =  DataGenerator::get_lorem_ipsum(16);
-    let admit_timestamp: NaiveDateTime = current_time;
-    let admit_notes: String = DataGenerator::get_lorem_ipsum(2000);
-    let discharge_timestamp: Option<NaiveDateTime> = Some( DataGenerator::add_random_seconds(current_time, 3600, 36000) );
-    let discharge_notes: String = DataGenerator::get_lorem_ipsum(2000);
+      let fixed_birth_date: NaiveDateTime = NaiveDate::from_ymd_opt(1909, 9, 21).unwrap().and_hms_opt(0, 0, 0).unwrap();
+      let fixed_discharge_timestamp: NaiveDateTime = NaiveDate::from_ymd_opt(2026, 9, 19).unwrap().and_hms_opt(0, 0, 0).unwrap();
 
-    // instantiate a DTO to prove it accepts data, but more importantly, detect unexpected changes to it that will break the application
-    let obj = Patient::new(
-        patient_id.clone(), // patient_id
-        constants::NOT_SPECIFIED_ID, //encounter_id, 
-        legal_first_name.clone(), //legal_first_name, 
-        legal_last_name.clone(), //legal_last_name, 
-        legal_middle_names.clone(), //legal_middle_names, 
-        phn.clone(), //phn, 
-        birth_date.clone(), //birth_date,
-        location_id.clone(), //location_id,
-        location_short_name.clone(), //location_short_name, 
-        admit_timestamp.clone(), //discharge_timestamp,
-        admit_notes.clone(), //admit_note
-        discharge_timestamp.clone(),
-        discharge_notes.clone()//discharge_notes
-    );
+      let patient_id: i64 = rng.random();
+      let legal_first_name: String = DataGenerator::get_first_name(100);
+      let legal_last_name: String = DataGenerator::get_last_name(100);
+      let legal_middle_names: String = DataGenerator::get_middle_names(100);
+      let phn: i64 = DataGenerator::get_phn();
+      let birth_date = fixed_birth_date; //NaiveDateTime = DataGenerator::get_date();
+      let location_id: i64 = rng.random();
+      let location_short_name: String =  DataGenerator::get_lorem_ipsum(16);
+      let admit_timestamp: NaiveDateTime = current_time;
+      let admit_notes: String = DataGenerator::get_lorem_ipsum(2000);
 
-    assert_eq!(obj.id, patient_id); 
-    assert_eq!(obj.encounter_id, constants::NOT_SPECIFIED_ID);
-    assert_eq!(obj.legal_first_name, legal_first_name );
-    assert_eq!(obj.legal_last_name, legal_last_name);
-    assert_eq!(obj.legal_middle_names, legal_middle_names);
-    assert_eq!(obj.phn, phn);
-    assert_eq!(obj.birth_date, birth_date);
-    assert_eq!(obj.location_id,location_id);
-    assert_eq!(obj.location_short_name,location_short_name);  
-    assert_eq!(obj.admit_timestamp, admit_timestamp);
-    assert_eq!(obj.admit_notes, admit_notes);
-    assert_eq!(obj.discharge_timestamp, discharge_timestamp);
-    assert_eq!(obj.discharge_notes, discharge_notes);
+      let discharge_timestamp: Option<NaiveDateTime> = Some( fixed_discharge_timestamp ); // DataGenerator::add_random_seconds(current_time, 3600, 36000) );
+
+      let discharge_notes: String = DataGenerator::get_lorem_ipsum(2000);
+
+      // instantiate a DTO to prove it accepts data, but more importantly, detect unexpected changes to it that will break the application
+      let mut obj = Patient::new(
+          patient_id.clone(), // patient_id
+          constants::NOT_SPECIFIED_ID, //encounter_id, 
+          legal_first_name.clone(), //legal_first_name, 
+          legal_last_name.clone(), //legal_last_name, 
+          legal_middle_names.clone(), //legal_middle_names, 
+          phn.clone(), //phn, 
+          birth_date.clone(), //birth_date,
+          location_id.clone(), //location_id,
+          location_short_name.clone(), //location_short_name, 
+          admit_timestamp.clone(), //admit_timestamp,
+          admit_notes.clone(), //admit_note
+          discharge_timestamp.clone(),
+          discharge_notes.clone()//discharge_notes
+      );
+
+      println!("...fixed_birth_date: {}", fixed_birth_date);
+      println!("...birth_date: {}", birth_date);
+      println!("...obj.birth_date: {}", obj.birth_date);
+
+      // basic tests
+      assert_eq!(obj.id, patient_id); 
+      assert_eq!(obj.encounter_id, constants::NOT_SPECIFIED_ID);
+      assert_eq!(obj.legal_first_name, legal_first_name );
+      assert_eq!(obj.legal_last_name, legal_last_name);
+      assert_eq!(obj.legal_middle_names, legal_middle_names);
+      assert_eq!(obj.phn, phn);
+      assert_eq!(obj.birth_date, birth_date);
+      assert_eq!(obj.location_id,location_id);
+      assert_eq!(obj.location_short_name,location_short_name);  
+      assert_eq!(obj.admit_timestamp, admit_timestamp);
+      assert_eq!(obj.admit_notes, admit_notes);
+      assert_eq!(obj.discharge_timestamp, discharge_timestamp);
+      assert_eq!(obj.discharge_notes, discharge_notes);
+
+      let tmp_prompt = "unit test";
+      let form_errors = "unit test";
+
+      // quick win: test copy from an AdmitDataForm
+      let frm = AdmitDataForm{
+          patient_id: patient_id.to_string(),
+          patient_first_name: legal_first_name.clone(),
+          patient_last_name: legal_last_name.clone(),
+          patient_middle_name: legal_middle_names.clone(),
+          phn: phn.to_string(),
+          birthdate: birth_date.to_string(),
+          encounter_id: constants::NOT_SPECIFIED_ID.to_string(),
+          location_id: location_id.to_string(),
+          action_flag: "admit".to_string(),
+          admit_notes: admit_notes.clone(),
+          user_prompt: tmp_prompt.to_string(),  
+          form_errors: form_errors.to_string(), 
+      };
+
+      let p = Patient::to_patient(frm.clone());
+      assert_eq!(p.admit_notes, admit_notes.clone());
+      assert_eq!(p.id, patient_id); 
+      assert_eq!(p.encounter_id, constants::NOT_SPECIFIED_ID);
+      assert_eq!(p.legal_first_name, legal_first_name );
+      assert_eq!(p.legal_last_name, legal_last_name);
+      assert_eq!(p.legal_middle_names, legal_middle_names);
+      assert_eq!(p.phn, phn);
+
+      assert!(p.birth_date == birth_date, "Birth dates do not match");
+      assert!(p.location_id == location_id, "Location Ids do not match");
+      //assert!(p.location_short_name == location_short_name, "location short_namea do not match: {} <> {}", p.location_short_name, location_short_name);
+
+      assert!(ConvertUtils::is_equal_to_yyyy_mm_dd_hh_mm_ss(p.admit_timestamp, admit_timestamp), "admit_timestamps do not match: {} <> {}", p.admit_timestamp, admit_timestamp);
+
+      assert!(p.admit_notes == admit_notes, "admit_notes do not match");
+
+      match p.discharge_timestamp {
+          Some( ts) => {
+              match discharge_timestamp {
+                  Some( ts2) => {
+                      assert!(ConvertUtils::is_equal_to_yyyy_mm_dd_hh_mm_ss(ts, ts2), "discharge_timestamps do not match: {} <> {}", ts, ts2);
+                  }
+                  None => {
+                      assert!(false, "Test Fail: discharge_timestamp is nothing, but p.discharge_timestamp exists");
+                  }
+              }
+          }
+          None => {
+              match discharge_timestamp {
+                  Some( _ts3) => {
+                      //assert!(false, "Test Fail: p.discharge_timestamp is nothing, but discharge_timestamp exists");
+                      assert!(true, "This is okay because AdmitDataForm does not have a Discharge Timestamp");
+                  }
+                  None => {
+                      assert!(true, "Both dates are nothing");
+                  }
+              }
+          }
+      };
+
+      // Empty frm.discharge_notes is okay because AdmitDataForm does not have a Discharge Notes
+      assert!(p.discharge_notes == "".to_string(), "discharge_notes do not match: ({}) ({})", p.discharge_notes, discharge_notes);
+
+
+      // quick win: test copy from an AdmitDataForm
+      let mut frm2 = frm.clone();
+      frm2.birthdate = "INVALID DATE FOR TEST".to_string();
+
+      let tmp_current_datetime = Utc::now().naive_utc();
+      let p2 = Patient::to_patient(frm2);
+      assert!(ConvertUtils::is_equal_to_yyyy_mm_dd_hh_mm_ss(p2.birth_date, tmp_current_datetime), "Invalid Birth Date not coerced correctly: {} <> {}", p2.birth_date, tmp_current_datetime);
+
+
+      assert_eq!(obj.birth_date_for_display(), birth_date.format("%Y-%b-%d").to_string());
+
+      // check invalid PHN output
+      assert_eq!(obj.phn_to_string(), phn.to_string()); // test before with a valid PHN
+      obj.phn = constants::NOT_SPECIFIED_ID;
+      assert_eq!(obj.phn_to_string(), "".to_string()); // test after
+
+      assert_eq!(obj.admit_timestamp_for_display(), admit_timestamp.format("%Y-%b-%d %H:%M:%S").to_string());
+      
+
+      obj.birth_date = fixed_birth_date;
+      assert_eq!(obj.age(), ((Utc::now().naive_utc() - fixed_birth_date).num_days() / 365).to_string());
+
+      obj.id = 1;
+      obj.legal_first_name = "UNIT TEST".to_string();
+      obj.legal_last_name = "UNIT TEST".to_string();
+      let tmp_patient_to_string = "(patient Id: 1\nlegal_first_name: UNIT TEST\nlegal_last_name: UNIT TEST)".to_string(); 
+      assert_eq!(obj.to_string(), tmp_patient_to_string);
+
+
+
   }
+
+
+
 
   #[test]
   fn test_create_user_dto() {
-    let current_time: NaiveDateTime = Utc::now().naive_utc();
-    let mut rng = rng();
+      let current_time: NaiveDateTime = Utc::now().naive_utc();
+      let mut rng = rng();
 
-    let user_id: i64 = rng.random();
-    let name: String = DataGenerator::get_first_name(100);
-    let user_name: String = DataGenerator::get_last_name(20);
-    let email: String = DataGenerator::get_last_name(80) + &"@maple.com";
-    let created_timestamp: NaiveDateTime = current_time;
-    let password: String = DataGenerator::get_last_name(80) + &"!abcde"; // terribly poor actual security practise; good enough for basic DAO testing, at this time
+      let user_id: i64 = rng.random();
+      let name: String = DataGenerator::get_first_name(100);
+      let user_name: String = DataGenerator::get_last_name(20);
+      let email: String = DataGenerator::get_last_name(80) + &"@maple.com";
+      let created_timestamp: NaiveDateTime = current_time;
+      let password: String = DataGenerator::get_last_name(80) + &"!abcde"; // terribly poor actual security practise; good enough for basic DAO testing, at this time
 
-    let obj = User::new (
-      user_id.clone(), // user_id
-      name.clone(),
-      user_name.clone(),
-      email.clone(),
-      created_timestamp.clone(),
-      password.clone()
-    );
+      let obj = User::new (
+        user_id.clone(), // user_id
+        name.clone(),
+        user_name.clone(),
+        email.clone(),
+        created_timestamp.clone(),
+        password.clone()
+      );
 
-    assert_eq!(obj.id, user_id); 
-    assert_eq!(obj.name, name); 
-    assert_eq!(obj.user_name, user_name); 
-    assert_eq!(obj.email, email); 
-    assert_eq!(obj.created_timestamp, created_timestamp); 
-    assert_eq!(obj.password, password); 
+      assert_eq!(obj.id, user_id); 
+      assert_eq!(obj.name, name); 
+      assert_eq!(obj.user_name, user_name); 
+      assert_eq!(obj.email, email); 
+      assert_eq!(obj.created_timestamp, created_timestamp); 
+      assert_eq!(obj.password, password); 
   }
 
     #[test]
@@ -251,6 +360,8 @@ fn test_create_encounter_dto() {
         granted_permissions: perms
     };
     
+    assert!(result.granted_permissions.len() == 2, "UserAuthorization should have 2 permissions");
+
     assert!(result.has_permission(1));
     assert!(!result.has_permission(9999));
 
@@ -333,4 +444,19 @@ fn test_create_encounter_dto() {
     assert_eq!(obj.feature_id, tmp_feature_id); 
     assert_eq!(obj.ref_group_id, tmp_ref_group_id); 
     assert_eq!(obj.ref_name, tmp_ref_name); 
+  }
+
+
+  fn test_permissions_dto() {
+      let mut rng = rng();
+      let tmp_department_id: i64 = rng.random();
+      let tmp_permission_id: i64 = rng.random();
+
+      let obj = Permission {
+          department_id: tmp_department_id,
+          permission_id: tmp_permission_id
+      };
+
+      assert_eq!(obj.department_id, tmp_department_id); 
+      assert_eq!(obj.permission_id, tmp_permission_id); 
   }

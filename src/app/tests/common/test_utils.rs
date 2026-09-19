@@ -79,7 +79,7 @@ impl DataGenerator{
     
     /// Returns a random date by calling .get_date(), returning it in YYYY-MM-DD format as a String
     ///
-    pub fn get_date_as_YYYY_MON_DD() -> String {
+    pub fn get_date_as_yyyy_mon_dd() -> String {
        let tmp_date = DataGenerator::get_date();
        return tmp_date.format("%Y-%b-%d").to_string();
     }

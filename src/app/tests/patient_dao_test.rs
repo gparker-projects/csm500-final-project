@@ -130,19 +130,31 @@ async fn test_get_patient_details() {
         },
     };
     let test_user_id = 2;
-    let test_patient_id = 1;
+    let test_patient_id_discharged = 1; // patient 1 has been discharged and should be preserved for testing
+    let test_patient_id_not_discharged = 27; // patient 27 has NOT been discharged and should be preserved for testing
 
     // instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
     // we can not test if the DAO itself is instantiated as the only content is a PgPool, which does not allow assert_eq!. If the object
     // does not instantiate however, the remainder of this test will fail.
-    let pdao = PatientDAO::new( db_pool ).await;
-    let qry_results: Option<Patient> = pdao.get_patient_details_not_discharged(test_user_id, test_patient_id).await.unwrap();
+    let pdao = PatientDAO::new( db_pool.clone() ).await;
+    let qry_results: Option<Patient> = pdao.get_patient_details_optional_discharged(test_user_id, test_patient_id_discharged, false).await.unwrap();
     match qry_results{
         Some (_p) => {
             assert!(true);
         }
         None => {
-            println!("Patient expected, no patient returned for id={} users_id={}", test_patient_id, test_user_id);
+            println!("Test 1 (Discharged): Patient expected, no patient returned for id={} users_id={}", test_patient_id_discharged, test_user_id);
+            assert!( false );
+        }
+    }
+
+    let qry_results: Option<Patient> = {PatientDAO::new( db_pool.clone() ).await}.get_patient_details_not_discharged(test_user_id, test_patient_id_not_discharged).await.unwrap();
+    match qry_results{
+        Some (_p) => {
+            assert!(true);
+        }
+        None => {
+            println!("Test 2 (Not Discharged): Patient expected, no patient returned for id={} users_id={}", test_patient_id_not_discharged, test_user_id);
             assert!( false );
         }
     }
@@ -197,7 +209,7 @@ async fn test_upsert_patient_from_admit_form() {
         patient_first_name: DataGenerator::get_first_name(100),
         patient_last_name: DataGenerator::get_first_name(100),
         patient_middle_name: DataGenerator::get_first_name(100),
-        birthdate: DataGenerator::get_date_as_YYYY_MON_DD(),
+        birthdate: DataGenerator::get_date_as_yyyy_mon_dd(),
         encounter_id: constants::INVALID_OTHER_ID.to_string(), // this field and others are not actually set/used by upsert_patient_from_admit_form() 
         location_id: constants::INVALID_OTHER_ID.to_string(), // will be ignored
         action_flag: "Y".to_string(), // will be ignored
@@ -257,7 +269,7 @@ async fn test_upsert_encounter_from_admit_form() {
         patient_first_name: DataGenerator::get_first_name(100),
         patient_last_name: DataGenerator::get_first_name(100),
         patient_middle_name: DataGenerator::get_first_name(100),
-        birthdate: DataGenerator::get_date_as_YYYY_MON_DD().to_string(),
+        birthdate: DataGenerator::get_date_as_yyyy_mon_dd().to_string(),
         encounter_id: constants::INVALID_OTHER_ID.to_string(), // this field and others are not actually set/used by upsert_patient_from_admit_form() 
         location_id: "12".to_string(), // will be ignored
         action_flag: "Y".to_string(), // will be ignored

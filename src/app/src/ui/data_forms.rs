@@ -99,7 +99,7 @@ pub struct AdmitDataForm {
     #[validate(length(min = 10, max = 10, message = "PHN must be a 10 digit number"))]
     pub phn: String,
 
-    #[validate(length(min = 10, max = 10, message = "Birthdate must be in YYYY-MON-DD format"))]
+    #[validate(length(min = 11, max = 11, message = "Birthdate must be in YYYY-MON-DD format"))]
     pub birthdate: String,
 
     //admit_timestamp -> not actually taken as an input

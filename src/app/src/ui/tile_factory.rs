@@ -69,7 +69,6 @@ impl WebContentFactory {
     /// 
     pub fn new( content_root_path: &str, app_version: String) -> Self {
         let mut tiles = HashMap::new();
-        tracing::debug!("WebContentFactory:new()");
         let tile_files = [("LoginTile.htl", WebContentItem::WCTypeLoginTile),
                                 ("PatientListTile.htl", WebContentItem::WCTypePatientListTile),
                                 ("Home.htl", WebContentItem::WCTypeHomePage),
@@ -78,9 +77,12 @@ impl WebContentFactory {
                                 ("InterventionTile.htl", WebContentItem::WCTypeInterventionFullPageTile),
                                 ("IntvDetailItemTile.htl", WebContentItem::WCTypeIntvDetailItemTile)       ];
 
+        tracing::debug!("WebContentFactory:new()");
+        println!("WebContentFactory:new()");
         // load tiles from pre-defined files, assigning to known constants so that the application can reliably load them later
         for item in tile_files{
            tracing::debug!("..Load tile from: {}", item.0);
+           println!("..Load tile from: {}", item.0);
            let tmp_content = fs::read_to_string(&( content_root_path.to_owned() + item.0) ).expect(constants::ERROR_READING_TEMPLATE);
 
            tiles.insert(item.1, tmp_content.replace(constants::RELEASE_NUMBER, &app_version)); 
