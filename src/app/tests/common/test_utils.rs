@@ -77,6 +77,13 @@ impl DataGenerator{
         base_date + td // return Ethel's birtdate + random duration between it and today
     }
     
+    /// Returns a random date by calling .get_date(), returning it in YYYY-MM-DD format as a String
+    ///
+    pub fn get_date_as_YYYY_MON_DD() -> String {
+       let tmp_date = DataGenerator::get_date();
+       return tmp_date.format("%Y-%b-%d").to_string();
+    }
+
     ///
     /// Returns a date with a random number of seconds added
     ///

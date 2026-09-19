@@ -77,7 +77,7 @@ impl PatientRoute{
     };
 
     // get patient encounter history
-    let patient_results = pdao.get_patient_details( userid, patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+    let patient_results = pdao.get_patient_details_not_discharged( userid, patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
     let patient_header = match patient_results {
         Some (patient_details) => {
             //println!("Patient details obtained"); //: {}", &tile_content);

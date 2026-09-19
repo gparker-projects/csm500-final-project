@@ -37,8 +37,11 @@ impl PatientDAO {
         }
     }
 
-    /// ### get_patient_details()
-    ///    Finds and returns the data for a specific patient, as a Patient struct
+
+  
+
+    /// ### get_patient_details_optional_discharged()
+    ///    Finds and returns the data for a specific patient, as a Patient struct, who may or may not have been discharged
     /// 
     /// #### Parameters:
     /// * _audit_user_id (i64): the id of the user making the data request, for audit purposes
@@ -48,12 +51,15 @@ impl PatientDAO {
     /// * Option<Patient>: the Patient, if found
     /// * sqlx::Error: An error, if applicable
     /// 
-    pub async fn get_patient_details(&self, _audit_user_id: i64, patient_id: i64) -> Result< Option<Patient>, std::io::Error> {
-        let tmp: String = db_query::QRY_SINGLE_PATIENT_DETAILS.to_owned();
+    pub async fn get_patient_details_optional_discharged(&self, _audit_user_id: i64, patient_id: i64, ignore_discharge: bool) -> Result< Option<Patient>, std::io::Error> {
+        let tmp: String = match ignore_discharge {
+            true => db_query::QRY_SINGLE_PATIENT_DETAILS_STILL_ADMITTED_NOT_DISCHARGED.to_owned(), 
+            false => db_query::QRY_SINGLE_PATIENT_DETAILS_DISREGARD_DISCHARGE.to_owned(),
+        };
         let query = tmp.replace("{}", &patient_id.to_string());
 
-        tracing::debug!("get_patient_details Query: {}", query);
-        //println!("get_patient_details Query: {}", query);
+        //tracing::debug!("get_patient_details Query: {}", query);
+        println!("get_patient_details_optional_discharged() Query: {}", query);
 
         match sqlx::query(&query)
         .fetch_optional(&self.connection)
@@ -110,6 +116,21 @@ impl PatientDAO {
                 Ok( None )
             }
         }
+    }
+
+    /// ### get_patient_details_not_discharged()
+    ///    Finds and returns the data for a specific patient, as a Patient struct, who has NOT been discharged
+    /// 
+    /// #### Parameters:
+    /// * _audit_user_id (i64): the id of the user making the data request, for audit purposes
+    /// * patient_id (i64): the id of the patient to be obtained
+    /// 
+    /// #### Returns:
+    /// * Option<Patient>: the Patient, if found
+    /// * sqlx::Error: An error, if applicable
+    /// 
+    pub async fn get_patient_details_not_discharged(&self, _audit_user_id: i64, patient_id: i64) -> Result< Option<Patient>, std::io::Error> {
+        return self.get_patient_details_optional_discharged(_audit_user_id, patient_id, true).await;
     }
 
     /// ### update_encounter_from_discharge_form()
@@ -203,6 +224,7 @@ impl PatientDAO {
     /// 
     pub async fn upsert_patient_from_admit_form(&self, form: AdmitDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
         tracing::debug!("> upsert_patient_from_admit_form");
+        println!("> upsert_patient_from_admit_form");
             
         let query_level_0 = db_query::UPSERT_PATIENT;
         let query_level_1 = &query_level_0.replace("{legal_last_name}", &form.patient_last_name.clone().trim());
@@ -212,7 +234,8 @@ impl PatientDAO {
         let query_level_5 = &query_level_4.replace("{phn}", &form.phn.clone());
         let query = query_level_5.clone();
 
-        tracing::debug!(" >> Upsert: {}", query_level_5);
+        tracing::debug!("..Upsert: {}", query_level_5);
+        println!("..Upsert: {}", query_level_5);
 
         let result = sqlx::query(&query)
                                                         .fetch_one(&self.connection)

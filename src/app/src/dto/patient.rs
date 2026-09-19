@@ -116,8 +116,9 @@ impl Patient {
       ((Utc::now().naive_utc() - self.birth_date).num_days() / 365).to_string()
     }
 
- 
-
+    ///
+    /// Converts an AdmitDataForm into a Patient DTO
+    /// 
     pub fn to_patient(frm: AdmitDataForm) -> Patient{
         Patient {
                 id: ConvertUtils::to_i64(frm.patient_id),

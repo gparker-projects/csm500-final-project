@@ -297,8 +297,8 @@ async fn test_ins_get_upd_feature_priority_intv_details_level() {
             let mut results: Vec<FeaturePreference> = Vec::with_capacity(rows.len());
             for row in rows { // should only ever iterate once
                 let tmp_id: i64 = row.0; // id
-                let tmp_display_order: i32 = row.1; // display_order
-                let tmp_weight: i32 = row.2; // weight
+                let _tmp_display_order: i32 = row.1; // display_order
+                let _tmp_weight: i32 = row.2; // weight
 
                 let tmp_calculation_date: chrono::NaiveDateTime = row.3; // calculation_date
                 let tmp_users_id: i64 = row.4; // users_id

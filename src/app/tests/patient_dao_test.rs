@@ -14,7 +14,7 @@
 mod common;
 
 use sqlx::postgres::{PgPoolOptions}; 
-use tracing;
+use chrono::{NaiveDate, Utc};
 
 use maple_emr::constants;
 use maple_emr::dao::patient_dao::PatientDAO;
@@ -35,56 +35,96 @@ use common::test_utils::DataGenerator;
 ///
 #[tokio::test]
 async fn test_get_patients_at_users_site_no_discharge() {
-    let test_user_id = 2;
-    let db_url = DB_CONN_STR;
     let db_pool = match PgPoolOptions::new()
         .max_connections(5)
-        .connect(db_url)
+        .connect(DB_CONN_STR)
         .await
     {
         Ok(pool) => pool,
         Err(e) => {
-            tracing::debug!("{}", e);
+            println!("{}", e);
             assert!(false);
             panic!("{}", e)
         },
     };
 
-  // instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
-  // we can not test if the DAO itself is instantiated as the only content is a PgPool, which does not allow assert_eq!. If the object
-  // does not instantiate however, the remainder of this test will fail.
-  let pdao = PatientDAO::new( db_pool );
-  let qry_results: Option< Vec<Patient>> = pdao.await.get_patients_at_users_site_no_discharge(test_user_id).await.unwrap();
-  
-  match qry_results{
-      Some (patient_list) => {
-        tracing::debug!("Retrieved {} patients", patient_list.len());
-        assert!(patient_list.len() > 7);
-      }
-      None => {
-        tracing::debug!("No patients");
-        assert!(false);
-      }
-  }
+    let test_user_id = 2;
+    // instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
+    // we can not test if the DAO itself is instantiated as the only content is a PgPool, which does not allow assert_eq!. If the object
+    // does not instantiate however, the remainder of this test will fail.
+    let pdao = PatientDAO::new( db_pool );
+    let qry_results: Option< Vec<Patient>> = pdao.await.get_patients_at_users_site_no_discharge(test_user_id).await.unwrap();
+    
+    match qry_results{
+        Some (patient_list) => {
+            println!("Retrieved {} patients", patient_list.len());
+            assert!(patient_list.len() > 0); // some patients must have been returned; # will vary with testing
+
+            for p in patient_list{ // this ends up being a bit of a data validation
+                assert!(p.id != constants::INVALID_PATIENT_ID, "Patient id=-1 returned, patients are not valid");
+                assert!(p.encounter_id != constants::INVALID_OTHER_ID, "Encounter id=-1 returned, patients are not valid");
+                assert!(p.location_id != constants::INVALID_OTHER_ID, "Location id=-1 returned, patients are not valid");
+
+                assert!(p.phn <= 9999999999, "Non-10 digit PHN returned, patients are not valid");
+                assert!(p.phn >  8999999999, "Lower than allowed value PHN returned, patients are not valid");
+                assert!(p.legal_first_name.len() > 0, "Empty First Name found, patients are not valid");
+                assert!(p.legal_last_name.len() > 0, "Empty Last Name found, patients are not valid");
+
+                assert!(p.legal_first_name.len() < 200, "First Name too long found, patients are not valid");
+                assert!(p.legal_last_name.len() < 200, "Last Name too long found, patients are not valid");
+                assert!(p.legal_middle_names.len() < 200, "Middle Name too long found, patients are not valid");
+
+                assert!(p.admit_notes.len() < 2000, "Admit notes too long found, patients are not valid");
+                assert!(p.discharge_notes.len() < 2000, "Discharge notes too long found, patients are not valid");
+
+                assert!(Some(p.admit_timestamp).is_some(), "Empty Admit Timestamp found, patients are not valid");
+
+                // check admit/discharge are after this course?
+                let earliest_birth_date = NaiveDate::from_ymd_opt(1880, 1, 1).unwrap().and_hms_opt(0, 0, 0).unwrap(); // clean date that will capture 100% of all living people
+                let earliest_record_date = NaiveDate::from_ymd_opt(2026, 7, 1).unwrap().and_hms_opt(0, 0, 0).unwrap(); // July 1 of this year, approximate start date of CSM500
+          
+                assert!(p.birth_date >= earliest_birth_date, "Birth date predates oldest person alive, patients are not valid");
+                assert!(p.birth_date <= Utc::now().naive_utc(), "Birth date is in the future, patients are not valid");
+
+                assert!(p.admit_timestamp >= earliest_record_date, "Admit Timestamp predates system creation, patients are not valid");
+                assert!(p.admit_timestamp <= Utc::now().naive_utc(), "Admit Timestamp is in the future, patients are not valid");
+
+                match p.discharge_timestamp {
+                    Some( dt ) => {
+                        assert!(dt >= earliest_record_date, "Discharge Timestamp predates system creation, patients are not valid");
+                        assert!(dt <= Utc::now().naive_utc(), "Discharge Timestamp is in the future, patients are not valid");
+                    },
+                    None => {
+                        assert!(p.discharge_notes.len() == 0, "Discharge Notes present, Discharge Timestamp is not; patients are not valid");
+                    },
+                };
+            }
+        }
+        None => {
+            println!("No patients found for user_id={}", test_user_id);
+            assert!(false);
+        }
+    }
 }
 
 /// ### test_get_patient_details()
 /// 
 /// Tests the ability for the DAO to retrieve Patient details
 /// 
+///  If there are no valid patients, you may need this SQL: update encounter set discharge_timestamp = null where id = 1
+/// 
 ///   Specifically tests: PatientDAO::get_patient_details() 
 ///
 #[tokio::test]
 async fn test_get_patient_details() {
-    let db_url = DB_CONN_STR;
     let db_pool = match PgPoolOptions::new()
         .max_connections(5)
-        .connect(db_url)
+        .connect(DB_CONN_STR)
         .await
     {
         Ok(pool) => pool,
         Err(e) => {
-            tracing::debug!("{}", e);
+            println!("{}", e);
             assert!(false);
             panic!("{}", e)
         },
@@ -96,14 +136,14 @@ async fn test_get_patient_details() {
     // we can not test if the DAO itself is instantiated as the only content is a PgPool, which does not allow assert_eq!. If the object
     // does not instantiate however, the remainder of this test will fail.
     let pdao = PatientDAO::new( db_pool ).await;
-    let qry_results: Option<Patient> = pdao.get_patient_details(test_user_id, test_patient_id).await.unwrap();
+    let qry_results: Option<Patient> = pdao.get_patient_details_not_discharged(test_user_id, test_patient_id).await.unwrap();
     match qry_results{
         Some (_p) => {
             assert!(true);
         }
         None => {
-            tracing::debug!("Patient expected, no patient returned");
-            assert!(false);
+            println!("Patient expected, no patient returned for id={} users_id={}", test_patient_id, test_user_id);
+            assert!( false );
         }
     }
 }
@@ -117,10 +157,15 @@ async fn test_wrapper_patient_dao() {
 
     // these both create new encounters and during parallel thread execution mess up the discharge
     // which is determistic on its ID.
+
+    println!(">> Stage 1: test_upsert_patient_from_admit_form()");
     test_upsert_patient_from_admit_form().await;
+
+    println!(">> Stage 2: test_upsert_encounter_from_admit_form()");
     test_upsert_encounter_from_admit_form().await;
 
     // must perform discharge last, otherwise the other items running in parallel mess up the id sequencing
+    println!(">> Stage 3: test_update_encounter_from_discharge_form()");
     test_update_encounter_from_discharge_form().await;
 }
 
@@ -131,15 +176,14 @@ async fn test_wrapper_patient_dao() {
 ///   Specifically tests: PatientDAO::upsert_patient_from_admit_form() 
 ///
 async fn test_upsert_patient_from_admit_form() {
-    let db_url = DB_CONN_STR;
     let db_pool = match PgPoolOptions::new()
         .max_connections(5)
-        .connect(db_url)
+        .connect(DB_CONN_STR)
         .await
     {
         Ok(pool) => pool,
         Err(e) => {
-            tracing::debug!("{}", e);
+            println!("{}", e);
             assert!(false);
             panic!("{}", e)
         },
@@ -153,7 +197,7 @@ async fn test_upsert_patient_from_admit_form() {
         patient_first_name: DataGenerator::get_first_name(100),
         patient_last_name: DataGenerator::get_first_name(100),
         patient_middle_name: DataGenerator::get_first_name(100),
-        birthdate: DataGenerator::get_date().to_string(),
+        birthdate: DataGenerator::get_date_as_YYYY_MON_DD(),
         encounter_id: constants::INVALID_OTHER_ID.to_string(), // this field and others are not actually set/used by upsert_patient_from_admit_form() 
         location_id: constants::INVALID_OTHER_ID.to_string(), // will be ignored
         action_flag: "Y".to_string(), // will be ignored
@@ -175,7 +219,7 @@ async fn test_upsert_patient_from_admit_form() {
             }
         }
         Err(e) => {
-            println!("Patient expected, no patient returned: {}", e);
+            println!("Patient id={} expected, no patient returned: {}", test_patient_id, e);
             assert!(false)
         }
     }
@@ -197,7 +241,7 @@ async fn test_upsert_encounter_from_admit_form() {
     {
         Ok(pool) => pool,
         Err(e) => {
-            tracing::debug!("{}", e);
+            println!("{}", e);
             assert!(false);
             panic!("{}", e)
         },
@@ -213,7 +257,7 @@ async fn test_upsert_encounter_from_admit_form() {
         patient_first_name: DataGenerator::get_first_name(100),
         patient_last_name: DataGenerator::get_first_name(100),
         patient_middle_name: DataGenerator::get_first_name(100),
-        birthdate: DataGenerator::get_date().to_string(),
+        birthdate: DataGenerator::get_date_as_YYYY_MON_DD().to_string(),
         encounter_id: constants::INVALID_OTHER_ID.to_string(), // this field and others are not actually set/used by upsert_patient_from_admit_form() 
         location_id: "12".to_string(), // will be ignored
         action_flag: "Y".to_string(), // will be ignored
@@ -280,7 +324,7 @@ async fn test_update_encounter_from_discharge_form() {
     {
         Ok(pool) => pool,
         Err(e) => {
-            tracing::debug!("{}", e);
+            println!("{}", e);
             assert!(false);
             panic!("{}", e)
         },
@@ -292,7 +336,7 @@ async fn test_update_encounter_from_discharge_form() {
 
     // start by getting the current patient and encounter ids
     let pdao = PatientDAO::new( db_pool ).await;
-    let qry_results: Option<Patient> = pdao.get_patient_details(test_user_id, test_patient_id).await.unwrap();
+    let qry_results: Option<Patient> = pdao.get_patient_details_not_discharged(test_user_id, test_patient_id).await.unwrap();
     match qry_results{
         Some (p) => {
             test_patient_id = p.id;
@@ -316,7 +360,7 @@ async fn test_update_encounter_from_discharge_form() {
             if enc_id != constants::INVALID_OTHER_ID{
 
                 // if the update actually worked, the data should have changed
-                let qry_results: Option<Patient> = pdao.get_patient_details(test_user_id, test_patient_id).await.unwrap();
+                let qry_results: Option<Patient> = pdao.get_patient_details_optional_discharged(test_user_id, test_patient_id, false).await.unwrap();
                 match qry_results{
                     Some (p) => {
                         assert_eq!( p.discharge_notes, tmp_frm.discharge_notes );        // discharge notes should be the same as what was sent in
@@ -324,7 +368,7 @@ async fn test_update_encounter_from_discharge_form() {
                         assert!(true)
                     }
                     None => {
-                        tracing::debug!("Patient expected, no patient returned");
+                        println!("Patient expected, no patient returned");
                         assert!(false)
                     }
                 }
@@ -335,7 +379,7 @@ async fn test_update_encounter_from_discharge_form() {
             }
         }
         Err(e) => {
-            println!("Error encounterred: {}", e);
+            println!("Error encountered: {}", e);
             assert!(false)
         }
     }

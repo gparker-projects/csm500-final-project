@@ -134,7 +134,7 @@ pub const QRY_INTERVENTION_FOR_ID: &str = r##"SELECT i.id intervention_id,
                                               "##;
 
 
-pub const QRY_SINGLE_PATIENT_DETAILS: &str =  r##"SELECT p.id "patient_id", e.id "encounter_id", e.location_id "location_id", legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as "legal_middle_names",
+pub const QRY_SINGLE_PATIENT_DETAILS_STILL_ADMITTED_NOT_DISCHARGED: &str =  r##"SELECT p.id "patient_id", e.id "encounter_id", e.location_id "location_id", legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as "legal_middle_names",
                                                 COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
                                                 birthdate, admit_timestamp,
                                                 discharge_timestamp as "discharge_timestamp?",
@@ -147,6 +147,22 @@ pub const QRY_SINGLE_PATIENT_DETAILS: &str =  r##"SELECT p.id "patient_id", e.id
 											    select max(admit_timestamp)
 												from encounter e2 where e2.patient_id = p.id
                                                  and discharge_timestamp is null
+                                                 )
+                                            "##;
+
+// Same query as above, droppin "and discharge_timestamp is null" clause, because it makes a huge difference
+pub const QRY_SINGLE_PATIENT_DETAILS_DISREGARD_DISCHARGE: &str =  r##"SELECT p.id "patient_id", e.id "encounter_id", e.location_id "location_id", legal_first_name, legal_last_name, COALESCE(legal_middle_names, '') as "legal_middle_names",
+                                                COALESCE(admit_notes, '') as "admit_notes", COALESCE(discharge_notes, '') as "discharge_notes",
+                                                birthdate, admit_timestamp,
+                                                discharge_timestamp as "discharge_timestamp?",
+                                                sin, phn, l2.short_name "location_short_name"
+                                            FROM patient p
+                                            join encounter e on p.id = e.patient_id
+											join location l2 on l2.id = e.location_id
+                                            where patient_id = {}
+											  and e.admit_timestamp = (
+											    select max(admit_timestamp)
+												from encounter e2 where e2.patient_id = p.id
                                                  )
                                             "##;
 

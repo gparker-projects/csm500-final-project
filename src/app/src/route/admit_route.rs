@@ -253,7 +253,7 @@ impl AdmitRoute{
           else{
               tracing::debug!("..Patient exists: view existing Patient and Encounter");
               println!("..Patient exists: view existing Patient and Encounter");
-              let tmp_patent = dao.get_patient_details( userid.clone(), patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+              let tmp_patent = dao.get_patient_details_not_discharged( userid.clone(), patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
               
               match tmp_patent {
                 Some(mut p) => {
