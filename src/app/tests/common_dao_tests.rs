@@ -18,7 +18,6 @@
 mod common;
 
 use sqlx::postgres::{PgPoolOptions}; 
-use tracing;
 use maple_emr::dao::common_dao::CommonDAO;
 
 use maple_emr::constants;

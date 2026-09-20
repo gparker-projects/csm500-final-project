@@ -44,7 +44,7 @@ impl ConvertUtils {
     ///  
     pub fn is_aged (d: NaiveDateTime, hours: i64) -> bool {
         let now = chrono::Utc::now().naive_utc();
-        if now - d > Duration::hours(hours) {
+        if (now - d) > Duration::hours(hours) {
             return true;
         }
         false
@@ -69,7 +69,7 @@ impl ConvertUtils {
         let a_no_milliseconds = a.with_nanosecond(0).unwrap();
         let b_no_milliseconds = b.with_nanosecond(0).unwrap();
         //println!("is_equal_to_yyyy_mm_dd_hh_mm_ss()");
-        //println!("..a={} == b={}", a, b);
+        //
         //println!("..a*={} == b*={}", a_no_milliseconds, b_no_milliseconds);
 
         return a_no_milliseconds == b_no_milliseconds

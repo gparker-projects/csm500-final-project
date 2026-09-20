@@ -98,7 +98,12 @@ async fn get_encounters() {
     let enc2: Option<Vec<Encounter>> = {EncounterDAO::new( db_pool.clone() )}.await.get_encounters( constants::INVALID_PATIENT_ID, false ).await.unwrap();
     match enc2 {
         Some(items) => {
-            assert!( false, "No Encounters expected, {} were returned", items.len() )
+            if items.len() == 0 {
+                assert!( true, "No Encounters returned, as expected" )
+            }
+            else{
+                assert!( false, "No Encounters expected, {} were returned", items.len() )
+            }             
         },
         None => assert!( true, "No Encounters returned, as expected" )
     };

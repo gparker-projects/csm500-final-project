@@ -12,9 +12,8 @@ mod common;
 use sqlx::postgres::PgPoolOptions; 
 use tracing;
 use maple_emr::{constants, dao::auth_dao::AuthDAO};
-use chrono::NaiveDateTime;
 
-//use maple_emr::constants;
+use chrono::NaiveDateTime;
 
 pub const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500";
 

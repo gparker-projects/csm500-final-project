@@ -62,6 +62,14 @@ fn test_create_encounter_dto() {
     assert_eq!(obj.encounter_site_name, encounter_site_name);
     assert_eq!(obj.room_identifier, room_identifier);
     assert_eq!(obj.is_current_encounter, is_current_encounter);
+
+    assert_eq!(obj.admit_timestamp_for_display(), current_time.format("%d/%m/%Y %H:%M:%S").to_string());
+
+    let check_string = "(encounter Id: ".to_owned() + &encounter_id.to_string() + ", admit_timestamp: " + &current_time.format("%d/%m/%Y %H:%M:%S").to_string() + 
+                               ", encounter_site_name: " + &encounter_site_name +
+                               ", is_current_encounter: " + &is_current_encounter + &")";
+
+    assert_eq!(obj.to_string(), check_string);
 }
 
 ///
@@ -148,6 +156,12 @@ fn test_create_intervention_details_dto() {
     assert_eq!(obj.notes, notes); 
     assert_eq!(obj.entry_timestamp, entry_timestamp); 
     assert_eq!(obj.intervention_type, intervention_type); 
+
+    assert_eq!(obj.entry_timestamp_for_display(), entry_timestamp.format("%Y-%b-%d %H:%M:%S").to_string()); 
+    assert_eq!(obj.type_name(), intervention_type.clone()); 
+    assert_eq!(obj.to_string(), "(InterventionDetail Id: ".to_owned() + &intervention_details_id.to_string() +
+                                ", intervention_type: " + &intervention_type + 
+                                ", value: " + &value + &")"   ); 
 }
 
  ///
@@ -354,7 +368,7 @@ fn test_create_user_auth_and_permission_dto() {
     }
 
     let result = UserAuthorization {
-        granted_permissions: perms
+        granted_permissions: perms.clone()
     };
     
     assert!(result.granted_permissions.len() == 2, "UserAuthorization should have 2 permissions");
@@ -366,6 +380,9 @@ fn test_create_user_auth_and_permission_dto() {
     assert!(result.has_permission_for_dept(1,2));    // should succeed
     assert!(!result.has_permission_for_dept(1,999)); // should fail
     assert!(!result.has_permission_for_dept(999,1)); // should fail
+
+    let ua: UserAuthorization = UserAuthorization::new(perms);
+    assert!(ua.granted_permissions.len() > 0);
 }
 
 #[test]
@@ -456,4 +473,8 @@ fn test_permissions_dto() {
 
     assert_eq!(obj.department_id, tmp_department_id); 
     assert_eq!(obj.permission_id, tmp_permission_id); 
+
+    let p : Permission = Permission::new( constants::INVALID_OTHER_ID, constants::INVALID_OTHER_ID);
+    assert_eq!(p.department_id, constants::INVALID_OTHER_ID);
+    assert_eq!(p.permission_id, constants::INVALID_OTHER_ID);
 }

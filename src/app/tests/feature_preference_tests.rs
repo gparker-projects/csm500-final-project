@@ -14,7 +14,7 @@
 mod common;
 
 use sqlx::postgres::{PgPoolOptions}; 
-use tracing;
+use chrono::NaiveDate;
 
 use maple_emr::constants;
 use maple_emr::dao::feature_preference_dao::FeaturePreferenceDAO;
@@ -24,14 +24,44 @@ pub const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500
 
 #[cfg(test)]
 
-///
+#[tokio::test]
+async fn test_ins_get_upd_feature_priority_intv_level() {
+
+    let earliest_birth_date = NaiveDate::from_ymd_opt(1880, 1, 1).unwrap().and_hms_opt(0, 0, 0).unwrap(); // clean date that will capture 100% of all living people
+
+    let tmp_calculation_date = earliest_birth_date;
+
+    let fp: FeaturePreference = FeaturePreference::new(
+        constants::INVALID_OTHER_ID,
+        10, 
+        11,        
+        tmp_calculation_date, 
+        constants::INVALID_OTHER_ID,
+        constants::INVALID_OTHER_ID,
+        constants::INVALID_OTHER_ID,
+        constants::INVALID_OTHER_ID,
+        "UNIT TEST FAKE VALUE".to_string()
+    );
+
+    assert_eq!(fp.id, constants::INVALID_OTHER_ID);
+    assert_eq!(fp.display_order, 10);
+    assert_eq!(fp.weight, 11);
+    assert_eq!(fp.calculation_date, tmp_calculation_date);
+    assert_eq!(fp.users_id, constants::INVALID_OTHER_ID);
+    assert_eq!(fp.department_id, constants::INVALID_OTHER_ID);
+    assert_eq!(fp.feature_id, constants::INVALID_OTHER_ID);
+    assert_eq!(fp.ref_group_id, constants::INVALID_OTHER_ID);
+    assert_eq!(fp.ref_name, "UNIT TEST FAKE VALUE".to_string());
+}
+
+
 /// Tests the ability for the DAO to CREATE, SELECT and UPDATE Feature Priority records at the Intervention level (not details)
 /// Specifically tests:
 ///  * upsert_feature_preference
 ///  * get_active_feature_preferences_of_interventions_for_user
 /// 
 #[tokio::test]
-async fn test_ins_get_upd_feature_priority_intv_level() {
+async fn test_upsert_get_feature_preferences_of_interventions_for_user() {
   let db_pool: sqlx::Pool<sqlx::Postgres> = match PgPoolOptions::new()
       .max_connections(5)
       .connect(DB_CONN_STR)
@@ -130,7 +160,8 @@ async fn test_ins_get_upd_feature_priority_intv_level() {
       }
   }
 }
-  ///
+
+///
 /// Tests the ability for the DAO to CREATE, SELECT and UPDATE Feature Priority records at the Intervention Details level
 /// Specifically tests:
 ///  * upsert_feature_preference
