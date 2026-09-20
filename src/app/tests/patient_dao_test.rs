@@ -49,12 +49,14 @@ async fn test_get_patients_at_users_site_no_discharge() {
     };
 
     let test_user_id = 2;
-    // instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
+
+    // Test 1: instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
     // we can not test if the DAO itself is instantiated as the only content is a PgPool, which does not allow assert_eq!. If the object
     // does not instantiate however, the remainder of this test will fail.
-    let pdao = PatientDAO::new( db_pool );
+    let pdao = PatientDAO::new( db_pool.clone() );
+
+    // Test 2: Valid user_id test
     let qry_results: Option< Vec<Patient>> = pdao.await.get_patients_at_users_site_no_discharge(test_user_id).await.unwrap();
-    
     match qry_results{
         Some (patient_list) => {
             println!("Retrieved {} patients", patient_list.len());
@@ -105,6 +107,20 @@ async fn test_get_patients_at_users_site_no_discharge() {
             assert!(false);
         }
     }
+
+    // Test 3: Invalid user_id test
+    let qry_results: Option< Vec<Patient>> = {PatientDAO::new( db_pool.clone() )}.await.get_patients_at_users_site_no_discharge(constants::INVALID_OTHER_ID).await.unwrap();
+    match qry_results{
+        Some (_items) => {
+            if _items.len() > 0 {
+                assert!(false, "Invalid user_id (-1), no results should have been returned")
+            }
+            else{  // method returns an empty vector, so as long as length is 0, this is okay
+                assert!(true); 
+            }
+        },
+        None => assert!(true),
+    };
 }
 
 /// ### test_get_patient_details()

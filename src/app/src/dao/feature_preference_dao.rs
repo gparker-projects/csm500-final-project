@@ -53,7 +53,7 @@ impl FeaturePreferenceDAO {
     /// * std::io::Error: An error, if applicable
     /// 
     async fn get_active_feature_preferences_for_user_intervention_level(&self, user_id: i64,
-                                                            intervention_type_id: i64,
+                                                         //   intervention_type_id: i64,
                                                             upper_limit: usize)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
         tracing::debug!("get_active_feature_preferences_for_user_intervention_level()");
         println!("get_active_feature_preferences_for_user_intervention_level()");
@@ -62,14 +62,7 @@ impl FeaturePreferenceDAO {
 
         let query_level_1 = query_level_0.replace("{users_id}", &user_id.to_string());
         let query_level_2 = query_level_1.replace("{limit_days}", &"14".to_string());
-
-        let tmp_intv_types = match intervention_type_id {
-            constants::CRT_ANY_INTERVENTION_GROUP => "1, 3".to_string(), // groups 1 and 3 are Clinical, non-Clinical intervention types
-            constants::CRT_CLINICAL_INTERVENTION_GRP_ID => constants::CRT_CLINICAL_INTERVENTION_GRP_ID.to_string(), // these two are actually covered by the _ condition; added for clarity
-            constants::CRT_NON_CLINICAL_INTERVENTION_GRP_ID => constants::CRT_NON_CLINICAL_INTERVENTION_GRP_ID.to_string(),
-            _ => intervention_type_id.to_string()
-        };
-        let query_level_3 = query_level_2.replace("{feature_ids}", &tmp_intv_types.clone());
+        let query_level_3 = query_level_2.replace("{feature_ids}", &"1, 3".to_string());
         let query = query_level_3.replace("{limit_rows}", &"3".to_string());
 
         //tracing::debug!("..SELECT sql: {}", query);
@@ -84,8 +77,10 @@ impl FeaturePreferenceDAO {
                                                 .await
                                                 .unwrap_or_default();
         if rows.is_empty() {
-            tracing::debug!("..Feature Prefs not found: user_id={} group_ids={}", user_id, &tmp_intv_types);
+            //tracing::debug!("..Feature Prefs not found: user_id={} group_ids={}", user_id, &tmp_intv_types);
             //println!("..Feature Prefs not found: user_id={} group_ids={}", user_id, &tmp_intv_types);
+
+            // this is an acceptable, known situation. The first time a user uses an FP, they will not already have it.
             return Ok( None );
         }
         else{
@@ -105,17 +100,17 @@ impl FeaturePreferenceDAO {
 
                     println!("....+ Adding" );
                     let tmp_calculation_date: NaiveDateTime = row.3; // calculation_date
-                    let tmp_department_id: i64 = match row.4 {
-                        None => constants::INVALID_OTHER_ID,
-                        Some(dept_id) => dept_id
-                    };       
+                    //let tmp_department_id: i64 = match row.4 {  // NOTE 1: department_id usage will not be available for the final implementation 
+                    //    None => constants::INVALID_OTHER_ID,    // due to remaining timeline
+                    //    Some(dept_id) => dept_id
+                    //};
 
                     let tmp_fp = FeaturePreference {
                         id: row.0,
                         display_order: i64::from(row.1),
                         weight: i64::from(row.2),
                         calculation_date: tmp_calculation_date,
-                        department_id: tmp_department_id,
+                        department_id: constants::INVALID_OTHER_ID,  // tmp_department_id, SEE NOTE 1 ABOVE
                         users_id: user_id, // spelling in DTO matches DB
                         feature_id: row.5, 
                         ref_group_id: i64::from(row.6),
@@ -129,9 +124,9 @@ impl FeaturePreferenceDAO {
                         lookup.insert( tmp_fp.get_unique_key() );
                         counter = counter + 1;
                     }
-                    else{
-                        println!("..Not Adding ID={}", &tmp_fp.get_unique_key());
-                    }
+                    //else{
+                    //    tracing::debug!("..Not Adding ID={}", &tmp_fp.get_unique_key()); // for debug only
+                    //}
                 }
             }
             return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
@@ -176,8 +171,10 @@ impl FeaturePreferenceDAO {
                                                 .await
                                                 .unwrap_or_default();
         if rows.is_empty() {
-            tracing::debug!("..Feature Prefs not found: user_id={} group_ids={}", user_id, &intervention_type_id.to_string());
-            //println!("..Feature Prefs not found: user_id={} group_ids={}", user_id, &tmp_intv_types);
+            //tracing::debug!("..Feature Prefs not found: user_id={} group_ids={}", user_id, &intervention_type_id.to_string());
+            //println!("..Feature Prefs not found: user_id={} group_ids={}", user_id, &tmp_intv_types); 
+
+            // this is an acceptable, known situation. The first time a user uses an FP, they will not already have it.
             return Ok( None );
         }
         else{
@@ -239,7 +236,7 @@ impl FeaturePreferenceDAO {
     /// * std::io::Error: An error, if applicable
     /// 
     pub async fn get_active_feature_preferences_of_interventions_for_user(&self, user_id: i64, upper_limit: usize)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
-        self.get_active_feature_preferences_for_user_intervention_level(user_id, constants::CRT_ANY_INTERVENTION_GROUP, upper_limit).await
+        self.get_active_feature_preferences_for_user_intervention_level(user_id, upper_limit).await // constants::CRT_ANY_INTERVENTION_GROUP,
     }
 
     /// ### upsert_feature_preference()

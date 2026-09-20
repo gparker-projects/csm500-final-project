@@ -52,6 +52,7 @@ impl InterventionDAO {
     /// * std::io::Error: the error that occured, if applicable
     /// 
     pub async fn get_intervention(&self, intervention_id: i64) -> Result< Option< Intervention >, std::io::Error> {
+        tracing::debug!("get_intervention()");
         let query = db_query::QRY_INTERVENTION_FOR_ID.replace("{}", &intervention_id.to_string());
 
         let rows: Vec<(i64, i64, String, String,
@@ -122,7 +123,7 @@ impl InterventionDAO {
     /// * std::io::Error: the error that occured, if applicable
     /// 
     pub async fn get_interventions(&self, encounter_id: i64, current_only: bool) -> Result< Option< Vec<Intervention> >, std::io::Error> {
-
+        tracing::debug!("get_interventions()");
         let tmp = match current_only {
             true => db_query::QRY_CURRENT_VITALS_FOR_ENC_ID,
             false => db_query::QRY_INTERVENTIONS_FOR_ENC_ID
@@ -141,7 +142,7 @@ impl InterventionDAO {
 
         if rows.is_empty() {
             //println!(">get_interventions() Query: {}", query);
-            tracing::debug!("No Interventions found for encounter_id: {} [count={}]", encounter_id, rows.len());
+            tracing::debug!("No Interventions found for encounter_id: {}", encounter_id);
             return Ok( Some( Vec::new() ) );
         }
         else{
@@ -198,7 +199,7 @@ impl InterventionDAO {
     /// * std::io::Error: the error that occured, if applicable
     /// 
     pub async fn get_all_intervention_details_for_an_intervention(&self, intervention_id: i64, type_id: i64) -> Result< Option< Vec<InterventionDetail> >, std::io::Error> {
-        println!("get_all_intervention_details_for_an_intervention()");
+        tracing::debug!("get_all_intervention_details_for_an_intervention()");
         let query =  match type_id == constants::NOT_SPECIFIED_ID {
             true => {
                 let tmp = db_query::QRY_ALL_INTERVENTION_DETAILS_FOR_AN_INTERVENTION;
@@ -218,8 +219,8 @@ impl InterventionDAO {
         .unwrap_or_default();
 
         if rows.is_empty() {
-            tracing::debug!("..No intervention details found for intervention_id: {} [{}]", intervention_id, rows.len());
-            tracing::debug!("..Query: {}", query);
+            tracing::debug!("..No intervention details found for intervention_id: {}", intervention_id);
+            //tracing::debug!("..Query: {}", query);
             return Ok( Some( Vec::new() ) );
         }
         else{
@@ -278,7 +279,7 @@ impl InterventionDAO {
     /// * std::io::Error: the error that occured, if applicable
     ///
     pub async fn upsert_intervention_from_intv_form(&self, form: InterventionDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
-        tracing::debug!("  > upsert_intervention_from_intv_form (Intervention id={})", &form.intervention_id);
+        tracing::debug!("upsert_intervention_from_intv_form()");
 
         let mut query_level_0 = db_query::UPDATE_INTERVENTION.to_string();
 
@@ -325,7 +326,7 @@ impl InterventionDAO {
     /// * std::io::Error: the error that occured, if applicable
     ///
     pub async fn upsert_intervention_details_from_intv_form(&self, form: InterventionDetailsDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
-        tracing::debug!("upsert_intervention_details_from_intv_form (Intv Dtls id={})", &form.intervention_details_id);
+        tracing::debug!("upsert_intervention_details_from_intv_form()");
        // println!("upsert_intervention_details_from_intv_form (Intv Dtls id={})", &form.intervention_details_id);
 
         let mut query_level_0 = db_query::UPDATE_INTERVENTION_DETAILS.to_string();

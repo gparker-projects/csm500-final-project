@@ -173,6 +173,7 @@ async fn test_get_intervention(){
         },
     };
 
+    // Test 1: Valid, results expected
     let temp_intv = {InterventionDAO::new( db_pool.clone() ).await}.get_intervention( 1 ).await.unwrap();
     let results =  match temp_intv {
         Some(i) => {
@@ -217,7 +218,14 @@ async fn test_get_intervention(){
             false
         },
     } ;
-    assert!(results)
+    assert!(results);
+
+    // Test 2: Invalid Id, should not return results
+    let temp_intv = {InterventionDAO::new( db_pool.clone() ).await}.get_intervention( constants::INVALID_OTHER_ID ).await.unwrap();
+    match temp_intv {
+        Some(_) => assert!(false, "Invalid Id (-1), no results should have been returned"),
+        None => assert!(true),
+    }
 }
 
 ///

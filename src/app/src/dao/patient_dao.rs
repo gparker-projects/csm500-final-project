@@ -273,7 +273,8 @@ impl PatientDAO {
         let tmp: String = db_query::QRY_ALL_PATIENTS_AT_USERS_SITE_NO_DISCHARGE.to_owned();
         let query = tmp.replace("{}", &user_id.to_string());
 
-        tracing::debug!(">get_patients_at_users_site_no_discharge() Query: {}", query);
+        //tracing::debug!(">get_patients_at_users_site_no_discharge() Query: {}", query);
+        println!(">get_patients_at_users_site_no_discharge() Query: {}", query);
 
         let rows: Vec<(i64, i64, i64, String, String, String,
                         String, String,
@@ -286,8 +287,7 @@ impl PatientDAO {
         .unwrap_or_default();
 
         if rows.is_empty() {
-            tracing::debug!(">get_patients_at_users_site_no_discharge() Query: {}", query);
-            tracing::debug!("No patients found for user_id: {} [{}]", user_id, rows.len());
+            //tracing::debug!("No patients found for user_id: {} [{}]", user_id, rows.len());
             return Ok( Some( Vec::new() ) );
         }
         else{

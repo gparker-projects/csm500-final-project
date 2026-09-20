@@ -5,6 +5,7 @@
 /// * get_active_feature_preferences_for_user
 /// * get_active_feature_preferences_of_interventions_for_user
 /// * get_active_feature_preferences_of_intervention_details_for_user
+/// 
 /// * upsert_feature_preference 
 ///
 /// Ref: Unit Testing in Rust is actually easy! - Flo Woelki (https://youtu.be/6wAFdBVJbwc?si=KdJfqvRdcXi9-mqo) - LOL NOT easy
@@ -159,6 +160,77 @@ async fn test_upsert_get_feature_preferences_of_interventions_for_user() {
         assert!(false);
       }
   }
+}
+
+
+
+
+
+
+///
+/// Tests the FeaturePreference::get_active_feature_preferences_for_user_intervention_level() function via 
+///   get_active_feature_preferences_of_interventions_for_user(). The function can block some calls and 
+///   this test will target abnormal, expected situations.
+/// 
+/// Specifically tests:
+///  * FeaturePreference::new()
+///  * get_active_feature_preferences_for_user_intervention_level
+/// 
+#[tokio::test]
+async fn test_get_preferences_for_new_never_existed_user() {
+    let db_pool = match PgPoolOptions::new()
+        .max_connections(5)
+        .connect(DB_CONN_STR)
+        .await
+    {
+        Ok(pool) => pool,
+        Err(e) => {
+            panic!("{}", e)
+        },
+    };
+
+    let never_existed_user_id = 11999999999911; // this user has not/will not exist for the purposes of this course and as such will always have no feature preferences
+
+    let test_upper_limit = 5;
+
+    // Test 1: check for preferences for a user who has never used it before
+    let qry_results = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.get_active_feature_preferences_of_interventions_for_user(never_existed_user_id, test_upper_limit).await;
+    match qry_results.unwrap(){
+        Some ( _results ) => assert!( false ),
+        None => assert!( true ),
+    } ;
+
+    // try to create a FeaturePreference that has never existed
+    // both test user and feature must exist, but not have been used unfortunately
+    //
+    // NOTE: might need to use this prior to run: delete * from feature_preference where users_id = 7 
+
+    let test_feature_id: i64 = 100002;
+    let test_dr_drake_ramoray_user_id: i64 = 7;
+
+    // Test 1: Valid Insertion
+    let qry_results = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.upsert_feature_preference(test_dr_drake_ramoray_user_id, test_feature_id).await;
+    match qry_results.unwrap(){
+        Some ( results ) => {
+            println!("..added id={}", results);// record should have been created or updated
+            assert!(true);
+        }
+        None => {
+            assert!(false); // record should have been created or updated, if not, fail
+        }
+    }
+
+    // Test 2: Invalid Id Insertion
+    let qry_results = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.upsert_feature_preference(test_dr_drake_ramoray_user_id, constants::INVALID_OTHER_ID).await;
+    match qry_results{
+        Ok( item ) => {
+            match item {
+                Some ( _results ) =>  assert!(false, "FeaturePreference should NOT have been created or updated; id was invalid"),// record should NOT have been created or updated
+                None => assert!(true), // record should have been created or updated, if not, fail
+            }
+        }
+        Err (e) => assert!(true), // record should have been created or updated, if not, fail
+    };
 }
 
 ///
