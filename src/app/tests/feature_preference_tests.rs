@@ -225,11 +225,14 @@ async fn test_get_preferences_for_new_never_existed_user() {
     match qry_results{
         Ok( item ) => {
             match item {
-                Some ( _results ) =>  assert!(false, "FeaturePreference should NOT have been created or updated; id was invalid"),// record should NOT have been created or updated
-                None => assert!(true), // record should have been created or updated, if not, fail
+                Some ( _ ) => {
+//                   println!("item returned = {}", item);
+                   assert!(false, "FeaturePreference should NOT have been created or updated; id was invalid");// record should NOT have been created or updated
+                },
+                None => assert!(true), // record sho uld have been created or updated, if not, fail
             }
         }
-        Err (e) => assert!(true), // record should have been created or updated, if not, fail
+        Err (_) => assert!(true), // record should have been created or updated, if not, fail
     };
 }
 
@@ -260,8 +263,10 @@ async fn test_ins_get_upd_feature_priority_intv_details_level() {
 
   println!("Testing: get_all_active_feature_preferences_for_user(): first insertion");
 
-  // try to create a FeaturePreference
+  // Test 1: try to create a FeaturePreference
   // instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
+
+  // Test 2: valid upsert of intervention detail
   let qry_results = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.upsert_feature_preference(test_user_id, test_feature_id).await;
   match qry_results.unwrap(){
       Some ( results ) => {
@@ -278,7 +283,7 @@ async fn test_ins_get_upd_feature_priority_intv_details_level() {
 
   println!("..first get: test_user_id={} test_feature_id={} 5 true", test_user_id, test_feature_id);
 
-  // check we can get the Intervention-level feature preference back
+  // Test 3: retrieve intervention detail to see if it was indeed updated
   let qry_results = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.get_active_feature_preferences_of_intervention_details_for_user(test_user_id, test_feature_id, test_upper_limit).await;
   match qry_results.unwrap(){
         Some ( results ) => {
@@ -343,7 +348,25 @@ async fn test_ins_get_upd_feature_priority_intv_details_level() {
             println!("..feature pref id={} not found", updated_fp_id);
             assert!(false);
       }
-   }
+
+        
+    }
+
+    // Test: Invalid User Id; should not return rows
+    let qry_results2 = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.get_active_feature_preferences_of_intervention_details_for_user(
+                                    constants::INVALID_OTHER_ID,
+                                    constants::INVALID_OTHER_ID,
+                                    test_upper_limit).await;
+    match qry_results2.unwrap(){
+        Some ( _items ) => {
+            assert!(false, "Invalid id (-1) no results expected");
+        },
+        None => assert!(true), // no results expected
+    }
+
+    // Low Limit Test
+    // High number of permissions Test    
+}
 
     const QRY_GET_INDIVIDUAL_FEATURE_PREFERENCE: &str = r##"
                                                 SELECT fp.id, display_order, weight,
@@ -429,4 +452,3 @@ async fn test_ins_get_upd_feature_priority_intv_details_level() {
             return Ok( results.first().cloned() ); // because this is in an enclosure we MUST add the return keyword for it to compile
         }
     }
-}

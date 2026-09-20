@@ -17,7 +17,7 @@
 
 use actix_web::cookie::Key;
 use serde::Deserialize;
-use std::sync::Arc;
+//use std::sync::Arc;
 use std::path::Path;
 use sqlx::postgres::{PgPool};
 
@@ -58,8 +58,8 @@ pub struct AppSession {
     pub wcf: WebContentFactory,
     pub app_key: Key,
     pub connection: PgPool,
-    pub system_config: SysConfig,
-    pub nle_session: Arc<ort::session::Session>
+    pub system_config: SysConfig//,
+    //pub nle_session: Arc<ort::session::Session>
 }
 
 impl AppSession {
@@ -123,8 +123,6 @@ pub struct UserSession {
     pub user_display_name: String,
     pub email: String,
     pub user_authorizations: UserAuthorization,   // for permissions and departments
-    // current patients
-    // preferences
 }
 
 impl UserSession {

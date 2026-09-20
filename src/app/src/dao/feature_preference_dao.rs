@@ -188,17 +188,17 @@ impl FeaturePreferenceDAO {
                 println!("....+ validating tmp_ref_group_id={} for addition to user={}",&intervention_type_id.to_string(), user_id ); 
 
                 let tmp_calculation_date: NaiveDateTime = row.3; // calculation_date
-                let tmp_department_id: i64 = match row.4 {
-                    None => constants::INVALID_OTHER_ID,
-                    Some(dept_id) => dept_id
-                };       
+               // let tmp_department_id: i64 = match row.4 {
+               //     None => constants::INVALID_OTHER_ID, // feature not implemented
+               //     Some(dept_id) => dept_id
+              //  };       
 
                 let tmp_fp = FeaturePreference {
                     id: row.0,
                     display_order: i64::from(row.1),
                     weight: i64::from(row.2),
                     calculation_date: tmp_calculation_date,
-                    department_id: tmp_department_id,
+                    department_id: constants::INVALID_OTHER_ID, // tmp_department_id, feature not implemented
                     users_id: user_id, // spelling in DTO matches DB
                     feature_id: row.5, 
                     ref_group_id: i64::from(row.6),
@@ -206,15 +206,20 @@ impl FeaturePreferenceDAO {
                 };
                 //println!("..Evaluating Pref ID={}", &tmp_fp.get_unique_key());
 
-                if !lookup.contains( &tmp_fp.get_unique_key() ) && counter < upper_limit{
-                  //  println!("...Adding ID={}", &tmp_fp.get_unique_key());
-                    results.push( tmp_fp.clone() );
-                    lookup.insert( tmp_fp.get_unique_key() );
-                    counter = counter + 1;
+                if counter < upper_limit {
+                    if !lookup.contains( &tmp_fp.get_unique_key() ) { // loop is a bit faster if this is insude the other check
+                    //  println!("...Adding ID={}", &tmp_fp.get_unique_key());
+                        results.push( tmp_fp.clone() );
+                        lookup.insert( tmp_fp.get_unique_key() );
+                        counter = counter + 1
+                    }
+                    else{
+                        println!("..Id already present"); // a do-nothing situation; not having the Id is acceptible
+                    }
                 }
-               // else{
-               //     println!("..Not Adding ID={}", &tmp_fp.get_unique_key());
-               // }
+                else{
+                    println!("..upper_limit already met"); // a do-nothing situation; the max counter having been reached is acceptible
+                }
                 
             }
             return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
@@ -282,19 +287,18 @@ impl FeaturePreferenceDAO {
 
                 //tracing::debug!("..INSERT sql: {}", query);
                 //println!("..INSERT sql: {}", query); // tracing does not preserve formatting, making copy/paste useless
-
-                let inner_result = sqlx::query(&query)
+                let qry_result = sqlx::query(&query)
                                                 .fetch_optional(&self.connection)
                                                 .await
-                                                .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
-                match inner_result {
-                    Some( inner_row  ) => {
-                        Ok( inner_row.get("id") )
+                                                .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e));
+                match qry_result{
+                    Ok(inner_result) => {
+                        let item = inner_result.unwrap();
+                        Ok( item.get("id") )
                     },
-                    None => {
-                        tracing::debug!(" >> Feature Preference insert failed user_id={} feature_id={}", user_id, feature_id);
-                        Ok( Some(constants::INVALID_OTHER_ID) ) 
-                    }
+                    Err(_) => {
+                        Ok( None ) 
+                    },
                 }
             }
         }

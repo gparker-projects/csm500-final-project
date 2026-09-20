@@ -149,10 +149,12 @@ async fn test_get_patient_details() {
     let test_patient_id_discharged = 1; // patient 1 has been discharged and should be preserved for testing
     let test_patient_id_not_discharged = 27; // patient 27 has NOT been discharged and should be preserved for testing
 
-    // instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
+    // Test 1: New - Instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
     // we can not test if the DAO itself is instantiated as the only content is a PgPool, which does not allow assert_eq!. If the object
     // does not instantiate however, the remainder of this test will fail.
     let pdao = PatientDAO::new( db_pool.clone() ).await;
+
+    // Test 2: Valid discharge
     let qry_results: Option<Patient> = pdao.get_patient_details_optional_discharged(test_user_id, test_patient_id_discharged, false).await.unwrap();
     match qry_results{
         Some (_p) => {
@@ -164,6 +166,7 @@ async fn test_get_patient_details() {
         }
     }
 
+    // Test 3: Retrieve details again of discharged patient
     let qry_results: Option<Patient> = {PatientDAO::new( db_pool.clone() ).await}.get_patient_details_not_discharged(test_user_id, test_patient_id_not_discharged).await.unwrap();
     match qry_results{
         Some (_p) => {
@@ -174,14 +177,27 @@ async fn test_get_patient_details() {
             assert!( false );
         }
     }
+
+    // Test 4: InValid discharge
+    let qry_results: Option<Patient> = pdao.get_patient_details_optional_discharged(test_user_id, constants::INVALID_OTHER_ID, false).await.unwrap();
+    match qry_results{
+        Some (_p) => {
+            
+            assert!( false,"Patient was returned, when none expected for id={} users_id={}", test_patient_id_discharged, test_user_id);
+        }
+        None => {
+           assert!(true);
+        }
+    }
 }
 
-#[tokio::test]
+
 /// ### test_wrapper_patient_dao()
 /// 
 /// Calls subordindate tests that MUST be executed in a specific order
 ///
-async fn test_wrapper_patient_dao() {
+#[tokio::test]
+async fn  test_wrapper_patient_dao() {
 
     // these both create new encounters and during parallel thread execution mess up the discharge
     // which is determistic on its ID.
@@ -202,7 +218,8 @@ async fn test_wrapper_patient_dao() {
 /// Tests the ability for the DAO to insert/update an encounter, based on an admit form
 /// 
 ///   Specifically tests: PatientDAO::upsert_patient_from_admit_form() 
-///
+/// 
+/// DO NOT ENABLE: \[tokio::test] HERE... it must be controlled by the wrapper test
 async fn test_upsert_patient_from_admit_form() {
     let db_pool = match PgPoolOptions::new()
         .max_connections(5)
@@ -235,6 +252,8 @@ async fn test_upsert_patient_from_admit_form() {
     };
 
     let pdao = PatientDAO::new( db_pool ).await;
+    
+    // Test 1: Upsert a Patient with a valid id
     let patient_results = pdao.upsert_patient_from_admit_form(tmp_frm.clone(), test_user_id).await;
     match patient_results {
         Ok ( p_id ) => {
@@ -251,6 +270,20 @@ async fn test_upsert_patient_from_admit_form() {
             assert!(false)
         }
     }
+
+    // Test 2: Upsert a Patient with invalid data
+    let mut tmp_frm2 = tmp_frm.clone();
+    tmp_frm2.birthdate = "INVALID UNIT TEST BIRTHDATE".to_string(); // this is intentionally invalid
+
+    let patient_results = pdao.upsert_patient_from_admit_form(tmp_frm2.clone(), test_user_id).await;
+    match patient_results {
+        Ok ( item ) => {
+            if item != constants::INVALID_OTHER_ID {
+                assert!(false, "Results returned when not expected; Invalid Patient id (-1)");
+            }            
+        },
+        Err( _ ) => assert!(true),
+    }
 }
 
 
@@ -259,7 +292,8 @@ async fn test_upsert_patient_from_admit_form() {
 /// Tests the ability for the DAO to insert/update an encounter, based on an admit form
 /// 
 ///   Specifically tests: PatientDAO::upsert_encounter_from_admit_form() 
-///
+/// 
+/// DO NOT ENABLE: \[tokio::test] HERE... it must be controlled by the wrapper test
 async fn test_upsert_encounter_from_admit_form() {
     let db_url = DB_CONN_STR;
     let db_pool = match PgPoolOptions::new()
@@ -335,6 +369,21 @@ async fn test_upsert_encounter_from_admit_form() {
             assert!(false)
         }
     }
+
+    // Test 3: perform an invalid update
+    let mut tmp_frm2 = tmp_frm.clone();
+    tmp_frm2.location_id = "TEST".to_string(); // non-standard invalid id
+
+    let results = pdao.upsert_encounter_from_admit_form(tmp_frm2.clone(), test_user_id).await;
+    match results {
+        Ok ( item ) => {
+            if item != constants::INVALID_OTHER_ID {
+                println!("found id={}", item);
+                assert!(false, "Results returned when not expected; Invalid data was provided");
+            }            
+        },
+        Err( _ ) => assert!(true),
+    }
 }
 
 /// ### test_update_encounter_from_discharge_form()
@@ -342,7 +391,8 @@ async fn test_upsert_encounter_from_admit_form() {
 /// Tests the ability for the DAO to update an encounter, based on a discharge form
 /// 
 ///   Specifically tests: PatientDAO::update_encounter_from_discharge_form() 
-///
+/// 
+/// DO NOT ENABLE: \[tokio::test] HERE... it must be controlled by the wrapper test
 async fn test_update_encounter_from_discharge_form() {
     let db_url = DB_CONN_STR;
     let db_pool = match PgPoolOptions::new()
@@ -364,6 +414,8 @@ async fn test_update_encounter_from_discharge_form() {
 
     // start by getting the current patient and encounter ids
     let pdao = PatientDAO::new( db_pool ).await;
+
+    // Test 1: Query the data
     let qry_results: Option<Patient> = pdao.get_patient_details_not_discharged(test_user_id, test_patient_id).await.unwrap();
     match qry_results{
         Some (p) => {
@@ -378,10 +430,10 @@ async fn test_update_encounter_from_discharge_form() {
     let tmp_frm = DischargeDataForm{
         patient_id: test_patient_id.to_string(), // <-------------------------- these might need to be changed, if the data changes
         encounter_id: tmp_encounter_id.to_string(),                      // this field and others are not actually set/used by upsert_patient_from_admit_form() 
-        discharge_notes: DataGenerator::get_lorem_ipsum(100)
+        discharge_notes: DataGenerator::get_lorem_ipsum(200)
     };
 
-    // first create a new encounter (id = -1)
+    // Test 2: Update the encounter using the discharge form; starts by creating a new encounter (id = -1)
     let results = pdao.update_encounter_from_discharge_form(tmp_frm.clone(), test_user_id).await;
     match results {
         Ok ( enc_id ) => {
@@ -411,5 +463,23 @@ async fn test_update_encounter_from_discharge_form() {
             assert!(false)
         }
     }
+
+    // Test 3: Test to throw an error within the  DAO call
+    let mut tmp_frm2 = tmp_frm.clone(); 
+    tmp_frm2.encounter_id = "INVALID UNIT TEST PATIENT ID".to_string(); // intentionally will cause the DAO to throw an error, proving it is handled
+    tmp_frm2.discharge_notes = "Updated by Unit Test: test_update_encounter_from_discharge_form(), Test 3".to_string(); 
+
+    let results2 = pdao.update_encounter_from_discharge_form(tmp_frm2.clone(), test_user_id).await;
+    match results2 {
+        Ok ( enc_id ) => {
+            if enc_id != constants::INVALID_OTHER_ID {
+                assert!(false, "Unexpected Encounter id returned; invalid data was provided")
+            }
+            else{
+                assert!(true)
+            }            
+        },
+        Err (_) => assert!(true),
+    };
 }
 

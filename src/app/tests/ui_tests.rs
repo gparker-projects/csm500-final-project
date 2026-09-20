@@ -5,8 +5,6 @@
 /// 
 #[cfg(test)]
 mod ui_tests {
-  use tracing;
-
   use maple_emr::ui::tile_factory::{WebContentFactory, WebContentItem};
 
   #[test]

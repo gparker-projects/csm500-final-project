@@ -66,8 +66,7 @@ impl InterventionDAO {
         .unwrap_or_default();
 
         if rows.is_empty() {
-            tracing::debug!(">get_interventions() Query: {}", query);
-            tracing::debug!("No Interventions found for encounter_id: {} [count={}]", intervention_id, rows.len());
+            tracing::debug!("No Interventions found for encounter_id: {} Query: {}", intervention_id, query);
             return Ok( None );
         }
         else{

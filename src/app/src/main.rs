@@ -211,11 +211,12 @@ async fn main() -> std::io::Result<()> {
   };
 
 
-  let nle_session: ort::session::Session = Session::builder().expect("Session could not be established")
+ /* let nle_session: ort::session::Session = Session::builder().expect("Session could not be established")
                   .with_optimization_level(GraphOptimizationLevel::Level1).expect("No Session")
                   .with_intra_threads(1).expect("Insufficient threads")
                   .commit_from_file(&(config.model_data_dir.clone() + &config.language_model_file.clone()) ).expect("File could not be accessed");
   let shared_session = Arc::new(nle_session);
+*/
 
   // use the Builder pattern to add one route at a time
   HttpServer::new( move || {
@@ -238,8 +239,8 @@ async fn main() -> std::io::Result<()> {
                   wcf: WebContentFactory::new(&get_static_path_base(), config.app_version.clone()),
                   app_key: tmp_app_key.clone(),
                   connection: db_pool.clone(),
-                  system_config: config.clone(),
-                  nle_session: Arc::clone(&shared_session), 
+                  system_config: config.clone()//,
+                  //nle_session: Arc::clone(&shared_session), 
               }
           ) 
       )

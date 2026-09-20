@@ -110,14 +110,9 @@ impl PatientDAO {
                     )
                 )
             }
-            Ok(None) => {
+            _ => {
                 tracing::debug!("get_patient_details() Query: {}", query);
                 tracing::debug!("No patient found for patient_id = {}", patient_id);
-                Ok( None )
-            }
-            Err(err) => {
-                tracing::debug!("get_patient_details() Query: {}", query);
-                tracing::error!("Error on patient for: {} ({})", patient_id, err);
                 Ok( None )
             }
         }
@@ -162,12 +157,15 @@ impl PatientDAO {
         let result = sqlx::query(&query_level_2)
                                                         .fetch_one(&self.connection)
                                                         .await
-                                                        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
-        
-        // return the patient id that was created or updated
-        let inserted_id: i64 = result.get("id");
-
-        Ok(inserted_id)
+                                                        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e));
+        match result {
+            Ok( row ) => {
+                Ok( row.get("id") ) // return the patient id that was created or updated
+            },
+            Err(_) => {
+                Ok( constants::INVALID_OTHER_ID )
+            }
+        }
     }
 
     /// ### upsert_encounter_from_admit_form()
@@ -205,12 +203,15 @@ impl PatientDAO {
         let result = sqlx::query(&query)
                                                         .fetch_one(&self.connection)
                                                         .await
-                                                        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
-        
-        // return the patient id that was created or updated
-        let inserted_id: i64 = result.get("id");
-
-        Ok(inserted_id)
+                                                        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e));
+        match result {
+            Ok( row ) => {
+                Ok( row.get("id") ) // return the patient id that was created or updated
+            },
+            Err(_) => {
+                Ok( constants::INVALID_OTHER_ID )
+            }
+        }
     }
     
     /// ### upsert_patient_from_admit_form()
@@ -245,12 +246,15 @@ impl PatientDAO {
         let result = sqlx::query(&query)
                                                         .fetch_one(&self.connection)
                                                         .await
-                                                        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
-        
-        // return the patient id that was created or updated
-        let inserted_id: i64 = result.get("id");
-
-        Ok(inserted_id)
+                                                        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e));
+        match result {
+            Ok( row ) => {
+                Ok( row.get("id") ) // return the patient id that was created or updated
+            },
+            Err(_) => {
+                Ok( constants::INVALID_OTHER_ID )
+            }
+        }
     }
 
   
@@ -309,7 +313,7 @@ impl PatientDAO {
                 let tmp_admit_timestamp: NaiveDateTime = row.9;// admit_timestamp
                 let tmp_discharge_timestamp = row.10;// chrono::NaiveDateTime; 
                 
-                let tmp_phn:    i64 = row.11; // phn
+                let tmp_phn: i64 = row.11; // phn
 
                 let tmp_location_short_name = row.12; // location_short_name
 

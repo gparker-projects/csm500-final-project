@@ -9,9 +9,16 @@ mod common;
 #[cfg(test)]
 mod convert_utils_tests {
     use maple_emr::constants;
-
     use maple_emr::{dto::user_auth::*};
     use maple_emr::session::*;
+    use maple_emr::ui::tile_factory::{WebContentFactory};
+
+   // use maple_emr::nle::nle::NaturalLanguageEngine;
+
+    use actix_web::cookie::Key;
+    use sqlx::postgres::{PgPoolOptions}; 
+
+    const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500";
 
     #[test]
     fn test_convert_utils() {
@@ -52,5 +59,82 @@ mod convert_utils_tests {
 
         assert!(maple_emr::dto::convert_utils::ConvertUtils::to_i64("not a number".to_string()) == constants::INVALID_OTHER_ID, "Not a number did not convert to -1");
         
+    }
+
+    #[test]
+    fn test_sys_config() {
+        let cfg = SysConfig{
+            max_general_fastactions: "1".to_string(),
+            ..Default::default()
+        };
+
+        let val = cfg.get_max_general_fastactions();
+        if val <= 0 {
+            assert!(false);
+        }
+        else{
+            assert!(true);
+        }
+    }
+
+    #[tokio::test]
+    async fn test_app_session() {
+        // required to set up the WebContentFactory
+        let path = std::env::current_dir().expect("Base path to executable could not be found");
+        let newpath = path.display().to_string() + "\\webc\\static\\";
+        let tmp_wcf = WebContentFactory::new(&newpath, "UNIT TEST".to_string());
+
+        // set up PgPool
+        let db_pool = match PgPoolOptions::new()
+            .max_connections(5)
+            .connect(DB_CONN_STR)
+            .await
+        {
+            Ok(pool) => pool,
+            Err(e) => {
+                tracing::debug!("{}", e);
+                assert!(false);
+                panic!("{}", e)
+            },
+        };
+
+        let tmp_cargo_manifest_dir = "\\data\\manifest_dir".to_string();
+        let tmp_command_mapping_file = "command_mapping.csv".to_string();
+        let tmp_language_model_file = "all-MiniLM-L6-v2.onnx".to_string();
+        let tmp_tokenizer_file = "tokenizer.json".to_string();
+        let tmp_model_data_dir = "\\data\\".to_string();
+        let tmp_data_sub_dir = "\\data\\".to_string();
+
+        // set up SysConfig
+        let cfg = SysConfig{
+            app_version: "v1.0Unit_test".to_string(),
+            db_conn_str: DB_CONN_STR.to_string(),
+            cargo_manifest_dir: tmp_cargo_manifest_dir, 
+            model_data_dir: tmp_model_data_dir,
+            command_mapping_file: tmp_command_mapping_file,
+            language_model_file: tmp_language_model_file, 
+            tokenizer_file: tmp_tokenizer_file, 
+            data_sub_dir: tmp_data_sub_dir, 
+            max_general_fastactions: "3".to_string(),
+            max_nle_fastactions: "3".to_string()
+        };
+
+        let tmp_key = Key::generate();
+
+        // finally: set up AppSession
+        let appsess = AppSession {
+            wcf: tmp_wcf, 
+            app_key: tmp_key,
+            connection: db_pool,
+            system_config: cfg
+        };
+
+        assert!( Some(appsess.get_db_connection()).is_some(), "AppSession did not have DBConnection established");
+
+        assert_eq!( appsess.get_full_path_language_model_file(),  "\\data\\all-MiniLM-L6-v2.onnx".to_string(), "AppSession did not have language_model_file");
+        assert_eq!( appsess.get_full_path_tokenizer_file(),       "\\data\\tokenizer.json".to_string(),        "AppSession did not have tokenizer_file");
+        assert_eq!( appsess.get_full_path_command_mapping_file(), "\\data\\command_mapping.csv".to_string(),  "AppSession did not have command_mapping_file");
+
+        assert!( Some(appsess.get_web_content_factory()).is_some(),  "AppSession did not properly store WCF");
     }
 }

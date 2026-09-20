@@ -38,7 +38,6 @@ impl AdmitRoute{
             Ok(e_id) => {
                 let p_id = req.patient_id.to_string();
                 tracing::debug!("  >Patient (id={p_id}) discharged, [encounter (id={e_id})] updated");
-                
             },
             Err(e) => {
                 tracing::debug!("  >Patient not discharged: {e}");
