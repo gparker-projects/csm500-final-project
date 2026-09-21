@@ -5,15 +5,15 @@
 /// ---------------------------------------------------------------------------------
 ///
 use maple_emr::constants;
-
 use maple_emr::dao::patient_dao::PatientWrapper;
-use maple_emr::dto::patient::Patient;
 use maple_emr::dto::encounter::Encounter;
-use maple_emr::dto::intervention::Intervention;
 use maple_emr::dto::feature_preference::FeaturePreference;
-
+use maple_emr::dto::intervention::Intervention;
+use maple_emr::dto::intervention_detail::InterventionDetail;
+use maple_emr::dto::patient::Patient;
 use maple_emr::dto::user_auth::{Permission, UserAuthorization};
 use maple_emr::session::{UserSession};
+
 #[cfg(test)]
 
 pub struct EntityFactory;
@@ -51,6 +51,17 @@ impl EntityFactory{
     #[allow(dead_code)]
     pub fn create_intervention() -> Intervention {
         return Intervention {
+            id: constants::INVALID_OTHER_ID,
+            ..Default::default()
+        }
+    }
+
+    ///
+    /// Returns a dto::Intervention Detail entity, with -1 as the Id. All other fields are defaulted.
+    ///
+    #[allow(dead_code)]
+    pub fn create_intervention_detail() -> InterventionDetail {
+        return InterventionDetail {
             id: constants::INVALID_OTHER_ID,
             ..Default::default()
         }
@@ -114,6 +125,23 @@ impl EntityFactory{
         for i in 1..11 {
             let mut obj = EntityFactory::create_intervention();
             obj.encounter_id = enc_id;
+            obj.id = i*1000;
+            results.push(obj);
+        }
+        return results; 
+    }
+
+   ///
+    /// Returns a vector of 10 dao::Intervention Details entities, linking the entities using a common encounter id (40404)
+    ///
+    #[allow(dead_code)]
+    pub fn create_vector_of_intervention_details() -> Vec<InterventionDetail> {
+        let mut results = Vec::new();
+        let intv_id = 40404; // common Intervention Details id for all records
+
+        for i in 1..11 {
+            let mut obj = EntityFactory::create_intervention_detail();
+            obj.intervention_id = intv_id;
             obj.id = i*1000;
             results.push(obj);
         }

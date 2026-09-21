@@ -339,7 +339,7 @@ pub const INSERT_INTERVENTION_DETAILS: &str = r##"
                 {type_id},
                 '{value}',
                 '{notes}',
-                NOW()) RETURNING ID;
+                NOW()) RETURNING id;
 "##;
 
 pub const UPDATE_INTERVENTION_DETAILS: &str = r##"
@@ -365,14 +365,14 @@ pub const INSERT_FEATURE_PREFERENCE: &str = r##"
             {users_id},
             null, 'Y',
             {feature_id})
-    RETURNING ID;
+    RETURNING id;
 "##;
 
 pub const UPDATE_FEATURE_PREFERENCE: &str = r##"
-UPDATE feature_preference
-	SET weight = weight + 1,
-		calculation_date = NOW()
+   UPDATE feature_preference
+	  SET weight = weight + 1,
+	  	  calculation_date = NOW()
 	WHERE users_id = {users_id}
 	  AND feature_id = {feature_id}
-	  AND active_flag='Y' RETURNING ID;
+	  AND active_flag='Y' RETURNING id;
 "##;

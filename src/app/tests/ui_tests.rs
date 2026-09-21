@@ -11,12 +11,16 @@ use std::ops::IndexMut;
 #[cfg(test)]
 use maple_emr::constants;
 use maple_emr::dto::encounter::Encounter;
+use maple_emr::dto::user_auth::Permission;
+
 use maple_emr::ui::tile_factory::{WebContentFactory, WebContentItem};
 use maple_emr::ui::simple_fmt::SimpleFormatter;
 use maple_emr::ui::common_fmt::CommonFormatter;
 use maple_emr::ui::menu_fmt::MenuFormatter;
 use maple_emr::ui::feat_preference_fmt::FeaturePreferenceFormatter;
+use maple_emr::ui::intervention_fmt::InterventionFormatter;
 use maple_emr::session::{UserSession}; // AppSession
+use maple_emr::ui::data_forms::InterventionDataForm;
 
 use common::entity_factory::EntityFactory;
 use common::test_utils::DataGenerator;
@@ -58,27 +62,284 @@ fn test_wcf_get_patient_details_full_tile() {
     let wcf = WebContentFactory::new(&newpath, "fake user".to_string());
 
     let pw = EntityFactory::create_patient_wrapper();
-    let sess: UserSession = EntityFactory::create_user_session();
+    let mut sess: UserSession = EntityFactory::create_user_session();
     let intv_type_list = EntityFactory::create_intervention_type_list("ITEM".to_string(), 2);
     
-    let html_results = wcf.get_patient_details_full_tile(
+    // Test 1: user_session.has_permission(Permission::ALLOW_CREATE_UPDATE_DISCHARGE) == false
+    let html_results1 = wcf.get_patient_details_full_tile(
         "patient_header".to_string(),
         "current_encounter".to_string(),
         "encounter_section".to_string(),
-        sess, 
+        sess.clone(), 
         "legacy_menu".to_string(),
         "intv_section".to_string(),
-        intv_type_list,
+        intv_type_list.clone(),
         "feature_pref_section".to_string(),
         pw.patient.id.to_string(),
         pw.current_encounter.id.to_string()
     );
+    assert_ne!(html_results1, "".to_string(), "Test 1: No HTML returned by: get_patient_details_full_tile()");
 
-    assert_ne!(html_results, "".to_string(), "No HTML returned by: get_patient_details_full_tile()");
+    sess.user_authorizations.granted_permissions.push( Permission::new(1, Permission::ALLOW_CREATE_UPDATE_DISCHARGE) );
+    // Test 2: user_session.has_permission(Permission::ALLOW_CREATE_UPDATE_DISCHARGE) == True
+    let html_results2 = wcf.get_patient_details_full_tile(
+        "patient_header".to_string(),
+        "current_encounter".to_string(),
+        "encounter_section".to_string(),
+        sess.clone(), 
+        "legacy_menu".to_string(),
+        "intv_section".to_string(),
+        intv_type_list.clone(),
+        "feature_pref_section".to_string(),
+        pw.patient.id.to_string(),
+        pw.current_encounter.id.to_string()
+    );
+    assert_ne!(html_results2, "".to_string(), "Test 2: No HTML returned by: get_patient_details_full_tile()");
 
-    //let html = wcf.get_admit_discharge_full_tile();
+    // Test 3: user_session.has_permission(Permission::ALLOW_CREATE_NON_CLINICAL_INTERVENTION) ONLY
+    let perm1 = Permission::new(1, Permission::ALLOW_CREATE_NON_CLINICAL_INTERVENTION);
+    sess.user_authorizations.granted_permissions = vec![perm1];
+    let html_results3 = wcf.get_patient_details_full_tile(
+        "patient_header".to_string(),
+        "current_encounter".to_string(),
+        "encounter_section".to_string(),
+        sess.clone(), 
+        "legacy_menu".to_string(),
+        "intv_section".to_string(),
+        intv_type_list.clone(),
+        "feature_pref_section".to_string(),
+        pw.patient.id.to_string(),
+        pw.current_encounter.id.to_string()
+    );
+    assert_ne!(html_results3, "".to_string(), "Test 3: No HTML returned by: get_patient_details_full_tile()");
 
-    //let html = wcf.get_modify_intervention_full_tile();
+    // Test 4: user_session does not have ALLOW_CREATE_CLINICAL_INTERVENTION or ALLOW_CREATE_NON_CLINICAL_INTERVENTION
+    sess.user_authorizations.granted_permissions = Vec::new();
+    let html_results3 = wcf.get_patient_details_full_tile(
+        "patient_header".to_string(),
+        "current_encounter".to_string(),
+        "encounter_section".to_string(),
+        sess.clone(), 
+        "legacy_menu".to_string(),
+        "intv_section".to_string(),
+        intv_type_list.clone(),
+        "feature_pref_section".to_string(),
+        pw.patient.id.to_string(),
+        pw.current_encounter.id.to_string()
+    );
+    assert_ne!(html_results3, "".to_string(), "Test 4: No HTML returned by: get_patient_details_full_tile()");
+}
+
+///
+/// Tests WebContentFactory::test_wcf_get_admit_discharge_full_tile()
+/// 
+#[test]
+fn test_wcf_get_admit_discharge_full_tile() {
+    let path = std::env::current_dir().expect("Base path to executable could not be found");
+    let newpath = path.display().to_string() + "\\webc\\static\\";
+    let wcf = WebContentFactory::new(&newpath, "fake user".to_string());
+
+    let mut tmp_patient = EntityFactory::create_patient();
+
+    // Test 1: Actual Patient, is_discharge_flag = false
+    let html_results1 = wcf.get_admit_discharge_full_tile(
+       "UNIT TEST, USER".to_string(), // user_identity_label
+       Some(tmp_patient.clone()), // current_patient
+       "LEGACY-MENU".to_string(), // legacy_menu
+       "LOCATION-MENU".to_string(), // location_menu
+       false, // is_discharge_flag
+       "USER-PROMPT".to_string() // user_prompt
+    );
+    assert_ne!(html_results1, "".to_string(), "Test 1: No HTML returned by: get_admit_discharge_full_tile()");
+
+    // Test 1a: Patient has existing admit notes
+    tmp_patient.admit_notes = "UNIT TEST Admit Notes".to_string();
+    let html_results2 = wcf.get_admit_discharge_full_tile(
+       "UNIT TEST, USER".to_string(), // user_identity_label
+       Some(tmp_patient.clone()), // current_patient
+       "LEGACY-MENU".to_string(), // legacy_menu
+       "LOCATION-MENU".to_string(), // location_menu
+       false, // is_discharge_flag
+       "USER-PROMPT".to_string() // user_prompt
+    );
+    assert_ne!(html_results2, "".to_string(), "Test 1: No HTML returned by: get_admit_discharge_full_tile()");
+
+    // Test 2: Actual Patient, is_discharge_flag = true
+    let html_results3 = wcf.get_admit_discharge_full_tile(
+       "UNIT TEST, USER".to_string(), // user_identity_label
+       Some(tmp_patient.clone()), // current_patient
+       "LEGACY-MENU".to_string(), // legacy_menu
+       "LOCATION-MENU".to_string(), // location_menu
+       true, // is_discharge_flag
+       "USER-PROMPT".to_string() // user_prompt
+    );
+    assert_ne!(html_results3, "".to_string(), "Test 2: No HTML returned by: get_admit_discharge_full_tile()");
+
+    // Test 2b: Actual Patient, is_discharge_flag = true, Admit notes="", request prompt <> ""
+    tmp_patient.admit_notes = String::new();
+    let html_results4 = wcf.get_admit_discharge_full_tile(
+       "UNIT TEST, USER".to_string(), // user_identity_label
+       Some(tmp_patient.clone()), // current_patient
+       "LEGACY-MENU".to_string(), // legacy_menu
+       "LOCATION-MENU".to_string(), // location_menu
+       true, // is_discharge_flag
+       "USER-PROMPT".to_string() // user_prompt
+    );
+    assert_ne!(html_results4, "".to_string(), "Test 2: No HTML returned by: get_admit_discharge_full_tile()");
+
+    tmp_patient.admit_notes = "UNIT TEST Admit Notes".to_string();
+
+    // Test 2a: Patient has existing discharge notes
+    tmp_patient.discharge_notes = "UNIT TEST Discharge Notes".to_string();
+    let html_results5 = wcf.get_admit_discharge_full_tile(
+       "UNIT TEST, USER".to_string(), // user_identity_label
+       Some(tmp_patient.clone()), // current_patient
+       "LEGACY-MENU".to_string(), // legacy_menu
+       "LOCATION-MENU".to_string(), // location_menu
+       true, // is_discharge_flag
+       "USER-PROMPT".to_string() // user_prompt
+    );
+    assert_ne!(html_results5, "".to_string(), "Test 2: No HTML returned by: get_admit_discharge_full_tile()");
+    
+    // reset for the rest of the tests
+    tmp_patient.admit_notes = String::new();
+    tmp_patient.discharge_notes = String::new();
+
+    // Test 2b: Patient has existing admit notes
+    tmp_patient.admit_notes = "UNIT TEST Admit Notes".to_string();
+    let html_results6 = wcf.get_admit_discharge_full_tile(
+       "UNIT TEST, USER".to_string(), // user_identity_label
+       Some(tmp_patient.clone()), // current_patient
+       "LEGACY-MENU".to_string(), // legacy_menu
+       "LOCATION-MENU".to_string(), // location_menu
+       true, // is_discharge_flag
+       "USER-PROMPT".to_string() // user_prompt
+    );
+    assert_ne!(html_results6, "".to_string(), "Test 2: No HTML returned by: get_admit_discharge_full_tile()");
+
+    // Test 3: None Patient, is_discharge_flag = false
+    let html_results7 = wcf.get_admit_discharge_full_tile(
+       "UNIT TEST, USER".to_string(), // user_identity_label
+       None, // current_patient
+       "LEGACY-MENU".to_string(), // legacy_menu
+       "LOCATION-MENU".to_string(), // location_menu
+       false, // is_discharge_flag
+       "USER-PROMPT".to_string() // user_prompt
+    );
+    assert_ne!(html_results7, "".to_string(), "Test 3: No HTML returned by: get_admit_discharge_full_tile()");
+
+    // Test 4: None Patient, is_discharge_flag = true
+    let html_results8 = wcf.get_admit_discharge_full_tile(
+       "UNIT TEST, USER".to_string(), // user_identity_label
+       None, // current_patient
+       "LEGACY-MENU".to_string(), // legacy_menu
+       "LOCATION-MENU".to_string(), // location_menu
+       true, // is_discharge_flag
+       "USER-PROMPT".to_string() // user_prompt
+    );
+    assert_ne!(html_results8, "".to_string(), "Test 4: No HTML returned by: get_admit_discharge_full_tile()");
+}
+
+///
+/// Tests WebContentFactory::get_modify_intervention_full_tile()
+/// 
+#[test]
+fn test_get_modify_intervention_full_tile() {
+    let path = std::env::current_dir().expect("Base path to executable could not be found");
+    let newpath = path.display().to_string() + "\\webc\\static\\";
+    let wcf = WebContentFactory::new(&newpath, "fake user".to_string());
+
+    let tmp_intv = EntityFactory::create_intervention();
+    let intv_type_list = EntityFactory::create_intervention_type_list("ITEM".to_string(), 2);
+    let intvdtls_list = EntityFactory::create_vector_of_intervention_details();
+    let measures_dropdown_list = EntityFactory::create_intervention_type_list("INTV-DTLS".to_string(), 2);
+    let user_dropdown_list = EntityFactory::create_intervention_type_list("USER-NAME".to_string(), 2);
+    let status_dropdown_list = EntityFactory::create_intervention_type_list("INTV-STATUS".to_string(), 2);
+
+    let mut tmp_frm: InterventionDataForm = InterventionDataForm {    
+        ..Default::default()
+    };
+
+    // Test 1: Some() current Intervention, Some() <Vec<InterventionDetail>
+    let html_results = wcf.get_modify_intervention_full_tile(
+        "UNIT TEST, USER".to_string(), 
+        Some(tmp_intv.clone()), 
+        "LEGACY-MENU".to_string(), 
+        user_dropdown_list.clone(),
+        status_dropdown_list.clone(),
+        "LOCATION-MENU".to_string(), 
+        intv_type_list[0].clone(), 
+        tmp_frm.clone(),
+        Some(intvdtls_list.clone()),
+        measures_dropdown_list.clone(),
+        "feature_pref_section".to_string() 
+    );
+    assert_ne!(html_results, "".to_string(), "Test 1: No HTML returned by: get_modify_intervention_full_tile()");
+
+    // Test 1a: Some() current Intervention, Some() <Vec<InterventionDetail>; form_errors exist
+    tmp_frm.form_errors = "FORM ERRORS".to_string();
+    let html_results = wcf.get_modify_intervention_full_tile(
+        "UNIT TEST, USER".to_string(), 
+        Some(tmp_intv.clone()), 
+        "LEGACY-MENU".to_string(), 
+        user_dropdown_list.clone(),
+        status_dropdown_list.clone(),
+        "LOCATION-MENU".to_string(), 
+        intv_type_list[0].clone(), 
+        tmp_frm.clone(),
+        Some(intvdtls_list.clone()),
+        measures_dropdown_list.clone(),
+        "feature_pref_section".to_string() 
+    );
+    assert_ne!(html_results, "".to_string(), "Test 1a: No HTML returned by: get_modify_intervention_full_tile()");
+
+    // Test 2: Some() current Intervention, None <Vec<InterventionDetail>
+    let html_results2 = wcf.get_modify_intervention_full_tile(
+        "UNIT TEST, USER".to_string(), 
+        Some(tmp_intv.clone()), 
+        "LEGACY-MENU".to_string(), 
+        user_dropdown_list.clone(),
+        status_dropdown_list.clone(),
+        "LOCATION-MENU".to_string(), 
+        intv_type_list[0].clone(), 
+        tmp_frm.clone(),
+        None,
+        measures_dropdown_list.clone(),
+        "feature_pref_section".to_string() 
+    );
+    assert_ne!(html_results2, "".to_string(), "Test 2: No HTML returned by: get_modify_intervention_full_tile()");
+
+    // Test 3: None current Intervention, Some() <Vec<InterventionDetail>
+    let html_results3 = wcf.get_modify_intervention_full_tile(
+        "UNIT TEST, USER".to_string(), 
+        None, 
+        "LEGACY-MENU".to_string(), 
+        user_dropdown_list.clone(),
+        status_dropdown_list.clone(),
+        "LOCATION-MENU".to_string(), 
+        intv_type_list[0].clone(), 
+        tmp_frm.clone(),
+        Some(intvdtls_list),
+        measures_dropdown_list.clone(),
+        "feature_pref_section".to_string() 
+    );
+    assert_ne!(html_results3, "".to_string(), "Test 3: No HTML returned by: get_modify_intervention_full_tile()");
+
+    // Test 4: None current Intervention, None <Vec<InterventionDetail
+    let html_results4 = wcf.get_modify_intervention_full_tile(
+        "UNIT TEST, USER".to_string(), 
+        None, 
+        "LEGACY-MENU".to_string(), 
+        user_dropdown_list.clone(),
+        status_dropdown_list.clone(),
+        "LOCATION-MENU".to_string(), 
+        intv_type_list[0].clone(), 
+        tmp_frm.clone(),
+        None,
+        measures_dropdown_list.clone(),
+        "feature_pref_section".to_string() 
+    );
+    assert_ne!(html_results4, "".to_string(), "Test 4: No HTML returned by: get_modify_intervention_full_tile()");
 }
 
 ///
@@ -220,4 +481,23 @@ fn test_feature_pref_formatter() {
     // test 2.3: item.ref_group_id == anything other than the prior two => "fast_action_add_measure"
     assert!(html_test2.contains(&"fast_action_add_measure".to_string()), "FeaturePreferenceFormatter produced incorrect HTML: missing fast_action_add_measure");
     println!("End test: test_feature_pref_formatter()");
+}
+
+///
+/// Tests methods of the InterventionFormatter struct
+/// 
+#[test]
+fn test_intervention_formatter() {
+    let intervention_details_item_tile = "intervention_details_item_tile".to_string();
+    let patient_id: i64 = 1;
+    let intvdtls_list = EntityFactory::create_vector_of_intervention_details();
+    let measures_dropdown_list = EntityFactory::create_intervention_type_list("INTV-DTLS".to_string(), 2);
+
+    // Test 1: intvdtls_list = None
+    let html_test1 = InterventionFormatter::get_view_only_intervention_details_list(intervention_details_item_tile.clone(), None, measures_dropdown_list.clone(), patient_id.to_string());
+    assert_eq!(html_test1, "No Measures Added".to_string(), "InterventionFormatter produced unexpected HTML");
+
+    // Test 1: 
+    let html_test2 = InterventionFormatter::get_view_only_intervention_details_list(intervention_details_item_tile.clone(), Some(intvdtls_list), measures_dropdown_list.clone(), patient_id.to_string());
+    assert!(html_test2.contains(""), "InterventionFormatter produced unexpected HTML");
 }

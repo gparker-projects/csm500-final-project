@@ -262,22 +262,4 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
     pub async fn get_intervention_type(&self, type_id: i64)-> Result< Option< (i64, String, String) >, std::io::Error> {
         self.get_common_reference(type_id).await
     }
-
-    /// ### CommonDAO::is_intervention_group_type()
-    ///   Confirms that the Reference Type Code Id provided is in one of the two types of Intervention groups:
-    ///    - Clinical or Non-Clinical
-    /// 
-    /// #### Parameters:
-    /// * common_ref_type_group_id (i64): the id to be checked
-    /// 
-    /// #### Returns:
-    /// * bool: true if the id matches one of the groups of Intervention Types
-    /// 
-    pub fn is_intervention_group_type(common_ref_type_group_id: i64) -> bool {
-        return match  common_ref_type_group_id{
-            constants::CRT_CLINICAL_INTERVENTION_GRP_ID => true,
-            constants::CRT_NON_CLINICAL_INTERVENTION_GRP_ID => true,
-            _ => false,
-        }
-    }
 }

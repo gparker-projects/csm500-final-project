@@ -172,6 +172,7 @@ impl DataGenerator{
     ///
     /// Shortcut method that returns chrono::Utc::now().naive_utc(), which is a NaiveDateTime
     /// 
+    #[allow(dead_code)]
     pub fn now() -> NaiveDateTime{
         chrono::Utc::now().naive_utc()
     }

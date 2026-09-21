@@ -322,16 +322,3 @@ async fn test_get_intervention_type() {
         None => assert!( false, "No intervention type returned; expected 1 (Documents)" ),
     };
 }
-
-/// ### test_is_intervention_group_type()
-/// 
-/// Tests the ability for the DAO to identify if a group is an intervention type or not
-/// 
-///   Specifically tests: CommonDAO::is_intervention_group_type() 
-///
-#[tokio::test]
-async fn test_is_intervention_group_type() {
-    assert!(CommonDAO::is_intervention_group_type(constants::CRT_CLINICAL_INTERVENTION_GRP_ID) == true, "Group was clinical intervention, should have returned true");
-    assert!(CommonDAO::is_intervention_group_type(constants::CRT_NON_CLINICAL_INTERVENTION_GRP_ID) == true, "Group was non-clinical intervention, should have returned true");
-    assert!(CommonDAO::is_intervention_group_type(constants::INVALID_OTHER_ID) == false, "Group was invalid, should have returned false");
-}

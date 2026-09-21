@@ -15,7 +15,7 @@ use tracing;
 
 use crate::{constants, dao::db_query};
 use crate::dto::feature_preference::FeaturePreference;
-use crate::dao::common_dao::CommonDAO;
+//use crate::dao::common_dao::CommonDAO;
 
 #[derive(Debug, Clone)]
 pub struct FeaturePreferenceDAO {
@@ -77,9 +77,6 @@ impl FeaturePreferenceDAO {
                                                 .await
                                                 .unwrap_or_default();
         if rows.is_empty() {
-            //tracing::debug!("..Feature Prefs not found: user_id={} group_ids={}", user_id, &tmp_intv_types);
-            //println!("..Feature Prefs not found: user_id={} group_ids={}", user_id, &tmp_intv_types);
-
             // this is an acceptable, known situation. The first time a user uses an FP, they will not already have it.
             return Ok( None );
         }
@@ -88,45 +85,33 @@ impl FeaturePreferenceDAO {
             let mut lookup: HashSet<String> = HashSet::new();
             let mut counter: usize = 0;
 
-            println!("..{} rows were returned", rows.len());
-
             for row in rows {
                 let tmp_feature_id: i64 = row.5;  //feature_id
-                let tmp_ref_group_id: i64 = i64::from(row.6); // ref_group_id
-
                 println!("....+ validating tmp_ref_group_id={} for addition to user={}",tmp_feature_id, user_id ); 
 
-                if CommonDAO::is_intervention_group_type(tmp_ref_group_id) {
+                let tmp_calculation_date: NaiveDateTime = row.3; // calculation_date
+                //let tmp_department_id: i64 = match row.4 {  // NOTE 1: department_id usage will not be available for the final implementation 
+                //    None => constants::INVALID_OTHER_ID,    // due to remaining timeline
+                //    Some(dept_id) => dept_id
+                //};
 
-                    println!("....+ Adding" );
-                    let tmp_calculation_date: NaiveDateTime = row.3; // calculation_date
-                    //let tmp_department_id: i64 = match row.4 {  // NOTE 1: department_id usage will not be available for the final implementation 
-                    //    None => constants::INVALID_OTHER_ID,    // due to remaining timeline
-                    //    Some(dept_id) => dept_id
-                    //};
+                let tmp_fp = FeaturePreference {
+                    id: row.0,
+                    display_order: i64::from(row.1),
+                    weight: i64::from(row.2),
+                    calculation_date: tmp_calculation_date,
+                    department_id: constants::INVALID_OTHER_ID,  // tmp_department_id, SEE NOTE 1 ABOVE
+                    users_id: user_id, // spelling in DTO matches DB
+                    feature_id: row.5, 
+                    ref_group_id: i64::from(row.6),
+                    ref_name: row.7
+                };
 
-                    let tmp_fp = FeaturePreference {
-                        id: row.0,
-                        display_order: i64::from(row.1),
-                        weight: i64::from(row.2),
-                        calculation_date: tmp_calculation_date,
-                        department_id: constants::INVALID_OTHER_ID,  // tmp_department_id, SEE NOTE 1 ABOVE
-                        users_id: user_id, // spelling in DTO matches DB
-                        feature_id: row.5, 
-                        ref_group_id: i64::from(row.6),
-                        ref_name: row.7
-                    };
-                    //println!("..Evaluating Pref ID={}", &tmp_fp.get_unique_key());
-
-                    if !lookup.contains( &tmp_fp.get_unique_key() ) && counter < upper_limit{
-                        println!("...Adding ID={}", &tmp_fp.get_unique_key());
-                        results.push( tmp_fp.clone() );
-                        lookup.insert( tmp_fp.get_unique_key() );
-                        counter = counter + 1;
-                    }
-                    //else{
-                    //    tracing::debug!("..Not Adding ID={}", &tmp_fp.get_unique_key()); // for debug only
-                    //}
+                if counter < upper_limit{ // !lookup.contains( &tmp_fp.get_unique_key() ) && -- no need for this check, as we are using a Set, which eliminates dups anyway
+                    //println!("...Adding ID={}", &tmp_fp.get_unique_key());
+                    results.push( tmp_fp.clone() );
+                    lookup.insert( tmp_fp.get_unique_key() );
+                    counter = counter + 1;
                 }
             }
             return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
@@ -267,29 +252,29 @@ impl FeaturePreferenceDAO {
         let result = sqlx::query(&query)
                                                         .fetch_optional(&self.connection)
                                                         .await
-                                                        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
-        match result {
-            Some( outer_row  ) => {
-               Ok( outer_row.get("id") )
-            },
+                                                        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e));
+        match result.unwrap() {
+            Some( outer_row  ) => Ok( outer_row.get("id") ),
             None => {
                 let query_level_0 = db_query::INSERT_FEATURE_PREFERENCE.to_string();
                     
                 let query_level_1 = &query_level_0.replace("{users_id}", &user_id.to_string());
                 let query = &query_level_1.replace("{feature_id}", &feature_id.to_string());
 
-                //tracing::debug!("..INSERT sql: {}", query);
-                //println!("..INSERT sql: {}", query); // tracing does not preserve formatting, making copy/paste useless
+                tracing::debug!("..INSERT sql: {}", query);
+                println!("..INSERT sql: {}", query); // tracing does not preserve formatting, making copy/paste useless
                 let qry_result = sqlx::query(&query)
                                                 .fetch_optional(&self.connection)
                                                 .await
                                                 .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e));
                 match qry_result{
                     Ok(inner_result) => {
+                        println!("....reached line 289");
                         let item = inner_result.unwrap();
                         Ok( item.get("id") )
                     },
                     Err(_) => {
+                        println!("....reached line 294");
                         Ok( None ) 
                     },
                 }

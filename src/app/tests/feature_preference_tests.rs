@@ -184,45 +184,67 @@ async fn test_get_preferences_for_new_never_existed_user() {
     };
 
     let never_existed_user_id = 11999999999911; // this user has not/will not exist for the purposes of this course and as such will always have no feature preferences
+    let mut test_upper_limit = 5;
 
-    let test_upper_limit = 5;
-
-    // Test 1: check for preferences for a user who has never used it before
+    // Test 1a: check for preferences for a user who has never used it before
     let qry_results = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.get_active_feature_preferences_of_interventions_for_user(never_existed_user_id, test_upper_limit).await;
     match qry_results.unwrap(){
-        Some ( _results ) => assert!( false ),
+        Some ( _results ) => assert!( false, "Test 1a failed" ),
         None => assert!( true ),
+    } ;
+
+    // Test 1b: check for preferences for an non-existant user with no permissions
+    test_upper_limit = 1;
+
+    let qry_results = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.get_active_feature_preferences_of_interventions_for_user(never_existed_user_id, test_upper_limit).await;
+    match qry_results.unwrap(){
+        Some ( _results ) => assert!( false, "Test 1b failed" ),
+        None => assert!( true ),
+    } ;
+
+    // Test 1c: check for preferences for an existing user with very few permissions
+    let qry_results = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.get_active_feature_preferences_of_interventions_for_user(3, test_upper_limit).await;
+    match qry_results.unwrap(){
+        Some ( _results ) => assert!( true ), // this user had permissions; the check should succeed, with records returned
+        None => assert!( true, "Test 1b failed: records should have been returned" ),
     } ;
 
     // try to create a FeaturePreference that has never existed
     // both test user and feature must exist, but not have been used unfortunately
     //
-    // NOTE: might need to use this prior to run: delete * from feature_preference where users_id = 7 
+    // NOTE: might need to use this prior to run: delete from feature_preference where users_id = 7 
+
+    // delete the preferences for user_id, so no collisions
+    delete_preference().await;
 
     let test_feature_id: i64 = 100002;
     let test_dr_drake_ramoray_user_id: i64 = 7;
 
-    // Test 1: Valid Insertion
+    // Test 2: Valid Insertion
     let qry_results = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.upsert_feature_preference(test_dr_drake_ramoray_user_id, test_feature_id).await;
     match qry_results.unwrap(){
-        Some ( results ) => {
-            println!("..added id={}", results);// record should have been created or updated
-            assert!(true);
-        }
-        None => {
-            assert!(false); // record should have been created or updated, if not, fail
-        }
+        Some ( results ) => assert!(true , "Test 2 failed" ), // record should have been created or updated
+        None => assert!(false), // record should have been created or updated, if not, fail
     }
 
-    // Test 2: Invalid Id Insertion
+    // Test 2b: Invalid Feature Id Insertion
     let qry_results = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.upsert_feature_preference(test_dr_drake_ramoray_user_id, constants::INVALID_OTHER_ID).await;
     match qry_results{
         Ok( item ) => {
             match item {
-                Some ( _ ) => {
-//                   println!("item returned = {}", item);
-                   assert!(false, "FeaturePreference should NOT have been created or updated; id was invalid");// record should NOT have been created or updated
-                },
+                Some ( _ ) => assert!(false, "FeaturePreference should NOT have been created or updated; id was invalid"), // record should NOT have been created or updated
+                None => assert!(true), // record sho uld have been created or updated, if not, fail
+            }
+        }
+        Err (_) => assert!(true), // record should have been created or updated, if not, fail
+    };
+
+    // Test 3: Invalid userid 
+    let qry_results = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.upsert_feature_preference(constants::INVALID_OTHER_ID, constants::INVALID_OTHER_ID).await;
+    match qry_results{
+        Ok( item ) => {
+            match item {
+                Some ( _ ) => assert!(false, "FeaturePreference should NOT have been created or updated; id was invalid"), // record should NOT have been created or updated
                 None => assert!(true), // record sho uld have been created or updated, if not, fail
             }
         }
@@ -456,5 +478,30 @@ async fn test_ins_get_upd_feature_priority_intv_details_level() {
                 );
             }
             return Ok( results.first().cloned() ); // because this is in an enclosure we MUST add the return keyword for it to compile
+        }
+    }
+
+    /// 
+    /// Delete the preferences for User_id, which has been designated for these unit tests
+    /// 
+    async fn delete_preference(){
+        const SQL_DELETE_PREFERENCES_FOR_USERID_7: &str = r##"delete from feature_preference where users_id = 7"##;     
+        let query = SQL_DELETE_PREFERENCES_FOR_USERID_7.to_string();
+
+        let db_pool: sqlx::Pool<sqlx::Postgres> = match PgPoolOptions::new()
+            .max_connections(5)
+            .connect(DB_CONN_STR)
+            .await   {
+            Ok(pool) => pool,
+            Err(e) => panic!("{}", e),
+        };
+
+        let result = sqlx::query(&query)
+                                                        .fetch_optional(&db_pool)
+                                                        .await
+                                                        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e));
+        match result {
+            Ok( _item ) => println!("Preferences for user_id=7 deleted"),
+            Err(e) => println!("Error on delete preferences for user_id=7: {}", e)
         }
     }
