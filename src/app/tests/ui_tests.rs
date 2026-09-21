@@ -10,22 +10,20 @@ use std::ops::IndexMut;
 
 #[cfg(test)]
 use maple_emr::constants;
-use maple_emr::dto::convert_utils::ConvertUtils;
-//use maple_emr::dao::patient_dao::PatientWrapper;
+use maple_emr::dto::encounter::Encounter;
 use maple_emr::ui::tile_factory::{WebContentFactory, WebContentItem};
 use maple_emr::ui::simple_fmt::SimpleFormatter;
 use maple_emr::ui::common_fmt::CommonFormatter;
 use maple_emr::ui::menu_fmt::MenuFormatter;
-
-use maple_emr::dto::user_auth::{Permission, UserAuthorization};
+use maple_emr::ui::feat_preference_fmt::FeaturePreferenceFormatter;
 use maple_emr::session::{UserSession}; // AppSession
 
 use common::entity_factory::EntityFactory;
+use common::test_utils::DataGenerator;
 
-use maple_emr::dto::encounter::Encounter;
-
-use crate::common::test_utils::DataGenerator;
-
+///
+/// Tests WebContentFactory::new() and general initalization
+/// 
 #[test]
 fn test_wcf() {
     // https://stackoverflow.com/questions/61974382/load-a-resource-file-at-runtime
@@ -83,6 +81,9 @@ fn test_wcf_get_patient_details_full_tile() {
     //let html = wcf.get_modify_intervention_full_tile();
 }
 
+///
+/// Tests methods of the SimpleFormatter struct
+/// 
 #[test]
 fn test_simple_formatter() {
     let search_string = "Unit test: test_simple_formatter()".to_string();
@@ -105,73 +106,118 @@ fn test_simple_formatter() {
     results = SimpleFormatter::get_single_patient_summary(EntityFactory::create_patient_wrapper(), -1);
     assert!( results.contains("Admission Concern") , "..formatting incomplete"); // from the static part of the content
 
-    // get_single_patient_summary Test 3: with an aged admit_timestamp 
+    //Test 3a: get_single_patient_summary with an aged admit_timestamp 
     let mut pcw = EntityFactory::create_patient_wrapper();
     pcw.patient.admit_timestamp = DataGenerator::get_date(); // all dates provided are now > 4hrs old
     pcw.most_recent_intervention = None; // also test the "is_some()" condition for the method
     results = SimpleFormatter::get_single_patient_summary(pcw, 1);
     assert!( results.contains("Admission Concern") , "..formatting incomplete"); // from the static part of the content
 
+    //Test 3b: get_single_patient_summary with a NEW (not aged) admit_timestamp 
+    let mut pcw2 = EntityFactory::create_patient_wrapper();
+    pcw2.patient.admit_timestamp = DataGenerator::now();
+    pcw2.most_recent_intervention = None; // also test the "is_some()" condition for the method 
+    results = SimpleFormatter::get_single_patient_summary(pcw2.clone(), 1);
+    assert!( results.contains("Admission Concern") , "..formatting incomplete"); // from the static part of the content
+
+    //Test 3c: get_single_patient_summary with a  -1 index
+    results = SimpleFormatter::get_single_patient_summary(pcw2, -1);
+    assert!( results.contains("Admission Concern") , "..formatting incomplete"); // from the static part of the content
+
+    // Test 4: get_home_route_summary_of_patients_tile_using_wrapper()
     results = SimpleFormatter::get_home_route_summary_of_patients_tile_using_wrapper(EntityFactory::create_vector_of_patient_wrappers() );
     assert!( results.contains("patientDtlsFrm") , "..formatting incomplete"); // from the static part of the content
     //assert!( results.contains( &search_string ) , "..formatting incomplete"); // from the data
 
+    // Test 5: get_encounter_list_tile()
     results = SimpleFormatter::get_encounter_list_tile(EntityFactory::create_vector_of_encounters());
     assert!( results.contains("encounterDtlsFrm") , "..formatting incomplete"); // from the static part of the content
     //assert!( results.contains( &search_string ) , "..formatting incomplete"); // from the data
 
+    // Test 6: create_vector_of_interventions()
     let mut lst = EntityFactory::create_vector_of_interventions();
     lst.index_mut(0).intervention_type_id = constants::CRT_INTERVENTION_ALERT_TYPE;
     lst.index_mut(5).intervention_type_id = 100052; // this is a clinical type
+    lst.index_mut(3).intervention_type_id = 100006; // this is Patient Transfer, a non-clinical type
 
+    // Test 7: get_intervention_list_for_patient_details_tile() - non-clinical records only
     results = SimpleFormatter::get_intervention_list_for_patient_details_tile(lst.clone(), false);
     assert!( results.contains("intvDtlsFrm") , "..formatting incomplete"); // from the static part of the content
 
-    // secondary check that the user can view clinical records
+    // Test 7b: secondary check that the user can view CLINICAL records
     results = SimpleFormatter::get_intervention_list_for_patient_details_tile(lst.clone(), true);
     assert!( results.contains("intvDtlsFrm") , "..formatting incomplete"); // from the static part of the content
 }
 
+///
+/// Tests methods of the CommonFormatter struct
+/// 
 #[test]
 fn test_common_formatter() {
     let items = EntityFactory::create_intervention_type_list("ITEM".to_string(), 2);
 
-    let html_result = CommonFormatter::get_dropdown_generic(items.clone(), "dummy_id".to_string(), 1);
-    assert!(html_result.contains(&"TEST-ITEM-2".to_string()), "CommonFormatter::get_dropdown_generic() produced incorrect HTML");
+    let html_test1 = CommonFormatter::get_dropdown_generic(items.clone(), "dummy_id".to_string(), 1);
+    assert!(html_test1.contains(&"TEST-ITEM-2".to_string()), "CommonFormatter::get_dropdown_generic() produced incorrect HTML");
     
-    let html_result2 = CommonFormatter::get_dropdown_user_with_department(items.clone(), 1);
-    assert!(html_result2.contains(&"TEST-ITEM-2".to_string()), "CommonFormatter::get_dropdown_user_with_department() produced incorrect HTML");
+    let html_test2 = CommonFormatter::get_dropdown_user_with_department(items.clone(), 1);
+    assert!(html_test2.contains(&"TEST-ITEM-2".to_string()), "CommonFormatter::get_dropdown_user_with_department() produced incorrect HTML");
     
-    let html_result3 = CommonFormatter::get_dropdown_intervention_status(items.clone(), 1);
-    assert!(html_result3.contains(&"TEST-ITEM-2".to_string()), "CommonFormatter::get_dropdown_intervention_status() produced incorrect HTML");
+    let html_test3 = CommonFormatter::get_dropdown_intervention_status(items.clone(), 1);
+    assert!(html_test3.contains(&"TEST-ITEM-2".to_string()), "CommonFormatter::get_dropdown_intervention_status() produced incorrect HTML");
 
     let items2 = EntityFactory::create_location_list( 2);
-    let html_result4 = CommonFormatter::get_location_dropdown(items2.clone(), 1);
-    assert!(html_result4.contains(&"TEST-LOCATION-2".to_string()), "CommonFormatter::get_location_dropdown() produced incorrect HTML");
+    let html_test4 = CommonFormatter::get_location_dropdown(items2.clone(), 1);
+    assert!(html_test4.contains(&"UNIT TEST-Location-2".to_string()), "CommonFormatter::get_location_dropdown() produced incorrect HTML");
 }
 
+///
+/// Tests methods of the MenuFormatter struct
+/// 
 #[test]
 fn test_menu_formatter() {
     let mut sess: UserSession = EntityFactory::create_user_session();
 
-    let html_result = {MenuFormatter{}}.get_legacy_menu(EntityFactory::create_vector_of_patients(), sess.clone());
-    assert!(html_result.contains(&"menuNotCurrent".to_string()), "MenuFormatter::get_legacy_menu() produced incorrect HTML");
+    let html_test1 = {MenuFormatter{}}.get_legacy_menu(EntityFactory::create_vector_of_patients(), sess.clone());
+    assert!(html_test1.contains(&"menuNotCurrent".to_string()), "MenuFormatter::get_legacy_menu() produced incorrect HTML");
 
-    let html_result = {MenuFormatter{}}.get_legacy_menu_with_patient(EntityFactory::create_vector_of_patients(), 5, sess.clone());
-    assert!(html_result.contains(&"menuNotCurrent".to_string()), "MenuFormatter::get_legacy_menu_with_patient() produced incorrect HTML");
+    let html_test2 = {MenuFormatter{}}.get_legacy_menu_with_patient(EntityFactory::create_vector_of_patients(), 5, sess.clone());
+    assert!(html_test2.contains(&"menuNotCurrent".to_string()), "MenuFormatter::get_legacy_menu_with_patient() produced incorrect HTML");
 
     //let perm: Permission = Permission::new(1, 1);
     //let perm2: Permission = Permission::new(1, 2);
     sess.user_authorizations.granted_permissions.remove(2); // reduced permissions
     //sess.user_authorizations.granted_permissions = vec![perm, perm2]; // reduced permissions
-    sess.email = "test3@gmail.com".to_string();
-    let html_result = {MenuFormatter{}}.get_legacy_menu_with_patient(EntityFactory::create_vector_of_patients(), 5, sess.clone());
-    assert!(html_result.contains(&"menuNotCurrent".to_string()), "MenuFormatter::get_legacy_menu_with_patient() produced incorrect HTML");
+    sess.email = "test3@gmail.com".to_string(); 
+    let html_test3 = {MenuFormatter{}}.get_legacy_menu_with_patient(EntityFactory::create_vector_of_patients(), 5, sess.clone());
+    assert!(html_test3.contains(&"menuNotCurrent".to_string()), "MenuFormatter::get_legacy_menu_with_patient() produced incorrect HTML");
 }
 
+///
+/// Tests methods of the FeaturePreferenceFormatter struct
+/// 
 #[test]
 fn test_feature_pref_formatter() {
-    
-    //FeaturePreferenceFormatter 
-    //get_feature_preference_section
+    let mut fp_list = EntityFactory::create_vector_of_feature_preferences();
+
+    fp_list[0].ref_group_id = constants::CRT_CLINICAL_INTERVENTION_GRP_ID; // for test 2.1
+    fp_list[1].ref_group_id = constants::CRT_NON_CLINICAL_INTERVENTION_GRP_ID; // for test 2.2
+    fp_list[2].ref_group_id = 100001; // for test 2.3
+
+    // Test 1: list == None situation (quick win)
+    let html_test1 = FeaturePreferenceFormatter::get_feature_preference_section(None);
+    assert_eq!(html_test1, String::new(), "FeaturePreferenceFormatter produced HTML; none expected");
+
+    // Test 2: Basic test
+    let html_test2 = FeaturePreferenceFormatter::get_feature_preference_section(Some(fp_list));
+
+    // should always contain the button code
+    assert!(html_test2.contains(&"fast_action_btn_id_".to_string()), "FeaturePreferenceFormatter produced incorrect HTML: missing fast_action_btn_id_");
+
+    // test 2.1: item.ref_group_id == constants::CRT_CLINICAL_INTERVENTION_GRP_ID => "fast_action_add_intv"
+    // test 2.2: item.ref_group_id == constants::CRT_NON_CLINICAL_INTERVENTION_GRP_ID => "fast_action_add_intv"
+    assert!(html_test2.contains(&"fast_action_add_intv".to_string()), "FeaturePreferenceFormatter produced incorrect HTML: missing fast_action_add_intv");
+
+    // test 2.3: item.ref_group_id == anything other than the prior two => "fast_action_add_measure"
+    assert!(html_test2.contains(&"fast_action_add_measure".to_string()), "FeaturePreferenceFormatter produced incorrect HTML: missing fast_action_add_measure");
+    println!("End test: test_feature_pref_formatter()");
 }

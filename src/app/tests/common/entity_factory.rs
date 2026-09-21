@@ -10,6 +10,7 @@ use maple_emr::dao::patient_dao::PatientWrapper;
 use maple_emr::dto::patient::Patient;
 use maple_emr::dto::encounter::Encounter;
 use maple_emr::dto::intervention::Intervention;
+use maple_emr::dto::feature_preference::FeaturePreference;
 
 use maple_emr::dto::user_auth::{Permission, UserAuthorization};
 use maple_emr::session::{UserSession};
@@ -61,7 +62,7 @@ impl EntityFactory{
     #[allow(dead_code)]
     pub fn create_vector_of_patients() -> Vec<Patient> {
         let mut results = Vec::new();
-        let pid = 10101; // common patient id for all records
+        //let pid = 10101; // common patient id for all records
 
         for i in 1..11 {
             let mut p = EntityFactory::create_patient(); 
@@ -151,6 +152,7 @@ impl EntityFactory{
     /// Create a couple of Permissions and put them in a vector, then add to the UserAuthorization.
     /// The UserAuthorization gets put into the UserSession
     /// 
+    #[allow(dead_code)]
     pub fn create_user_session() -> UserSession {
         let perm: Permission = Permission::new(1, 1);
         let perm2: Permission = Permission::new(1, 2);
@@ -160,15 +162,18 @@ impl EntityFactory{
             granted_permissions: vec![perm.clone(), perm2.clone(), perm3]
         };
 
-        let mut sess: UserSession = UserSession {
+        return UserSession {
             user_id: "5".to_string(), // 
             user_display_name: "TEST, UNIT".to_string(), //
             email: "test@gmail.com".to_string(), //
             user_authorizations: ua //
-        };
-        return sess;
+        }
     }
 
+    ///
+    /// Creates a vector of tuples (i64, String, String) representing interventions, for testing.
+    /// 
+    #[allow(dead_code)]
     pub fn create_intervention_type_list(short_identifier: String, unique_index: i64) -> Vec<(i64, String, String)>{
         let mut items = Vec::new();
         for i in 1..11 {
@@ -181,6 +186,10 @@ impl EntityFactory{
         items
     }
 
+    ///
+    /// Creates a vector of tuples (i64, String) representing locations, for testing.
+    /// 
+    #[allow(dead_code)]
     pub fn create_location_list(unique_index: i64) -> Vec<(i64,  String)>{
         let mut items = Vec::new();
         for i in 1..11 {
@@ -189,6 +198,30 @@ impl EntityFactory{
                 _ => "UNIT TEST Location ".to_owned() + &i.to_string(),
             };
             items.push( (i, str.clone()) );
+        }
+        items
+    }
+
+    ///
+    /// Creates a vector of FeaturePreferences for testing.
+    /// 
+    #[allow(dead_code)]
+    pub fn create_vector_of_feature_preferences() -> Vec<FeaturePreference>{
+        let mut items = Vec::new();
+        
+        for i in 1..11 {
+            let fp = FeaturePreference{
+               id: i,
+               display_order: 1,
+               weight: 1,
+               calculation_date: chrono::Utc::now().naive_utc(),
+               users_id: 1,
+               department_id: 1,
+               feature_id: 1,
+               ref_group_id: 1,
+               ref_name: "UNIT TEST 1".to_string(),
+            };
+            items.push( fp );
         }
         items
     }

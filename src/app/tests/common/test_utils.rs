@@ -167,5 +167,12 @@ impl DataGenerator{
         let result = name_list.get(rng.random_range(0..name_list.len()-1 ) ).unwrap(); // return a item from the prior list
 
         result.to_string()
-    }    
+    }
+
+    ///
+    /// Shortcut method that returns chrono::Utc::now().naive_utc(), which is a NaiveDateTime
+    /// 
+    pub fn now() -> NaiveDateTime{
+        chrono::Utc::now().naive_utc()
+    }
 }
