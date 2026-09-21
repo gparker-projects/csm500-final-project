@@ -204,18 +204,11 @@ impl FeaturePreferenceDAO {
                     ref_group_id: i64::from(row.6),
                     ref_name: row.7
                 };
-                //println!("..Evaluating Pref ID={}", &tmp_fp.get_unique_key());
 
                 if counter < upper_limit {
-                    if !lookup.contains( &tmp_fp.get_unique_key() ) { // loop is a bit faster if this is insude the other check
-                    //  println!("...Adding ID={}", &tmp_fp.get_unique_key());
-                        results.push( tmp_fp.clone() );
-                        lookup.insert( tmp_fp.get_unique_key() );
-                        counter = counter + 1
-                    }
-                    else{
-                        println!("..Id already present"); // a do-nothing situation; not having the Id is acceptible
-                    }
+                    results.push( tmp_fp.clone() );
+                    lookup.insert( tmp_fp.get_unique_key() );
+                    counter = counter + 1
                 }
                 else{
                     println!("..upper_limit already met"); // a do-nothing situation; the max counter having been reached is acceptible

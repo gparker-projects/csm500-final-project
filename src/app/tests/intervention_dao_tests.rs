@@ -356,10 +356,26 @@ async fn test_upsert_intervention_from_intv_form(){
          ..Default::default() 
     };
 
-    // if the key fields match, the DAO has successfully pulled the right record.
+    // Test 1: Valid Intervention Insert if the key fields match, the DAO has successfully pulled the right record.
     // Some fields are subject to frequent change and not worth testing.
-    let obj_id = {InterventionDAO::new( db_pool.clone() ).await}.upsert_intervention_from_intv_form( tmp_frm, constants::INVALID_OTHER_ID ).await.unwrap();
+    let obj_id = {InterventionDAO::new( db_pool.clone() ).await}.upsert_intervention_from_intv_form( tmp_frm.clone(), constants::INVALID_OTHER_ID ).await.unwrap();
     assert!(obj_id != constants::INVALID_OTHER_ID, "New ID was not returned, update did not occur");
+
+    // Test 2: Invalid Intervention Upsert
+    let mut tmp_frm2 = tmp_frm.clone();
+    tmp_frm2.intervention_id = "INVALID UNIT TEST RECORD".to_string();
+    let qry_results = {InterventionDAO::new( db_pool.clone() ).await}.upsert_intervention_from_intv_form( tmp_frm2, constants::INVALID_OTHER_ID ).await;
+    match qry_results {
+        Ok(row) => {
+            if row == constants::INVALID_OTHER_ID {
+                assert!(true)
+            }
+            else {
+                assert!(false, "Unexpected id returned; invalid data had been provided")
+            }
+        },
+        Err (_) => assert!(true),
+    }
 }
 
 
@@ -390,8 +406,25 @@ async fn test_upsert_intervention_details_from_intv_form(){
          ..Default::default() 
     };
 
-    // if the key fields match, the DAO has successfully pulled the right record.
+    // Test 1: if the key fields match, the DAO has successfully pulled the right record.
     // Some fields are subject to frequent change and not worth testing.
-    let obj_id = {InterventionDAO::new( db_pool.clone() ).await}.upsert_intervention_details_from_intv_form( tmp_frm, constants::INVALID_OTHER_ID ).await.unwrap();
+    let obj_id = {InterventionDAO::new( db_pool.clone() ).await}.upsert_intervention_details_from_intv_form( tmp_frm.clone(), constants::INVALID_OTHER_ID ).await.unwrap();
     assert!(obj_id != constants::INVALID_OTHER_ID, "New ID was not returned, update did not occur");
+
+    // Test 2: Invalid Intervention Details Upsert
+    let mut tmp_frm2 = tmp_frm.clone();
+    tmp_frm2.intervention_details_id = "INVALID UNIT TEST RECORD".to_string();
+
+    let qry_results = {InterventionDAO::new( db_pool.clone() ).await}.upsert_intervention_details_from_intv_form( tmp_frm2.clone(), constants::INVALID_OTHER_ID ).await;
+    match qry_results {
+        Ok(row) => {
+            if row == constants::INVALID_OTHER_ID {
+                assert!(true)
+            }
+            else {
+                assert!(false, "Unexpected id returned; invalid data had been provided")
+            }
+        },
+        Err (_) => assert!(true),
+    }
 }

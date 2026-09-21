@@ -256,10 +256,10 @@ async fn test_ins_get_upd_feature_priority_intv_details_level() {
       },
   };
 
-  let test_user_id = 2; // we will use user #2, which is admin user and has lots of data (permissions)
-  let test_feature_id: i64 = 100002;
+  let mut test_user_id = 2; // we will use user #2, which is admin user and has lots of data (permissions)
+  let mut test_upper_limit = 5;
+  let mut test_feature_id: i64 = 100002;
   let fp_id: i64;
-  let test_upper_limit = 5;
 
   println!("Testing: get_all_active_feature_preferences_for_user(): first insertion");
 
@@ -310,7 +310,7 @@ async fn test_ins_get_upd_feature_priority_intv_details_level() {
   let updated_fp_id: i64; // = constants::INVALID_OTHER_ID;;
 
   println!("..update created record: test_user_id={} test_feature_id={} 5 true", test_user_id, test_feature_id);
-  // try to update the FeaturePreference
+  // Test 4: try to update the FeaturePreference
   let qry_results = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.upsert_feature_preference(test_user_id, test_feature_id).await;
   match qry_results.unwrap(){
         Some ( results ) => {
@@ -325,7 +325,7 @@ async fn test_ins_get_upd_feature_priority_intv_details_level() {
 
   println!("..retrieve updated: test_user_id={} test_feature_id={}, 5 true", test_user_id, test_feature_id); // NOTE: use of constants::CRT_ANY_INTERVENTION_GROUP below, it is a group for intervention-level test ids
 
-  // try to pull out that same that was updated: this time, the updated timestamp should be different than the first time
+  // Test 4b (validation): try to pull out that same that was updated: this time, the updated timestamp should be different than the first time
   let qry_results_updated = get_individual_feature_preference( updated_fp_id).await;
   match qry_results_updated.unwrap(){
       Some ( item ) => {
@@ -347,12 +347,10 @@ async fn test_ins_get_upd_feature_priority_intv_details_level() {
       None => {
             println!("..feature pref id={} not found", updated_fp_id);
             assert!(false);
-      }
-
-        
+      }        
     }
 
-    // Test: Invalid User Id; should not return rows
+    // Test 5: Invalid User Id; should not return rows
     let qry_results2 = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.get_active_feature_preferences_of_intervention_details_for_user(
                                     constants::INVALID_OTHER_ID,
                                     constants::INVALID_OTHER_ID,
@@ -364,8 +362,22 @@ async fn test_ins_get_upd_feature_priority_intv_details_level() {
         None => assert!(true), // no results expected
     }
 
-    // Low Limit Test
-    // High number of permissions Test    
+    test_user_id = 2;     // we will use user #2, which is admin user and has lots of data (permissions)
+    test_upper_limit = 1; // drop the limit really low for testing
+    test_feature_id = 1; // drop the limit really low for testing
+
+    // Test 6: Valid user with lots of Feature Preferences at the Intervention Details level
+    // * Low Limit Test
+    // * High number of permissions Test    
+    let qry_results2 = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.get_active_feature_preferences_of_intervention_details_for_user(
+                                    test_user_id,
+                                    test_feature_id,
+                                    test_upper_limit).await;
+    match qry_results2.unwrap(){
+        Some ( _items ) => assert!(true),
+        None => assert!(false, "Results expected"),
+    }
+
 }
 
     const QRY_GET_INDIVIDUAL_FEATURE_PREFERENCE: &str = r##"

@@ -6,4 +6,5 @@
 //! This module provides struts and classes for testing.
 //! 
 //!
+pub mod entity_factory;
 pub mod test_utils;

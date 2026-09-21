@@ -100,7 +100,7 @@ impl EncounterDAO {
 
         if rows.is_empty() {
             tracing::debug!(">get_encounters() Query: {}", query);
-            tracing::debug!("No encounters found for patient_id: {} [{}]", patient_id, rows.len());
+            //tracing::debug!("No encounters found for patient_id: {} [{}]", patient_id, rows.len());
             return Ok( Some( Vec::new() ) );
         }
         else{

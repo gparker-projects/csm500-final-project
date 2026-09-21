@@ -1,7 +1,7 @@
 /// ---------------------------------------------------------------------------------
 /// Provides supporting utility methods for use during testing (test case execution)
 /// 
-/// NOTE: Comments are intentionally breif, as this is not primary system code
+/// NOTE: Comments are intentionally brief, as this is not primary system code
 /// ---------------------------------------------------------------------------------
 /// 
 use rand::{RngExt, rng};

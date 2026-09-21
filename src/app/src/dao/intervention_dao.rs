@@ -304,12 +304,15 @@ impl InterventionDAO {
         let result = sqlx::query(&query)
                                                         .fetch_one(&self.connection)
                                                         .await
-                                                        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
-        
-        // return the patient id that was created or updated
-        let inserted_id: i64 = result.get("id");
-
-        Ok(inserted_id)
+                                                        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e));
+        match result {
+            Ok( row ) => { // NOTE: MUST be lowercase, per Postgresql
+                Ok( row.get("id") ) // return the patient id that was created or updated
+            },
+            Err(_) => {
+                Ok( constants::INVALID_OTHER_ID )
+            }
+        }
     }
 
 
@@ -348,13 +351,14 @@ impl InterventionDAO {
         let result = sqlx::query(&query)
                                                         .fetch_one(&self.connection)
                                                         .await
-                                                        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
-        
-        // return the patient id that was created or updated
-        let inserted_id: i64 = result.get("id"); // NOTE: MUST be lowercase, per Postgresql
-
-
-
-        Ok(inserted_id)
+                                                        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e));
+        match result {
+            Ok( row ) => { // NOTE: MUST be lowercase, per Postgresql
+                Ok( row.get("id") ) // return the patient id that was created or updated
+            },
+            Err(_) => {
+                Ok( constants::INVALID_OTHER_ID )
+            }
+        }
     }
 }

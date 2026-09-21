@@ -197,7 +197,7 @@ async fn test_get_patient_details() {
 /// Calls subordindate tests that MUST be executed in a specific order
 ///
 #[tokio::test]
-async fn  test_wrapper_patient_dao() {
+async fn   test_wrapper_patient_dao() {
 
     // these both create new encounters and during parallel thread execution mess up the discharge
     // which is determistic on its ID.

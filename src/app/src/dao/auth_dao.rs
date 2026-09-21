@@ -89,15 +89,11 @@ impl AuthDAO {
                         }
                     }
                 ) )
-            }
-            Ok(None) => {
+            },
+            _ => {
                 tracing::debug!("No user found for: {}", user_name);
                 Ok( None )
-            }
-            Err(err) => {
-                tracing::error!("Error on login for: {} ({})", user_name, err);
-                Ok( None )
-            }
+            },
         }
     }   
 
