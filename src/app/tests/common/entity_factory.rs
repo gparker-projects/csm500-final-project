@@ -10,8 +10,10 @@ use maple_emr::dao::patient_dao::PatientWrapper;
 use maple_emr::dto::patient::Patient;
 use maple_emr::dto::encounter::Encounter;
 use maple_emr::dto::intervention::Intervention;
+
+use maple_emr::dto::user_auth::{Permission, UserAuthorization};
+use maple_emr::session::{UserSession};
 #[cfg(test)]
-//use maple_emr::dto::intervention_detail::InterventionDetail;
 
 pub struct EntityFactory;
 
@@ -142,5 +144,52 @@ impl EntityFactory{
             current_encounter: e,
             most_recent_intervention: Some(i),
         }
+    }
+
+
+    ///
+    /// Create a couple of Permissions and put them in a vector, then add to the UserAuthorization.
+    /// The UserAuthorization gets put into the UserSession
+    /// 
+    pub fn create_user_session() -> UserSession {
+        let perm: Permission = Permission::new(1, 1);
+        let perm2: Permission = Permission::new(1, 2);
+        let perm3: Permission = Permission::new(1, Permission::ALLOW_CREATE_UPDATE_ADMIT);
+
+        let ua = UserAuthorization {
+            granted_permissions: vec![perm.clone(), perm2.clone(), perm3]
+        };
+
+        let mut sess: UserSession = UserSession {
+            user_id: "5".to_string(), // 
+            user_display_name: "TEST, UNIT".to_string(), //
+            email: "test@gmail.com".to_string(), //
+            user_authorizations: ua //
+        };
+        return sess;
+    }
+
+    pub fn create_intervention_type_list(short_identifier: String, unique_index: i64) -> Vec<(i64, String, String)>{
+        let mut items = Vec::new();
+        for i in 1..11 {
+            let str = match i {
+                unique_index => "UNIT TEST-".to_owned() + &short_identifier + "-" + &i.to_string(), // (i64, String, String) 
+                _ => "UNIT TEST ".to_owned() + &short_identifier + " " + &i.to_string(),
+            };
+            items.push( (i, str.clone(), str.clone()) );
+        }
+        items
+    }
+
+    pub fn create_location_list(unique_index: i64) -> Vec<(i64,  String)>{
+        let mut items = Vec::new();
+        for i in 1..11 {
+            let str = match i {
+                unique_index => "UNIT TEST-Location-".to_owned() + &i.to_string(), // (i64, String) 
+                _ => "UNIT TEST Location ".to_owned() + &i.to_string(),
+            };
+            items.push( (i, str.clone()) );
+        }
+        items
     }
 }

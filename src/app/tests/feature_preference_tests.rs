@@ -135,7 +135,6 @@ async fn test_upsert_get_feature_preferences_of_interventions_for_user() {
         }
   }
 
-
   println!("..retrieve updated: test_user_id={} test_feature_id={}, 5 true", test_user_id, test_feature_id); // NOTE: use of constants::CRT_ANY_INTERVENTION_GROUP below, it is a group for intervention-level test ids
 
   // try to pull out that same that was updated: this time, the updated timestamp should be different than the first time
@@ -161,11 +160,6 @@ async fn test_upsert_get_feature_preferences_of_interventions_for_user() {
       }
   }
 }
-
-
-
-
-
 
 ///
 /// Tests the FeaturePreference::get_active_feature_preferences_for_user_intervention_level() function via 

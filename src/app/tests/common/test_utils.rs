@@ -82,7 +82,7 @@ impl DataGenerator{
     }
 
     ///
-    /// Returns a random date between Aug 21, 1909 and Augt 17, 2026(ish)... for testing purposes
+    /// Returns a random date between Aug 21, 1909 and Aug 17, 2026(ish)... for testing purposes
     /// ref: https://docs.rs/chrono/latest/chrono/naive/struct.NaiveDateTime.html
     ///
     #[allow(dead_code)]

@@ -143,7 +143,6 @@ impl SimpleFormatter {
 
 	    if i.is_some() {
 	       let tmp_intv = i.unwrap();
-
 	       results_sbuf.push_str("&nbsp;");
 	       results_sbuf.push_str( &tmp_intv.intervention_type );
 	       results_sbuf.push_str("&nbsp;@&nbsp;");
@@ -154,7 +153,6 @@ impl SimpleFormatter {
 	       results_sbuf.push_str(")");
 	    }
 	    results_sbuf.push_str("</td></tr>");
-
 	    results_sbuf.push_str("</table>");
 
         return results_sbuf;
@@ -168,7 +166,6 @@ impl SimpleFormatter {
         tracing::debug!(">get_intervention_list_tile()");
 
         results_sbuf.push_str(&CommonFormatter::get_hidden_form("intvDtls".to_owned(), "intvDtlsFrm".to_owned()) );
-
         results_sbuf.push_str("<table <tr><th>Description</th><th>Date Performed</th><th>Date Scheduled</th><th>State</th></tr>"); 
 
         for row in intervention_list{

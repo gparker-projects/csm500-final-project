@@ -152,7 +152,7 @@ impl WebContentFactory {
         };
         let ht11 = &ht10.replace(constants::SECTION_1_VISIBLE_TAG, &visible_tag);
 
-        let visible_tag = match active_user_session.has_permission(Permission::ALLOW_CREATE_CLINICAL_INTERVENTION) ||active_user_session.has_permission(Permission::ALLOW_CREATE_NON_CLINICAL_INTERVENTION)  {
+        let visible_tag = match active_user_session.has_permission(Permission::ALLOW_CREATE_CLINICAL_INTERVENTION) || active_user_session.has_permission(Permission::ALLOW_CREATE_NON_CLINICAL_INTERVENTION)  {
             true => String::new(),
             false => " class='hidden' ".to_string(),
         };
