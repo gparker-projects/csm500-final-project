@@ -119,72 +119,70 @@ pub struct AdmitDataForm {
 }
 
 impl AdmitDataForm {
-
+    pub const ACTION_FLAG_ADMIT: &str = r##"admit"##;
+    pub const ACTION_FLAG_DISCHARGE: &str = r##"discharge"##;
+    
     pub fn validate_fields(&self) -> Result<(), ValidationError> {
         let mut error = ValidationError::new("AdmitDataFormError");
 
         if ! (self.patient_id.len() > 0) || ! self.patient_id.parse::<i64>().is_ok() {
             error.message = Some("Patient Id invalid".into());
-            println!("AdmitDataForm::validate_fields() Error: {} [{}]", error.message.as_ref().unwrap(), self.patient_id);
+            //println!("AdmitDataForm::validate_fields() Error: {} [{}]", error.message.as_ref().unwrap(), self.patient_id);
             return Err(error);
         }
 
         if ! (self.patient_first_name.len() >= 1) && (self.patient_first_name.len() <= 200){
             error.message = Some("Patient First Name is invalid".into());
-            println!("AdmitDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            //println!("AdmitDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
             return Err(error);
         }
 
         if ! (self.patient_last_name.len() >= 1) && (self.patient_last_name.len() <= 200) {
             error.message = Some("Patient Last Name is invalid".into());
-            println!("AdmitDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            //println!("AdmitDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
             return Err(error);
         }
 
         // can't really validate the presence of a middle name, as some people do not have them
-        if ! (self.patient_middle_name.len() > 200){
-            println!("AdmitDataForm::validate_fields()");
-            println!(".. patient_middle_name >{}<", self.patient_middle_name);
+        if self.patient_middle_name.len() > 200{
+            //println!("AdmitDataForm::validate_fields()");
+            //println!(".. patient_middle_name >{}<", self.patient_middle_name);
             error.message = Some("Patient Middle Names invalid".into());
-            println!("AdmitDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            //println!("AdmitDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
             return Err(error);
         }        
 
         if ! (self.phn.len() == 10) || ! self.phn.parse::<i64>().is_ok() {
             let err_msg = "PHN ".to_owned() + &self.phn + "must be a 10 digit number".into();
-
             error.message = Some(err_msg.into());
-
-            println!("AdmitDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            //println!("AdmitDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
             return Err(error);
         }
         
         if ! (self.birthdate.len() > 0) {
             error.message = Some("Birthdate must be in YYYY/MM/DD format".into());
-            println!("AdmitDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            //println!("AdmitDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
             return Err(error);
         }
        
         if ! (self.encounter_id.len() > 0) || ! self.encounter_id.parse::<i64>().is_ok() {
             error.message = Some("Encounter Id invalid".into());
-            println!("AdmitDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            //println!("AdmitDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
             return Err(error);
         }
 
         if ! (self.location_id.len() > 0) || ! self.location_id.parse::<i64>().is_ok() {
             error.message = Some("Location Id invalid".into());
-            println!("AdmitDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            //println!("AdmitDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
             return Err(error);
         }
 
         if ! (self.admit_notes.len() > 1) && (self.admit_notes.len() < 2000){
             error.message = Some("Admit notes is invalid".into());
-            println!("AdmitDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+            //println!("AdmitDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
             return Err(error);
         }
-
-        println!("AdmitDataForm::validate_fields(): PASSED");
-
+        //println!("AdmitDataForm::validate_fields(): PASSED");
         Ok(())
     }
 }
@@ -251,14 +249,14 @@ impl InterventionDataForm {
             return Err(error);
         }
 
-        if (! (self.description.len() > 0) && (self.description.len() < 2000)) || self.description.len() > 2000 {
+        if ! (self.description.len() >= 0 || self.description.len() <= 2000) {
             error.message = Some("Description is required and must be less than 2000 characters.".into());
             println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
             println!("...value={}", self.description);
             return Err(error);
         }
 
-        if  self.notes.len() != 0 && self.notes.len() > 2000 {
+        if  ! (self.notes.len() >= 0 || self.notes.len() <= 2000) {
             error.message = Some("Notes must be less than 2000 characters.".into());
             println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
             return Err(error);
@@ -300,13 +298,13 @@ impl InterventionDataForm {
             return Err(error);
         }
 
-        if ! (self.scheduled_timestamp.len() == 0) && (self.scheduled_timestamp.len() == 16)   {
+        if ! (self.scheduled_timestamp.len() == 0 || self.scheduled_timestamp.len() == 16)   {
             error.message = Some("Schedule date/time, when provided, must be in YYYY/MM/DD HH:MM format".into());
             println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
             return Err(error);
         }
 
-        if ! (self.performed_timestamp.len() == 0) && (self.performed_timestamp.len() == 16)   {
+        if ! (self.performed_timestamp.len() == 0 || self.performed_timestamp.len() == 16)   {
             error.message = Some("Performed date/time, when provided, must be in YYYY/MM/DD HH:MM format".into());
             println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
             return Err(error);
