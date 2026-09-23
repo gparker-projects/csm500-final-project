@@ -96,7 +96,9 @@ impl NLERoute{
 
         let cur_session: UserSession = user_session.get(constants::USER_SESSION).unwrap().unwrap();
         let pdao = PatientDAO::new( app_session.get_db_connection() ).await;
-        let referenced_patient = CommandController::get_referenced_patient(pdao, userid, prompt.clone()).await; // perform a basic search within the prompt for any of the current patients
+        let patients_list = pdao.get_patients_at_users_site_no_discharge(userid).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
+
+        let referenced_patient = CommandController::get_referenced_patient(patients_list, userid, prompt.clone()).await; // perform a basic search within the prompt for any of the current patients
 
         let mut prompt_final = prompt.clone();
 

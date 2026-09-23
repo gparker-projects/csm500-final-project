@@ -249,14 +249,14 @@ impl InterventionDataForm {
             return Err(error);
         }
 
-        if ! (self.description.len() >= 0 || self.description.len() <= 2000) {
+        if  self.description.len() > 2000 {
             error.message = Some("Description is required and must be less than 2000 characters.".into());
             println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
             println!("...value={}", self.description);
             return Err(error);
         }
 
-        if  ! (self.notes.len() >= 0 || self.notes.len() <= 2000) {
+        if  self.notes.len() > 2000 {
             error.message = Some("Notes must be less than 2000 characters.".into());
             println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
             return Err(error);

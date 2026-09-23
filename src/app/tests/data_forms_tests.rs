@@ -258,18 +258,20 @@ fn test_intervention_data_form  () {
 
     //------------------------------------------------------------------------
     // Test 4: description must be between 0 and 2000
-    frm.description = "INTERVENTION DESCRIPTION".to_string();
+    frm.description = DataGenerator::get_lorem_ipsum(2001);
     match frm.validate_fields() {
         Err (e) => println!("Test 4 success, received next error as expected: {}", e),
         _ => assert!(false, "Test 4: Data was invalid"),
     };
+    frm.description ="Normal Length Description".to_string();
 
     // Test 5: description must be between 0 and 2000
-    frm.notes = "INTERVENTION DESCRIPTION".to_string();
+    frm.notes = DataGenerator::get_lorem_ipsum(2001);
     match frm.validate_fields() {
         Err (e) => println!("Test 5 success, received next error as expected: {}", e),
         _ => assert!(false, "Test 5: Data was invalid"),
     };
+    frm.notes ="Normal Length Description".to_string();
 
     //------------------------------------------------------------------------
     // Test 6: Location Id EMPTY
@@ -386,11 +388,37 @@ fn test_intervention_data_form  () {
     // Test 22: patient_id negative
     frm.patient_id = "-1".to_string();
     match frm.validate_fields() {
-        Err (e) => assert!(false, "Test 22: Data was invalid: {}", e),
-        _ => println!("Test 22 success, NO Further Errors expected or received"),
+        Err (e) => assert!(false, "Test 22: Data was valid: {}", e),
+        _ => println!("Test 22 success, received next error as expected"),
     };
 
     // if ! (self.scheduled_timestamp.len() == 0) && (self.scheduled_timestamp.len() == 16)   {
 
-    // if ! (self.performed_timestamp.len() == 0) && (self.performed_timestamp.len() == 16)   {
+    // Test 23: scheduled_timestamp INVALID length
+    frm.scheduled_timestamp = "BAD_TIMESTAMP".to_string();
+    match frm.validate_fields() {
+        Err (e) => println!("Test 23 success, received next error as expected: {}", e),
+        _ => assert!(false, "Test 23: scheduled_timestamp was invalid"),
+    };
+    frm.scheduled_timestamp = "0123456789123456".to_string();
+
+    // Test 24: scheduled_timestamp INVALID length
+    frm.performed_timestamp = "BAD_TIMESTAMP".to_string();
+    match frm.validate_fields() {
+        Err (e) => println!("Test 24 success, received next error as expected: {}", e),
+        _ => assert!(false, "Test 24: scheduled_timestamp was invalid"),
+    };
+
+    // the last two cases are both positive
+    frm.performed_timestamp = String::new();
+    match frm.validate_fields() {
+        Err (e) => assert!(false, "Test 25: scheduled_timestamp was invalid: {}", e),
+        _ => println!("Test 25 success, received next error as expected"),
+    };
+
+    frm.performed_timestamp = "0123456789123456".to_string();
+    match frm.validate_fields() {
+        Err (e) => assert!(false, "Test 26: scheduled_timestamp was invalid: {}", e),
+        _ => println!("Test 26 success, received next error as expected"),
+    };
 }

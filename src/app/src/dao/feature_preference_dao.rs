@@ -248,11 +248,10 @@ impl FeaturePreferenceDAO {
         //   However if it fails as well, we just carry on and do not interrupt the user with an error.
         //
         // tracing::debug!("..UPDATE sql: {}", query);
-        println!("..UPDATE sql: {}", query);  // tracing does not preserve formatting, making copy/paste useless
+        //println!("..UPDATE sql: {}", query);  // tracing does not preserve formatting, making copy/paste useless
         let result = sqlx::query(&query)
                                                         .fetch_optional(&self.connection)
-                                                        .await
-                                                        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e));
+                                                        .await;
         match result.unwrap() {
             Some( outer_row  ) => Ok( outer_row.get("id") ),
             None => {

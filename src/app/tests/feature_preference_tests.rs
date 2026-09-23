@@ -223,7 +223,7 @@ async fn test_get_preferences_for_new_never_existed_user() {
     // Test 2: Valid Insertion
     let qry_results = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.upsert_feature_preference(test_dr_drake_ramoray_user_id, test_feature_id).await;
     match qry_results.unwrap(){
-        Some ( results ) => assert!(true , "Test 2 failed" ), // record should have been created or updated
+        Some ( _results ) => assert!(true , "Test 2 failed" ), // record should have been created or updated
         None => assert!(false), // record should have been created or updated, if not, fail
     }
 

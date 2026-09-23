@@ -1,16 +1,18 @@
 //! # nle (Natural Language Engine)
 //! 
+//! This module provides struts and classes that will work with data and the Natural Language Model (NLM) for the application.
+//! This not only handles user-provided prompts, but also the work of initiating and calling the Machine Learning/NLM engine.
+//! 
 //! Structs and functions within the nle module
 //!
 //!    CSM500 Project (April - October 2026)
 //!      Graham Parker (Student ID: 240120522)
 //! 
 //! REFERENCES
+//!   https://ort.pyke.io/#load-your-model
+//!   https://github.com/pykeio/ort/blob/main/examples/sentence-transformers/semantic-similarity.rs
+//!   S. Lyu and A. Rzeznik, Practical Rust Projects: Build Serverless, AI, Machine Learning, Embedded, Game, and Web Applications. Berkeley, CA: Apress, 2023. doi: DOI:%2010.1007/978-1-4842-9331-7.
 //! 
-//! ## Overview
-//! This module provides struts and classes that will work with data and the Natural Language Model (NLM) for the application.
-//! This not only handles user-provided prompts, but also the work of initiating and calling the Machine Learning/NLM engine.
-//!
  
 use tracing;
 use ndarray::{Ix2, Axis}; 
@@ -21,11 +23,6 @@ use ort::{
 };
 use tokenizers::Tokenizer;
 
-// Refs for ML code:
-//   https://ort.pyke.io/#load-your-model
-//   https://github.com/pykeio/ort/blob/main/examples/sentence-transformers/semantic-similarity.rs
-//   S. Lyu and A. Rzeznik, Practical Rust Projects: Build Serverless, AI, Machine Learning, Embedded, Game, and Web Applications. Berkeley, CA: Apress, 2023. doi: DOI:%2010.1007/978-1-4842-9331-7.
-//  
 pub struct NaturalLanguageEngine {
     session: ort::session::Session,
     tokenizer: tokenizers::Tokenizer,
@@ -33,9 +30,18 @@ pub struct NaturalLanguageEngine {
 
 impl NaturalLanguageEngine {
 
-    //
-    // cargo_manifest_dir should be: env!("CARGO_MANIFEST_DIR")
-    //
+    /// # NaturalLanguageEngine::new()
+    /// 
+    /// Primary constructor for a NaturalLanguageEngine object.
+    ///   Note: cargo_manifest_dir should be: env!("CARGO_MANIFEST_DIR")
+    /// 
+    /// ## Parameters:
+    /// 
+    /// * model_file_path: &str - full path the the NLE model file
+    /// * tokenizer_file_path: &str -  full path the the tokenizer file
+    /// 
+    /// ## Returns: a newly initialized NaturalLanguageEngine
+    /// 
     pub async fn new(model_file_path: &str, tokenizer_file_path: &str) -> Self {
         tracing::debug!("NaturalLanguageEngine::new()");
         tracing::debug!("..load model for session: {}", model_file_path);
@@ -54,33 +60,46 @@ impl NaturalLanguageEngine {
         }
     }
 
+    /// # get_classifier_rankings()
+    /// 
+    ///  Retrieves the id of the permission associated with the operation (column 0 from the command mapping)
+    ///  that matches the prompt_string.
+    /// 
+    /// ## Parameters:
+    /// 
+    /// * prompt (String): the user provided prompt
+    /// 
+    /// ## Returns: Vec<(String, f32)>, which is a list of classifier rankings
+    /// 
+    /// * i64: Id of the command (permission) to be executed
+    /// * String: User Label for the control
+    /// 
     pub async fn get_classifier_rankings(&mut self, inputs: Vec<String> ) -> Vec< (String, f32) > {
-      // println!("cwd: {:?}", std::env::current_dir().expect("Current dir could not be accessed"));
-      // let canonical = std::fs::canonicalize("all-MiniLM-L6-v2.onnx").expect("File could not be accessed"); // errors if it doesn't exist
-      // println!("resolved: {:?}", canonical);
       tracing::debug!("NaturalLanguageEngine::get_classifier_rankings()");
-      println!("NaturalLanguageEngine::get_classifier_rankings()");
+      //println!("NaturalLanguageEngine::get_classifier_rankings()");
 
       let mut results: Vec< (String, f32) > = vec![]; // assemble all results into vector to return
 
       // Encode our input strings. `encode_batch` will pad each input to be the same length.
-      let encodings = self.tokenizer.encode_batch(inputs.clone(), false).map_err(|e| Error::new(e.to_string())).expect("String could not be tokenized");
+      let encodings = self.tokenizer.encode_batch(inputs.clone(), false)
+                                                                // .map_err(|e| Error::new(e.to_string()))
+                                                                 .expect("String could not be tokenized");
 
-      // Get the padded length of each encoding.
+      // Get the padded length of each encoding
       let padded_token_length = encodings[0].len();
 
-      // Get our token IDs & mask as a flattened array.
+      // Get our token IDs & mask as a flattened array
       let ids: Vec<i64> = encodings.iter().flat_map(|e| e.get_ids().iter().map(|i| *i as i64)).collect();
       let mask: Vec<i64> = encodings.iter().flat_map(|e| e.get_attention_mask().iter().map(|i| *i as i64)).collect();
 
-      // Convert our flattened arrays into 2-dimensional tensors of shape [N, L].
+      // Convert our flattened arrays into 2-dimensional tensors of shape [N, L]
       let a_ids = TensorRef::from_array_view(([inputs.len(), padded_token_length], &*ids)).expect("Tensor (ids) could not be flattened");
       let a_mask = TensorRef::from_array_view(([inputs.len(), padded_token_length], &*mask)).expect("Tensor (mask) could not be flattened");
 
-      // Run the model.
+      // Run the model
       let outputs = self.session.run(ort::inputs![a_ids, a_mask]).expect("Outputs could not be retrieved from session");
 
-      // Extract our embeddings tensor and convert it to a strongly-typed 2-dimensional array.
+      // Extract embeddings tensor and convert it to a strongly-typed 2-dimensional array
       let embeddings = outputs[1].try_extract_array::<f32>().expect("Embeddings could not be extracted from array").into_dimensionality::<Ix2>().unwrap();
 
       //println!("Similarity for '{}'", inputs[0]); // the first item in the list is the item being compared
