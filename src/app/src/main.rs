@@ -26,11 +26,8 @@ use actix_files::*;
 use actix_session::{storage::CookieSessionStore, SessionMiddleware}; //, storage::RedisSessionStore}
 use actix_web::{web, App, HttpServer, HttpResponse, Responder};
 use actix_web::cookie::Key;
-use ort::{	session::{Session, builder::GraphOptimizationLevel} };
-//use serde::Deserialize;
 use std::env;
 use std::fs::read_to_string;
-use std::sync::Arc;
 use sqlx::postgres::{PgPoolOptions};
 use tracing;
 use tracing_subscriber::{
@@ -191,6 +188,7 @@ async fn route_to_not_found() -> impl Responder {
 async fn main() -> std::io::Result<()> {
   init_logging();
   let config = init_config();
+  let binding_addr = config.clone().website_bind_address;
 
   //establish database connection for entire application here, add to the application session
   let db_url = &config.db_conn_str.clone();
@@ -222,6 +220,7 @@ async fn main() -> std::io::Result<()> {
   HttpServer::new( move || {
 
     let tmp_app_key = get_application_secret_key(); // create within the enclosure to make sure it is available and consistent for the two uses below
+    
 
     App::new()
         .wrap(
@@ -266,7 +265,7 @@ async fn main() -> std::io::Result<()> {
       .default_service(web::to(route_to_not_found))
       .service(Files::new("/webc/", "./webc"))  // ref: ttps://actix.rs/docs/static-files/
   })
-  .bind("127.0.0.1:8000")?
+  .bind(binding_addr)? //  "127.0.0.1:8000"
   .run()
   .await
 }

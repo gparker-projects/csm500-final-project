@@ -28,8 +28,9 @@ pub struct CommandController{
 
 impl CommandController{
 
-    pub const NO_PATIENT_FOUND: i8 = 0;
-    pub const KNOWN_PATIENT_FOUND: i8 = 2;
+    pub const NO_PATIENT_FOUND: i8 = 0;    
+    pub const TARGET_PATIENT_FOUND: i8 = 2;
+    pub const OTHER_PATIENT_FOUND: i8 = 1;
 
     pub const CONTEXT_LEVEL_NO_PATIENT_REQUIRED: i8 = 0; //context level: either no patient (0), within a patient/encounter (1) or within a patient's intervention (2)
     pub const CONTEXT_LEVEL_REQUIRES_PATIENT: i8 = 1;
@@ -114,7 +115,7 @@ impl CommandController{
         tracing::info!("..current_context_level {} <= {} permitted_level ", current_context_level, permitted_level);
 
         // either meets the required level, or is "no patient context required"
-        if permitted_level >= current_context_level || permitted_level == CommandController::CONTEXT_LEVEL_NO_PATIENT_REQUIRED { // 0
+        if permitted_level >= current_context_level { // || permitted_level == CommandController::CONTEXT_LEVEL_NO_PATIENT_REQUIRED
             tracing::info!("....allowed");
             return true;
         }
@@ -228,38 +229,44 @@ impl CommandController{
     /// * prompt: String - the prompt to be searched for the patient.
     /// 
     /// ## Returns: (i8, Option<Patient>): a tuple of the results code and an Option<Patient>
-    /// * i8: - NO_PATIENT_FOUND if the patient was not found
-    ///       - KNOWN_PATIENT_FOUND if a known patient was found
+    /// * i8: - NO_PATIENT_FOUND if the patient was not found and NO patient was found
+    ///       - TARGET_PATIENT_FOUND if the patient indicated by the prompt was found
+    ///       - OTHER_PATIENT_FOUND, if the target patient was not found, but we've been able to provide a substitute.
     /// 
     pub async fn get_referenced_patient(patients_list: Vec<Patient>, _audit_userid: i64, prompt: String) -> (i8, Option<Patient>){
         //tracing::info!("get_referenced_patient()");
+        println!("get_referenced_patient()");
 
-        let mut result_code: i8 = Self::NO_PATIENT_FOUND;
+        let mut result_code: i8 = CommandController::NO_PATIENT_FOUND;
         let mut result: Option<Patient> = None;
-        let mut first_patient: Option<Patient> = None;
-        let tmp_prompt = prompt.to_lowercase();
+        let tmp_prompt = prompt.to_lowercase(); // ensure the prompt matches case with the search string
 
-        for p in patients_list {
+        println!("..checking prompt: {}", tmp_prompt.clone());
+
+        for p in patients_list.clone() {
             //tracing::info!("..checking for: {}, {}", &p.legal_last_name, &p.legal_first_name);
+            println!("..checking against: {}, {}", &p.legal_last_name, &p.legal_first_name);
             if tmp_prompt.contains(&p.legal_first_name.to_lowercase()) || tmp_prompt.contains(&p.legal_last_name.to_lowercase()){
                 //tracing::info!("...> matched patient: {}, {}", &p.legal_last_name, &p.legal_first_name);
-                result_code = Self::KNOWN_PATIENT_FOUND;
+                println!("...> matched patient: {}, {}", &p.legal_last_name, &p.legal_first_name);
+                result_code = CommandController::TARGET_PATIENT_FOUND;
                 result = Some(p);
                 break;
             }
-            first_patient = match first_patient {
-                None => Some (p),
-                Some(p) => Some (p)
-            };
         }
-        //if result_code == Self::NO_PATIENT_FOUND{
-        //    println!("..no patients found in prompt.");
-        //}
 
-        result = match result {
-            None =>  first_patient ,  // basically this is just an override for if the above logic still resulted in a None
-            Some(_p) => first_patient 
-        };
+        // if the target patient was not found, return the first one and update the status code to OTHER_PATIENT_FOUND
+        if result_code == CommandController::NO_PATIENT_FOUND  {
+            println!("...<< target patient was not found, substituting with first patient");
+            //if patients_list.len() > 0 { //  a zero-patient list would mean there are none in the facility, which is not realistic
+            result_code = CommandController::OTHER_PATIENT_FOUND;
+            let p_list = patients_list.clone();
+            result = Some(p_list.first().unwrap().clone()); // this was kind of crazy
+            //}
+        }
+
+        println!("..returning patient: {} {}", result.clone().unwrap().legal_first_name, result.clone().unwrap().legal_last_name);
+
         ( result_code, result )
     }
 

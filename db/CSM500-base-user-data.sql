@@ -67,6 +67,26 @@ INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permi
 INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 3, 1, 1, 11, 1);
 INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 3, 1, 1, 12, 1);
 
+insert into user_permission (active_flag,users_id, department_id, role_id, permission_id, site_id)
+                      values('Y', 3, 1, 1, 100006, 1); -- PATIENT TRANSFER
+                      
+insert into user_permission (active_flag,users_id, department_id, role_id, permission_id, site_id)
+                      values('Y', 3, 1, 1, 100040, 1); -- ALERTS
+                      
+insert into user_permission (active_flag,users_id, department_id, role_id, permission_id, site_id)
+                      values('Y', 3, 1, 1, 100041, 1); -- APPOINTMENTS
+          
+          insert into user_permission (active_flag,users_id, department_id, role_id, permission_id, site_id)
+                      values('Y', 3, 1, 1, 100046, 1); -- DOCUMENTS
+                      
+          insert into user_permission (active_flag,users_id, department_id, role_id, permission_id, site_id)
+                      values('Y', 3, 1, 1, 100052, 1); -- medical insurance
+                      
+          insert into user_permission (active_flag,users_id, department_id, role_id, permission_id, site_id)
+                      values('Y', 3, 1, 1, 100049, 1); -- next of kin
+                      
+          insert into user_permission (active_flag,users_id, department_id, role_id, permission_id, site_id)
+                      values('Y', 3, 1, 1, 100050, 1); -- primary address
 COMMIT;
 
 -- Mary Medical AssistantTwo will have the Medical Assistant role, with access to non-clinical data only

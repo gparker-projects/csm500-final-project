@@ -103,7 +103,7 @@ impl NLERoute{
         let mut prompt_final = prompt.clone();
 
         let patient_id = match referenced_patient.clone().0 {
-            CommandController::NO_PATIENT_FOUND => {
+            CommandController::OTHER_PATIENT_FOUND => {
                 if default_patient != constants::INVALID_PATIENT_ID {
                     default_patient // if the patient is still invalid, but we have a value patient from the context, provide that instead
                 }
@@ -111,7 +111,7 @@ impl NLERoute{
                     constants::INVALID_PATIENT_ID
                 }
             },
-            CommandController::KNOWN_PATIENT_FOUND =>{
+            CommandController::TARGET_PATIENT_FOUND =>{
                 let p: Patient = referenced_patient.clone().1.unwrap(); // pull out the patient's name and adjust the prompt prior to matching
                 prompt_final = prompt.clone().replace(&p.legal_first_name, "patient").replace(&p.legal_last_name, "patient");
                 p.id

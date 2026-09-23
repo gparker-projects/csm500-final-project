@@ -116,7 +116,8 @@ mod convert_utils_tests {
             tokenizer_file: tmp_tokenizer_file, 
             data_sub_dir: tmp_data_sub_dir, 
             max_general_fastactions: "3".to_string(),
-            max_nle_fastactions: "3".to_string()
+            max_nle_fastactions: "3".to_string(),
+            website_bind_address: "10.10.10.10:8080".to_string()
         };
 
         let tmp_key = Key::generate();

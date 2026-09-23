@@ -17,7 +17,6 @@
 use tracing;
 use ndarray::{Ix2, Axis}; 
 use ort::{
-	Error,
 	session::{Session, builder::GraphOptimizationLevel},
 	value::TensorRef
 };

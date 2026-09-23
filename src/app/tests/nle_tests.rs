@@ -92,9 +92,9 @@ async fn test_fmt_get_nle_options_content() {
     assert_ne!(html_result1, String::new(), "Test 6: No HTML returned by NLECommandFormatter::get_nle_options_content");
 
     // Test 7: Test the results of is_command_allowed_at_context_level() permission id, current context, required context, expected_true_value
-    let truth_variations = vec![(4, 0, true), (12, 0,  true),  (9999, 0,  true), (100000, 0,  true), // row is for current level=CONTEXT_LEVEL_NO_PATIENT_REQUIRED
-                                (4, 1, true), (12, 1,  true),  (9999, 1,  true), (100000, 1,  true), // row is for current level=CONTEXT_LEVEL_REQUIRES_PATIENT
-                                (4, 2, true), (12, 2,  false), (9999, 2,  true), (100000, 2,  true), // row is for current level=CONTEXT_LEVEL_REQUIRES_PATIENT_INTERVENTION
+    let truth_variations = vec![(4, 0, true),  (12, 0,  true),  (9999, 0,  true),  (100000, 0,  true), // row is for current level=CONTEXT_LEVEL_NO_PATIENT_REQUIRED
+                                                      (4, 1, false), (12, 1,  true),  (9999, 1,  false), (100000, 1,  true), // row is for current level=CONTEXT_LEVEL_REQUIRES_PATIENT
+                                                      (4, 2, false), (12, 2,  false), (9999, 2,  false), (100000, 2,  true), // row is for current level=CONTEXT_LEVEL_REQUIRES_PATIENT_INTERVENTION
                                ];
     for item in truth_variations {
         let tmp_result = CommandController::is_command_allowed_at_context_level (item.0, item.1);
@@ -127,7 +127,7 @@ async fn test_fmt_get_nle_options_content() {
         granted_permissions: vec![perm.clone(), perm2.clone(), perm3.clone(), perm4.clone(), perm5.clone()]
     };
 
-    let mut user_prompt: String = "transfer john smith".to_string();
+    let user_prompt: String = "transfer john smith".to_string();
 
     let test_nle7 = NaturalLanguageEngine::new(&minimlm_model_file_path, &tokenizer_file_path).await;
     let mut test_cmd7: CommandController = CommandController::new(&mapping_file_path, test_nle7);
@@ -150,8 +150,11 @@ async fn test_fmt_get_nle_options_content() {
     test_cmd7d.unit_test_invalidate_command_hashset();
     let rankings:  Vec<(String, f32)> = test_cmd7d.get_filtered_classifier_rankings(user_prompt.clone() , ua.clone(), CommandController::CONTEXT_LEVEL_REQUIRES_PATIENT_INTERVENTION).await; // level 2
     assert_eq!(rankings.len(), 0, "Test 7d: No rankings expected to be returned");
+}
 
-    // Step 9: ---------------------------------  get_referenced_patient()  ---------------------------------
+
+#[tokio::test]
+async fn test_nle_get_referenced_patient() {
     let db_pool = match PgPoolOptions::new()
         .max_connections(5)
         .connect(DB_CONN_STR)
@@ -166,18 +169,17 @@ async fn test_fmt_get_nle_options_content() {
     };
 
     let test_user_id = 2;
+    let mut user_prompt: String = "transfer john smith".to_string();
     let patients_list = {PatientDAO::new( db_pool.clone() ).await}.get_patients_at_users_site_no_discharge( test_user_id ).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
 
     // Test 9a: Patient should NOT be found
     let mut referenced_patient: (i8, Option<maple_emr::dto::patient::Patient>) = CommandController::get_referenced_patient(patients_list.clone(), test_user_id, user_prompt.clone() ).await; // perform a basic search within the prompt for any of the current patients
-    assert_eq!(referenced_patient.0, CommandController::NO_PATIENT_FOUND, "No patient was expected, but one was returned");
-    assert!(Some(referenced_patient.1).is_some(), "Test 9a: Default Patient not returned");
+    assert_eq!(referenced_patient.0, CommandController::OTHER_PATIENT_FOUND, "No patient was expected, an alternative was returned");
+    assert!(Some(referenced_patient.1).is_some(), "Test 9a: Target Patient not returned");
     
     // Test 9b: Patient SHOULD be found
     user_prompt = "transfer kate beaton".to_string();
     referenced_patient = CommandController::get_referenced_patient(patients_list.clone(), test_user_id, user_prompt.clone() ).await; // perform a basic search within the prompt for any of the current patients
-    assert_eq!(referenced_patient.0, CommandController::KNOWN_PATIENT_FOUND, "A known patient was expected, but none was returned");
+    assert_eq!(referenced_patient.0, CommandController::TARGET_PATIENT_FOUND, "A known patient was expected, but none was returned");
     assert!(Some(referenced_patient.1).is_some(), "Test 9b: A patient was returned, when none were expected");
 }
-
-

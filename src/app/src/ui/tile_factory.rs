@@ -78,11 +78,11 @@ impl WebContentFactory {
                                 ("IntvDetailItemTile.htl", WebContentItem::WCTypeIntvDetailItemTile)       ];
 
         tracing::debug!("WebContentFactory:new()");
-        println!("WebContentFactory:new()");
+        //println!("WebContentFactory:new()");
         // load tiles from pre-defined files, assigning to known constants so that the application can reliably load them later
         for item in tile_files{
            tracing::debug!("..Load tile from: {}", item.0);
-           println!("..Load tile from: {}", item.0);
+           //println!("..Load tile from: {}", item.0);
            let tmp_content = fs::read_to_string(&( content_root_path.to_owned() + item.0) ).expect(constants::ERROR_READING_TEMPLATE);
 
            tiles.insert(item.1, tmp_content.replace(constants::RELEASE_NUMBER, &app_version)); 
@@ -296,7 +296,7 @@ impl WebContentFactory {
                                                   feature_pref_section: String
                                                   ) -> String {
         tracing::debug!(">get_modify_intervention_full_page_tile()");
-        println!(">get_modify_intervention_full_page_tile()");
+        //println!(">get_modify_intervention_full_page_tile()");
 
         let tags = ["{intervention_id}",
                                 "{intervention_type}",

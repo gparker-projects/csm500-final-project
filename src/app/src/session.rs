@@ -39,6 +39,7 @@ pub struct SysConfig {
     pub data_sub_dir: String,
     pub max_general_fastactions: String,
     pub max_nle_fastactions: String, // not implemented for use at this time
+    pub website_bind_address: String,
 }
 
 impl SysConfig{
