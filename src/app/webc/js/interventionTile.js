@@ -1,6 +1,8 @@
 function validateForm() {
     const errLabel = document.getElementById('errLabel');
     const desc_field = document.getElementById('description');
+    const scheduled_timestamp = document.getElementById('scheduled_timestamp').value;
+    const performed_timestamp = document.getElementById('performed_timestamp').value;
     errLabel.textContent = '';
     let isValid = true;
     
@@ -11,8 +13,39 @@ function validateForm() {
         isValid = false;
     }
 
+    // ref: https://www.geeksforgeeks.org/javascript/how-to-validate-string-date-format-in-javascript/
+    //      https://stackoverflow.com/questions/28126345/writing-js-regex-for-yyyy-mm-dd-hhmm
+    // special mention: https://regex101.com/ 
+    const valid_timestamp = /^[0-9]{4}-(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]$/i;
+
+    if (scheduled_timestamp.trim() != '') { // field is optional
+        if ( !valid_timestamp.test(scheduled_timestamp) ) {
+            errLabel.textContent = "Scheduled Date/Time must be in YYYY-MON-DD HH:MM format (" +scheduled_timestamp+ ")";
+            isValid = false;
+        }
+        else{
+            console.log("...scheduled_timestamp valid");
+        }
+    }
+    else{
+            console.log("...scheduled_timestamp EMPTY");
+    }
+
+    if (performed_timestamp.trim() != '') { // field is optional
+        if ( !valid_timestamp.test(performed_timestamp) ) {
+            errLabel.textContent = "Performed Date/Time must be in YYYY-MON-DD HH:MM format (" +performed_timestamp+ ")";
+            isValid = false;
+        }
+        else{
+            console.log("...performed_timestamp valid");
+        }
+    }
+    else{
+        console.log("...performed_timestamp EMPTY");
+    }
+
     if ( !hasAcceptableChars( desc_field.value ) ) {
-        errLabel.textContent = "Description must only contain letters, numbers or basic punctuation.";
+        errLabel.textContent = "Description is required and must only contain letters, numbers or basic punctuation.";
         isValid = false;
     }
     

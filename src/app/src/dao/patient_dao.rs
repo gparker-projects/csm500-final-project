@@ -278,7 +278,7 @@ impl PatientDAO {
         let query = tmp.replace("{}", &user_id.to_string());
 
         //tracing::debug!(">get_patients_at_users_site_no_discharge() Query: {}", query);
-        println!(">get_patients_at_users_site_no_discharge() Query: {}", query);
+        //println!(">get_patients_at_users_site_no_discharge() Query: {}", query);
 
         let rows: Vec<(i64, i64, i64, String, String, String,
                         String, String,

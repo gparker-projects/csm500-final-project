@@ -160,7 +160,7 @@ impl AdmitDataForm {
         }
         
         if ! (self.birthdate.len() > 0) {
-            error.message = Some("Birthdate must be in YYYY/MM/DD format".into());
+            error.message = Some("Birthdate must be in YYYY-MON-DD format".into());
             //println!("AdmitDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
             return Err(error);
         }
@@ -298,14 +298,14 @@ impl InterventionDataForm {
             return Err(error);
         }
 
-        if ! (self.scheduled_timestamp.len() == 0 || self.scheduled_timestamp.len() == 16)   {
-            error.message = Some("Schedule date/time, when provided, must be in YYYY/MM/DD HH:MM format".into());
+        if ! (self.scheduled_timestamp.len() == 0 || self.scheduled_timestamp.len() == 17)   {
+            error.message = Some("Schedule date/time, when provided, must be in YYYY-MON-DD HH:MM format".into());
             println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
             return Err(error);
         }
 
-        if ! (self.performed_timestamp.len() == 0 || self.performed_timestamp.len() == 16)   {
-            error.message = Some("Performed date/time, when provided, must be in YYYY/MM/DD HH:MM format".into());
+        if ! (self.performed_timestamp.len() == 0 || self.performed_timestamp.len() == 17)   {
+            error.message = Some("Performed date/time, when provided, must be in YYYY-MON-DD HH:MM format".into());
             println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
             return Err(error);
         }

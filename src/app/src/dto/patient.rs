@@ -111,7 +111,7 @@ impl Patient {
     ///   String: a string representation of the birth date, in YYYY-MON-DD format
     /// 
     pub fn birth_date_for_display(&self) -> String{
-        self.birth_date.format("%Y-%b-%d").to_string()
+        self.birth_date.format(constants::SYSTEM_DATEONLY_FORMAT).to_string()
     }
 
     /// ### phn_to_string()
@@ -134,7 +134,7 @@ impl Patient {
     ///   String: a string representation of the Admit Timestamp, in YYYY-MON-DD HH:MM:SS format
     /// 
     pub fn admit_timestamp_for_display(&self) -> String{
-        self.admit_timestamp.format("%Y-%b-%d %H:%M:%S").to_string()
+        self.admit_timestamp.format(constants::SYSTEM_DATETIME_FORMAT).to_string()
     }
 
     /// ### age()
@@ -159,7 +159,7 @@ impl Patient {
     pub fn to_patient(frm: AdmitDataForm) -> Patient{
 
         // convert birthdate, if possible
-        let tmp_birthdate = match NaiveDateTime::parse_from_str(&frm.birthdate, "%Y-%m-%d %H:%M:%S"){
+        let tmp_birthdate = match NaiveDateTime::parse_from_str(&frm.birthdate, constants::SYSTEM_DATETIME_FORMAT){
             Ok(p) => p,
             Err(_e) => {
                 //println!("ConvertUtils::to_naivedatetime()"); 

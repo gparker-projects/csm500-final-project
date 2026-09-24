@@ -16,7 +16,9 @@ pub const DATABASE_ERROR_NOT_FOUND : &str = "Not Found";
 pub const GENERAL_ERROR_NOT_FOUND : &str = "Not Found";
 pub const SESSION_ERROR_INVALID : &str = "User session invalid";
 
-pub const SYSTEM_DATETIME_FORMAT : &str= "%Y-%b-%d %H:%M:%S";
+pub const SYSTEM_DATEONLY_FORMAT : &str= "%Y-%b-%d";
+pub const SYSTEM_DATETIME_FORMAT : &str= "%Y-%b-%d %H:%M";
+pub const SYSTEM_DATETIME_WITH_SECONDS_FORMAT : &str= "%Y-%b-%d %H:%M:%S";
 
 pub const CARGO_MANIFEST_DIR : &str= r##"CARGO_MANIFEST_DIR"##;
 

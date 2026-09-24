@@ -10,6 +10,7 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use std::fmt;
+use crate::constants;
 
 #[derive(Deserialize, Serialize, Debug, Clone, Default)]
 pub struct InterventionDetail {
@@ -60,7 +61,7 @@ impl InterventionDetail {
     /// helper method to return the entry_timestamp (date and time) in a format that can be easily displayed
     ///
     pub fn entry_timestamp_for_display(&self) -> String{
-        self.entry_timestamp.format("%Y-%b-%d %H:%M:%S").to_string()
+        self.entry_timestamp.format(constants::SYSTEM_DATETIME_FORMAT).to_string()
     }
 
     pub fn type_name(&self) -> String{

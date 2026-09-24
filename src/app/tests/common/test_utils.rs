@@ -105,7 +105,7 @@ impl DataGenerator{
     #[allow(dead_code)]
     pub fn get_date_as_yyyy_mon_dd() -> String {
        let tmp_date = DataGenerator::get_date();
-       return tmp_date.format("%Y-%b-%d").to_string();
+       return tmp_date.format("%Y-%b-%d").to_string(); // keep the format raw for testing
     }
 
     ///

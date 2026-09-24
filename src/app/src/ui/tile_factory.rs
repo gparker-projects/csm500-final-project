@@ -214,7 +214,7 @@ impl WebContentFactory {
                 } 
 
                 // ...except for admit_timestamp which will be Now()
-                let result_2 = result.replace("{admit_timestamp}", &chrono::Utc::now().format("%Y-%b-%d %H:%M:%S").to_string());
+                let result_2 = result.replace("{admit_timestamp}", &chrono::Utc::now().format(constants::SYSTEM_DATETIME_FORMAT ).to_string());
                 let result_3 = result_2.replace("{location_id}", &location_menu);
                 let result_4 = result_3.replace("{user_prompt}", &user_prompt);
                 let result_5 = result_4.replace("{admit_notes}", &user_prompt);
@@ -244,7 +244,7 @@ impl WebContentFactory {
                 let result_3 = result_2.replace("{user_prompt}", &user_prompt);
                                 
                 if is_discharge_flag {
-                    let result_4 = result_3.replace("{discharge_timestamp}", &chrono::Utc::now().format("%Y-%b-%d %H:%M:%S").to_string());
+                    let result_4 = result_3.replace("{discharge_timestamp}", &chrono::Utc::now().format(constants::SYSTEM_DATETIME_FORMAT).to_string());
                     let result_5 = match p.discharge_notes.len() == 0 && user_prompt.len() > 0 {
                         true => result_4.replace("{discharge_notes}", &user_prompt),
                         false => result_4.replace("{discharge_notes}", &p.discharge_notes),
@@ -296,7 +296,7 @@ impl WebContentFactory {
                                                   feature_pref_section: String
                                                   ) -> String {
         tracing::debug!(">get_modify_intervention_full_page_tile()");
-        //println!(">get_modify_intervention_full_page_tile()");
+        println!(">get_modify_intervention_full_page_tile()");
 
         let tags = ["{intervention_id}",
                                 "{intervention_type}",
@@ -326,11 +326,13 @@ impl WebContentFactory {
         let notes: String;
         let tmp_encounter_id: String;
 
+        println!("..form errors?: >{}<", req.clone().form_errors);
+
         let data_items = match current_intervention{
             None =>{ // Create new Intervention path
-                tracing::debug!("..Create new Intervention");
-                println!("..Create new Intervention");
-                println!("..(debug001)encounter_id: {}", req.encounter_id.to_string());
+                tracing::debug!("..View to create new Intervention");
+                println!("..View to create new Intervention");
+                println!("..(debug001) encounter_id: {}", req.encounter_id.to_string());
                 dd_user = CommonFormatter::get_dropdown_user_with_department(user_dropdown_list,constants::NOT_SPECIFIED_ID); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
                 dd_intv_status =  CommonFormatter::get_dropdown_intervention_status(status_dropdown_list, constants::DEFAULT_INTERVENTION_STATUS_NEW); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
 
@@ -374,7 +376,7 @@ impl WebContentFactory {
                 description = intv.description.to_string();
                 notes = intv.notes.to_string();
                 tmp_encounter_id = intv.encounter_id.to_string();
-                println!("..(debug002)encounter_id: {}", intv.encounter_id.to_string());
+                println!("..(debug002) encounter_id: {}", intv.encounter_id.to_string());
 
                 let form_errors = match req.clone().form_errors.as_str() {
                     "" => constants::ERR_LABEL_NO_ERROR_TAG.to_string(), 
@@ -382,6 +384,7 @@ impl WebContentFactory {
                         let mut tmp_error = constants::ERR_LABEL_WITH_ERROR_TAG.to_string();
                         let error_msg = req.clone().form_errors;
                         tmp_error = tmp_error.replace ("{form_errors}",&error_msg);
+                        println!("..errors reported: {}", error_msg.clone());
                         tmp_error
                     },
                 };

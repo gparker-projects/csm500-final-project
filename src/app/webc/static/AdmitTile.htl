@@ -22,11 +22,18 @@
       return regex.test(str);
   }
 
+  // Ref: https://www.geeksforgeeks.org/javascript/how-to-validate-string-date-format-in-javascript/
+  function isValidDate(str) {
+      let date = new Date(str);
+      let ans = (date instanceof Date) && !isNaN(date);
+      return ans;
+  }
+
   function validateForm() {
     const errLabel = document.getElementById('errLabel');
     errLabel.textContent = '';
     let isValid = true;
-    
+
     console.log("in validateForm();");
 
     if (document.getElementById('patient_first_name').value.trim() == '' || !hasAcceptableChars(document.getElementById('patient_first_name').value)) {
@@ -49,7 +56,11 @@
       isValid = false;
     }
 
-    if (document.getElementById('birthdate').value.trim() == ''|| document.getElementById('birthdate').value.length != 11|| !hasAcceptableChars(document.getElementById('birthdate').value)) {
+    if (document.getElementById('birthdate').value.trim() == ''||
+        document.getElementById('birthdate').value.length != 11||
+        !hasAcceptableChars(document.getElementById('birthdate').value)||
+        ! isValidDate( document.getElementById('birthdate').value )
+        ) {
       errLabel.textContent = "Birthdate must be provided in YYYY-MON-DD format.";
       errLabel.style = "color: red";
       isValid = false;

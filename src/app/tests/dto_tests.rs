@@ -308,7 +308,7 @@ fn test_create_intervention_details_dto() {
       obj.phn = constants::NOT_SPECIFIED_ID;
       assert_eq!(obj.phn_to_string(), "".to_string()); // test after
 
-      assert_eq!(obj.admit_timestamp_for_display(), admit_timestamp.format("%Y-%b-%d %H:%M:%S").to_string());
+      assert_eq!(obj.admit_timestamp_for_display(), admit_timestamp.format("%Y-%b-%d %H:%M").to_string());
       
 
       obj.birth_date = fixed_birth_date;

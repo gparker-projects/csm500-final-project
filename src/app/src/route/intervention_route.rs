@@ -32,6 +32,7 @@ impl InterventionRoute{
     /// 
     pub async fn route_to_intervention_save(app_session: web::Data<AppSession>, user_session: Session, mut req: web::Form<InterventionDataForm>) -> impl Responder {
         tracing::debug!("-> Route Requested: /route_to_discharge_patient_save ");
+        println!("-> Route Requested: /route_to_discharge_patient_save ");
 
         let req_clone0 = req.clone();
         let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
@@ -40,8 +41,8 @@ impl InterventionRoute{
         let frm_errors = req.validate_fields();
         match frm_errors {
             Err(e) => {
-                tracing::error!("!InterventionDataForm > Form errors detected");
-                println!("!InterventionDataForm > Form errors detected");
+                tracing::error!("..!InterventionDataForm > Form errors detected, redirect to view/modify intervention");
+                println!("..!InterventionDataForm > Form errors detected, redirect to view/modify intervention");
                 Self::route_to_view_or_modify_intervention(
                     app_session.clone(), user_session.clone(), web::Form(
                         {
@@ -53,7 +54,8 @@ impl InterventionRoute{
                 ).await;
             },
             _ => { // "do nothing, because form was valid"
-                tracing::debug!("Form validation successful (InterventionDataForm)");
+                tracing::debug!("..Form validation successful (InterventionDataForm), saving");
+                println!("..Form validation successful (InterventionDataForm), saving");
 
                 let idao = InterventionDAO::new( app_session.get_db_connection() ).await;
                 let results = idao.upsert_intervention_from_intv_form(req_clone0.clone(), user_session_details.get_userid_as_i64()).await;
@@ -69,9 +71,10 @@ impl InterventionRoute{
                                                                                     type_id).await.unwrap();
                     },
                     Err(e) => {
-                        tracing::debug!("  >Intervention not created/updated: {e}");
+                        tracing::debug!("....Error occurred: Intervention not created/updated: {e}");
                     }
                 }
+                
             },
         };
 
@@ -84,6 +87,7 @@ impl InterventionRoute{
     /// 
     pub async fn route_to_add_new_intervention(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<InterventionDataFormBasic>)  -> impl Responder {
         tracing::debug!("-> Route Requested: /intvnew  route_to_add_new_intervention()");
+        println!("-> Route Requested: /intvnew  route_to_add_new_intervention()");
         let mut tmp_encounter_id = req.encounter_id.clone();
         let tmp_patient_id = req.patient_id.clone();
 
@@ -129,7 +133,8 @@ impl InterventionRoute{
     /// Route for adding a new Intervention for a Patient-Encounter
     /// 
     pub async fn route_to_view_or_modify_intervention(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<InterventionDataForm>)  -> impl Responder {
-        tracing::debug!("-> Route Requested: /intv  (add/modify)");
+        tracing::debug!("-> Route Requested: /intv  (add/modify) route_to_view_or_modify_intervention()");
+        println!("-> Route Requested: /intv  (add/modify) route_to_view_or_modify_intervention()");
         let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
         let wcf = &app_session.get_web_content_factory();
         let userid = user_session_details.clone().get_userid_as_i64();
@@ -165,7 +170,7 @@ impl InterventionRoute{
                 {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), req.get_patient_id_as_i64(), user_session_details.clone())
             }
             None => {
-                tracing::debug!("No patients found for legacy menu");
+                //tracing::debug!("No patients found for legacy menu");
                 constants::LEGACY_MENU_ON_ERROR.to_string()
             }
         };

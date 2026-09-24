@@ -123,11 +123,12 @@ impl InterventionDAO {
     /// 
     pub async fn get_interventions(&self, encounter_id: i64, current_only: bool) -> Result< Option< Vec<Intervention> >, std::io::Error> {
         tracing::debug!("get_interventions()");
+        println!("get_interventions({})", encounter_id);
         let tmp = match current_only {
             true => db_query::QRY_CURRENT_VITALS_FOR_ENC_ID,
             false => db_query::QRY_INTERVENTIONS_FOR_ENC_ID
         };
-        let query = tmp.replace("{}", &encounter_id.to_string());
+        let query = tmp.replace("{encounter_id}", &encounter_id.to_string());
 
         let rows: Vec<(i64, i64, String, String,
                        i64, i64, i64, i64,
@@ -140,7 +141,8 @@ impl InterventionDAO {
         .unwrap_or_default();
 
         if rows.is_empty() {
-            //println!(">get_interventions() Query: {}", query);
+            //println!("..No Interventions found for encounter_id: Query: {}", query);
+            println!("..No Interventions found");
             tracing::debug!("No Interventions found for encounter_id: {}", encounter_id);
             return Ok( Some( Vec::new() ) );
         }
