@@ -27,8 +27,16 @@ pub struct InterventionRoute{}
 
 impl InterventionRoute{
 
-    ///
-    /// Route that will update the intervention and then redirect back to the modify screen
+    /// ### InterventionRoute::route_to_intervention_save()
+    ///    Route that will update the intervention and then redirect back to the modify screen
+    /// 
+    /// #### Parameters:
+    /// * app_session (web::Data<session::AppSession>): the application session
+    /// * user_session (actix_session::Session): the user's session
+    /// * req: web::Form<DischargeDataForm>: the user's request, encapsulated in a InterventionDataForm
+    /// 
+    /// #### Returns:
+    /// * Responder (actix_web::response::responder): the HTTP responder (response) for the request
     /// 
     pub async fn route_to_intervention_save(app_session: web::Data<AppSession>, user_session: Session, mut req: web::Form<InterventionDataForm>) -> impl Responder {
         tracing::debug!("-> Route Requested: /route_to_discharge_patient_save ");
@@ -82,8 +90,16 @@ impl InterventionRoute{
         InterventionRoute::route_to_view_or_modify_intervention( app_session, user_session, req ).await
     }
 
-    ///
-    /// Wrapper route for the adding new, or modifying existing Interventions of a patient, without having any web form to pass data in from
+    /// ### InterventionRoute::route_to_add_new_intervention()
+    ///    Wrapper route for the adding new, or modifying existing Interventions of a patient, without having any web form to pass data in from
+    /// 
+    /// #### Parameters:
+    /// * app_session (web::Data<session::AppSession>): the application session
+    /// * user_session (actix_session::Session): the user's session
+    /// * req: web::Form<DischargeDataForm>: the user's request, encapsulated in a InterventionDataFormBasic
+    /// 
+    /// #### Returns:
+    /// * Responder (actix_web::response::responder): the HTTP responder (response) for the request
     /// 
     pub async fn route_to_add_new_intervention(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<InterventionDataFormBasic>)  -> impl Responder {
         tracing::debug!("-> Route Requested: /intvnew  route_to_add_new_intervention()");
@@ -112,8 +128,16 @@ impl InterventionRoute{
         )).await
     }
 
-    ///
-    /// Wrapper route for hyperlink to view/modify an Intervention without having any web form to pass data in from
+    /// ### InterventionRoute::route_to_modify_intervention_basic()
+    ///    Wrapper route for hyperlink to view/modify an Intervention without having any web form to pass data in from
+    /// 
+    /// #### Parameters:
+    /// * app_session (web::Data<session::AppSession>): the application session
+    /// * user_session (actix_session::Session): the user's session
+    /// * req: web::Form<DischargeDataForm>: the user's request, encapsulated in a InterventionDataFormLink
+    /// 
+    /// #### Returns:
+    /// * Responder (actix_web::response::responder): the HTTP responder (response) for the request
     /// 
     pub async fn route_to_modify_intervention_basic(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<InterventionDataFormLink>) -> impl Responder {
         tracing::debug!("-> Route Requested: /intvlink  route_to_modify_intervention_basic()");
@@ -128,9 +152,16 @@ impl InterventionRoute{
             )).await
     }
 
-
-    ///
-    /// Route for adding a new Intervention for a Patient-Encounter
+    /// ### InterventionRoute::route_to_view_or_modify_intervention()
+    ///    Route for adding a new Intervention for a Patient-Encounter
+    /// 
+    /// #### Parameters:
+    /// * app_session (web::Data<session::AppSession>): the application session
+    /// * user_session (actix_session::Session): the user's session
+    /// * req: web::Form<DischargeDataForm>: the user's request, encapsulated in a InterventionDataForm
+    /// 
+    /// #### Returns:
+    /// * Responder (actix_web::response::responder): the HTTP responder (response) for the request
     /// 
     pub async fn route_to_view_or_modify_intervention(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<InterventionDataForm>)  -> impl Responder {
         tracing::debug!("-> Route Requested: /intv  (add/modify) route_to_view_or_modify_intervention()");

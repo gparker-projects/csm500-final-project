@@ -22,8 +22,16 @@ use crate::ui::data_forms::*;
 pub struct InterventionDetailsRoute{}
 
 impl InterventionDetailsRoute{
-    ///
-    /// Route that will update the intervention and then redirect back to the modify screen
+    /// ### InterventionDetailsRoute::route_to_add_intervention_detail()
+    ///    Route that will update the intervention and then redirect back to the modify screen
+    /// 
+    /// #### Parameters:
+    /// * app_session (web::Data<session::AppSession>): the application session
+    /// * user_session (actix_session::Session): the user's session
+    /// * req: web::Form<DischargeDataForm>: the user's request, encapsulated in a InterventionDetailsAddFormBasic
+    /// 
+    /// #### Returns:
+    /// * Responder (actix_web::response::responder): the HTTP responder (response) for the request
     /// 
     pub async fn route_to_add_intervention_detail(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<InterventionDetailsAddFormBasic>) -> impl Responder {
         tracing::debug!("-> Route Requested: /route_to_add_intervention_detail ");
@@ -57,8 +65,16 @@ impl InterventionDetailsRoute{
         ).await
     }
 
-    ///
-    /// Route that will update the intervention and then redirect back to the modify screen
+    /// ### InterventionDetailsRoute::route_to_intervention_detail_save()
+    ///    Route that will update the intervention and then redirect back to the modify screen
+    /// 
+    /// #### Parameters:
+    /// * app_session (web::Data<session::AppSession>): the application session
+    /// * user_session (actix_session::Session): the user's session
+    /// * req: web::Form<DischargeDataForm>: the user's request, encapsulated in a InterventionDetailsDataForm
+    /// 
+    /// #### Returns:
+    /// * Responder (actix_web::response::responder): the HTTP responder (response) for the request
     /// 
     pub async fn route_to_intervention_detail_save(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<InterventionDetailsDataForm>) -> impl Responder {
         tracing::debug!("-> Route Requested: /route_to_intervention_detail_save ");
