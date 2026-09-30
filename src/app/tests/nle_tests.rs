@@ -13,6 +13,7 @@
 
 mod common;
 
+//use actix_web::cookie::time::format_description::modifier::End;
 use sqlx::postgres::{PgPoolOptions}; 
 
 use maple_emr::constants;
@@ -27,6 +28,9 @@ use maple_emr::dto::user_auth::UserAuthorization;
 
 use common::entity_factory::EntityFactory;
 
+//use crate::common::test_utils;
+use crate::common::test_utils::DataGenerator;
+
 pub const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500";
 
 #[tokio::test]
@@ -34,6 +38,7 @@ async fn test_fmt_get_nle_options_content() {
     let tmp_patient = EntityFactory::create_patient();
     let p_id = tmp_patient.id; //constants::INVALID_OTHER_ID;
     let static_base_path = std::env::current_dir().expect("Base path to executable could not be found").display().to_string() + "\\data\\";
+    let option_limit: usize = 3;
 
     let mut test_prompts_and_matches: Vec<(String, f32)> = Vec::new();
     test_prompts_and_matches.push (("Weak Match".to_string(),      0.10));
@@ -63,32 +68,34 @@ async fn test_fmt_get_nle_options_content() {
     let test_nle_2b = NaturalLanguageEngine::new(&minimlm_model_file_path, &tokenizer_file_path).await;
     let _test_cmd_2b: CommandController = CommandController::new(&bad_path, test_nle_2b);
 
+
+
     // Test 3: NLECommandFormatter::get_nle_options_content; patient provided
-    let html_result1 = NLECommandFormatter::get_nle_options_content(test_prompts_and_matches.clone(), test_cmd, p_id, Some(tmp_patient));
+    let html_result1 = NLECommandFormatter::get_nle_options_content(test_prompts_and_matches.clone(), test_cmd, p_id, Some(tmp_patient), option_limit);
     assert_ne!(html_result1, String::new(), "Test 3: No HTML returned by NLECommandFormatter::get_nle_options_content");
 
     // Test 4: NLECommandFormatter::get_nle_options_content; no patient provided
     let test_nle2 = NaturalLanguageEngine::new(&minimlm_model_file_path, &tokenizer_file_path).await;
     let test_cmd2: CommandController = CommandController::new(&mapping_file_path, test_nle2);
-    let html_result1 = NLECommandFormatter::get_nle_options_content(test_prompts_and_matches.clone(), test_cmd2, p_id, None);
+    let html_result1 = NLECommandFormatter::get_nle_options_content(test_prompts_and_matches.clone(), test_cmd2, p_id, None, option_limit);
     assert_ne!(html_result1, String::new(), "Test 4: No HTML returned by NLECommandFormatter::get_nle_options_content");
 
     // Test 5: NLECommandFormatter::get_nle_options_content; no patient provided, patient_id = -1
     let test_nle3 = NaturalLanguageEngine::new(&minimlm_model_file_path, &tokenizer_file_path).await;
     let test_cmd3: CommandController = CommandController::new(&mapping_file_path, test_nle3);
-    let html_result1 = NLECommandFormatter::get_nle_options_content(test_prompts_and_matches.clone(), test_cmd3, constants::INVALID_PATIENT_ID, None);
+    let html_result1 = NLECommandFormatter::get_nle_options_content(test_prompts_and_matches.clone(), test_cmd3, constants::INVALID_PATIENT_ID, None, option_limit);
     assert_ne!(html_result1, String::new(), "Test 5: No HTML returned by NLECommandFormatter::get_nle_options_content");
 
     // Test 5b: NLECommandFormatter::get_nle_options_content; no patient provided, patient_id = -1
     let test_nle5b = NaturalLanguageEngine::new(&minimlm_model_file_path, &tokenizer_file_path).await;
     let test_cmd5b: CommandController = CommandController::new(&mapping_file_path, test_nle5b);
-    let html_result1 = NLECommandFormatter::get_nle_options_content(test_prompts_and_matches.clone(), test_cmd5b, 100000, None);
+    let html_result1 = NLECommandFormatter::get_nle_options_content(test_prompts_and_matches.clone(), test_cmd5b, 100000, None, option_limit);
     assert_ne!(html_result1, String::new(), "Test 5b: No HTML returned by NLECommandFormatter::get_nle_options_content");
 
     // Test 6: NLECommandFormatter::get_nle_options_content; no patient provided, patient_id = -1; NO ITEMS
     let test_nle4 = NaturalLanguageEngine::new(&minimlm_model_file_path, &tokenizer_file_path).await;
     let test_cmd4: CommandController = CommandController::new(&mapping_file_path, test_nle4);
-    let html_result1 = NLECommandFormatter::get_nle_options_content(Vec::new(), test_cmd4, constants::INVALID_PATIENT_ID, None);
+    let html_result1 = NLECommandFormatter::get_nle_options_content(Vec::new(), test_cmd4, constants::INVALID_PATIENT_ID, None, option_limit);
     assert_ne!(html_result1, String::new(), "Test 6: No HTML returned by NLECommandFormatter::get_nle_options_content");
 
     // Test 7: Test the results of is_command_allowed_at_context_level() permission id, current context, required context, expected_true_value
@@ -182,4 +189,97 @@ async fn test_nle_get_referenced_patient() {
     referenced_patient = CommandController::get_referenced_patient(patients_list.clone(), test_user_id, user_prompt.clone() ).await; // perform a basic search within the prompt for any of the current patients
     assert_eq!(referenced_patient.0, CommandController::TARGET_PATIENT_FOUND, "A known patient was expected, but none was returned");
     assert!(Some(referenced_patient.1).is_some(), "Test 9b: A patient was returned, when none were expected");
+}
+
+
+///
+/// Tests the NL prompt with all levels of permissions for a wide array of commands that could be executed, against 2 possible phrases for each command
+/// 
+///    cargo test --test nle_tests test_validate_prompt_results_clinical -- --exact --nocapture
+/// 
+#[tokio::test]
+async fn test_validate_prompt_results_clinical() {
+    let static_base_path = std::env::current_dir().expect("Base path to executable could not be found").display().to_string() + "\\data\\";
+    let minimlm_model_file_path = static_base_path.clone() + &"all-MiniLM-L6-v2.onnx".to_string();
+    let tokenizer_file_path = static_base_path.clone() + &"tokenizer.json".to_string();
+    let mapping_file_path = static_base_path.clone() + &"command_mapping.csv".to_string();
+
+    // populate the prompt with permissions a clinical user would have
+    //   clinical users are ids: 1, 2, 6, 7
+    //    non-clinical: 3, 4 and also 5 is very limited
+    //    admin: 5
+    let clinical_permissions = vec![1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12,
+                                              100002, 100003, 100004, 100005, 100006, 100007, 100008, 
+                                              100009, 100010, 100011, 100012, 100038, 100040, 100041, 
+                                              100042, 100043, 100044, 100045, 100046, 100047, 100048   ];
+    let mut ua: UserAuthorization = UserAuthorization::new(Vec::new());
+
+    for perm in clinical_permissions{
+        ua.granted_permissions.push( Permission::new(1, perm) );
+    }
+
+    let valid_prompts  = vec![
+                "high fall risk on admission", "bed alarm activated and signage posted at bedside", // 100040 Alerts/CCI/SPI"
+                "cci flag for aggressive behaviour", "patient has hemophilia", //  100040	"Alerts/CCI/SPI"
+                "patient has severe alergy to penicillin", "allergy band applied", // 100043	"Allergies"
+                "follow-up with dermatologist booked for next wednesday at 10:00", "patient reminded to bring medication and given appointment card", // 100041	"Appointments"
+                "electrolytes and cbc drawn from right antecubital at 1600", "specimen labelled sent to lab", // 100002	"Collect Specimen: Bloodwork"
+                "suspected dehydration, iv fluids started", "urine output reasssessment in four hours", // 2	"create-clinical-intervention"
+                "interpreter services requeted for family", "social worker notified for children at home", // 3	"create-non-clinical-intervention"
+                "patient admitted to medical unit from ed for acute poisoning", "admission ordered", // 4	"create-update-admit"
+                "primary diagnosis confirmed as community-acquired covid-19", "secondary diagnosis of pneumonia noted", // 100042	"Diagnoses"
+                "signed consent form scanned added to chart", "discharge summary uploaded for general physician", // 100046	"Documents"
+                "influenza vaccine administered to right deltoid", "no reaction observed to influenza vaccine after 15 minutes", // 100045	"Immunizations"
+                "incorrect permissions at log in", "password reset and access restored", // 1	"login"
+                "all done", "end of shift log out", // 1	"logout"
+                "patient reports low mood and poor sleep for two weeks", "referral made to the mental health liaison team", // 100047	"Mental Health and Wellness"
+                "family requested to speak with attending physician", "message left for physician on call", // 100012	"Other"
+                "patient ported to ed with a walker and standby assist", "daily gait training to continue as part of physio", // 100048	"Physiotherapy"
+                "patient returned with minimal chest drainage", "chest tubes in place following cabg", // 100008	"Procedure: (Cardiovascular) Open Heart Surgery"
+                "2 mg morphine administered iv for pain rated 6/10", "pain reassessed at 3/10 pain after 60 minutes", // 100005	"Procedure: Administer Medication"
+                "one unit of type ab started at 1400", "vitals stable with no signs of reaction to transfusion", // 100010	"Procedure: Blood Transfusion"
+                "bp 144/90, rr 17, hr 60, spo2 96% on room air", "temperature 37.2 degrees and patient was afebrile", // 100038	"Procedure: Collect Vitals"
+                "ct head completed, no contrast", "abnormal acute intracranial reported", // 100003	"Procedure: CT Scan"
+                "3cm laceration to left forearm closed with four sutures", "patient to return in 10 days for removal", // 100009	"Procedure: General Suture"
+                "mri lumbar spine completed this morning", "radiology report review pending", // 100004	"Procedure: Magnetic Resonance Imaging (MRI)"
+                "portable chest x-ray done at bedside", "findings show left lower lobe dispersement", // 100011	"Procedure: X-Ray"
+                "worsening oxygen levels, patient transfer to icu requested", "bed confirmed and report given to receiving porter", // 100006	"Support Request: Patient Transfer"
+                "referral sent to nephrology for declining creatinine", "consult expected by 23:00", // 100007	"Support Request: Physician Referral"
+                "iv fluid rate increased to 100 ml/hr", "patient now managing oral fluids well", // 6	"update-clinical-intervention"
+                "interpreter meeting rescheduled to tomorrow afternoon", "patient agreed to the new time", // 7	"update-non-clinical-intervention"
+                "review admission records prior to rounds", "patient admitt for copd exacerbation", // 8	"view-admit"
+                "review recent labs and vitals trend", "potassium remains low and needs replacement", // 9	"view-any-clinical-data"
+                "check active changes to care plan", "wound dressing change at 1700", // 10	"view-clinical-intervention"
+                "discharge summary agrees with previous admission", "patient was sent home on oral antibiotics and referral to gp", // 11	"view-discharge"
+                "check patient orders", "update next of kin address" // 12	"view-non-clinical-intervention" 
+            ];
+
+    println!("test_validate_prompt_results_clinical()");
+
+    let test_nle = NaturalLanguageEngine::new(&minimlm_model_file_path, &tokenizer_file_path).await;
+    let mut test_cmd: CommandController = CommandController::new(&mapping_file_path, test_nle);
+
+    let start_time = DataGenerator::now();
+
+    let mut num_of_runs = 0;
+
+    // run every prompt for every context level
+    for pmp in valid_prompts{
+        for context_level in 0..=2 {
+            let rankings:  Vec<(String, f32)> = test_cmd.get_filtered_classifier_rankings(pmp.to_string(), ua.clone(), context_level).await; // level 0
+
+            println!("..Prompt: {} @ Level: {}", pmp, context_level);
+            for item in rankings.clone() {
+                println!("....'{}': ({:.1}%)", item.0, item.1 * 100.);
+            }
+            if rankings.clone().len() == 0 {
+                assert!(false);
+            }
+            num_of_runs = num_of_runs + 1;
+        }
+    }
+    let end_time = DataGenerator::now();
+    println!("Start time: {}", start_time);
+    println!("End time: {} / No. of Runs: {}", end_time, num_of_runs);
+    assert!(true);
 }

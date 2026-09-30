@@ -19,7 +19,7 @@ impl NLECommandFormatter {
     ///
     /// 
     /// 
-    pub fn get_nle_options_content( items: Vec< (String, f32)>, cmd: CommandController, patient_id: i64, referred_patient: Option<Patient>) -> String{
+    pub fn get_nle_options_content( items: Vec< (String, f32)>, cmd: CommandController, patient_id: i64, referred_patient: Option<Patient>, option_limit: usize) -> String{
         tracing::debug!("get_nle_options_content()");
         
         let mut results_sbuf = String::with_capacity(500); 
@@ -46,8 +46,6 @@ impl NLECommandFormatter {
         if items.len() > 0 {
             results_sbuf.push_str("<div class='data'>Here are some options, based on your prompt:<p>\n");
             results_sbuf.push_str("<form action=\"/nlprompt\" method=\"post\" id=\"nlpActionCmdForm\" name=\"nlpActionCmdForm\" onSubmit=\"event.preventDefault(); return performNLAction();\" align=\"right\" class=\"nlpCommandAreaCls\">\n");
-
-            let option_limit = 3;
 
             // iterate the list of options to ensure we are not duplicating any (names may be different, but actions should not be)
             for item in items.into_iter(){

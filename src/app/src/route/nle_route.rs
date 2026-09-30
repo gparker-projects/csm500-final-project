@@ -133,7 +133,8 @@ impl NLERoute{
 
         let classifer_results_final: Vec< (String, f32)> = cmd.get_filtered_classifier_rankings( prompt_final, cur_session.clone().user_authorizations, context_level).await;
 
-        results_sbuf.push_str( &NLECommandFormatter::get_nle_options_content(classifer_results_final, cmd, patient_id, referenced_patient.1 ));
+        let option_limit: usize = app_session.system_config.max_nle_fastactions.parse::<usize>().unwrap(); // pull maximum number of NL options to present, from the system config
+        results_sbuf.push_str( &NLECommandFormatter::get_nle_options_content(classifer_results_final, cmd, patient_id, referenced_patient.1,  option_limit));
         
         HttpResponse::Ok().body( results_sbuf )
     }
