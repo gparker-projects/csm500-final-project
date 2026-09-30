@@ -65,31 +65,43 @@ pub struct AppSession {
 
 impl AppSession {
 
-  ///
-  /// Returns a clone of the current web content factory
+  /// ### get_db_connection()
+  ///    Accessor returns a clone of the current web content factory
+  /// 
+  /// #### Returns:
+  /// * WebContentFactory: the current web content factory instance
   /// 
   pub fn get_web_content_factory(&self) -> WebContentFactory{
       return self.wcf.clone();
   }
 
-  ///
-  /// Returns a clone of the current connection to the datbase
+  /// ### get_db_connection()
+  ///    Accessor rReturns a clone of the current connection to the datbase
+  /// 
+  /// #### Returns:
+  /// * PgPool: the current database connection as a PgPool
   /// 
   pub fn get_db_connection(&self) -> PgPool{
       return self.connection.clone();
   }
 
-  ///
-  /// Returns a full path to the language model file 
+  /// ### get_full_path_language_model_file()
+  ///    Accessor returns a full path to the language model file 
+  /// 
+  /// #### Returns:
+  /// * String: the fill path to the language model file
   /// 
   pub fn get_full_path_language_model_file(&self) -> String {
       Path::new( &self.system_config.cargo_manifest_dir.clone()  )
                 .join(self.system_config.data_sub_dir.clone())
                  .join(self.system_config.language_model_file.clone()).to_string_lossy().to_string()
   }
- 
-  ///
-  /// Returns a full to the path tokenizer file 
+
+  /// ### get_full_path_tokenizer_file()
+  ///    Accessor returns a full path to the tokenizer file 
+  /// 
+  /// #### Returns:
+  /// * String: the fill path to the tokenizer file
   /// 
   pub fn get_full_path_tokenizer_file(&self) -> String {
       Path::new(&self.system_config.cargo_manifest_dir.clone()  )
@@ -97,8 +109,11 @@ impl AppSession {
                  .join(self.system_config.tokenizer_file.clone()).to_string_lossy() .to_string()
   }
 
-  ///
-  /// Returns a full path to the command mapping file 
+  /// ### get_full_path_command_mapping_file()
+  ///    Accessor returns a full path to the command mapping file 
+  /// 
+  /// #### Returns:
+  /// * String: the fill path to the mapping file
   /// 
   pub fn get_full_path_command_mapping_file(&self) -> String {
       Path::new( &self.system_config.cargo_manifest_dir.clone()  )

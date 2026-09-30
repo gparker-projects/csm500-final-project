@@ -54,19 +54,29 @@ mod nle;
 mod route;
 mod session;
 
-//use std::sync::Mutex; // needed for thread safety per https://actix.rs/docs/application/
-
-///
+/// ### fn is_it_up()
+/// 
 /// Allows a monitoring services to perform a basic "is the application up?" check
+/// 
+/// #### Parameters: None
+/// 
+/// #### Returns: 
+/// * Responder: the general responder that allows the system to report system is up using an Ok() response
 /// 
 async fn is_it_up() -> impl Responder {
     tracing::info!("-> /isItUp Requested");
     HttpResponse::Ok().body("MapleEMR is Up")
 }
 
-///
+/// ### fn get_static_path_base()
+/// 
 /// Helper function: obtains the web static path base, which is used to retrieve many sources of static content
 /// TODO: if this is not being used anywhere other than WebContentFactory, can we remove it?
+/// 
+/// #### Parameters: None
+/// 
+/// #### Returns: 
+/// * String: the base static file path, based on std::env::current_dir()
 /// 
 fn get_static_path_base() -> String{
    //let path = see below
@@ -74,9 +84,16 @@ fn get_static_path_base() -> String{
    return std::env::current_dir().expect("Base path to executable could not be found").display().to_string() + "\\webc\\static\\";
 }
 
-///
-/// Provides the secret key for the application, usually from a config file (TODO)
-/// REF: https://docs.rs/actix-web/latest/actix_web/cookie/struct.Key.html
+/// ### fn get_application_secret_key()
+///   Provides the secret key for the application, usually from a config file (TODO)
+/// 
+/// #### Referencees:
+///  https://docs.rs/actix-web/latest/actix_web/cookie/struct.Key.html
+/// 
+/// #### Parameters: None
+/// 
+/// #### Returns: 
+/// * Key: the Key obtained from the actix_web::cookie::Key class
 /// 
 fn get_application_secret_key() -> Key {
     tracing::info!(">get_application_secret_key()");
@@ -88,6 +105,13 @@ fn get_application_secret_key() -> Key {
     )
 }
 
+/// ### fn init_logging()
+///   Initializes standard Rust logging for the application, creating a file with name format: maple_emr-%Y-%b-%d_%H%M%S.log
+/// 
+/// #### Parameters: None
+/// 
+/// #### Returns: None
+/// 
 fn init_logging(){
   // added per recommendation from 0-to-Prod
   // https://rust.code-maven.com/logging/tracing-to-a-file.html
@@ -113,9 +137,14 @@ fn init_logging(){
   println!("MapleEMR is running! Access via: http://127.0.0.1:8000");
 }
 
-///
-/// Reads the system configuration file from a static path... so it is the only one we need to do this from
+/// ### init_config()
+///   Reads the system configuration file from a static path... so it is the only one we need to do this from
 ///  the rest of the config settings are in this config file, eliminating many constants otherwise requird by the application
+/// 
+/// #### Parameters: None
+/// 
+/// #### Returns:
+/// * SysConfig: an initialized SysConfig instance
 /// 
 fn init_config() -> SysConfig {
     // collect the cargo manifest directory at runtime, which means it might not be present
@@ -162,7 +191,7 @@ fn init_config() -> SysConfig {
     final_config
 }
 
-/// ### NLERoute::route_to_not_found()
+/// ### route_to_not_found()
 ///   Route for processing resource not found / 404 errors
 /// 
 /// #### Parameters: None
