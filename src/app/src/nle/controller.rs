@@ -1,7 +1,7 @@
 //! Natural Language Engline (NLE) controller module
 //!
-//!    CSM500 Project (April - October 2026)
-//!      Graham Parker (Student ID: 240120522)
+//! CSM500 Project (April - October 2026)
+//! Graham Parker (Student ID: 240120522)
 //! 
 //! REFERENCES
 //! 
@@ -229,9 +229,9 @@ impl CommandController{
     /// * prompt: String - the prompt to be searched for the patient.
     /// 
     /// ## Returns: (i8, Option<Patient>): a tuple of the results code and an Option<Patient>
-    /// * i8: - NO_PATIENT_FOUND if the patient was not found and NO patient was found
-    ///       - TARGET_PATIENT_FOUND if the patient indicated by the prompt was found
-    ///       - OTHER_PATIENT_FOUND, if the target patient was not found, but we've been able to provide a substitute.
+    /// * i8: - NO_PATIENT_FOUND (0) if the patient was not found and NO patient was found
+    ///       - TARGET_PATIENT_FOUND (2) if the patient indicated by the prompt was found
+    ///       - OTHER_PATIENT_FOUND (1) if the target patient was not found, but we've been able to provide a substitute.
     /// 
     pub async fn get_referenced_patient(patients_list: Vec<Patient>, _audit_userid: i64, prompt: String) -> (i8, Option<Patient>){
         //tracing::info!("get_referenced_patient()");

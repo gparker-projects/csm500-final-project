@@ -2,7 +2,9 @@
 /// Unit & Integration tests for the User Interface (ui) module
 ///
 /// Ref: Unit Testing in Rust is actually easy! - Flo Woelki (https://youtu.be/6wAFdBVJbwc?si=KdJfqvRdcXi9-mqo) - LOL NOT easy
-/// 
+///  CSM500 Project (April - October 2026)
+///  Graham Parker (Student ID: 240120522)
+/// -------------------------------------------------------------------
 
 mod common;
 
@@ -23,7 +25,7 @@ use maple_emr::session::{UserSession}; // AppSession
 use maple_emr::ui::data_forms::InterventionDataForm;
 
 use common::entity_factory::EntityFactory;
-use common::test_utils::DataGenerator;
+use common::data_generator::DataGenerator;
 
 ///
 /// Tests WebContentFactory::new() and general initalization

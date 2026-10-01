@@ -11,6 +11,9 @@
 ///
 /// Ref: Unit Testing in Rust is actually easy! - Flo Woelki (https://youtu.be/6wAFdBVJbwc?si=KdJfqvRdcXi9-mqo) - LOL NOT easy
 /// 
+///  CSM500 Project (April - October 2026)
+///  Graham Parker (Student ID: 240120522)
+/// -------------------------------------------------------------------
 
 mod common;
 

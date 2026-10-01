@@ -3,9 +3,8 @@
 //!  component of the MVC pattern.
 //! -------------------------------------------------------------------
 //!
-//!    CSM500 Project (April - October 2026)
-//!      Graham Parker (Student ID: 240120522)
-//! 
+//!  CSM500 Project (April - October 2026)
+//!  Graham Parker (Student ID: 240120522)
 //! -------------------------------------------------------------------
 
 pub mod admit_route;

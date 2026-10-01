@@ -7,6 +7,9 @@
 ///
 /// Ref: Unit Testing in Rust is actually easy! - Flo Woelki (https://youtu.be/6wAFdBVJbwc?si=KdJfqvRdcXi9-mqo) - LOL NOT easy
 /// 
+///  CSM500 Project (April - October 2026)
+///  Graham Parker (Student ID: 240120522)
+/// -------------------------------------------------------------------
 
 mod common;
 
@@ -50,7 +53,7 @@ async fn test_get_current_encounter() {
     // does not instantiate however, the remainder of this test will fail.
     let pdao = EncounterDAO::new( db_pool.clone() );
     let enc: Encounter = pdao.await.get_current_encounter( patient_id ).await;
-    assert!( enc.id == 81, "Different Encounter returned" );
+    assert!( enc.id == 187, "Different Encounter returned for patient_id={}", patient_id );
 
     // Test 2: INVALID_PATIENT_ID
     let _enc2: Encounter = {EncounterDAO::new( db_pool.clone() )}.await.get_current_encounter( constants::INVALID_PATIENT_ID ).await;

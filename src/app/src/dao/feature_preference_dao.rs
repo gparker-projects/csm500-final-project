@@ -1,11 +1,8 @@
 //! # Defines a Data Access Object (DAO) for a Feature Preference entity, which enables retrieval
 //!   and assembly of an Feature Preference object, based on data in the database.
 //!
-//!    CSM500 Project (April - October 2026)
-//!      Graham Parker (Student ID: 240120522)
-//! 
-//! REFERENCES
-//! 
+//!  CSM500 Project (April - October 2026)
+//!  Graham Parker (Student ID: 240120522)
 
 use chrono::NaiveDateTime;
 use std::collections::HashSet;

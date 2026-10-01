@@ -3,11 +3,8 @@
 //! controls such as drop down lists, generic hidden forms etc.
 //! -------------------------------------------------------------------
 //! 
-//!    CSM500 Project (April - October 2026)
-//!      Graham Parker (Student ID: 240120522)
-//! 
-//! REFERENCES
-//! 
+//!  CSM500 Project (April - October 2026)
+//!  Graham Parker (Student ID: 240120522)
 //! -------------------------------------------------------------------
 
 pub struct CommonFormatter{}

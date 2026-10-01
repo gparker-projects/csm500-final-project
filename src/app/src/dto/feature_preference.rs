@@ -2,11 +2,8 @@
 //!  stores information related to a feature which a user has used
 //!  at least once, but likely many times.
 //!
-//!    CSM500 Project (April - October 2026)
-//!      Graham Parker (Student ID: 240120522)
-//! 
-//! REFERENCES
-//! 
+//!  CSM500 Project (April - October 2026)
+//!  Graham Parker (Student ID: 240120522)
 
 use serde::{Deserialize, Serialize};
 use chrono::{NaiveDateTime}; 

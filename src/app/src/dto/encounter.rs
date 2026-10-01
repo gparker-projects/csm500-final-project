@@ -2,11 +2,8 @@
 //! an event whereby a patient has attended the hospital to have one or 
 //! more interventions applied to them.
 //!
-//!    CSM500 Project (April - October 2026)
-//!      Graham Parker (Student ID: 240120522)
-//! 
-//! REFERENCES
-//! 
+//!  CSM500 Project (April - October 2026)
+//!  Graham Parker (Student ID: 240120522)
 
 use serde::{Deserialize, Serialize};
 use chrono::{NaiveDateTime}; 

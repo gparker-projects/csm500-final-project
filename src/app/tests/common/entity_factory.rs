@@ -2,8 +2,10 @@
 /// Provides a means to create quick/easy entities for testing, for use with test case execution
 /// 
 /// NOTE: Comments are intentionally brief, as this is not primary system code
-/// ---------------------------------------------------------------------------------
-///
+///  CSM500 Project (April - October 2026)
+///  Graham Parker (Student ID: 240120522)
+/// -------------------------------------------------------------------
+
 use maple_emr::constants;
 use maple_emr::dao::patient_dao::PatientWrapper;
 use maple_emr::dto::encounter::Encounter;

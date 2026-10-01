@@ -2,8 +2,10 @@
 /// Provides supporting utility methods for use during testing (test case execution)
 /// 
 /// NOTE: Comments are intentionally brief, as this is not primary system code
-/// ---------------------------------------------------------------------------------
-/// 
+///  CSM500 Project (April - October 2026)
+///  Graham Parker (Student ID: 240120522)
+/// -------------------------------------------------------------------
+
 use rand::{RngExt, rng};
 use chrono::{NaiveDate, NaiveDateTime, TimeDelta};
 

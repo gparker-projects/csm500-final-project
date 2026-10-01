@@ -11,12 +11,15 @@
 ///
 /// Ref: Unit Testing in Rust is actually easy! - Flo Woelki (https://youtu.be/6wAFdBVJbwc?si=KdJfqvRdcXi9-mqo) - LOL NOT easy
 /// 
-///
+///  CSM500 Project (April - October 2026)
+///  Graham Parker (Student ID: 240120522)
+/// -------------------------------------------------------------------
+
 use chrono::{Utc, NaiveDateTime, NaiveDate};
 use rand::{RngExt, rng};
 
-use common::test_utils::*; 
-use maple_emr::{constants, dto::{encounter::*, intervention::*, intervention_detail::*, patient::*, user::*, feature_preference::*}};
+use common::data_generator::*; 
+use maple_emr::{constants, dto::{encounter::*, feature_preference::*, intervention::*, intervention_detail::*, patient::*, user::*}};
 use maple_emr::dto::{user_auth::*, convert_utils::*};
 use maple_emr::ui::data_forms::AdmitDataForm;
 
@@ -171,7 +174,7 @@ fn test_create_intervention_details_dto() {
     assert_eq!(obj.entry_timestamp, entry_timestamp); 
     assert_eq!(obj.intervention_type, intervention_type); 
 
-    assert_eq!(obj.entry_timestamp_for_display(), entry_timestamp.format("%Y-%b-%d %H:%M:%S").to_string()); 
+    assert_eq!(obj.entry_timestamp_for_display(), entry_timestamp.format("%Y-%b-%d %H:%M").to_string()); 
     assert_eq!(obj.type_name(), intervention_type.clone()); 
     assert_eq!(obj.to_string(), "(InterventionDetail Id: ".to_owned() + &intervention_details_id.to_string() +
                                 ", intervention_type: " + &intervention_type + 
@@ -263,15 +266,20 @@ fn test_create_patient_dto() {
       };
 
       let p = Patient::to_patient(frm.clone());
+      println!("...birth_date.to_string(): {}", birth_date.to_string());
+      println!("...frm.birth_date: {}", frm.birthdate);
+      println!("...p.birth_date: {}", p.birth_date);
+
+      // NaiveDateTime.to_string() uses the system date time format, which we've overridden for the system
+      assert!(ConvertUtils::is_equal_to_yyyy_mm_dd_hh_mm_ss(p.birth_date, birth_date), "Birth dates do not match: {} <> {}", p.birth_date, birth_date);
+
       assert_eq!(p.admit_notes, admit_notes.clone());
       assert_eq!(p.id, patient_id); 
       assert_eq!(p.encounter_id, constants::NOT_SPECIFIED_ID);
       assert_eq!(p.legal_first_name, legal_first_name );
       assert_eq!(p.legal_last_name, legal_last_name);
       assert_eq!(p.legal_middle_names, legal_middle_names);
-      assert_eq!(p.phn, phn);
-
-      assert!(p.birth_date == birth_date, "Birth dates do not match");
+      assert_eq!(p.phn, phn);      
       assert!(p.location_id == location_id, "Location Ids do not match");
       //assert!(p.location_short_name == location_short_name, "location short_namea do not match: {} <> {}", p.location_short_name, location_short_name);
 

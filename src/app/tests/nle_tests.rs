@@ -1,14 +1,11 @@
-//! -------------------------------------------------------------------
-//! Unit & Integration tests for NLECommandFormatter module. Includes:
-//!
-//! * NLECommandFormatter::get_nle_options_content()
-//!    CSM500 Project (April - October 2026)
-//!      Graham Parker (Student ID: 240120522)
-//! 
-//! REFERENCES
-//! 
-//! -------------------------------------------------------------------
-
+/// -------------------------------------------------------------------
+/// Unit & Integration tests for NLECommandFormatter module. Includes:
+///
+/// * NLECommandFormatter::get_nle_options_content()
+/// 
+///  CSM500 Project (April - October 2026)
+///  Graham Parker (Student ID: 240120522)
+/// -------------------------------------------------------------------
 #[cfg(test)]
 
 mod common;
@@ -28,8 +25,7 @@ use maple_emr::dto::user_auth::UserAuthorization;
 
 use common::entity_factory::EntityFactory;
 
-//use crate::common::test_utils;
-use crate::common::test_utils::DataGenerator;
+use crate::common::data_generator::DataGenerator;
 
 pub const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500";
 
@@ -189,14 +185,15 @@ async fn test_nle_get_referenced_patient() {
 
     // Test 9a: Patient should NOT be found
     let mut referenced_patient: (i8, Option<maple_emr::dto::patient::Patient>) = CommandController::get_referenced_patient(patients_list.clone(), test_user_id, user_prompt.clone() ).await; // perform a basic search within the prompt for any of the current patients
-    assert_eq!(referenced_patient.0, CommandController::OTHER_PATIENT_FOUND, "No patient was expected, an alternative was returned");
-    assert!(Some(referenced_patient.1).is_some(), "Test 9a: Target Patient not returned");
+    assert_eq!(referenced_patient.0, CommandController::OTHER_PATIENT_FOUND, "Test 9a.0: No patient was expected, an alternative was returned");
+    assert!(Some(referenced_patient.1).is_some(), "Test 9a.1: Target Patient not returned");
     
     // Test 9b: Patient SHOULD be found
-    user_prompt = "transfer kate beaton".to_string();
+    user_prompt = "transfer sweeny todd".to_string();
     referenced_patient = CommandController::get_referenced_patient(patients_list.clone(), test_user_id, user_prompt.clone() ).await; // perform a basic search within the prompt for any of the current patients
-    assert_eq!(referenced_patient.0, CommandController::TARGET_PATIENT_FOUND, "A known patient was expected, but none was returned");
-    assert!(Some(referenced_patient.1).is_some(), "Test 9b: A patient was returned, when none were expected");
+    assert_eq!(referenced_patient.0, CommandController::TARGET_PATIENT_FOUND, "Test 9b.0 A known patient was expected, but none was returned");
+
+    assert!(Some(referenced_patient.1).is_some(), "Test 9b.1: A patient was returned, when none were expected");
 }
 
 
@@ -274,7 +271,7 @@ async fn test_validate_prompt_results_clinical() {
     let start_time = DataGenerator::now();
 
     let mut num_of_runs = 0;
-    let expected_iteration_count = valid_prompts.len();
+    let expected_iteration_count = valid_prompts.len()*3;
 
     // run every prompt for every context level
     for pmp in valid_prompts{

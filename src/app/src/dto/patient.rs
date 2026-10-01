@@ -1,10 +1,7 @@
 //! # Defines a Data Transfer Object for a Patient
 //!
-//!    CSM500 Project (April - October 2026)
-//!      Graham Parker (Student ID: 240120522)
-//! 
-//! REFERENCES
-//! 
+//!  CSM500 Project (April - October 2026)
+//!  Graham Parker (Student ID: 240120522)
 
 use serde::{Deserialize, Serialize};
 use chrono::{NaiveDateTime, Utc}; 
@@ -157,17 +154,26 @@ impl Patient {
     /// * Patient: a fully constructed patient
     /// 
     pub fn to_patient(frm: AdmitDataForm) -> Patient{
-
+        //println!("..to_patient received: {}", frm.birthdate); 
+        //println!("..sliced wiil be: >{}<", &frm.birthdate[0..10]); 
         // convert birthdate, if possible
-        let tmp_birthdate = match NaiveDateTime::parse_from_str(&frm.birthdate, constants::SYSTEM_DATETIME_FORMAT){
+        let tmp_birthdate = match NaiveDateTime::parse_from_str(&frm.birthdate, constants::SYSTEM_DATEONLY_FORMAT){
             Ok(p) => p,
             Err(_e) => {
-                //println!("ConvertUtils::to_naivedatetime()"); 
-                //println!("..String provided: {}", frm.birthdate.clone()); 
-                //println!("..Date format error: {}", e); 
-                Utc::now().naive_utc()
+                //println!("..1st tier parse error: {}", e);
+                let sliced_date = frm.birthdate[0..10].to_owned() + &" 00:00:00".to_string(); // tricky; the system datetime of NaiveDateTime is pulled from the server and may not match our system YYYY-MON-DD
+                //println!("..sliced_date: {}", sliced_date);
+                match NaiveDateTime::parse_from_str(&sliced_date, "%Y-%m-%d %H:%M:%S"){
+                    Ok(p2) => p2,
+                    Err(e2) => {
+                        println!("..2nd tier parse error: {}", e2); 
+                        Utc::now().naive_utc()
+                    }
+                }
             },
         };
+
+        println!("..will use tmp_birthdate=>{}<", tmp_birthdate); 
 
         Patient {
                 id: ConvertUtils::to_i64(frm.patient_id),

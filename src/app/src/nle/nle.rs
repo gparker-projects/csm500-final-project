@@ -5,8 +5,8 @@
 //! 
 //! Structs and functions within the nle module
 //!
-//!    CSM500 Project (April - October 2026)
-//!      Graham Parker (Student ID: 240120522)
+//! CSM500 Project (April - October 2026)
+//! Graham Parker (Student ID: 240120522)
 //! 
 //! REFERENCES
 //!   https://ort.pyke.io/#load-your-model

@@ -3,11 +3,8 @@
 //! Centralized for reuse, and also for easier management.
 //! --------------------------------------------------------------------------------- 
 //!
-//!    CSM500 Project (April - October 2026)
-//!      Graham Parker (Student ID: 240120522)
-//! 
-//! REFERENCES
-//! 
+//!  CSM500 Project (April - October 2026)
+//!  Graham Parker (Student ID: 240120522)
 
 // Note: query is entirely dependant on Permission Id=1 being the login record Id
 //

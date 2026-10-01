@@ -1,9 +1,7 @@
 //! Defines a Data Transfer Object for a User
 //!
-//!    CSM500 Project (April - October 2026)
-//!      Graham Parker (Student ID: 240120522)
-//! 
-//! REFERENCES
+//! CSM500 Project (April - October 2026)
+//! Graham Parker (Student ID: 240120522)
 //! 
 
 use serde::{Deserialize, Serialize};

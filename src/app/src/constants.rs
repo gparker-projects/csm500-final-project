@@ -3,8 +3,8 @@
 //!  for reuse, and also for easier management.
 //! ---------------------------------------------------------------------------------
 //!
-//!    CSM500 Project (April - October 2026)
-//!      Graham Parker (Student ID: 240120522)
+//! CSM500 Project (April - October 2026)
+//! Graham Parker (Student ID: 240120522)
 //! 
 //! ---------------------------------------------------------------------------------
 
@@ -18,6 +18,7 @@ pub const SESSION_ERROR_INVALID : &str = "User session invalid";
 
 pub const SYSTEM_DATEONLY_FORMAT : &str= "%Y-%b-%d";
 pub const SYSTEM_DATETIME_FORMAT : &str= "%Y-%b-%d %H:%M";
+#[allow(dead_code)]
 pub const SYSTEM_DATETIME_WITH_SECONDS_FORMAT : &str= "%Y-%b-%d %H:%M:%S";
 
 pub const CARGO_MANIFEST_DIR : &str= r##"CARGO_MANIFEST_DIR"##;
@@ -40,6 +41,7 @@ pub const NOT_SPECIFIED_ID: i64 = -1;
 
 pub const DEFAULT_INTERVENTION_STATUS_NEW: i64 = 13;
 
+#[allow(dead_code)]
 pub const CRT_ANY_INTERVENTION_GROUP: i64 = -1;
 pub const CRT_CLINICAL_INTERVENTION_GRP_ID: i64 = 1;
 pub const CRT_NON_CLINICAL_INTERVENTION_GRP_ID: i64 = 3;

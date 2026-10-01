@@ -1,10 +1,9 @@
 //! Formats options and items related to the Natural Language prompts
 //!
-//!    CSM500 Project (April - October 2026)
-//!      Graham Parker (Student ID: 240120522)
-//! 
-//! REFERENCES
-//! 
+//!  CSM500 Project (April - October 2026)
+//!  Graham Parker (Student ID: 240120522)
+//! -------------------------------------------------------------------
+
 
 use std::collections::{HashSet};
 use tracing;

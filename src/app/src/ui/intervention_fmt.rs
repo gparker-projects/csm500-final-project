@@ -2,12 +2,10 @@
 //! Struct and implementation for creating html that formats Inverventions
 //!   and Intervention Details.
 //!
-//!    CSM500 Project (April - October 2026)
-//!      Graham Parker (Student ID: 240120522)
-//! 
-//! REFERENCES
-//! 
+//!  CSM500 Project (April - October 2026)
+//!  Graham Parker (Student ID: 240120522)
 //! -------------------------------------------------------------------
+
 use crate::constants;
 
 use crate::dto::intervention_detail::InterventionDetail;

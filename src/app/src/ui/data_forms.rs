@@ -6,11 +6,8 @@
 //! These could have been put into routes, but were assembled all together
 //! for easier reference, consistency and organization.
 //! 
-//!    CSM500 Project (April - October 2026)
-//!      Graham Parker (Student ID: 240120522)
-//! 
-//! REFERENCES
-//! 
+//!  CSM500 Project (April - October 2026)
+//!  Graham Parker (Student ID: 240120522)
 //! -------------------------------------------------------------------
 
 use validator::{Validate, ValidationError};
@@ -119,7 +116,9 @@ pub struct AdmitDataForm {
 }
 
 impl AdmitDataForm {
+    #[allow(dead_code)]
     pub const ACTION_FLAG_ADMIT: &str = r##"admit"##;
+    #[allow(dead_code)]
     pub const ACTION_FLAG_DISCHARGE: &str = r##"discharge"##;
     
     pub fn validate_fields(&self) -> Result<(), ValidationError> {

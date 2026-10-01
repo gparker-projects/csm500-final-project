@@ -1,12 +1,8 @@
 //! -------------------------------------------------------------------
 //! Intervention Details and related routes
 //!
-//!    CSM500 Project (April - October 2026)
-//!      Graham Parker (Student ID: 240120522)
-//! 
-//! REFERENCES
-//!
-//! -------------------------------------------------------------------
+//!  CSM500 Project (April - October 2026)
+//!  Graham Parker (Student ID: 240120522)
 
 use actix_web::{web, HttpResponse, Responder};
 use actix_session::{Session}; 

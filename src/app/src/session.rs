@@ -1,17 +1,17 @@
 //! ---------------------------------------------------------------------------------
 //! Application and user session structs to hold persistent information and 
-//!   connections that will be shared across the application to all users, or for
-//!   only a specific user, across all their interactions.
+//! connections that will be shared across the application to all users, or for
+//! only a specific user, across all their interactions.
 //!
-//!      CSM500 Project (April - October 2026)
-//!         Graham Parker (Student ID: 240120522)
+//! CSM500 Project (April - October 2026)
+//! Graham Parker (Student ID: 240120522)
 //! 
 //! REFERENCES
-//!   For application-wide state/variables: 
-//!     https://actix.rs/docs/application/
+//!  For application-wide state/variables: 
+//!  https://actix.rs/docs/application/
 //! 
-//!   For Stores user session variables:
-//!     https://docs.rs/actix-session/latest/actix_session/struct.SessionMiddleware.html
+//!  For Stores user session variables:
+//!  https://docs.rs/actix-session/latest/actix_session/struct.SessionMiddleware.html
 //! 
 //! ---------------------------------------------------------------------------------
 

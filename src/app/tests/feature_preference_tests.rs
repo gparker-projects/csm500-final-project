@@ -68,7 +68,10 @@ async fn test_ins_get_upd_feature_priority_intv_level() {
 /// Specifically tests:
 ///  * upsert_feature_preference
 ///  * get_active_feature_preferences_of_interventions_for_user
-/// 
+///  CSM500 Project (April - October 2026)
+///  Graham Parker (Student ID: 240120522)
+/// -------------------------------------------------------------------
+
 #[tokio::test]
 async fn test_upsert_get_feature_preferences_of_interventions_for_user() {
   let db_pool: sqlx::Pool<sqlx::Postgres> = match PgPoolOptions::new()
@@ -86,7 +89,7 @@ async fn test_upsert_get_feature_preferences_of_interventions_for_user() {
   let test_user_id = 2; // we will use user #2, which is admin user and has lots of data (permissions)
   let test_feature_id: i64 = 100002;
   let mut fp_id: i64 = constants::INVALID_OTHER_ID;
-  let test_upper_limit = 5;
+  let test_upper_limit = 20;
 
   println!("Testing: get_all_active_feature_preferences_for_user(): first insertion");
 

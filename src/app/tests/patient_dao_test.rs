@@ -10,6 +10,9 @@
 ///
 /// Ref: Unit Testing in Rust is actually easy! - Flo Woelki (https://youtu.be/6wAFdBVJbwc?si=KdJfqvRdcXi9-mqo) - LOL NOT easy
 /// 
+///  CSM500 Project (April - October 2026)
+///  Graham Parker (Student ID: 240120522)
+/// -------------------------------------------------------------------
 
 mod common;
 
@@ -23,7 +26,7 @@ use maple_emr::ui::data_forms::*;
 
 pub const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500";
 
-use common::test_utils::DataGenerator;
+use common::data_generator::DataGenerator;
 
 #[cfg(test)]
 

@@ -2,11 +2,10 @@
 //! Struct and implementation for creating the legacy html menu
 //! -------------------------------------------------------------------
 //!
-//!    CSM500 Project (April - October 2026)
-//!      Graham Parker (Student ID: 240120522)
-//! 
-//! REFERENCES
-//! 
+//!  CSM500 Project (April - October 2026)
+//!  Graham Parker (Student ID: 240120522)
+//! -------------------------------------------------------------------
+
 use crate::session::UserSession;
 use crate::constants;
 use crate::dto::user_auth::Permission;

@@ -2,11 +2,8 @@
 //!  some form of medical treatment or operation performed/to be performed
 //!  on a patient.
 //!
-//!    CSM500 Project (April - October 2026)
-//!      Graham Parker (Student ID: 240120522)
-//! 
-//! REFERENCES
-//! 
+//!  CSM500 Project (April - October 2026)
+//!  Graham Parker (Student ID: 240120522)
 
 use serde::{Deserialize, Serialize};
 use chrono::{NaiveDateTime}; 

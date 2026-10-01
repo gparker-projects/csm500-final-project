@@ -7,12 +7,10 @@
 //!        2) New Measures (Intervention Details) can only be created from within an Intervention (due to context requirement)
 //!        3) Admissions can happen anywhere (no context needed)
 //!
-//!    CSM500 Project (April - October 2026)
-//!      Graham Parker (Student ID: 240120522)
-//! 
-//! REFERENCES
-//! 
+//!  CSM500 Project (April - October 2026)
+//!  Graham Parker (Student ID: 240120522)
 //! -------------------------------------------------------------------
+
 use crate::constants;
 
 use crate::dto::feature_preference::FeaturePreference;
