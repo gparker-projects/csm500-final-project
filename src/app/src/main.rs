@@ -95,12 +95,12 @@ fn get_static_path_base() -> String{
 /// #### Returns: 
 /// * Key: the Key obtained from the actix_web::cookie::Key class
 /// 
-fn get_application_secret_key() -> Key {
+fn get_application_secret_key(session_key: String) -> Key {
     tracing::info!(">get_application_secret_key()");
 
     actix_web::cookie::Key::from(
     std::env::var("SESSION_KEY")
-        .unwrap_or_else(|_| "this_is_a_new_system_key_to_prevent_regeneration_of_a_key_every_time_the_app_starts".to_string())
+        .unwrap_or_else(|_| session_key )
         .as_bytes()
     )
 }
@@ -248,8 +248,7 @@ async fn main() -> std::io::Result<()> {
   // use the Builder pattern to add one route at a time
   HttpServer::new( move || {
 
-    let tmp_app_key = get_application_secret_key(); // create within the enclosure to make sure it is available and consistent for the two uses below
-    
+    let tmp_app_key = get_application_secret_key( config.clone().session_key ); // create within the enclosure to make sure it is available and consistent for the two uses below
 
     App::new()
         .wrap(

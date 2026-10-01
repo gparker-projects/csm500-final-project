@@ -40,6 +40,7 @@ pub struct SysConfig {
     pub max_general_fastactions: String,
     pub max_nle_fastactions: String, // not implemented for use at this time
     pub website_bind_address: String,
+    pub session_key: String,
 }
 
 impl SysConfig{

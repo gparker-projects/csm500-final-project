@@ -33,21 +33,21 @@ impl DefaultRoute{
         
         let wcf = &app_session.get_web_content_factory(); 
         tracing::debug!("Checking session for Validation errors");
+       
         
         match user_session.get::<String>(constants::VALIDATION_ERRORS){
             Ok(Some(validation_errors))=> {
-            tracing::debug!("Ok(Some()) Validation errors present in session: {}", &validation_errors);
-            // if the login form had validation errors, then we need to show them in the regenerated page.
+                tracing::debug!("Ok(Some()) Validation errors present in session: {}", &validation_errors);
+                // if the login form had validation errors, then we need to show them in the regenerated page.
 
-            let mut content = wcf.get_tile(WebContentItem::WCTypeLoginTile); // retrieve the page base content
+                let mut content = wcf.get_tile(WebContentItem::WCTypeLoginTile); // retrieve the page base content
 
-            // construct alternate content for the page
-            let alt_content = "<label id=\"errLabel\" style=\"color: red\"><b>".to_owned() + &validation_errors + "</b>"; //.expect("User session invalid")
-            content = content.replace("<label id=\"errLabel\">", &alt_content);   // retrieve validation errors; they are just raw text for now
+                // construct alternate content for the page
+                let alt_content = "<label id=\"errLabel\" style=\"color: red\"><b>".to_owned() + &validation_errors + "</b>"; //.expect("User session invalid")
+                content = content.replace("<label id=\"errLabel\">", &alt_content);   // retrieve validation errors; they are just raw text for now
+                user_session.purge(); // minimize attack vectors by purging the session 
 
-            user_session.purge(); // minimize attack vectors by purging the session 
-
-            HttpResponse::Ok().body( content )
+                HttpResponse::Ok().body( content )
             },
             Ok( None )=> {
                 tracing::debug!("Ok( None ) No active session");
