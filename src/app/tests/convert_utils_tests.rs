@@ -12,14 +12,16 @@ mod convert_utils_tests {
     use maple_emr::{dto::user_auth::*};
     use maple_emr::session::*;
     use maple_emr::ui::tile_factory::{WebContentFactory};
-
-   // use maple_emr::nle::nle::NaturalLanguageEngine;
-
+    
     use actix_web::cookie::Key;
     use sqlx::postgres::{PgPoolOptions}; 
 
     const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500";
 
+    /// ### test_convert_utils()
+    /// 
+    /// Tests the is_aged() function of the ConvertUtils strut
+    /// 
     #[test]
     fn test_convert_utils() {
         assert!(maple_emr::dto::convert_utils::ConvertUtils::to_i64("not a number".to_string()) == constants::INVALID_OTHER_ID, "Not a number did not convert to -1");
@@ -32,6 +34,15 @@ mod convert_utils_tests {
         assert!(!maple_emr::dto::convert_utils::ConvertUtils::is_aged(future, 4), "Timestamp is in future, asserted as aged (past)");
     }
 
+    /// ### test_sessions()
+    /// 
+    /// Tests the ability for a Session to be created/populated
+    /// 
+    ///   Specifically tests: session::UserSession::
+    ///      new()
+    ///      get_userid_as_i64()
+    ///      get_user_display_name()
+    ///      has_permission()
     #[test]
     fn test_sessions() {
         // create a couple of permission and put them in a Vector, then add to the UserAuthorization
@@ -61,6 +72,12 @@ mod convert_utils_tests {
         
     }
 
+    /// ### test_sys_config()
+    /// 
+    /// Tests the ability for a SysConfig to be created/populated
+    /// 
+    ///   Specifically tests: session::SysConfig::new() and ::get_max_general_fastactions()
+    ///
     #[test]
     fn test_sys_config() {
         let cfg = SysConfig{
@@ -77,6 +94,18 @@ mod convert_utils_tests {
         }
     }
 
+    /// ### test_app_session()
+    /// 
+    /// Tests the ability for an AppSession to be created/populated
+    /// 
+    ///   Specifically tests: session::AppSession::
+    ///     new() 
+    ///     get_db_connection()
+    ///     get_full_path_language_model_file()
+    ///     get_full_path_tokenizer_file()
+    ///     get_full_path_command_mapping_file()
+    ///     get_web_content_factory()
+    ///
     #[tokio::test]
     async fn test_app_session() {
         // required to set up the WebContentFactory

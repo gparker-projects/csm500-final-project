@@ -14,7 +14,8 @@ use common::test_utils::DataGenerator;
 const STRING_200_CHARS_LONG: &str = r##"01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"##;
 const STRING_201_CHARS_LONG: &str = r##"012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567891"##;
 
-///
+/// ### test_generic_web_form_data()
+/// 
 /// Tests GenericWebFormData struct methods
 /// 
 #[test]
@@ -29,11 +30,12 @@ fn test_generic_web_form_data () {
     assert_eq!(frm.get_uid_as_i64(), 1);
 }
 
-///
+/// ### test_intervention_details_data_form_basic()
+/// 
 /// Tests InterventionDataFormBasic struct methods
 /// 
 #[test]
-fn test_intervention_data_form_basic  () {
+fn test_intervention_data_form_basic() {
     let mut frm = InterventionDataFormBasic {
         intervention_type_id: "-1".to_string(),
         encounter_id: "-1".to_string(),
@@ -46,11 +48,12 @@ fn test_intervention_data_form_basic  () {
     assert_eq!(frm.get_patient_id_as_i64(), 1);
 }
 
-///
+/// ### test_intervention_details_data_form_basic()
+/// 
 /// Tests InterventionDetailsDataForm struct methods
 /// 
 #[test]
-fn test_intervention_details_data_form_basic  () {
+fn test_intervention_details_data_form_basic() {
     let mut frm = InterventionDetailsDataForm {
         type_id: "-1".to_string(),
         ..Default::default()
@@ -62,11 +65,12 @@ fn test_intervention_details_data_form_basic  () {
     assert_eq!(frm.get_type_id_as_i64(), 1);
 }
 
-///
+/// ### test_admit_data_form()
+/// 
 /// Tests AdmitDataForm struct methods
 /// 
 #[test]
-fn test_admit_data_form () {
+fn test_admit_data_form() {
     let p = EntityFactory::create_patient();
     let mut frm = AdmitDataForm { // start with a form full of invalid data
         patient_id: String::new(),
@@ -217,11 +221,12 @@ fn test_admit_data_form () {
     };
 }
 
-///
+/// ### test_intervention_data_form()
+/// 
 /// Tests InterventionDataForm struct methods
 /// 
 #[test]
-fn test_intervention_data_form  () {
+fn test_intervention_data_form() {
     let mut frm = InterventionDataForm {
         patient_id: "-1".to_string(),
         intervention_type_id: "-1".to_string(),

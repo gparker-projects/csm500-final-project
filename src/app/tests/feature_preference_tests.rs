@@ -1,5 +1,5 @@
 ///
-/// Unit & Integration tests for the FeaturePreferenceDAO module. Includes
+/// Unit & Integration tests for the FeaturePreference DTO and FeaturePreferenceDAO module. Includes:
 /// 
 /// * new()
 /// * get_active_feature_preferences_for_user
@@ -25,6 +25,12 @@ pub const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500
 
 #[cfg(test)]
 
+/// ### test_ins_get_upd_feature_priority_intv_level()
+/// 
+/// Tests the ability for the FeaturePreference::new() to correctly instantiate and populate a new object.
+/// Specifically tests:
+///  * get_unique_key() and data fields only
+/// 
 #[tokio::test]
 async fn test_ins_get_upd_feature_priority_intv_level() {
 
@@ -53,9 +59,11 @@ async fn test_ins_get_upd_feature_priority_intv_level() {
     assert_eq!(fp.feature_id, constants::INVALID_OTHER_ID);
     assert_eq!(fp.ref_group_id, constants::INVALID_OTHER_ID);
     assert_eq!(fp.ref_name, "UNIT TEST FAKE VALUE".to_string());
+    assert_eq!(fp.get_unique_key(), "-1.-1".to_string());
 }
 
-
+/// ### test_upsert_get_feature_preferences_of_interventions_for_user()
+/// 
 /// Tests the ability for the DAO to CREATE, SELECT and UPDATE Feature Priority records at the Intervention level (not details)
 /// Specifically tests:
 ///  * upsert_feature_preference
@@ -161,7 +169,8 @@ async fn test_upsert_get_feature_preferences_of_interventions_for_user() {
   }
 }
 
-///
+/// ### test_get_preferences_for_new_never_existed_user()
+/// 
 /// Tests the FeaturePreference::get_active_feature_preferences_for_user_intervention_level() function via 
 ///   get_active_feature_preferences_of_interventions_for_user(). The function can block some calls and 
 ///   this test will target abnormal, expected situations.
@@ -252,7 +261,8 @@ async fn test_get_preferences_for_new_never_existed_user() {
     };
 }
 
-///
+/// ### test_ins_get_upd_feature_priority_intv_details_level()
+/// 
 /// Tests the ability for the DAO to CREATE, SELECT and UPDATE Feature Priority records at the Intervention Details level
 /// Specifically tests:
 ///  * upsert_feature_preference
@@ -409,9 +419,10 @@ async fn test_ins_get_upd_feature_priority_intv_details_level() {
                                                 WHERE fp.ID = {feature_preference_id}
                                                          "##; 
 
+    /// ### get_individual_feature_preference()
+    /// 
     /// Finds and returns an intervention based on an intervention/id 
     /// This is not needed by the main application code and as such is only present in the unit test
-    ///
     /// 
     async fn get_individual_feature_preference(feature_preference_id: i64) -> Result< Option< FeaturePreference >, std::io::Error> {
         let query = QRY_GET_INDIVIDUAL_FEATURE_PREFERENCE.replace("{feature_preference_id}", &feature_preference_id.to_string());
@@ -481,8 +492,9 @@ async fn test_ins_get_upd_feature_priority_intv_details_level() {
         }
     }
 
+    /// ### delete_preference()
     /// 
-    /// Delete the preferences for User_id, which has been designated for these unit tests
+    /// Deletes the preferences for User_id, which has been designated for these unit tests
     /// 
     async fn delete_preference(){
         const SQL_DELETE_PREFERENCES_FOR_USERID_7: &str = r##"delete from feature_preference where users_id = 7"##;     

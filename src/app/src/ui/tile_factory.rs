@@ -52,7 +52,7 @@ pub enum WebContentItem {
 }
 
 /// -------------------------------------------------------------------
-/// Create a factory for creating web content tiles and pages
+/// WebContentFactory is an object factory for creating web content tiles and pages
 /// -------------------------------------------------------------------
 #[derive(Clone)]
 pub struct WebContentFactory
@@ -61,12 +61,23 @@ pub struct WebContentFactory
 }
 
 impl WebContentFactory {
+
+    /// ### WebContentFactory::new()
+    ///   Creates a new web content factory, which is capable of prodicing Web Content Tile objects for reuse/consumption in the main application
+    /// 
+    ///   This follows the object factory pattern.
+    /// 
+    /// #### Parameters:
+    /// * content_root_path: &str - the root path to the tile files (*.htl) that are to be loaded. Each file it associated with a WebContentItem enumeration entry.
+    /// * app_version: String - version of the application to be inserted into calls to create HTMl tile content
+    /// 
+    /// #### References:
+    ///   https://doc.rust-lang.org/rust-by-example/std_misc/file/read_lines.html#a-more-efficient-approach
+    ///   https://www.geeksforgeeks.org/system-design/factory-method-for-designing-pattern/
+    /// 
+    /// #### Returns:
+    /// * a referenge to this WebContentFactory instance
     ///
-    /// Creates a new web content factory, which is capable of prodicing Web Content Tile objects for reuse/consumption in the main application
-    /// This follows the object factory pattern: https://www.geeksforgeeks.org/system-design/factory-method-for-designing-pattern/
-    /// 
-    /// https://doc.rust-lang.org/rust-by-example/std_misc/file/read_lines.html#a-more-efficient-approach
-    /// 
     pub fn new( content_root_path: &str, app_version: String) -> Self {
         let mut tiles = HashMap::new();
         let tile_files = [("LoginTile.htl", WebContentItem::WCTypeLoginTile),
@@ -99,17 +110,30 @@ impl WebContentFactory {
         return self.tile_hashmap.len();
     }
 
-    ///
+
+    /// ### WebContentFactory::get_tile()
     /// Obtains a specifically enumerated tile. This method does not require use of Options because we are
     /// keeping the key (tile_type: WebContentItem) tightly controlled at this point, so there is no risk
     /// of calling the method with an invalid (enumeration) entry.
+    /// 
+    /// #### Parameters:
+    /// * tile_type: WebContentItem - enumeration element representing the Tile to be retrieved
+    /// 
+    /// #### Returns:
+    /// * String: the resulting home tile HTML to be rendered
     /// 
     pub fn get_tile(&self, tile_type: WebContentItem) -> String {
         return self.tile_hashmap[&tile_type].clone();
     }
 
-    ///
-    /// Wrapper method to return the main home page tile.
+    /// ### WebContentFactory::get_home_tile_with_user_identity()
+    ///   Wrapper method to return the main home page tile.
+    /// 
+    /// #### Parameters:
+    /// * user_identity_label: String - the current user's identity string to be displayed
+    /// 
+    /// #### Returns:
+    /// * String: the resulting home tile HTML to be rendered
     /// 
     pub fn get_home_tile_with_user_identity(&self, user_identity_label: String) -> String {
         let results = self.tile_hashmap[&WebContentItem::WCTypeHomePage].clone();
@@ -118,8 +142,24 @@ impl WebContentFactory {
         return results.replace(constants::USER_IDENTITY_TILE_TAG, &user_identity_label)
     }
   
-    ///
-    /// Provide (deep) summary details of a patient
+    /// ### WebContentFactory::get_patient_details_full_tile()
+    ///   Provide (deep) summary details of a patient
+    /// 
+    /// #### Parameters:
+    /// * patient_header: String - HTML for the patient header section, to be inserted into the tile
+    /// * user_identity_label: String - the current user's identity string to be displayed
+    /// * current_encounter: String - HTML for the current encounter section, to be inserted into the tile
+    /// * encounter_section: String - HTML for the historical encounter section, to be inserted into the tile
+    /// * active_user_session: UserSession - the session of the current user, providing additional context data for display
+    /// * intv_section: String - HTML for the intevention section, to be inserted into the tile 
+    /// * intervention_type_list: Vec<(i64, String, String)>  - a list of Intervention Types for the current intervention, to construct a dropdown list to be displayed
+    /// * legacy_menu: String - HTML for the legacy menu to be inserted into the tile
+    /// * feature_pref_section: String - HTML for the feature preference list to be inserted into the tile
+    /// * patient_id: String - the id of the patient to be displayed
+    /// * encounter_id: String - the id of the encounter to be displayed
+    /// 
+    /// #### Returns:
+    /// * String: the resulting HTML to be rendered
     /// 
     pub fn get_patient_details_full_tile(&self, patient_header: String, current_encounter: String, encounter_section: String,
                                                 active_user_session: UserSession, legacy_menu: String, intv_section: String, 
@@ -163,9 +203,20 @@ impl WebContentFactory {
         return ht_final.clone();
     }
 
-    ///
-    /// Provide HTML for creating a new patient admit, or completing it as a discharge for an existing patient
-    /// It is the same table (Encounter), so one route should suffice
+    /// ### WebContentFactory::get_admit_discharge_full_tile()
+    ///   Provide HTML for creating a new patient admit, or completing it as a discharge for an existing patient
+    ///   It is the same table (Encounter), so one route should suffice
+    /// 
+    /// #### Parameters:
+    /// * user_identity_label: String - the current user's identity string to be displayed
+    /// * current_patient: Option<Patient> - the current (option-wrapped) patient to be displayed
+    /// * legacy_menu: String - HTML for the legacy menu to be inserted into the tile
+    /// * location_menu: String - HTML for the dropdown list of locations to be inserted into the tile
+    /// * is_discharge_flag: bool - True/False flag to indicate if the discharged patients are to be displayed.
+    /// * user_prompt: String - the NL prompt provided by the user (if available)
+    /// 
+    /// #### Returns:
+    /// * String: the resulting HTML to be rendered
     /// 
     pub fn get_admit_discharge_full_tile(&self, user_identity_label: String,
                                                 current_patient: Option<Patient>,
@@ -279,9 +330,24 @@ impl WebContentFactory {
         return home_tile_level_1.clone();
     }
    
-   
-    ///
-    /// Provide HTML for modifying an Intervention
+    /// ### WebContentFactory::get_modify_intervention_full_tile()
+    ///   Provides HTML for rendering the view/modify (full) intervention tile
+    /// 
+    /// #### Parameters:
+    /// * user_identity_label: String - the current user's identity string to be displayed
+    /// * current_intervention: Option<Intervention> - the current (option-wrapped) intervention to be displayed
+    /// * legacy_menu: String - HTML for the legacy menu to be inserted into the tile
+    /// * user_dropdown_list: Vec<(i64, String, String)> - HTML for the dropdown list of users to be inserted into the tile
+    /// * status_dropdown_list: Vec<(i64, String, String)> - HTML for the dropdown list of intervention statuses to be inserted into the tile
+    /// * location_menu: String - HTML for the dropdown list of locations to be inserted into the tile
+    /// * intv_type: (i64, String, String) - the current type of the intervention, along with its id number and display name. This is used in lieu of a list
+    /// * req: InterventionDataForm - the user's current request data, encapsulated in an InterventionDataForm
+    /// * intv_details_list: Option<Vec<InterventionDetail>> - an option-wrapped list of InterventionDetails for the current intervention, to construct a list to be displayed
+    /// * measures_dropdown_list: Vec<(i64, String, String)> - a list of Intervention Types (measures) for the current intervention, to construct a dropdown list to be displayed
+    /// * feature_pref_section: String - HTML for the feature preference list to be inserted into the tile
+    /// 
+    /// #### Returns:
+    /// * String: the resulting HTML to be rendered
     /// 
     pub fn get_modify_intervention_full_tile(&self, user_identity_label: String,
                                                   current_intervention: Option<Intervention>,

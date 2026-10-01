@@ -33,6 +33,10 @@ use crate::common::test_utils::DataGenerator;
 
 pub const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500";
 
+/// ### test_fmt_get_nle_options_content()
+/// 
+/// Tests the get_nle_options_content() method of the NLECommandFormatter struct
+/// 
 #[tokio::test]
 async fn test_fmt_get_nle_options_content() {
     let tmp_patient = EntityFactory::create_patient();
@@ -160,6 +164,10 @@ async fn test_fmt_get_nle_options_content() {
 }
 
 
+/// ### test_nle_get_referenced_patient()
+/// 
+/// Tests the get_referenced_patient() method of the CommandController struct
+/// 
 #[tokio::test]
 async fn test_nle_get_referenced_patient() {
     let db_pool = match PgPoolOptions::new()
@@ -192,7 +200,8 @@ async fn test_nle_get_referenced_patient() {
 }
 
 
-///
+/// ### test_validate_prompt_results_clinical()
+/// 
 /// Tests the NL prompt with all levels of permissions for a wide array of commands that could be executed, against 2 possible phrases for each command
 /// 
 ///    cargo test --test nle_tests test_validate_prompt_results_clinical -- --exact --nocapture

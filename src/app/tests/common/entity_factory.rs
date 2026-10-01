@@ -131,7 +131,7 @@ impl EntityFactory{
         return results; 
     }
 
-   ///
+    ///
     /// Returns a vector of 10 dao::Intervention Details entities, linking the entities using a common encounter id (40404)
     ///
     #[allow(dead_code)]
@@ -204,11 +204,15 @@ impl EntityFactory{
     #[allow(dead_code)]
     pub fn create_intervention_type_list(short_identifier: String, unique_index: i64) -> Vec<(i64, String, String)>{
         let mut items = Vec::new();
+        
         for i in 1..11 {
-            let str = match i {
-                unique_index => "UNIT TEST-".to_owned() + &short_identifier + "-" + &i.to_string(), // (i64, String, String) 
-                _ => "UNIT TEST ".to_owned() + &short_identifier + " " + &i.to_string(),
-            };
+            let str: String; 
+            if i == unique_index {
+                str = "UNIT TEST-".to_owned() + &short_identifier + "-" + &i.to_string();            
+            }
+            else{
+                str = "UNIT TEST ".to_owned() + &short_identifier + " " + &i.to_string();
+            }
             items.push( (i, str.clone(), str.clone()) );
         }
         items
@@ -221,10 +225,13 @@ impl EntityFactory{
     pub fn create_location_list(unique_index: i64) -> Vec<(i64,  String)>{
         let mut items = Vec::new();
         for i in 1..11 {
-            let str = match i {
-                unique_index => "UNIT TEST-Location-".to_owned() + &i.to_string(), // (i64, String) 
-                _ => "UNIT TEST Location ".to_owned() + &i.to_string(),
-            };
+            let str: String; 
+            if i == unique_index {
+                str = "UNIT TEST-Location-".to_owned() + &i.to_string();          
+            }
+            else{
+                str = "UNIT TEST Location ".to_owned() + &i.to_string();
+            }
             items.push( (i, str.clone()) );
         }
         items

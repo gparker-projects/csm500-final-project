@@ -19,9 +19,15 @@ use crate::ui::common_fmt::CommonFormatter;
 pub struct SimpleFormatter{}
 
 impl SimpleFormatter {
-
-    ///
-    /// Provide rendering of a list of patients, as a screen tile
+    /// ### SimpleFormatter::get_home_route_summary_of_patients_tile_using_wrapper()
+    ///   Provides HTML rendering of a list of patients, as a screen tile. Iteratively calls SimpleFormatter::get_single_patient_summary() 
+    ///   on each wrapper.
+    /// 
+    /// #### Parameters:
+    /// * patient_list: Vec<PatientWrapper> - the list of patients (Patient Wrappers) to be displayed
+    /// 
+    /// #### Returns:
+    /// * String: the resulting HTML for the list of patients
     /// 
     pub fn get_home_route_summary_of_patients_tile_using_wrapper(patient_list: Vec<PatientWrapper>) -> String {
         let mut results_sbuf = String::with_capacity(100); 
@@ -45,6 +51,16 @@ impl SimpleFormatter {
     // -----------------------------------------------------------------------------------
     // Encounter formatters
     // -----------------------------------------------------------------------------------
+
+    /// ### SimpleFormatter::get_single_encounter_summary_tile()
+    ///   Provides HTML rendering of an ancounter
+    /// 
+    /// #### Parameters:
+    /// * encounter: Encounter - the encounter to be rendered
+    /// 
+    /// #### Returns:
+    /// * String: the resulting HTML for the encounter
+    /// 
     pub fn get_single_encounter_summary_tile( encounter: Encounter) -> String {
         let mut results_sbuf = String::with_capacity(100);
 
@@ -70,8 +86,14 @@ impl SimpleFormatter {
         return results_sbuf;
     }
 
-    ///
-    /// Provide HTML for all of a Patient's encounters
+    /// ### SimpleFormatter::get_encounter_list_tile()
+    ///   Provides HTML for all of a Patient's encounters
+    /// 
+    /// #### Parameters:
+    /// * encounter_list: Vec<Encounter> - the list of Encounters to be displayed
+    /// 
+    /// #### Returns:
+    /// * String: the resulting HTML for the list of encounters for a Patient
     /// 
     pub fn get_encounter_list_tile(encounter_list: Vec<Encounter>) -> String {
         let mut results_sbuf = String::with_capacity(100); 
@@ -97,8 +119,19 @@ impl SimpleFormatter {
         return results_sbuf;
     }
 
-     pub fn get_single_patient_summary(pwrap: PatientWrapper, index: i8) -> String {
-        let mut results_sbuf = String::with_capacity(500); 
+
+    /// ### SimpleFormatter::get_single_patient_summary()
+    ///   Provides HTML for the summary of a single Patient
+    /// 
+    /// #### Parameters:
+    /// * pwrap: PatientWrapper - a wrapper of the patient, current encounter and (optionally) current vitals to be displayed
+    /// * index: i8 - the index of the entry to be shown. If not -1, the index will be prefixed to the data, as a visual placeholder.
+    /// 
+    /// #### Returns:
+    /// * String: the resulting HTML for a single Patient summary tile
+    /// 
+    pub fn get_single_patient_summary(pwrap: PatientWrapper, index: i8) -> String {
+        let mut results_sbuf: String = String::with_capacity(500); 
 	    let p = pwrap.patient;
 	    let e = pwrap.current_encounter;
 	    let i = pwrap.most_recent_intervention;
@@ -158,8 +191,15 @@ impl SimpleFormatter {
         return results_sbuf;
     }
 
-    ///
+    /// ### SimpleFormatter::get_intervention_list_for_patient_details_tile()
     /// Provide HTML for all of a (Patient's) Encounter's Interventions
+    /// 
+    /// #### Parameters:
+    /// * intervention_list: Vec<Intervention> - the list of Interventions to be displayed
+    /// * user_can_view_clinical_data: bool - True/False indicating if the user is allowed to view clinical data. If False, clinical Intervention details will not be included.
+    /// 
+    /// #### Returns:
+    /// * String: the resulting HTML for a list of intervention details
     /// 
     pub fn get_intervention_list_for_patient_details_tile(intervention_list: Vec<Intervention>, user_can_view_clinical_data: bool) -> String {
         let mut results_sbuf = String::with_capacity(100); 

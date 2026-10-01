@@ -26,6 +26,12 @@ mod common;
 
 #[cfg(test)] 
 
+/// ### test_create_encounter_dto()
+/// 
+/// Tests the ability to create an Encounter DTO and its basic methods:
+/// * admit_timestamp_for_display()
+/// * to_string() - trait override
+/// 
 #[test]
 fn test_create_encounter_dto() {
     let current_time: NaiveDateTime = Utc::now().naive_utc();
@@ -72,8 +78,9 @@ fn test_create_encounter_dto() {
     assert_eq!(obj.to_string(), check_string);
 }
 
-///
-/// Prove the Intervention DTO works/continues to work
+/// ### test_create_intervention_dto()
+/// 
+/// Tests the ability to create an Intervention DTO
 /// 
 #[test]
 fn test_create_intervention_dto() {
@@ -125,6 +132,13 @@ fn test_create_intervention_dto() {
     assert_eq!(obj.performed_timestamp, Some(current_time));
 }
 
+/// ### test_create_intervention_details_dto()
+/// 
+/// Tests the ability to create an Intervention Details DTO and its basic methods:
+/// * entry_timestamp_for_display()
+/// * type_name()
+/// * to_string() -- override of trait
+/// 
 #[test]
 fn test_create_intervention_details_dto() {
     let mut rng = rng();
@@ -164,13 +178,14 @@ fn test_create_intervention_details_dto() {
                                 ", value: " + &value + &")"   ); 
 }
 
- ///
- /// Prove the Patient DTO works/continues to work; includes the Encounter table details
- /// 
- // REF: Random number gerneration for tests: Zero-to-prod, page 159; now deprecated apparently.
- /// 
- #[test]
- fn test_create_patient_dto() {
+/// ### test_create_patient_dto()
+/// 
+/// Tests the ability to create a User DTO and prove the Patient DTO works/continues to work; includes the Encounter table details
+/// 
+/// REF: Random number gerneration for tests: Zero-to-prod, page 159; now deprecated apparently.
+/// 
+#[test]
+fn test_create_patient_dto() {
       let current_time: NaiveDateTime = Utc::now().naive_utc();
       let mut rng = rng();
 
@@ -321,9 +336,10 @@ fn test_create_intervention_details_dto() {
       assert_eq!(obj.to_string(), tmp_patient_to_string);
 }
 
-
-
-
+/// ### test_create_user_dto()
+/// 
+/// Tests the ability to create a User DTO
+///
 #[test]
 fn test_create_user_dto() {
       let current_time: NaiveDateTime = Utc::now().naive_utc();
@@ -353,6 +369,12 @@ fn test_create_user_dto() {
       assert_eq!(obj.password, password); 
 }
 
+/// ### test_create_user_auth_and_permission_dto()
+/// 
+/// Tests the ability to create a UserAuthorization DTO and its basid methods:
+/// * has_permission()
+/// * has_permission_for_dept()
+///
 #[test]
 fn test_create_user_auth_and_permission_dto() {
     let basic_perms= [(1, 2), (2, 1)];
@@ -385,6 +407,10 @@ fn test_create_user_auth_and_permission_dto() {
     assert!(ua.granted_permissions.len() > 0);
 }
 
+/// ### test_encounter_dto()
+/// 
+/// Tests the ability to create an Encounter DTO
+///
 #[test]
 fn test_encounter_dto(){   
     let current_time: NaiveDateTime = Utc::now().naive_utc();
@@ -423,6 +449,10 @@ fn test_encounter_dto(){
     assert_eq!(obj.is_current_encounter, tmp_is_current_encounter); 
   }
 
+/// ### test_feature_preference_dto()
+/// 
+/// Tests the ability to create a FeaturePreference DTO
+///
   #[test]
 fn test_feature_preference_dto(){
 let mut rng = rng();
@@ -460,6 +490,10 @@ assert_eq!(obj.ref_group_id, tmp_ref_group_id);
 assert_eq!(obj.ref_name, tmp_ref_name); 
 }
 
+/// ### test_permissions_dto()
+/// 
+/// Tests the ability to create a Permission DTO
+///
  #[test]
 fn test_permissions_dto() {
     let mut rng = rng();

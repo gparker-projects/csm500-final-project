@@ -26,9 +26,19 @@ pub struct User {
 } 
 
 impl User {
-    /// Basic constructor
+    /// ### User::New()
+    ///    Basic constructor for a new User. Note: used by test cases only
     /// 
-    /// Note: used by test cases only
+    /// #### Parameters:
+    /// * id: i64 - numeric id of the user, as represented in the database, or -1 if new/temporary
+    /// * name: String - display name of the user
+    /// * user_name: String - user account for the user, for authentication
+    /// * email: String - email address of the user
+    /// * created_timestamp: NaiveDateTime - the date/time the user was created
+    /// * password: String - a password, for authentication
+    /// 
+    /// #### Returns:
+    /// * a newly initialized User object
     /// 
     #[allow(dead_code)] 
     pub fn new(id: i64,
