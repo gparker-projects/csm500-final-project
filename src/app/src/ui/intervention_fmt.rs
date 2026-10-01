@@ -17,8 +17,17 @@ pub struct InterventionFormatter{}
 
 impl InterventionFormatter{
 
-    ///
-    /// Provide HTML for a readonly list of InterventionDetail(s)
+    /// ### InterventionFormatter::get_view_only_intervention_details_list()
+    ///   Provide HTML for a readonly list of InterventionDetail(s)
+    /// 
+    /// #### Parameters:
+    /// * intervention_details_item_tile: String - template HMTL for a single Intervention Details section, which will be used for replacingthe HTML for a specific intervention detail
+    /// * intvdtls_list: Option<Vec<InterventionDetail>> - the option-wrapped list of intervention details to be displayed
+    /// * measures_dropdown_list: Vec<(i64, String, String)> - a list of Intervention Details (aka measures) to be rendered as a dropdown via CommonFormatter::get_dropdown_generic()
+    /// * patient_id: String - the id of the patient for this tile rendering
+    /// 
+    /// #### Returns:
+    /// * String: the resulting HTML for the intervention details to be displayed
     /// 
     pub fn get_view_only_intervention_details_list(intervention_details_item_tile: String,
                                                    intvdtls_list: Option<Vec<InterventionDetail>>, 

@@ -1,4 +1,4 @@
-//! Natural Language prompt and related routes
+//! Formats options and items related to the Natural Language prompts
 //!
 //!    CSM500 Project (April - October 2026)
 //!      Graham Parker (Student ID: 240120522)
@@ -16,8 +16,19 @@ use crate::nle::controller::CommandController;
 pub struct NLECommandFormatter{}
 
 impl NLECommandFormatter {
-    ///
+    /// ### NLECommandFormatter::get_nle_options_content()
+    ///    Constructs the options that will be displayed when a user has submitted an NL prompt. 
+    ///    Includes supporting the HTML form, for action exection.
     /// 
+    /// #### Parameters:
+    /// * items: Vec< (String, f32)> - a list of option descriptions received, with their probability for matching the option the user has attempted to request via NL prompt
+    /// * cmd: CommandController - the CommandController to be used reverse look up the command to be provided, for the list of options received
+    /// * patient_id: i64 - the id of the patient contect which the user is currently working for 
+    /// * referred_patient: Option<Patient> - an option-wrapped patient, which has been referred by the user's request. Indicates which patient the command is likely targetting.
+    /// * option_limit: usize - the upper limit of the number of options that are to be returned
+    /// 
+    /// #### Returns:
+    /// * String: the resulting HTML for displaying the NLE options
     /// 
     pub fn get_nle_options_content( items: Vec< (String, f32)>, cmd: CommandController, patient_id: i64, referred_patient: Option<Patient>, option_limit: usize) -> String{
         tracing::debug!("get_nle_options_content()");

@@ -15,15 +15,32 @@ use crate::dto::patient::*;
 pub struct MenuFormatter{}
 
 impl MenuFormatter {
-    ///
-    /// Provide HTML for the main system menu; replaces tag: <!--MapleEMR::LegacyMenu-->
+    
+    /// ### MenuFormatter::get_legacy_menu()
+    ///   Provide HTML for the main system menu; replaces tag: <!--MapleEMR::LegacyMenu-->
+    ///   Defaults the patient to None (id=-1)
+    /// 
+    /// #### Parameters:
+    /// * patient_list: Vec<Patient> - the list of patients to be displayed
+    /// * active_user_session: UserSession - the active user sesion, to be used for checking permissions and providing the username
+    /// 
+    /// #### Returns:
+    /// * String: the resulting HTML for the menu
     /// 
     pub fn get_legacy_menu(&self, patient_list: Vec<Patient>, active_user_session: UserSession) -> String {
        return self.get_legacy_menu_with_patient(patient_list, constants::INVALID_PATIENT_ID, active_user_session);
     }
 
-    ///
-    /// Provide HTML for the main system menu; replaces tag: <!--MapleEMR::LegacyMenu-->
+    /// ### MenuFormatter::get_legacy_menu_with_patient()
+    ///   Provide HTML for the main system menu; replaces tag: <!--MapleEMR::LegacyMenu-->
+    /// 
+    /// #### Parameters:
+    /// * patient_list: Vec<Patient> - the list of patients to be displayed
+    /// * patient_id: i64 - the current patient (if available; could be -1) in the list
+    /// * active_user_session: UserSession - the active user sesion, to be used for checking permissions and providing the username
+    /// 
+    /// #### Returns:
+    /// * String: the resulting HTML for the menu
     /// 
     pub fn get_legacy_menu_with_patient(&self, patient_list: Vec<Patient>, patient_id: i64, active_user_session: UserSession) -> String {
         let mut results_sbuf = String::with_capacity(100); 

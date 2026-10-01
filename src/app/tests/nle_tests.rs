@@ -254,7 +254,10 @@ async fn test_validate_prompt_results_clinical() {
                 "check patient orders", "update next of kin address" // 12	"view-non-clinical-intervention" 
             ];
 
-    println!("test_validate_prompt_results_clinical()");
+    println!("This is test test_validate_prompt_results_clinical()");
+    println!("  Providing supporting evidence of executability of the NL module integrated into MapleHMS\n");
+    println!("  Supporting Use Case: 7.0 Natural Language (NL) Prompt\n");
+    println!("  Execute via DOS: cargo test --test nle_tests test_validate_prompt_results_clinical -- --exact --nocapture > nle_test_results_2026-MM-DD_HHMM.log");
 
     let test_nle = NaturalLanguageEngine::new(&minimlm_model_file_path, &tokenizer_file_path).await;
     let mut test_cmd: CommandController = CommandController::new(&mapping_file_path, test_nle);
@@ -262,6 +265,7 @@ async fn test_validate_prompt_results_clinical() {
     let start_time = DataGenerator::now();
 
     let mut num_of_runs = 0;
+    let expected_iteration_count = valid_prompts.len();
 
     // run every prompt for every context level
     for pmp in valid_prompts{
@@ -279,7 +283,8 @@ async fn test_validate_prompt_results_clinical() {
         }
     }
     let end_time = DataGenerator::now();
-    println!("Start time: {}", start_time);
-    println!("End time: {} / No. of Runs: {}", end_time, num_of_runs);
-    assert!(true);
+    println!("\nStart time: {}", start_time);
+    println!("End time: {}", end_time);
+    println!("No. of Runs where results were produced: {}", num_of_runs);
+    assert_eq!(num_of_runs, expected_iteration_count, "Number of successful runs ({}) did not match expected number ({})", num_of_runs, expected_iteration_count);
 }

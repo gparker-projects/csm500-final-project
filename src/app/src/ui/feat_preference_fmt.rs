@@ -21,11 +21,17 @@ pub struct FeaturePreferenceFormatter{}
 
 impl FeaturePreferenceFormatter{
 
-    ///
-    /// Generates an HTML tile based on a list of FeaturePreference objects.
-    ///  Two cases are present: when the feature preference is at the Intervention Level and when it is at the 
-    ///  Intervention Details level (could be expanded). This is identified by the item's ref_group_id (from the
-    ///  database) matching "1", which is the group to which all Intervention types belong.
+    /// ### FeaturePreferenceFormatter::get_feature_preference_section()
+    ///   Generates an HTML tile based on a list of FeaturePreference objects.
+    ///      Two cases are present: when the feature preference is at the Intervention Level and when it is at the 
+    ///      Intervention Details level (could be expanded). This is identified by the item's ref_group_id (from the
+    ///      database) matching "1", which is the group to which all Intervention types belong.
+    /// 
+    /// #### Parameters:
+    /// * feature_pref_list: Option<Vec<FeaturePreference>> - An option wrapped list of FeaturePreferences that could be displayed.
+    ///                                                       If no FPs are available for the user (None option) an empty string is returned
+    /// #### Returns:
+    /// * String: the resulting HTML for the user's feature preferences
     /// 
     pub fn get_feature_preference_section(feature_pref_list: Option<Vec<FeaturePreference>>) -> String {
         tracing::debug!("get_feature_preference_tile()");
