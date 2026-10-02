@@ -13,11 +13,11 @@
 
 mod common;
 
-use maple_emr::constants;
+use maple_hms::constants;
 use sqlx::postgres::{PgPoolOptions}; 
 use tracing;
-use maple_emr::dao::encounter_dao::EncounterDAO;
-use maple_emr::dto::encounter::Encounter;
+use maple_hms::dao::encounter_dao::EncounterDAO;
+use maple_hms::dto::encounter::Encounter;
 
 pub const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500";
 
@@ -31,7 +31,7 @@ pub const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500
 ///
 #[tokio::test]
 async fn test_get_current_encounter() {
-    use maple_emr::constants;
+    use maple_hms::constants;
 
     let db_pool = match PgPoolOptions::new()
         .max_connections(5)

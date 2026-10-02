@@ -11,18 +11,18 @@ mod common;
 use std::ops::IndexMut;
 
 #[cfg(test)]
-use maple_emr::constants;
-use maple_emr::dto::encounter::Encounter;
-use maple_emr::dto::user_auth::Permission;
+use maple_hms::constants;
+use maple_hms::dto::encounter::Encounter;
+use maple_hms::dto::user_auth::Permission;
 
-use maple_emr::ui::tile_factory::{WebContentFactory, WebContentItem};
-use maple_emr::ui::simple_fmt::SimpleFormatter;
-use maple_emr::ui::common_fmt::CommonFormatter;
-use maple_emr::ui::menu_fmt::MenuFormatter;
-use maple_emr::ui::feat_preference_fmt::FeaturePreferenceFormatter;
-use maple_emr::ui::intervention_fmt::InterventionFormatter;
-use maple_emr::session::{UserSession}; // AppSession
-use maple_emr::ui::data_forms::InterventionDataForm;
+use maple_hms::ui::tile_factory::{WebContentFactory, WebContentItem};
+use maple_hms::ui::simple_fmt::SimpleFormatter;
+use maple_hms::ui::common_fmt::CommonFormatter;
+use maple_hms::ui::menu_fmt::MenuFormatter;
+use maple_hms::ui::feat_preference_fmt::FeaturePreferenceFormatter;
+use maple_hms::ui::intervention_fmt::InterventionFormatter;
+use maple_hms::session::{UserSession}; // AppSession
+use maple_hms::ui::data_forms::InterventionDataForm;
 
 use common::entity_factory::EntityFactory;
 use common::data_generator::DataGenerator;

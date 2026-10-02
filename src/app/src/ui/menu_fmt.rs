@@ -16,7 +16,7 @@ pub struct MenuFormatter{}
 impl MenuFormatter {
     
     /// ### MenuFormatter::get_legacy_menu()
-    ///   Provide HTML for the main system menu; replaces tag: <!--MapleEMR::LegacyMenu-->
+    ///   Provide HTML for the main system menu; replaces tag: <!--MapleHMS::LegacyMenu-->
     ///   Defaults the patient to None (id=-1)
     /// 
     /// #### Parameters:
@@ -31,7 +31,7 @@ impl MenuFormatter {
     }
 
     /// ### MenuFormatter::get_legacy_menu_with_patient()
-    ///   Provide HTML for the main system menu; replaces tag: <!--MapleEMR::LegacyMenu-->
+    ///   Provide HTML for the main system menu; replaces tag: <!--MapleHMS::LegacyMenu-->
     /// 
     /// #### Parameters:
     /// * patient_list: Vec<Patient> - the list of patients to be displayed

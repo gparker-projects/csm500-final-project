@@ -19,10 +19,10 @@ mod common;
 use sqlx::postgres::{PgPoolOptions}; 
 use chrono::{NaiveDate, Utc};
 
-use maple_emr::constants;
-use maple_emr::dao::patient_dao::PatientDAO;
-use maple_emr::dto::patient::Patient;
-use maple_emr::ui::data_forms::*;
+use maple_hms::constants;
+use maple_hms::dao::patient_dao::PatientDAO;
+use maple_hms::dto::patient::Patient;
+use maple_hms::ui::data_forms::*;
 
 pub const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500";
 

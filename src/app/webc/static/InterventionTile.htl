@@ -45,10 +45,10 @@
 
 	    <tr class="data-label">
 	      <td colspan=2>
-	          <div class="data-field-ro">Assigned to:&nbsp;<div id="MapleEMR::UserIdDropDownControl"></div></div>
+	          <div class="data-field-ro">Assigned to:&nbsp;<div id="MapleHMS::UserIdDropDownControl"></div></div>
 	      </td>
 	      <td>
-	          <div class="data-field-ro">Status:&nbsp;<div id="MapleEMR::StatusIdDropDownControl"></div></div>
+	          <div class="data-field-ro">Status:&nbsp;<div id="MapleHMS::StatusIdDropDownControl"></div></div>
 	      </td>
 	    </tr>
 
@@ -82,7 +82,7 @@
 		<input type="hidden" name="addFrm_patient_id" id="addFrm_patient_id" value="{patient_id}">
 		<table>
 			<tr class="data-label">
-			<td><div class="data-field-ro"><div id="MapleEMR::InterventionDetailsTypeDropDownControl"></div></td>
+			<td><div class="data-field-ro"><div id="MapleHMS::InterventionDetailsTypeDropDownControl"></div></td>
 			<input type="hidden" name="addFrm_intv_id" id="addFrm_intv_id" value="{intervention_id}">
 			<input type="hidden" name="addFrm_intv_dtls_id" id="addFrm_intv_dtls_id" value="-1">
 			<td><div>Value</div><input type="text" name="addFrm_value" id="addFrm_value" class="data-field-rw" value=""></td>
@@ -104,8 +104,8 @@
 </tr>
 <tr>
 	<td>
-		<div id="MapleEMR::FeaturePreference"></div>
-		<div id="MapleEMR::InterventionDetailsList"></div>
+		<div id="MapleHMS::FeaturePreference"></div>
+		<div id="MapleHMS::InterventionDetailsList"></div>
 	</td>
 </tr>
 <tr>

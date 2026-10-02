@@ -9,7 +9,7 @@
 mod common;
 
 #[cfg(test)]
-use maple_emr::ui::data_forms::*;
+use maple_hms::ui::data_forms::*;
 
 use common::entity_factory::EntityFactory;
 use common::data_generator::DataGenerator;

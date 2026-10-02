@@ -2,9 +2,9 @@
 <link rel="stylesheet" href="/webc/css/home.css">
 <script src="/webc/js/patientListTile.js" defer></script>
 
-<div id="MapleEMR::PatientHeader"></div><p></p>
+<div id="MapleHMS::PatientHeader"></div><p></p>
 
-<div align="left" <div id="MapleEMR::SectionVisible_1"></div> >
+<div align="left" <div id="MapleHMS::SectionVisible_1"></div> >
 <form action="/discharge" method="post" id="dischargeForm" onSubmit="event.preventDefault(); return submitDischargeForm()">
   <input type="submit" value="Discharge Patient">
   <input type="hidden" id="patient_id" name="patient_id" value="{patient_id}">
@@ -14,13 +14,13 @@
 </div>
 
 <h1>Treatments, Procedures and Medication</h1>
-<div id="MapleEMR::CurrentInterventions"></div><p></p>
+<div id="MapleHMS::CurrentInterventions"></div><p></p>
 
-<div align="left" <div id="MapleEMR::SectionVisible_2"></div> >
+<div align="left" <div id="MapleHMS::SectionVisible_2"></div> >
 <form action="/intvnew" method="post" id="addIntvForm" onSubmit="event.preventDefault(); return submitAddIntvForm()">
   <div align="left" >
       <input type="submit" value="Add/Request">
-      <div id="MapleEMR::InterventionTypeDropDownControl"></div>
+      <div id="MapleHMS::InterventionTypeDropDownControl"></div>
   </div>
   <input type="hidden" id="patient_id" name="patient_id" value="{patient_id}">
   <input type="hidden" id="encounter_id" name="encounter_id" value="{encounter_id}">
@@ -31,7 +31,7 @@
 <div align="center">
 <form action="/fast" method="post" id="fastForm" onsubmit="event.preventDefault(); return fastAction();">
   <div align="left">
-      <div id="MapleEMR::FeaturePreference"></div>
+      <div id="MapleHMS::FeaturePreference"></div>
   </div>
   <input type="hidden" id="patient_id" name="patient_id" value="{patient_id}">
   <input type="hidden" id="encounter_id" name="encounter_id" value="{encounter_id}">

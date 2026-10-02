@@ -21,9 +21,9 @@
 mod common;
 
 use sqlx::postgres::{PgPoolOptions}; 
-use maple_emr::dao::common_dao::CommonDAO;
+use maple_hms::dao::common_dao::CommonDAO;
 
-use maple_emr::constants;
+use maple_hms::constants;
 
 pub const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500";
 

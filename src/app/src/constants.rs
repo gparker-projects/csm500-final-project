@@ -55,25 +55,25 @@ pub const CRT_INTERVENTION_ALERT_TYPE: i64 = 100040;
 pub const ERR_LABEL_NO_ERROR_TAG: &str = r##"<label id="errLabel"></label>"##;
 pub const ERR_LABEL_WITH_ERROR_TAG: &str = r##"<label id="errLabel" class='clinical-emergency-red'>{form_errors}</label><br>"##; //  style="color: red"
 
-pub const RELEASE_NUMBER: &str = r##"<div id="MapleEMR::ReleaseNumber"></div>"##;
-pub const LEGACY_MENU_TILE_TAG : &str = r##"<div id="MapleEMR::LegacyMenu"></div>"##;
-pub const USER_IDENTITY_TILE_TAG : &str = r##"<div id="MapleEMR::UserIdentity"></div>"##;
-pub const BODY_TILE_CONTENT_TAG: &str = r##"<div id="MapleEMR::BodyTile"></div>"##;
+pub const RELEASE_NUMBER: &str = r##"<div id="MapleHMS::ReleaseNumber"></div>"##;
+pub const LEGACY_MENU_TILE_TAG : &str = r##"<div id="MapleHMS::LegacyMenu"></div>"##;
+pub const USER_IDENTITY_TILE_TAG : &str = r##"<div id="MapleHMS::UserIdentity"></div>"##;
+pub const BODY_TILE_CONTENT_TAG: &str = r##"<div id="MapleHMS::BodyTile"></div>"##;
 
-pub const FEATURE_PREFERENCE_TILE_TAG : &str = r##"<div id="MapleEMR::FeaturePreference"></div>"##;
+pub const FEATURE_PREFERENCE_TILE_TAG : &str = r##"<div id="MapleHMS::FeaturePreference"></div>"##;
 
-pub const PATIENT_HEADER_TILE_TAG : &str = r##"<div id="MapleEMR::PatientHeader"></div>"##;
-pub const CURRENT_ENCOUNTER_TILE_TAG : &str =r##"<div id="MapleEMR::CurrentEncounter"></div>"##;
-pub const CURRENT_INTERVENTIONS_TILE_TAG : &str =r##"<div id="MapleEMR::CurrentInterventions"></div>"##;
-pub const ENCOUNTER_HISTORY_TILE_TAG : &str =r##"<div id="MapleEMR::EncounterHistory"></div>"##;
+pub const PATIENT_HEADER_TILE_TAG : &str = r##"<div id="MapleHMS::PatientHeader"></div>"##;
+pub const CURRENT_ENCOUNTER_TILE_TAG : &str =r##"<div id="MapleHMS::CurrentEncounter"></div>"##;
+pub const CURRENT_INTERVENTIONS_TILE_TAG : &str =r##"<div id="MapleHMS::CurrentInterventions"></div>"##;
+pub const ENCOUNTER_HISTORY_TILE_TAG : &str =r##"<div id="MapleHMS::EncounterHistory"></div>"##;
 
-pub const SECTION_1_VISIBLE_TAG : &str = r##"<div id="MapleEMR::SectionVisible_1"></div>"##;
-pub const SECTION_2_VISIBLE_TAG : &str = r##"<div id="MapleEMR::SectionVisible_2"></div>"##;
+pub const SECTION_1_VISIBLE_TAG : &str = r##"<div id="MapleHMS::SectionVisible_1"></div>"##;
+pub const SECTION_2_VISIBLE_TAG : &str = r##"<div id="MapleHMS::SectionVisible_2"></div>"##;
 
-pub const INTERVENTION_TYPE_DROP_DOWN_CONTROL_TAG : &str = r##"<div id="MapleEMR::InterventionTypeDropDownControl"></div>"##;
+pub const INTERVENTION_TYPE_DROP_DOWN_CONTROL_TAG : &str = r##"<div id="MapleHMS::InterventionTypeDropDownControl"></div>"##;
 
 pub const LEGACY_MENU_ON_ERROR : &str = r##"<div id="legacyMenu" align="left"><ul><li><a class="menuNotCurrent" href="\home">My Dashboard</li></ul></div>"##;
 
 // The Intervention Details editing section has a lot of inline/control level replaces, so the regular tagging above becomes cumbersome to work with
-pub const ITEM_ID_INLINE_TAG : &str = r##"{MapleEMR::itemId}"##; // This one is different from the rest because it will be used multiple times in a single tile
-pub const INTERVENTION_DETAILS_TYPE_DROP_DOWN_CONTROL_TAG : &str = r##"<div id="MapleEMR::InterventionDetailsTypeDropDownControl"></div>"##;              
+pub const ITEM_ID_INLINE_TAG : &str = r##"{MapleHMS::itemId}"##; // This one is different from the rest because it will be used multiple times in a single tile
+pub const INTERVENTION_DETAILS_TYPE_DROP_DOWN_CONTROL_TAG : &str = r##"<div id="MapleHMS::InterventionDetailsTypeDropDownControl"></div>"##;              

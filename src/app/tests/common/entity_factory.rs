@@ -6,15 +6,15 @@
 ///  Graham Parker (Student ID: 240120522)
 /// -------------------------------------------------------------------
 
-use maple_emr::constants;
-use maple_emr::dao::patient_dao::PatientWrapper;
-use maple_emr::dto::encounter::Encounter;
-use maple_emr::dto::feature_preference::FeaturePreference;
-use maple_emr::dto::intervention::Intervention;
-use maple_emr::dto::intervention_detail::InterventionDetail;
-use maple_emr::dto::patient::Patient;
-use maple_emr::dto::user_auth::{Permission, UserAuthorization};
-use maple_emr::session::{UserSession};
+use maple_hms::constants;
+use maple_hms::dao::patient_dao::PatientWrapper;
+use maple_hms::dto::encounter::Encounter;
+use maple_hms::dto::feature_preference::FeaturePreference;
+use maple_hms::dto::intervention::Intervention;
+use maple_hms::dto::intervention_detail::InterventionDetail;
+use maple_hms::dto::patient::Patient;
+use maple_hms::dto::user_auth::{Permission, UserAuthorization};
+use maple_hms::session::{UserSession};
 
 #[cfg(test)]
 
@@ -28,7 +28,7 @@ impl EntityFactory{
     ///
     #[allow(dead_code)]
     pub fn create_patient() -> Patient {
-        use maple_emr::constants;
+        use maple_hms::constants;
 
         return Patient {
             id: constants::INVALID_OTHER_ID,

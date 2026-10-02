@@ -1,33 +1,33 @@
 <tr class="data-label">
-<div id="divRO_{MapleEMR::itemId}">
+<div id="divRO_{MapleHMS::itemId}">
 <table>
   <tr class="field-row">
 	<td class="field-label">{count})&nbsp;{type_name}</td>
 	<td class="field-value">{value}</td>
 	<td class="field-value">{notes}</td>
 	<td class="field-label"><i>{entry_timestamp}</i></td><td class="field-label">
-	<input type="button" id="itemEdit_{MapleEMR::itemId}" name="itemEdit_{MapleEMR::itemId}" value="Edit">
+	<input type="button" id="itemEdit_{MapleHMS::itemId}" name="itemEdit_{MapleHMS::itemId}" value="Edit">
   </td></tr>
 </table>
 </div>
 
-<div id="divRW_{MapleEMR::itemId}" class="hidden">
-<form action="/intvdtlsave" method="post" id="itemForm_{MapleEMR::itemId}" name="itemForm_{MapleEMR::itemId}" onsubmit="event.preventDefault(); return validateItvDtlsForm({MapleEMR::itemId});">
+<div id="divRW_{MapleHMS::itemId}" class="hidden">
+<form action="/intvdtlsave" method="post" id="itemForm_{MapleHMS::itemId}" name="itemForm_{MapleHMS::itemId}" onsubmit="event.preventDefault(); return validateItvDtlsForm({MapleHMS::itemId});">
 	<table>
 		 <tr class="data-label">
-		   <td><div class="data-field-ro"><div id="MapleEMR::InterventionDetailsTypeDropDownControl"></div></td>
-		   <input type="hidden" name="intv_id_{MapleEMR::itemId}" id="intv_id_{MapleEMR::itemId}" value="{intervention_id}">
-		   <input type="hidden" name="intv_dtls_id_{MapleEMR::itemId}" id="intv_dtls_id_{MapleEMR::itemId}" value="{MapleEMR::itemId}">
-		   <td><input type="text" name="intv_dtls_value_{MapleEMR::itemId}" id="intv_dtls_value_{MapleEMR::itemId}" class="data-field-rw" value="{value}"></td>
-		   <td><div>Note</div><textarea id="intv_dtls_notes_{MapleEMR::itemId}" name="intv_dtls_notes_{MapleEMR::itemId}" rows="2" cols="50" class="data-field-rw">{notes}</textarea></td>
+		   <td><div class="data-field-ro"><div id="MapleHMS::InterventionDetailsTypeDropDownControl"></div></td>
+		   <input type="hidden" name="intv_id_{MapleHMS::itemId}" id="intv_id_{MapleHMS::itemId}" value="{intervention_id}">
+		   <input type="hidden" name="intv_dtls_id_{MapleHMS::itemId}" id="intv_dtls_id_{MapleHMS::itemId}" value="{MapleHMS::itemId}">
+		   <td><input type="text" name="intv_dtls_value_{MapleHMS::itemId}" id="intv_dtls_value_{MapleHMS::itemId}" class="data-field-rw" value="{value}"></td>
+		   <td><div>Note</div><textarea id="intv_dtls_notes_{MapleHMS::itemId}" name="intv_dtls_notes_{MapleHMS::itemId}" rows="2" cols="50" class="data-field-rw">{notes}</textarea></td>
 		   <td>
-		     <input type="submit" value="Save" onclick="event.preventDefault(); return validateItvDtlsForm({MapleEMR::itemId});">
-		     <input type="button" id="itemCancel_{MapleEMR::itemId}" value="Cancel">
+		     <input type="submit" value="Save" onclick="event.preventDefault(); return validateItvDtlsForm({MapleHMS::itemId});">
+		     <input type="button" id="itemCancel_{MapleHMS::itemId}" value="Cancel">
 		   </td>
 		</tr>
 		<tr class="data-field-ro">
 			<td colspan="4">
-				<label id="itemForm_{MapleEMR::itemId}_errors" class="hidden"></label>
+				<label id="itemForm_{MapleHMS::itemId}_errors" class="hidden"></label>
 			</td>
 	    </tr>
 	</table>
@@ -35,24 +35,24 @@
 </div>
 
 <script>
-	const itemEdit_{MapleEMR::itemId} = document.getElementById('itemEdit_{MapleEMR::itemId}');
-	const itemCancel_{MapleEMR::itemId} = document.getElementById('itemCancel_{MapleEMR::itemId}');
-	const divRO_{MapleEMR::itemId} = document.getElementById('divRO_{MapleEMR::itemId}');
-	const divRW_{MapleEMR::itemId} = document.getElementById('divRW_{MapleEMR::itemId}');
+	const itemEdit_{MapleHMS::itemId} = document.getElementById('itemEdit_{MapleHMS::itemId}');
+	const itemCancel_{MapleHMS::itemId} = document.getElementById('itemCancel_{MapleHMS::itemId}');
+	const divRO_{MapleHMS::itemId} = document.getElementById('divRO_{MapleHMS::itemId}');
+	const divRW_{MapleHMS::itemId} = document.getElementById('divRW_{MapleHMS::itemId}');
 
-	itemCancel_{MapleEMR::itemId}.addEventListener('click', () => {
-      console.log("itemCancel_{MapleEMR::itemId}> toggle");
+	itemCancel_{MapleHMS::itemId}.addEventListener('click', () => {
+      console.log("itemCancel_{MapleHMS::itemId}> toggle");
 	  event.preventDefault();
-	  divRO_{MapleEMR::itemId}.classList.toggle('hidden');
-	  divRW_{MapleEMR::itemId}.classList.toggle('hidden');
+	  divRO_{MapleHMS::itemId}.classList.toggle('hidden');
+	  divRW_{MapleHMS::itemId}.classList.toggle('hidden');
 	  event.preventDefault();
 	});
 
-	itemEdit_{MapleEMR::itemId}.addEventListener('click', () => {
-	  console.log("itemEdit_{MapleEMR::itemId}> toggle");
+	itemEdit_{MapleHMS::itemId}.addEventListener('click', () => {
+	  console.log("itemEdit_{MapleHMS::itemId}> toggle");
 	  event.preventDefault();
-	  divRO_{MapleEMR::itemId}.classList.toggle('hidden');
-	  divRW_{MapleEMR::itemId}.classList.toggle('hidden');
+	  divRO_{MapleHMS::itemId}.classList.toggle('hidden');
+	  divRW_{MapleHMS::itemId}.classList.toggle('hidden');
 	  event.preventDefault();
 	});
 

@@ -367,14 +367,14 @@ impl WebContentFactory {
                                 "{scheduled_timestamp}",
                                 "{performed_timestamp}",
                                 "{location_id}",
-                                "<div id=\"MapleEMR::UserIdDropDownControl\">",
-                                "<div id=\"MapleEMR::StatusIdDropDownControl\">",
+                                "<div id=\"MapleHMS::UserIdDropDownControl\">",
+                                "<div id=\"MapleHMS::StatusIdDropDownControl\">",
                                 "{description}",
                                 "{notes}",
                                 "{encounter_id}",
                                 "{patient_id}",
                                 constants::ERR_LABEL_NO_ERROR_TAG,
-                                "<div id=\"MapleEMR::InterventionDetailsList\">",
+                                "<div id=\"MapleHMS::InterventionDetailsList\">",
                                 constants::FEATURE_PREFERENCE_TILE_TAG,
                                 "{hide_add_new_measure}"];
 
@@ -396,8 +396,8 @@ impl WebContentFactory {
                 tracing::debug!("..View to create new Intervention");
                 println!("..View to create new Intervention");
                 println!("..(debug001) encounter_id: {}", req.encounter_id.to_string());
-                dd_user = CommonFormatter::get_dropdown_user_with_department(user_dropdown_list,constants::NOT_SPECIFIED_ID); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
-                dd_intv_status =  CommonFormatter::get_dropdown_intervention_status(status_dropdown_list, constants::DEFAULT_INTERVENTION_STATUS_NEW); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
+                dd_user = CommonFormatter::get_dropdown_user_with_department(user_dropdown_list,constants::NOT_SPECIFIED_ID); // "<div id=\"MapleHMS::UserIdDropDownControl\">",
+                dd_intv_status =  CommonFormatter::get_dropdown_intervention_status(status_dropdown_list, constants::DEFAULT_INTERVENTION_STATUS_NEW); // "<div id=\"MapleHMS::StatusIdDropDownControl\">",
 
                 let tmp_data_items = [constants::NOT_SPECIFIED_ID.to_string(), //"{intervention_id}",
                                                   intv_type.1, //"{intervention_type}",
@@ -405,14 +405,14 @@ impl WebContentFactory {
                                                   scheduled_timestamp, //"{scheduled_timestamp}",
                                                   performed_timestamp, //"{performed_timestamp}",
                                                   location_menu , //"{location_id}", 
-                                                  dd_user,        //"<div id=\"MapleEMR::UserIdDropDownControl\">",
-                                                  dd_intv_status, //"<div id=\"MapleEMR::StatusIdDropDownControl\">",
+                                                  dd_user,        //"<div id=\"MapleHMS::UserIdDropDownControl\">",
+                                                  dd_intv_status, //"<div id=\"MapleHMS::StatusIdDropDownControl\">",
                                                   String::new(), //"{description}",
                                                   String::new(), //"{notes}",
                                                   req.encounter_id.to_string(), // "{encounter_id}",  //TODO
                                                   req.patient_id.to_string(),
                                                   constants::ERR_LABEL_NO_ERROR_TAG.to_string(), // **preserve the tag** .. no error to display
-                                                  String::new(),  //"<div id=\"MapleEMR::InterventionDetailsList\">"
+                                                  String::new(),  //"<div id=\"MapleHMS::InterventionDetailsList\">"
                                                   String::new(), // feature_pref_section // if the intervention has not been saved, do not allow preference additions
                                                   " class='hidden'".to_string()
                                                   ];
@@ -421,8 +421,8 @@ impl WebContentFactory {
             Some (intv) => {
                 tracing::debug!("..Update existing Intervention");
                 println!("..Update existing Intervention");
-                dd_user = CommonFormatter::get_dropdown_user_with_department(user_dropdown_list,intv.users_id); // "<div id=\"MapleEMR::UserIdDropDownControl\">",
-                dd_intv_status =  CommonFormatter::get_dropdown_intervention_status(status_dropdown_list, intv.status_id); // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
+                dd_user = CommonFormatter::get_dropdown_user_with_department(user_dropdown_list,intv.users_id); // "<div id=\"MapleHMS::UserIdDropDownControl\">",
+                dd_intv_status =  CommonFormatter::get_dropdown_intervention_status(status_dropdown_list, intv.status_id); // "<div id=\"MapleHMS::StatusIdDropDownControl\">",
 
                 let intv_details_html =  InterventionFormatter::get_view_only_intervention_details_list(
                                                   self.get_tile(WebContentItem::WCTypeIntvDetailItemTile),
@@ -458,8 +458,8 @@ impl WebContentFactory {
                                                     scheduled_timestamp,
                                                     performed_timestamp,
                                                     location_menu, //location_id 
-                                                    dd_user, // "<div id=\"MapleEMR::UserIdDropDownControl\">",
-                                                    dd_intv_status, // "<div id=\"MapleEMR::StatusIdDropDownControl\">",
+                                                    dd_user, // "<div id=\"MapleHMS::UserIdDropDownControl\">",
+                                                    dd_intv_status, // "<div id=\"MapleHMS::StatusIdDropDownControl\">",
                                                     description,
                                                     notes,
                                                     tmp_encounter_id,

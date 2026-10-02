@@ -15,7 +15,7 @@ mod common;
 
 use sqlx::postgres::PgPoolOptions; 
 use tracing;
-use maple_emr::{constants, dao::auth_dao::AuthDAO};
+use maple_hms::{constants, dao::auth_dao::AuthDAO};
 
 use chrono::NaiveDateTime;
 

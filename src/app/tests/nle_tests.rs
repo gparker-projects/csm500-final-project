@@ -13,15 +13,15 @@ mod common;
 //use actix_web::cookie::time::format_description::modifier::End;
 use sqlx::postgres::{PgPoolOptions}; 
 
-use maple_emr::constants;
-use maple_emr::dao::patient_dao::PatientDAO;
+use maple_hms::constants;
+use maple_hms::dao::patient_dao::PatientDAO;
 
-use maple_emr::nle::controller::CommandController;
-use maple_emr::ui::nle_command_fmt::NLECommandFormatter;
-use maple_emr::nle::nle::*;
+use maple_hms::nle::controller::CommandController;
+use maple_hms::ui::nle_command_fmt::NLECommandFormatter;
+use maple_hms::nle::nle::*;
 
-use maple_emr::dto::user_auth::Permission;
-use maple_emr::dto::user_auth::UserAuthorization;
+use maple_hms::dto::user_auth::Permission;
+use maple_hms::dto::user_auth::UserAuthorization;
 
 use common::entity_factory::EntityFactory;
 
@@ -184,7 +184,7 @@ async fn test_nle_get_referenced_patient() {
     let patients_list = {PatientDAO::new( db_pool.clone() ).await}.get_patients_at_users_site_no_discharge( test_user_id ).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
 
     // Test 9a: Patient should NOT be found
-    let mut referenced_patient: (i8, Option<maple_emr::dto::patient::Patient>) = CommandController::get_referenced_patient(patients_list.clone(), test_user_id, user_prompt.clone() ).await; // perform a basic search within the prompt for any of the current patients
+    let mut referenced_patient: (i8, Option<maple_hms::dto::patient::Patient>) = CommandController::get_referenced_patient(patients_list.clone(), test_user_id, user_prompt.clone() ).await; // perform a basic search within the prompt for any of the current patients
     assert_eq!(referenced_patient.0, CommandController::OTHER_PATIENT_FOUND, "Test 9a.0: No patient was expected, an alternative was returned");
     assert!(Some(referenced_patient.1).is_some(), "Test 9a.1: Target Patient not returned");
     

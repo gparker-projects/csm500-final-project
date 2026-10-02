@@ -41,10 +41,8 @@
 
 
 <div align="center">
-<img src="/webc/img/mapleLogo.png" height="60px" width="200px">
-
+<img src="/webc/img/mapleLogo-lrg.png">
 <label id="errLabel"></label><br>
-
 <div id="roundbluebox" align="center" >
 <form action="/login" method="post" id="loginForm" onSubmit="event.preventDefault(); return validateForm()">
 

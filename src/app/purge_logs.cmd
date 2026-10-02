@@ -1,1 +1,1 @@
-del C:\uol\csm500-final-project\src\app\maple_emr-*.log
+del C:\uol\csm500-final-project\src\app\maple_hms-*.log

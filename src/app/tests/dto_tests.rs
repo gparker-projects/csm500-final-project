@@ -19,9 +19,9 @@ use chrono::{Utc, NaiveDateTime, NaiveDate};
 use rand::{RngExt, rng};
 
 use common::data_generator::*; 
-use maple_emr::{constants, dto::{encounter::*, feature_preference::*, intervention::*, intervention_detail::*, patient::*, user::*}};
-use maple_emr::dto::{user_auth::*, convert_utils::*};
-use maple_emr::ui::data_forms::AdmitDataForm;
+use maple_hms::{constants, dto::{encounter::*, feature_preference::*, intervention::*, intervention_detail::*, patient::*, user::*}};
+use maple_hms::dto::{user_auth::*, convert_utils::*};
+use maple_hms::ui::data_forms::AdmitDataForm;
 
 mod common;
 

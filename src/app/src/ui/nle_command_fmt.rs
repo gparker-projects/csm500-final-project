@@ -37,7 +37,7 @@ impl NLECommandFormatter {
         let mut user_options: Vec<(String, f32, i64)> = Vec::new();
         let mut alt_patient_id: i64 = constants::INVALID_OTHER_ID;
 
-        results_sbuf.push_str( "<div id=\"MapleEMR::NLPCanvas\">" );
+        results_sbuf.push_str( "<div id=\"MapleHMS::NLPCanvas\">" );
   
         let patient_name: String; // if the prompt did not infer a patient id, we will use the forced one
         match referred_patient {

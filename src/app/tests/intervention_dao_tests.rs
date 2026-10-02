@@ -21,11 +21,11 @@ use chrono::{Utc, NaiveDateTime};
 use sqlx::postgres::{PgPoolOptions}; 
 use tracing;
 
-use maple_emr::constants;
-use maple_emr::dao::intervention_dao::InterventionDAO;
-use maple_emr::dto::intervention::Intervention;
-use maple_emr::dto::intervention_detail::InterventionDetail;
-use maple_emr::ui::data_forms::*;
+use maple_hms::constants;
+use maple_hms::dao::intervention_dao::InterventionDAO;
+use maple_hms::dto::intervention::Intervention;
+use maple_hms::dto::intervention_detail::InterventionDetail;
+use maple_hms::ui::data_forms::*;
 
 const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500";
 const INVALID_HIGH_VALUE_ID: i64 = 99999999999;

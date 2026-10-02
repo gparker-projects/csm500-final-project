@@ -65,7 +65,7 @@ mod session;
 /// 
 async fn is_it_up() -> impl Responder {
     tracing::info!("-> /isItUp Requested");
-    HttpResponse::Ok().body("MapleEMR is Up")
+    HttpResponse::Ok().body("MapleHMS is Up")
 }
 
 /// ### fn get_static_path_base()
@@ -106,7 +106,7 @@ fn get_application_secret_key(session_key: String) -> Key {
 }
 
 /// ### fn init_logging()
-///   Initializes standard Rust logging for the application, creating a file with name format: maple_emr-%Y-%b-%d_%H%M%S.log
+///   Initializes standard Rust logging for the application, creating a file with name format: maple_hms-%Y-%b-%d_%H%M%S.log
 /// 
 /// #### Parameters: None
 /// 
@@ -116,7 +116,7 @@ fn init_logging(){
   // added per recommendation from 0-to-Prod
   // https://rust.code-maven.com/logging/tracing-to-a-file.html
   //
-  let log_filename = "maple_emr-".to_owned() + &chrono::Local::now().format("%Y-%b-%d_%H%M%S").to_string() +".log";
+  let log_filename = "maple_hms-".to_owned() + &chrono::Local::now().format("%Y-%b-%d_%H%M%S").to_string() +".log";
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::fmt::layer()
@@ -133,8 +133,7 @@ fn init_logging(){
         // Enable this to also log to STDOUT:
         //.with(tracing_subscriber::fmt::layer())
         .init();
-  tracing::info!("MapleEMR is running!");
-  println!("MapleEMR is running! Access via: http://127.0.0.1:8000");
+  tracing::info!("MapleHMS is running!");
 }
 
 /// ### init_config()
@@ -228,7 +227,7 @@ async fn main() -> std::io::Result<()> {
       .await
   {
       Ok(pool) => {
-        tracing::info!("Database connection established to: {}", db_url);
+        tracing::info!("Database connection established to: http://{}", db_url);
         pool
       },
       Err(e) => {
@@ -244,6 +243,7 @@ async fn main() -> std::io::Result<()> {
                   .commit_from_file(&(config.model_data_dir.clone() + &config.language_model_file.clone()) ).expect("File could not be accessed");
   let shared_session = Arc::new(nle_session);
 */
+println!("MapleHMS is running! Access via: http://{}", binding_addr.clone());
 
   // use the Builder pattern to add one route at a time
   HttpServer::new( move || {

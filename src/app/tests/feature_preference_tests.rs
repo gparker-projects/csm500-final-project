@@ -17,9 +17,9 @@ mod common;
 use sqlx::postgres::{PgPoolOptions}; 
 use chrono::NaiveDate;
 
-use maple_emr::constants;
-use maple_emr::dao::feature_preference_dao::FeaturePreferenceDAO;
-use maple_emr::dto::feature_preference::FeaturePreference;
+use maple_hms::constants;
+use maple_hms::dao::feature_preference_dao::FeaturePreferenceDAO;
+use maple_hms::dto::feature_preference::FeaturePreference;
 
 pub const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500";
 

@@ -9,21 +9,21 @@
 </head>
 <body>
 
-<div class="userIdentity"><img src="/webc/img/mapleLogo.png" alt="MapleEMR" title="<div id="MapleEMR::UserIdentity"></div>"><div id="MapleEMR::ReleaseNumber"></div></div>
+<div class="userIdentity"><img src="/webc/img/mapleLogo.png" alt="MapleHMS" title="<div id="MapleHMS::UserIdentity"></div>"><div id="MapleHMS::ReleaseNumber"></div></div>
 <p>
-<div id="MapleEMR::LegacyMenu"></div>
+<div id="MapleHMS::LegacyMenu"></div>
 
 <div id="mainContentArea" align="left">
 
-	<div id="MapleEMR::BodyTile"></div>
+	<div id="MapleHMS::BodyTile"></div>
 
-	<div id="MapleEMR::PatientList"></div>
+	<div id="MapleHMS::PatientList"></div>
 
 </div>
 
 
 <div id="nlpCommandArea" align="left" class="nlpCommandAreaCls">
-  <div id="MapleEMR::NLPCanvas"></div>
+  <div id="MapleHMS::NLPCanvas"></div>
   <form action="/nlprompt" method="post" id="nlpCommandForm" name="nlpCommandForm" onSubmit="event.preventDefault(); return validateNLPrompt()" align="left" class="nlpCommandAreaCls">
 	
 	<div align="right"><textarea id="prompt" name="prompt" rows="3" cols="20" class="data-field-rw" placeholder="How can I help?"></textarea>
