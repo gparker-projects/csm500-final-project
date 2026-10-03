@@ -19,6 +19,8 @@ mod convert_utils_tests {
     use maple_hms::{dto::user_auth::*};
     use maple_hms::session::*;
     use maple_hms::ui::tile_factory::{WebContentFactory};
+
+    use std::env::VarError;
     
     use actix_web::cookie::Key;
     use sqlx::postgres::{PgPoolOptions}; 
@@ -87,6 +89,8 @@ mod convert_utils_tests {
     ///
     #[test]
     fn test_sys_config() {
+        println!("test_sys_config()");
+        // Test 1: basic SysConfig and field value accessors
         let cfg = SysConfig{
             max_general_fastactions: "1".to_string(),
             max_age_feature_preferences: "10".to_string(),
@@ -94,7 +98,33 @@ mod convert_utils_tests {
         };
  
         assert_eq!(cfg.get_max_general_fastactions(), 1, "Incorrect max_general_fastactions returned");
-        assert_eq!(cfg.get_max_age_feature_preferences(), 10, "Incorrect max_age_feature_preferences returned");        
+        assert_eq!(cfg.get_max_age_feature_preferences(), 10, "Incorrect max_age_feature_preferences returned");  
+
+        // Test 2: use the SysConfig::new() method to construct the SysConfig
+        let base_path = std::env::current_dir().expect("Base path to TOML could not be found");
+        let config_path = base_path.display().to_string();
+
+        println!("..config_path = {}", config_path);
+
+        let test2_config = SysConfig::new( Ok( config_path ) );
+
+        println!("..app_version = {}", test2_config.app_version);
+        assert_ne!(test2_config.app_version, "", "App version not set");
+
+        println!("..db_conn_str = {}", test2_config.db_conn_str);
+        assert_ne!(test2_config.db_conn_str, "", "db_conn_str not set");
+        
+        assert_ne!(test2_config.cargo_manifest_dir, "", "cargo_manifest_dir not set");
+        assert_ne!(test2_config.model_data_dir, "", "model_data_dir not set");
+        assert_ne!(test2_config.command_mapping_file, "", "command_mapping_file not set");
+        assert_ne!(test2_config.language_model_file, "", "language_model_file not set");
+        assert_ne!(test2_config.tokenizer_file, "", "tokenizer_file not set");
+        assert_ne!(test2_config.data_sub_dir, "", "data_sub_dir not set");
+        assert_ne!(test2_config.max_general_fastactions, "", "max_general_fastactions not set");
+        assert_ne!(test2_config.max_nle_fastactions, "", "max_nle_fastactions not set");
+        assert_ne!(test2_config.website_bind_address, "", "website_bind_address not set");
+        assert_ne!(test2_config.session_key, "", "session_key not set");
+        assert_ne!(test2_config.max_age_feature_preferences, "", "max_age_feature_preferences not set");
     }
 
     /// ### test_app_session()

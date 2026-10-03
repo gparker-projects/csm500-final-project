@@ -31,7 +31,7 @@ const LOGIN_SCREEN_ID_TAG : &str = "<div id=\"MapleHMS::ID=Login\"></div>";
 /// ### test_default_route()
 /// 
 /// Tests DefaultRoute::default_route()
-//#[tokio::test]
+
  #[actix_web::test]
 async fn test_default_route(){
 
@@ -48,6 +48,7 @@ async fn test_default_route(){
             let body = String::from_utf8_lossy(&item);
             println!("Body = {}", body);
 
+            // confirm the content of the screen was loaded correctly by detecting a tag only present in the key Tile template file
             assert!( String::from_utf8_lossy(&item).contains( LOGIN_SCREEN_ID_TAG ), "Response did not contain expected content"); 
         },
         Err(_e) => { 
@@ -56,6 +57,10 @@ async fn test_default_route(){
     };
 }
 
+/// ### get_mock_app_session() 
+/// 
+/// Supporting method that sets up an initial mock application session for use by the main tests
+/// 
 async fn get_mock_app_session() -> web::Data<maple_hms::session::AppSession> {
    // a lot of set up to mimic a live system session
     let path = std::env::current_dir().expect("Base path to executable could not be found");
@@ -129,30 +134,4 @@ async fn get_mock_user_session() -> UserSession {
         user_authorizations: ua //
     }
 }
-
-References:
- https://bitskingdom.com/blog/web-apps-rust-performance-optimization/
-
-
-#[actix_web::test]
-use reqwest;
-use tokio;
-
-#[cfg(test)] 
-
-/// ### test_create_encounter_dto()
-/// 
-/// Tests the ability to create an Encounter DTO and its basic methods:
-/// * admit_timestamp_for_display()
-/// * to_string() - trait override
-/// 
-#[test]
-async fn test_reqwest() {
-    let response = reqwest::get("/")
-        .await
-        .unwrap()
-        .text()
-        .await
-        .unwrap();
-    println!("Response: {}", response);
-}*/
+*/

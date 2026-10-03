@@ -125,6 +125,27 @@ impl SysConfig{
 
         final_config
     }
+
+    /// ### fn get_application_secret_key()
+    ///   Provides the secret key for the application, usually from a config file (TODO)
+    /// 
+    /// #### Referencees:
+    ///  https://docs.rs/actix-web/latest/actix_web/cookie/struct.Key.html
+    /// 
+    /// #### Parameters: None
+    /// 
+    /// #### Returns: 
+    /// * Key: the Key obtained from the actix_web::cookie::Key class
+    /// 
+   pub fn get_application_secret_key(&self) -> Key {
+        tracing::info!(">get_application_secret_key()");
+
+        actix_web::cookie::Key::from(
+        std::env::var("SESSION_KEY")
+            .unwrap_or_else(|_| self.clone().session_key )
+            .as_bytes()
+        )
+    }
 }
 
 ///

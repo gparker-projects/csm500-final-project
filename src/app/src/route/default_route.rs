@@ -1,8 +1,10 @@
-//! Default route (" / ")
+//! ---------------------------------------------------------------------------------
+//! Default route (" / "), 404 Not found and a server monitoring (is it up?) route.
 //!
 //!  CSM500 Project (April - October 2026)
 //!  Graham Parker (Student ID: 240120522)
-
+//! 
+//! ---------------------------------------------------------------------------------
 use actix_web::{web, HttpResponse, Responder};
 use actix_session::{Session}; 
 use actix_web::http::StatusCode;
@@ -16,7 +18,7 @@ pub struct BasicRoute{}
 
 impl BasicRoute{
 
-    /// ### fn is_it_up()
+    /// ### is_it_up_route()
     /// 
     /// Allows a monitoring services to perform a basic "is the application up?" check
     /// 
@@ -25,12 +27,12 @@ impl BasicRoute{
     /// #### Returns: 
     /// * Responder: the general responder that allows the system to report system is up using an Ok() response
     /// 
-    pub async fn is_it_up() -> impl Responder {
+    pub async fn is_it_up_route() -> impl Responder {
         tracing::info!("-> /isItUp Requested");
         HttpResponse::Ok().body("MapleHMS is Up")
     }
 
-    /// ### route_to_not_found()
+    /// ### not_found_route()
     ///   Route for processing resource not found / 404 errors
     /// 
     /// #### Parameters: None
@@ -38,7 +40,7 @@ impl BasicRoute{
     /// #### Returns:
     /// * Responder (actix_web::response::responder): the HTTP responder (response) for the request
     /// 
-    pub async fn route_to_not_found() -> impl Responder {
+    pub async fn not_found_route() -> impl Responder {
         //HttpResponse::NotFound().body("Sorry, Page not found")
         tracing::info!("-> /isItUp Requested");
         actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SEE_OTHER)

@@ -19,25 +19,20 @@
 //! 
 //! ---------------------------------------------------------------------------------
 
-
 use actix_cors::Cors;
 use actix_files::*;
 use actix_session::{storage::CookieSessionStore, SessionMiddleware}; //, storage::RedisSessionStore}
 use actix_web::{web, App, HttpServer};
-use actix_web::cookie::Key;
 use std::env;
 
 use sqlx::postgres::{PgPoolOptions};
 use tracing;
-use tracing_subscriber::{
-    Layer, filter::LevelFilter, layer::SubscriberExt, util::SubscriberInitExt,
-};
+use tracing_subscriber::{ Layer, filter::LevelFilter, layer::SubscriberExt, util::SubscriberInitExt, };
 
 use crate::ui::tile_factory::WebContentFactory;
 use crate::session::*;
 use crate::route::admit_route::AdmitRoute;
 use crate::route::default_route::BasicRoute;
-
 use crate::route::home_route::HomeRoute;
 use crate::route::intervention_route::InterventionRoute;
 use crate::route::intervention_details_route::InterventionDetailsRoute;
@@ -54,41 +49,96 @@ mod nle;
 mod route;
 mod session;
 
-/// ### fn get_static_path_base()
+/// # Main program
+///  Loads the NLP engine and adds handlers for key paths of the web application
 /// 
-/// Helper function: obtains the web static path base, which is used to retrieve many sources of static content
-/// TODO: if this is not being used anywhere other than WebContentFactory, can we remove it?
+/// ### References: Add CORS headers to allow javascript connectivity
+///  https://docs.rs/actix-cors/latest/actix_cors/struct.Cors.html 
 /// 
-/// #### Parameters: None
+/// Returns std::io::Result<()> 
 /// 
-/// #### Returns: 
-/// * String: the base static file path, based on std::env::current_dir()
-/// 
-fn get_static_path_base() -> String{
-   //let path = see below
-   //println!("Default Route base dir: {}", path.clone());
-   return std::env::current_dir().expect("Base path to executable could not be found").display().to_string() + "\\webc\\static\\";
-}
+#[tokio::main]
+async fn main() -> std::io::Result<()> {
+    init_logging();
+    let config = SysConfig::new(env::var(constants::CARGO_MANIFEST_DIR));
+    let binding_addr = config.clone().website_bind_address;
 
-/// ### fn get_application_secret_key()
-///   Provides the secret key for the application, usually from a config file (TODO)
-/// 
-/// #### Referencees:
-///  https://docs.rs/actix-web/latest/actix_web/cookie/struct.Key.html
-/// 
-/// #### Parameters: None
-/// 
-/// #### Returns: 
-/// * Key: the Key obtained from the actix_web::cookie::Key class
-/// 
-fn get_application_secret_key(session_key: String) -> Key {
-    tracing::info!(">get_application_secret_key()");
+    //establish database connection for entire application here, add to the application session
+    let db_url = &config.db_conn_str.clone();
 
-    actix_web::cookie::Key::from(
-    std::env::var("SESSION_KEY")
-        .unwrap_or_else(|_| session_key )
-        .as_bytes()
-    )
+    let db_pool = match PgPoolOptions::new()
+        .max_connections(5)
+        .connect(db_url)
+        .await
+    {
+        Ok(pool) => {
+            tracing::info!("Database connection established to: http://{}", db_url);
+            pool
+        },
+        Err(e) => {
+            tracing::error!("{}", e);
+            panic!("{}", e)
+        },
+    };
+
+ /* let nle_session: ort::session::Session = Session::builder().expect("Session could not be established")
+                  .with_optimization_level(GraphOptimizationLevel::Level1).expect("No Session")
+                  .with_intra_threads(1).expect("Insufficient threads")
+                  .commit_from_file(&(config.model_data_dir.clone() + &config.language_model_file.clone()) ).expect("File could not be accessed");
+  let shared_session = Arc::new(nle_session);
+*/
+    println!("MapleHMS is running! Access via: http://{}", binding_addr.clone());
+
+    let static_path_base = std::env::current_dir().expect("Base path to executable could not be found").display().to_string() + "\\webc\\static\\";
+
+    // use the Builder pattern to add one route at a time
+    HttpServer::new( move || {
+        let tmp_app_key = config.get_application_secret_key(); //  MUST create within the enclosure, but NOT below, to have it available and consistent for the two uses below
+
+        App::new()
+            .wrap(
+            Cors::default()
+                //.allowed_origin("http://localhost:8000") // Restrict to specific origin
+                .allow_any_origin() // not great... will have to do for now
+                .allowed_methods(vec!["GET", "POST"])
+                .allowed_headers(vec![actix_web::http::header::AUTHORIZATION, actix_web::http::header::ACCEPT])
+                .allow_any_header()
+                .max_age(3600),
+        )
+        .app_data(  // this enclosure allows the session state to be created and made available to all routes. actix_web magic.
+            web::Data::new( session::AppSession {
+                    wcf: WebContentFactory::new(&static_path_base, config.app_version.clone()),
+                    app_key: tmp_app_key.clone(),
+                    connection: db_pool.clone(),
+                    system_config: config.clone()//,
+                }
+            ) 
+        )
+        .wrap(SessionMiddleware::new(CookieSessionStore::default(), tmp_app_key.clone())) // for user session
+        .route("/", web::get().to( BasicRoute::default_route ))
+        .route("/login", web::post().to( LoginRoute::login ))
+        .route("/home", web::get().to( HomeRoute::route_to_home )) // main workspace
+        .route("/patientdtls", web::post().to( PatientRoute::route_to_patient_details ))
+        .route("/nlprompt", web::post().to( NLERoute::natural_language_prompt ))
+        .route("/admit", web::post().to( AdmitRoute::route_to_admit_discharge ))
+        .route("/admitnew", web::post().to( AdmitRoute::route_to_admit_new_no_patient ))
+        .route("/admitsave", web::post().to( AdmitRoute::route_to_admit_save ))
+        .route("/discharge", web::post().to( AdmitRoute::route_to_discharge_patient ))
+        .route("/dischargesave", web::post().to( AdmitRoute::route_to_discharge_patient_save ))
+        .route("/intvlink", web::post().to( InterventionRoute::route_to_modify_intervention_basic ))
+        .route("/intvnew", web::post().to( InterventionRoute::route_to_add_new_intervention ))
+        .route("/intv", web::post().to( InterventionRoute::route_to_view_or_modify_intervention ))
+        .route("/intvsave", web::post().to( InterventionRoute::route_to_intervention_save ))
+        .route("/intvdtlnew", web::post().to( InterventionDetailsRoute::route_to_add_intervention_detail ))
+        .route("/intvdtlsave", web::post().to( InterventionDetailsRoute::route_to_intervention_detail_save ))
+        .route("/isItUp", web::get().to( BasicRoute::is_it_up_route ))
+        .route("/logout", web::get().to( LoginRoute::logout ))
+        .default_service(web::to(BasicRoute::not_found_route))
+        .service(Files::new("/webc/", "./webc"))  // ref: ttps://actix.rs/docs/static-files/
+    })
+    .bind(binding_addr)? //  "127.0.0.1:8000"
+    .run()
+    .await
 }
 
 /// ### fn init_logging()
@@ -99,121 +149,23 @@ fn get_application_secret_key(session_key: String) -> Key {
 /// #### Returns: None
 /// 
 fn init_logging(){
-  // added per recommendation from 0-to-Prod
-  // https://rust.code-maven.com/logging/tracing-to-a-file.html
-  //
-  let log_filename = "maple_hms-".to_owned() + &chrono::Local::now().format("%Y-%b-%d_%H%M%S").to_string() +".log";
-    tracing_subscriber::registry()
-        .with(
-            tracing_subscriber::fmt::layer()
-                .with_ansi(false)
-                .with_writer(
-                    std::fs::OpenOptions::new()
-                        .create(true)
-                        .append(true)
-                        .open(log_filename)
-                        .unwrap(),
-                )
-                .with_filter(LevelFilter::DEBUG),
-        )
-        // Enable this to also log to STDOUT:
-        //.with(tracing_subscriber::fmt::layer())
-        .init();
-  tracing::info!("MapleHMS is running!");
-}
-
-
- 
-/// # Main program
-/// 
-/// Loads the NLP engine and adds handlers for key paths of the web application
-/// 
-/// Ref: Add CORS headers to allow javascript connectivity
-///      ->  https://docs.rs/actix-cors/latest/actix_cors/struct.Cors.html 
-/// 
-/// Returns std::io::Result<()> for 
-#[tokio::main]
-async fn main() -> std::io::Result<()> {
-  init_logging();
-  let config = SysConfig::new(env::var(constants::CARGO_MANIFEST_DIR));
-  let binding_addr = config.clone().website_bind_address;
-
-  //establish database connection for entire application here, add to the application session
-  let db_url = &config.db_conn_str.clone();
-
-  let db_pool = match PgPoolOptions::new()
-      .max_connections(5)
-      .connect(db_url)
-      .await
-  {
-      Ok(pool) => {
-        tracing::info!("Database connection established to: http://{}", db_url);
-        pool
-      },
-      Err(e) => {
-        tracing::error!("{}", e);
-        panic!("{}", e)
-      },
-  };
-
-
- /* let nle_session: ort::session::Session = Session::builder().expect("Session could not be established")
-                  .with_optimization_level(GraphOptimizationLevel::Level1).expect("No Session")
-                  .with_intra_threads(1).expect("Insufficient threads")
-                  .commit_from_file(&(config.model_data_dir.clone() + &config.language_model_file.clone()) ).expect("File could not be accessed");
-  let shared_session = Arc::new(nle_session);
-*/
-  println!("MapleHMS is running! Access via: http://{}", binding_addr.clone());
-
-  // use the Builder pattern to add one route at a time
-  HttpServer::new( move || {
-
-    let tmp_app_key = get_application_secret_key( config.clone().session_key ); // create within the enclosure to make sure it is available and consistent for the two uses below
-
-    App::new()
-        .wrap(
-          Cors::default()
-              //.allowed_origin("http://localhost:8000") // Restrict to specific origin
-              .allow_any_origin() // not great... will have to do for now
-              .allowed_methods(vec!["GET", "POST"])
-              .allowed_headers(vec![actix_web::http::header::AUTHORIZATION, actix_web::http::header::ACCEPT])
-              .allow_any_header()
-              .max_age(3600),
-      )
-      .app_data(  // this enclosure allows the session state to be created and made available to all routes. actix_web magic.
-          web::Data::new( session::AppSession {
-                  //wcf: Mutex::new( WebContentFactory::new(&get_static_path_base()) )
-                  wcf: WebContentFactory::new(&get_static_path_base(), config.app_version.clone()),
-                  app_key: tmp_app_key.clone(),
-                  connection: db_pool.clone(),
-                  system_config: config.clone()//,
-                  //nle_session: Arc::clone(&shared_session), 
-              }
-          ) 
-      )
-      .wrap(SessionMiddleware::new(CookieSessionStore::default(), tmp_app_key.clone())) // for user session
-      .route("/", web::get().to( BasicRoute::default_route ))
-      .route("/login", web::post().to( LoginRoute::login ))
-      .route("/home", web::get().to( HomeRoute::route_to_home )) // main workspace
-      .route("/patientdtls", web::post().to( PatientRoute::route_to_patient_details ))
-      .route("/nlprompt", web::post().to( NLERoute::natural_language_prompt ))
-      .route("/admit", web::post().to( AdmitRoute::route_to_admit_discharge ))
-      .route("/admitnew", web::post().to( AdmitRoute::route_to_admit_new_no_patient ))
-      .route("/admitsave", web::post().to( AdmitRoute::route_to_admit_save ))
-      .route("/discharge", web::post().to( AdmitRoute::route_to_discharge_patient ))
-      .route("/dischargesave", web::post().to( AdmitRoute::route_to_discharge_patient_save ))
-      .route("/intvlink", web::post().to( InterventionRoute::route_to_modify_intervention_basic ))
-      .route("/intvnew", web::post().to( InterventionRoute::route_to_add_new_intervention ))
-      .route("/intv", web::post().to( InterventionRoute::route_to_view_or_modify_intervention ))
-      .route("/intvsave", web::post().to( InterventionRoute::route_to_intervention_save ))
-      .route("/intvdtlnew", web::post().to( InterventionDetailsRoute::route_to_add_intervention_detail ))
-      .route("/intvdtlsave", web::post().to( InterventionDetailsRoute::route_to_intervention_detail_save ))
-      .route("/isItUp", web::get().to( BasicRoute::is_it_up ))
-      .route("/logout", web::get().to( LoginRoute::logout ))
-      .default_service(web::to(BasicRoute::route_to_not_found))
-      .service(Files::new("/webc/", "./webc"))  // ref: ttps://actix.rs/docs/static-files/
-  })
-  .bind(binding_addr)? //  "127.0.0.1:8000"
-  .run()
-  .await
+    // added per recommendation from 0-to-Prod
+    // https://rust.code-maven.com/logging/tracing-to-a-file.html
+    //
+    let log_filename = "maple_hms-".to_owned() + &chrono::Local::now().format("%Y-%b-%d_%H%M%S").to_string() +".log";
+        tracing_subscriber::registry()
+            .with(
+                tracing_subscriber::fmt::layer()
+                    .with_ansi(false)
+                    .with_writer(
+                        std::fs::OpenOptions::new()
+                            .create(true)
+                            .append(true)
+                            .open(log_filename)
+                            .unwrap(),
+                    )
+                    .with_filter(LevelFilter::DEBUG),
+            )
+            .init();
+    tracing::info!("MapleHMS is running!");
 }
