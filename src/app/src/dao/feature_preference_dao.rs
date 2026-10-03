@@ -122,7 +122,9 @@ impl FeaturePreferenceDAO {
     /// #### Parameters:
     /// * user_id (i64): the id of the user for which the feature preferences are to be obtains
     /// * intervention_type_id (i64): type of intervention that will be used to limit the set of feature preferences retrieved
+    /// * limits_days (i64): the maximum number of days to allow a FeaturePreference to be considered in the list of active entries
     /// * upper_limit (usize): number of preferences (upper limit) to be returned
+    /// 
     /// * intervention_level_only (bool): when true, only retrives intervention-level preferences
     /// 
     /// #### Returns:
@@ -131,13 +133,14 @@ impl FeaturePreferenceDAO {
     /// 
     pub async fn get_active_feature_preferences_of_intervention_details_for_user(&self, user_id: i64,
                                                                                        intervention_type_id: i64,
+                                                                                       limits_days: i64,
                                                                                        upper_limit: usize)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
         tracing::debug!("get_active_feature_preferences_for_user_intervention_details_level()");
      //   println!("get_active_feature_preferences_for_user_intervention_details_level()");
          
         let query_level_0 = db_query::QRY_ACTIVE_FEATURE_PREFERENCES_FOR_USER_INTERVENTION_DETAILS_LEVEL;
         let query_level_1 = query_level_0.replace("{users_id}", &user_id.to_string());
-        let query_level_2 = query_level_1.replace("{limit_days}", &"14".to_string());
+        let query_level_2 = query_level_1.replace("{limit_days}", &limits_days.to_string());
         let query_level_3 = query_level_2.replace("{feature_ids}", &intervention_type_id.to_string());
         let query = query_level_3.replace("{limit_rows}", &"3".to_string());
 

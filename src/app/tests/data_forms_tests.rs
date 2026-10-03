@@ -1,5 +1,7 @@
-///
+/// -------------------------------------------------------------------
 /// Unit & Integration tests for the data_forms crate of the UI module
+/// 
+/// ###Includes:
 ///
 /// Ref: Unit Testing in Rust is actually easy! - Flo Woelki (https://youtu.be/6wAFdBVJbwc?si=KdJfqvRdcXi9-mqo) - LOL NOT easy
 ///  CSM500 Project (April - October 2026)
@@ -408,26 +410,33 @@ fn test_intervention_data_form_standard() {
         Err (e) => println!("Test 23 success, received next error as expected: {}", e),
         _ => assert!(false, "Test 23: scheduled_timestamp was invalid"),
     };
-    frm.scheduled_timestamp = "0123456789123456".to_string();
+    frm.scheduled_timestamp = "01234567891234567".to_string();
 
     // Test 24: scheduled_timestamp INVALID length
     frm.performed_timestamp = "BAD_TIMESTAMP".to_string();
     match frm.validate_fields() {
         Err (e) => println!("Test 24 success, received next error as expected: {}", e),
-        _ => assert!(false, "Test 24: scheduled_timestamp was invalid"),
+        _ => assert!(false, "Test 24: performed_timestamp was invalid"),
     };
 
-    // Test 25: the last two cases are both positive
+    // Test 25: positive test
     frm.performed_timestamp = String::new();
     match frm.validate_fields() {
-        Err (e) => println!("Test 25 success, received next error as expected: {}", e),//assert!(false, "Test 25: scheduled_timestamp was invalid: {}", e),
-        _ => assert!(false, "Test 25: performed_timestamp  was invalid"),// println!("Test 25 success, received next error as expected"),
+        Err (e) => assert!(false, "Test 25: performed_timestamp was valid (length 0) and should have passed: {}", e),
+        _ => println!("Test 25 success - no error, as expected"),
+    };
+
+    // Test 26: negative
+    frm.performed_timestamp = "0123456789123456789".to_string();
+    match frm.validate_fields() {
+        Err (e) => println!("Test 26 success, received next error as expected: {}", e),//assert!(false, "Test 25: scheduled_timestamp was invalid: {}", e),
+        _ => assert!(false, "Test 26: performed_timestamp was invalid"),// println!("Test 25 success, received next error as expected"),
     };
 
     // Test 26: positive
-    frm.performed_timestamp = "0123456789123456".to_string();
+    frm.performed_timestamp = "01234567891234567".to_string();
     match frm.validate_fields() {
-        Err (e) => println!("Test 25 success, received next error as expected: {}", e),//assert!(false, "Test 25: scheduled_timestamp was invalid: {}", e),
-        _ => assert!(false, "Test 25: performed_timestamp was invalid"),// println!("Test 25 success, received next error as expected"),
+        Err (e) => assert!(false, "Test 27: performed_timestamp was valid (length 0) and should have passed: {}", e),
+        _ => println!("Test 27 success - no error, as expected"),
     };
 }

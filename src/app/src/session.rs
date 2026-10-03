@@ -23,6 +23,11 @@ use sqlx::postgres::{PgPool};
 
 use crate::ui::tile_factory::{WebContentFactory}; 
 use crate::dto::{user_auth::*};
+use std::fs::read_to_string;
+
+use std::env::VarError;
+
+use crate::constants;
 
 ///
 /// Stores application-wide configuration loaded at startup
@@ -41,14 +46,84 @@ pub struct SysConfig {
     pub max_nle_fastactions: String, // not implemented for use at this time
     pub website_bind_address: String,
     pub session_key: String,
+    pub max_age_feature_preferences: String,
 }
 
 impl SysConfig{
-    ///
-    /// Basic accessor that converts the max_general_fastactions to a usize (generic integer)
+    /// ### get_max_general_fastactions()
+    ///  Basic accessor that converts the max_general_fastactions to a usize (generic integer)
+    ///  by unwrapping and parsing the attribute from a String type.
+    /// 
+    /// #### Returns:
+    /// * usize: max_general_fastactions as usize (generic integer)
     /// 
     pub fn get_max_general_fastactions(&self) -> usize{
         self.max_general_fastactions.parse().unwrap()
+    }
+
+    /// ### get_max_age_feature_preferences()
+    ///  Basic accessor that converts the max_age_feature_preferences to a usize (generic integer)
+    ///  by unwrapping and parsing the attribute from a String type.
+    /// 
+    /// #### Returns:
+    /// * usize: max_age_feature_preferences as usize (generic integer)
+    /// 
+    pub fn get_max_age_feature_preferences(&self) -> i64{
+        self.max_age_feature_preferences.parse().unwrap()
+    }
+
+    /// ### session::SysConfig::new()
+    ///   Reads the system configuration file from a static path... so it is the only one we need to do this from
+    ///  the rest of the config settings are in this config file, eliminating many constants otherwise requird by the application
+    /// 
+    /// #### Parameters: None
+    /// 
+    /// #### Returns:
+    /// * SysConfig: an initialized SysConfig instance
+    /// 
+    pub fn new(config_path: Result<String, VarError>) -> Self {
+        // collect the cargo manifest directory at runtime, which means it might not be present
+        let cargo_manifest_dir = match config_path {
+            Ok(tmp_path) => {
+                tracing::info!("CARGO_MANIFEST_DIR = {}", tmp_path);
+                tmp_path
+            }
+            Err(e) => {
+                tracing::error!("CARGO_MANIFEST_DIR not set: {}", e);
+                "INVALID_PATH".to_string()
+            }
+        };
+
+        let base_model_data_dir = cargo_manifest_dir.clone()  + constants::DATA_SUB_DIRECTORY;
+        let toml_config_file = cargo_manifest_dir.clone()  + constants::SYSTEM_CONFIGURATION_FILE;
+
+        let toml_config_str = read_to_string(toml_config_file.clone()); 
+        let mut final_config: SysConfig = Default::default();
+
+        match toml_config_str {
+            Ok(results) => {
+
+                let tmp_config = toml::from_str::<SysConfig>( &results );
+                match tmp_config {
+                    Ok(ok_config) => {
+                        tracing::info!("Configuration loaded: {}", toml_config_file.clone());
+                        final_config = ok_config;
+                    }
+                    Err(e) => {
+                        tracing::error!("Error reading from TOML ({}): {}", toml_config_file.clone(), e);
+                        eprintln!("Error reading from TOML ({}): {}", toml_config_file.clone(), e);
+                    },
+                }
+            }
+            Err(e) => {
+                tracing::error!("Error reading from TOML ({}): {}", toml_config_file.clone(), e);
+                eprintln!("Error reading from TOML ({}): {}", toml_config_file.clone(), e);
+            },
+        }
+        final_config.cargo_manifest_dir = cargo_manifest_dir; // override some of the values, with setting obtained elsewhere in by the system
+        final_config.model_data_dir = base_model_data_dir;
+
+        final_config
     }
 }
 
@@ -120,7 +195,7 @@ impl AppSession {
       Path::new( &self.system_config.cargo_manifest_dir.clone()  )
                 .join(self.system_config.data_sub_dir.clone())
                 .join(self.system_config.command_mapping_file.clone()).to_string_lossy().to_string()
-  }  
+  }
 
   /*
   ///

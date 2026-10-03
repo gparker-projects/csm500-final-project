@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <HTML>
 <HEAD>
-  <TITLE>Maple EMR</TITLE>
+  <TITLE>MapleHMS - Admit</TITLE>
   <link rel="stylesheet" href="/webc/css/login.css">
   <link rel="stylesheet" href="/webc/css/dataentryform.css">
+  <div id="MapleHMS::ID=Admit"></div>
   <script>
 
   // checks if a string is an alphanumeric or basic punctuation

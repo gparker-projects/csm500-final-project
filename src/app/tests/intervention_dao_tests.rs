@@ -1,5 +1,7 @@
-///
+/// -------------------------------------------------------------------
 /// Unit & Integration tests for the InterventionDAO module:
+/// 
+/// ###Includes:
 /// 
 /// * new()
 /// * get_intervention

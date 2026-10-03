@@ -1,5 +1,7 @@
-///
+/// -------------------------------------------------------------------
 /// #Unit & Integration tests for the PatientDAO module
+/// 
+/// ###Includes:
 /// 
 /// * new()
 /// * get_patient_details

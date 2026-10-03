@@ -1,5 +1,7 @@
+/// -------------------------------------------------------------------
 /// #Unit & Integration tests for the CommonDAO module
 /// 
+/// ###Includes:
 /// * new()
 /// * get_locations_for_user()
 /// * get_common_reference()

@@ -1,8 +1,12 @@
-/// #Unit & Integration tests for the Convert Utils module
+/// -------------------------------------------------------------------
+/// #Unit & Integration tests for the Session, SysConfig and Convert Utils module
 /// 
 /// ###Includes:
-/// * to_i64()
-/// * is_aged()
+/// * ConvertUtils::to_i64(), is_aged()
+/// * UserSession::*
+/// * SysConfig::*
+/// * AppSession::*
+/// 
 ///  CSM500 Project (April - October 2026)
 ///  Graham Parker (Student ID: 240120522)
 /// -------------------------------------------------------------------
@@ -85,16 +89,12 @@ mod convert_utils_tests {
     fn test_sys_config() {
         let cfg = SysConfig{
             max_general_fastactions: "1".to_string(),
+            max_age_feature_preferences: "10".to_string(),
             ..Default::default()
         };
-
-        let val = cfg.get_max_general_fastactions();
-        if val <= 0 {
-            assert!(false);
-        }
-        else{
-            assert!(true);
-        }
+ 
+        assert_eq!(cfg.get_max_general_fastactions(), 1, "Incorrect max_general_fastactions returned");
+        assert_eq!(cfg.get_max_age_feature_preferences(), 10, "Incorrect max_age_feature_preferences returned");        
     }
 
     /// ### test_app_session()
@@ -150,7 +150,8 @@ mod convert_utils_tests {
             max_general_fastactions: "3".to_string(),
             max_nle_fastactions: "3".to_string(),
             website_bind_address: "10.10.10.10:8080".to_string(),
-            session_key: "thisIsAVeryinauthenticSessionKeyOnlyToBeused_forunit_testing".to_string()
+            session_key: "thisIsAVeryinauthenticSessionKeyOnlyToBeused_forunit_testing".to_string(),
+            max_age_feature_preferences: "30".to_string()
         };
 
         let tmp_key = Key::generate();

@@ -19,15 +19,14 @@
 //! 
 //! ---------------------------------------------------------------------------------
 
-use actix_web::http::StatusCode;
 
 use actix_cors::Cors;
 use actix_files::*;
 use actix_session::{storage::CookieSessionStore, SessionMiddleware}; //, storage::RedisSessionStore}
-use actix_web::{web, App, HttpServer, HttpResponse, Responder};
+use actix_web::{web, App, HttpServer};
 use actix_web::cookie::Key;
 use std::env;
-use std::fs::read_to_string;
+
 use sqlx::postgres::{PgPoolOptions};
 use tracing;
 use tracing_subscriber::{
@@ -37,7 +36,8 @@ use tracing_subscriber::{
 use crate::ui::tile_factory::WebContentFactory;
 use crate::session::*;
 use crate::route::admit_route::AdmitRoute;
-use crate::route::default_route::DefaultRoute;
+use crate::route::default_route::BasicRoute;
+
 use crate::route::home_route::HomeRoute;
 use crate::route::intervention_route::InterventionRoute;
 use crate::route::intervention_details_route::InterventionDetailsRoute;
@@ -53,20 +53,6 @@ mod dao;
 mod nle;
 mod route;
 mod session;
-
-/// ### fn is_it_up()
-/// 
-/// Allows a monitoring services to perform a basic "is the application up?" check
-/// 
-/// #### Parameters: None
-/// 
-/// #### Returns: 
-/// * Responder: the general responder that allows the system to report system is up using an Ok() response
-/// 
-async fn is_it_up() -> impl Responder {
-    tracing::info!("-> /isItUp Requested");
-    HttpResponse::Ok().body("MapleHMS is Up")
-}
 
 /// ### fn get_static_path_base()
 /// 
@@ -136,72 +122,6 @@ fn init_logging(){
   tracing::info!("MapleHMS is running!");
 }
 
-/// ### init_config()
-///   Reads the system configuration file from a static path... so it is the only one we need to do this from
-///  the rest of the config settings are in this config file, eliminating many constants otherwise requird by the application
-/// 
-/// #### Parameters: None
-/// 
-/// #### Returns:
-/// * SysConfig: an initialized SysConfig instance
-/// 
-fn init_config() -> SysConfig {
-    // collect the cargo manifest directory at runtime, which means it might not be present
-    let cargo_manifest_dir = match env::var(constants::CARGO_MANIFEST_DIR) {
-        Ok(tmp_path) => {
-            tracing::info!("CARGO_MANIFEST_DIR = {}", tmp_path);
-            tmp_path
-        }
-        Err(e) => {
-            tracing::error!("CARGO_MANIFEST_DIR not set: {}", e);
-            "INVALID_PATH".to_string()
-        }
-    };
-
-    let base_model_data_dir = cargo_manifest_dir.clone()  + constants::DATA_SUB_DIRECTORY;
-    let toml_config_file = cargo_manifest_dir.clone()  + constants::SYSTEM_CONFIGURATION_FILE;
-
-    let toml_config_str = read_to_string(toml_config_file.clone()); 
-    let mut final_config: session::SysConfig = Default::default();
-
-    match toml_config_str {
-        Ok(results) => {
-
-            let tmp_config = toml::from_str::<session::SysConfig>( &results );
-            match tmp_config {
-                Ok(ok_config) => {
-                    tracing::info!("Configuration loaded: {}", toml_config_file.clone());
-                    final_config = ok_config;
-                }
-                Err(e) => {
-                    tracing::error!("Error reading from TOML ({}): {}", toml_config_file.clone(), e);
-                    eprintln!("Error reading from TOML ({}): {}", toml_config_file.clone(), e);
-                },
-            }
-        }
-        Err(e) => {
-            tracing::error!("Error reading from TOML ({}): {}", toml_config_file.clone(), e);
-            eprintln!("Error reading from TOML ({}): {}", toml_config_file.clone(), e);
-        },
-    }
-    final_config.cargo_manifest_dir = cargo_manifest_dir; // override some of the values, with setting obtained elsewhere in by the system
-    final_config.model_data_dir = base_model_data_dir;
-
-    final_config
-}
-
-/// ### route_to_not_found()
-///   Route for processing resource not found / 404 errors
-/// 
-/// #### Parameters: None
-/// 
-/// #### Returns:
-/// * Responder (actix_web::response::responder): the HTTP responder (response) for the request
-/// 
-async fn route_to_not_found() -> impl Responder {
-    //HttpResponse::NotFound().body("Sorry, Page not found")
-     actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SEE_OTHER)
-}
 
  
 /// # Main program
@@ -215,7 +135,7 @@ async fn route_to_not_found() -> impl Responder {
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
   init_logging();
-  let config = init_config();
+  let config = SysConfig::new(env::var(constants::CARGO_MANIFEST_DIR));
   let binding_addr = config.clone().website_bind_address;
 
   //establish database connection for entire application here, add to the application session
@@ -243,7 +163,7 @@ async fn main() -> std::io::Result<()> {
                   .commit_from_file(&(config.model_data_dir.clone() + &config.language_model_file.clone()) ).expect("File could not be accessed");
   let shared_session = Arc::new(nle_session);
 */
-println!("MapleHMS is running! Access via: http://{}", binding_addr.clone());
+  println!("MapleHMS is running! Access via: http://{}", binding_addr.clone());
 
   // use the Builder pattern to add one route at a time
   HttpServer::new( move || {
@@ -272,7 +192,7 @@ println!("MapleHMS is running! Access via: http://{}", binding_addr.clone());
           ) 
       )
       .wrap(SessionMiddleware::new(CookieSessionStore::default(), tmp_app_key.clone())) // for user session
-      .route("/", web::get().to( DefaultRoute::default_route ))
+      .route("/", web::get().to( BasicRoute::default_route ))
       .route("/login", web::post().to( LoginRoute::login ))
       .route("/home", web::get().to( HomeRoute::route_to_home )) // main workspace
       .route("/patientdtls", web::post().to( PatientRoute::route_to_patient_details ))
@@ -288,9 +208,9 @@ println!("MapleHMS is running! Access via: http://{}", binding_addr.clone());
       .route("/intvsave", web::post().to( InterventionRoute::route_to_intervention_save ))
       .route("/intvdtlnew", web::post().to( InterventionDetailsRoute::route_to_add_intervention_detail ))
       .route("/intvdtlsave", web::post().to( InterventionDetailsRoute::route_to_intervention_detail_save ))
-      .route("/isItUp", web::get().to( is_it_up ))
+      .route("/isItUp", web::get().to( BasicRoute::is_it_up ))
       .route("/logout", web::get().to( LoginRoute::logout ))
-      .default_service(web::to(route_to_not_found))
+      .default_service(web::to(BasicRoute::route_to_not_found))
       .service(Files::new("/webc/", "./webc"))  // ref: ttps://actix.rs/docs/static-files/
   })
   .bind(binding_addr)? //  "127.0.0.1:8000"

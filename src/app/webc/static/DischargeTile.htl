@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <HTML>
 <HEAD>
-  <TITLE>Maple EMR</TITLE>
+  <TITLE>MapleHMS - Discharge</TITLE>
   <link rel="stylesheet" href="/webc/css/login.css">
   <link rel="stylesheet" href="/webc/css/home.css">
   <link rel="stylesheet" href="/webc/css/dataentryform.css">
-  <script>
-  
+  <div id="MapleHMS::ID=Discharge"></div>
+  <script> 
 
   // checks if a string is an alphanumeric or basic punctuation
   // https://www.tutorialspoint.com/article/how-to-validate-an-input-is-alphanumeric-or-not-using-javascript

@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <HTML>
 <HEAD>
-  <TITLE>Maple EMR</TITLE>
+  <TITLE>MapleHMS - Login</TITLE>
   <link rel="stylesheet" href="/webc/css/login.css">
+  <div id="MapleHMS::ID=Login"></div>
 
   <script>
   <!-- REFs: https://www.w3schools.com/js/js_validation.asp

@@ -1,6 +1,7 @@
-///
+/// -------------------------------------------------------------------
 /// #Unit & Integration tests for the DTO module. Includes all DTO objects
 /// 
+/// ###Includes:
 /// * Encounter
 /// * FeeaturePreference
 /// * Intervention and InterventionDetails
@@ -270,8 +271,16 @@ fn test_create_patient_dto() {
       println!("...frm.birth_date: {}", frm.birthdate);
       println!("...p.birth_date: {}", p.birth_date);
 
+      println!("Performing Birthdate conversion");
       // NaiveDateTime.to_string() uses the system date time format, which we've overridden for the system
-      assert!(ConvertUtils::is_equal_to_yyyy_mm_dd_hh_mm_ss(p.birth_date, birth_date), "Birth dates do not match: {} <> {}", p.birth_date, birth_date);
+      assert!(ConvertUtils::is_equal_to_yyyy_mm_dd_hh_mm_ss(p.birth_date, birth_date), "Standard Test: Birth dates do not match: {} <> {}", p.birth_date, birth_date);
+
+      println!("..Test 2 - Controlled Match against YYYY-MON-DD");
+      let mut frm2 = frm.clone();
+      frm2.birthdate = "1909-SEP-21".to_string(); // NaiveDate::from_ymd_opt(1909, 9, 21).unwrap().and_hms_opt(0, 0, 0).unwrap();
+      let p2 = Patient::to_patient( frm2.clone() );
+      // controlled match
+      assert!(ConvertUtils::is_equal_to_yyyy_mm_dd_hh_mm_ss(p2.birth_date, birth_date), "Controlled Match: Birth dates do not match: {} <> {}", p.birth_date, birth_date);
 
       assert_eq!(p.admit_notes, admit_notes.clone());
       assert_eq!(p.id, patient_id); 
@@ -319,10 +328,10 @@ fn test_create_patient_dto() {
       let mut frm2 = frm.clone();
       frm2.birthdate = "INVALID DATE FOR TEST".to_string();
 
+      // negative test that should fail
       let tmp_current_datetime = Utc::now().naive_utc();
       let p2 = Patient::to_patient(frm2);
-      assert!(ConvertUtils::is_equal_to_yyyy_mm_dd_hh_mm_ss(p2.birth_date, tmp_current_datetime), "Invalid Birth Date not coerced correctly: {} <> {}", p2.birth_date, tmp_current_datetime);
-
+      assert!(! ConvertUtils::is_equal_to_yyyy_mm_dd_hh_mm_ss(p2.birth_date, tmp_current_datetime), "Invalid Birth Date not coerced correctly: {} <> {}", p2.birth_date, tmp_current_datetime);
 
       assert_eq!(obj.birth_date_for_display(), birth_date.format("%Y-%b-%d").to_string());
 

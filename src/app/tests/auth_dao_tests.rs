@@ -1,5 +1,7 @@
+/// -------------------------------------------------------------------
 /// #Unit & Integration tests for the AuthDAO module
 /// 
+/// ###Includes:
 /// * new()
 /// * can_user_login()
 /// * get_user_and_departments_at_current_user_sites()

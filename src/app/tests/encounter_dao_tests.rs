@@ -1,5 +1,7 @@
-///
+/// -------------------------------------------------------------------
 /// #Unit & Integration tests for the EncounterDAO module
+/// 
+/// ###Includes:
 /// 
 /// * new()
 /// * get_current_encounter()

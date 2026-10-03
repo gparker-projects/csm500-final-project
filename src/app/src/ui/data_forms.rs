@@ -303,9 +303,23 @@ impl InterventionDataForm {
             return Err(error);
         }
 
-        if ! (self.performed_timestamp.len() == 0 || self.performed_timestamp.len() == 17)   {
-            error.message = Some("Performed date/time, when provided, must be in YYYY-MON-DD HH:MM format".into());
-            println!("InterventionDataForm::validate_fields() Error: {}", error.message.as_ref().unwrap());
+        let passed_performed_timestamp: bool = match self.performed_timestamp.len() {
+            0 => {
+                println!("performed_timestamp.len() is zero");
+                true
+            },
+            17 => {
+                println!("performed_timestamp.len() is 17");
+                true
+            },
+            _ => {
+                println!("performed_timestamp.len() is other");
+                error.message = Some("Performed date/time, when provided, must be in YYYY-MON-DD HH:MM format".into());
+                false
+            },
+        };
+        if ! passed_performed_timestamp {
+            println!("InterventionDataForm::validate_fields() Error on performed_timestamp: {}", error.message.as_ref().unwrap());
             return Err(error);
         }
 

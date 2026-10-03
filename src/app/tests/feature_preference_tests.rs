@@ -1,5 +1,7 @@
-///
-/// Unit & Integration tests for the FeaturePreference DTO and FeaturePreferenceDAO module. Includes:
+/// -------------------------------------------------------------------
+/// Unit & Integration tests for the FeaturePreference DTO and FeaturePreferenceDAO module. 
+/// 
+/// ###Includes:
 /// 
 /// * new()
 /// * get_active_feature_preferences_for_user
@@ -9,7 +11,7 @@
 /// * upsert_feature_preference 
 ///
 /// Ref: Unit Testing in Rust is actually easy! - Flo Woelki (https://youtu.be/6wAFdBVJbwc?si=KdJfqvRdcXi9-mqo) - LOL NOT easy
-/// 
+/// -------------------------------------------------------------------
 #[cfg(test)]
 
 mod common;
@@ -288,6 +290,7 @@ async fn test_ins_get_upd_feature_priority_intv_details_level() {
   let mut test_user_id = 2; // we will use user #2, which is admin user and has lots of data (permissions)
   let mut test_upper_limit = 5;
   let mut test_feature_id: i64 = 100002;
+  let test_limit_days = 30;
   let fp_id: i64;
 
   println!("Testing: get_all_active_feature_preferences_for_user(): first insertion");
@@ -313,7 +316,7 @@ async fn test_ins_get_upd_feature_priority_intv_details_level() {
   println!("..first get: test_user_id={} test_feature_id={} 5 true", test_user_id, test_feature_id);
 
   // Test 3: retrieve intervention detail to see if it was indeed updated
-  let qry_results = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.get_active_feature_preferences_of_intervention_details_for_user(test_user_id, test_feature_id, test_upper_limit).await;
+  let qry_results = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.get_active_feature_preferences_of_intervention_details_for_user(test_user_id, test_feature_id, test_limit_days, test_upper_limit).await;
   match qry_results.unwrap(){
         Some ( results ) => {
             let mut found: bool = false;
@@ -383,6 +386,7 @@ async fn test_ins_get_upd_feature_priority_intv_details_level() {
     let qry_results2 = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.get_active_feature_preferences_of_intervention_details_for_user(
                                     constants::INVALID_OTHER_ID,
                                     constants::INVALID_OTHER_ID,
+                                    test_limit_days, 
                                     test_upper_limit).await;
     match qry_results2.unwrap(){
         Some ( _items ) => {
@@ -401,6 +405,7 @@ async fn test_ins_get_upd_feature_priority_intv_details_level() {
     let qry_results2 = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.get_active_feature_preferences_of_intervention_details_for_user(
                                     test_user_id,
                                     test_feature_id,
+                                    test_limit_days, 
                                     test_upper_limit).await;
     match qry_results2.unwrap(){
         Some ( _items ) => assert!(true),
