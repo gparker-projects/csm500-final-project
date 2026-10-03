@@ -19,10 +19,9 @@ mod convert_utils_tests {
     use maple_hms::{dto::user_auth::*};
     use maple_hms::session::*;
     use maple_hms::ui::tile_factory::{WebContentFactory};
-
-    use std::env::VarError;
     
     use actix_web::cookie::Key;
+    use std::env::VarError;
     use sqlx::postgres::{PgPoolOptions}; 
 
     const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500";
@@ -100,20 +99,18 @@ mod convert_utils_tests {
         assert_eq!(cfg.get_max_general_fastactions(), 1, "Incorrect max_general_fastactions returned");
         assert_eq!(cfg.get_max_age_feature_preferences(), 10, "Incorrect max_age_feature_preferences returned");  
 
-        // Test 2: use the SysConfig::new() method to construct the SysConfig
+        println!("Test 2 started");
+        // Test 2: use the SysConfig::new() method to construct the SysConfig - VALID test
         let base_path = std::env::current_dir().expect("Base path to TOML could not be found");
         let config_path = base_path.display().to_string();
-
-        println!("..config_path = {}", config_path);
-
-        let test2_config = SysConfig::new( Ok( config_path ) );
-
+        //println!("..config_path = {}", config_path);
+        let test2_config = SysConfig::new( Ok( config_path.clone() ) );
         println!("..app_version = {}", test2_config.app_version);
         assert_ne!(test2_config.app_version, "", "App version not set");
 
         println!("..db_conn_str = {}", test2_config.db_conn_str);
         assert_ne!(test2_config.db_conn_str, "", "db_conn_str not set");
-        
+
         assert_ne!(test2_config.cargo_manifest_dir, "", "cargo_manifest_dir not set");
         assert_ne!(test2_config.model_data_dir, "", "model_data_dir not set");
         assert_ne!(test2_config.command_mapping_file, "", "command_mapping_file not set");
@@ -125,6 +122,34 @@ mod convert_utils_tests {
         assert_ne!(test2_config.website_bind_address, "", "website_bind_address not set");
         assert_ne!(test2_config.session_key, "", "session_key not set");
         assert_ne!(test2_config.max_age_feature_preferences, "", "max_age_feature_preferences not set");
+        
+        let key1 = test2_config.get_application_secret_key();
+        assert!(Some(key1).is_some(), "Key was not created, non-persistent key should still have been set");
+
+        println!("Test 3 started - invalid file");
+        // Test 3: SysConfig::new(), INVALID file
+        let test2_config = SysConfig::new( Ok( "INVALID FILE PATH".to_string() ) );
+        
+        assert!(Some(test2_config.clone()).is_some(), "Config was not created");
+        assert_eq!(test2_config.app_version, "".to_string(), "App version was set, should not have been possible");
+
+        // Test 4: get application secret key
+        println!("Test 4 started: no config, key test");
+        let key = test2_config.get_application_secret_key();
+        assert!(Some(key).is_some(), "Key was not created, non-persistent key should still have been set");
+
+        // Test 5: SysConfig::new(), INVALID file; we'll have it try to load the .lock file as if it were the .toml
+        let wrong_file = config_path.clone() + "\\tests\\"; // push the directory down a level into a test directory, where it will grab a poorly constructed file
+        println!("Test 5 started: wrong file - attempt load of: {}", wrong_file);
+        let test3_config = SysConfig::new( Ok( wrong_file ));
+        assert!(Some(test3_config.clone()).is_some(), "Config was not created");
+        assert_eq!(test3_config.app_version, "".to_string(), "App version was set, should not have been possible");
+
+        // Test 6: 
+        println!("Test 6 started: Error passed in instead of file path. Why? The original caller may not have actaully had a file.");
+        let test3_config = SysConfig::new( Err( VarError::NotPresent ));
+        assert!(Some(test3_config.clone()).is_some(), "Config was not created");
+        assert_eq!(test3_config.app_version, "".to_string(), "App version was set, should not have been possible");
     }
 
     /// ### test_app_session()

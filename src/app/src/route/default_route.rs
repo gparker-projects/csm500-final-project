@@ -41,8 +41,7 @@ impl BasicRoute{
     /// * Responder (actix_web::response::responder): the HTTP responder (response) for the request
     /// 
     pub async fn not_found_route() -> impl Responder {
-        //HttpResponse::NotFound().body("Sorry, Page not found")
-        tracing::info!("-> /isItUp Requested");
+        tracing::info!("-> Error 404 route");
         actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SEE_OTHER)
     }
 
@@ -64,11 +63,11 @@ impl BasicRoute{
         
         let wcf = &app_session.get_web_content_factory(); 
         tracing::debug!("Checking session for Validation errors");
-       
         
         match user_session.get::<String>(constants::VALIDATION_ERRORS){
             Ok(Some(validation_errors))=> {
-                tracing::debug!("Ok(Some()) Validation errors present in session: {}", &validation_errors);
+                tracing::debug!("..Ok(Some()) Validation errors present in session");
+                //println!("Ok(Some()) Validation errors present in session: {}", &validation_errors);
                 // if the login form had validation errors, then we need to show them in the regenerated page.
 
                 let mut content = wcf.get_tile(WebContentItem::WCTypeLoginTile); // retrieve the page base content
@@ -80,12 +79,8 @@ impl BasicRoute{
 
                 HttpResponse::Ok().body( content )
             },
-            Ok( None )=> {
-                tracing::debug!("Ok( None ) No active session");
-                HttpResponse::Ok().body( wcf.get_tile(WebContentItem::WCTypeLoginTile) )
-            },
-            Err(e)=> {
-                tracing::error!("User session does not exist: {}", e);
+            _ => {
+                tracing::debug!("..Ok( None ) No active session");
                 HttpResponse::Ok().body( wcf.get_tile(WebContentItem::WCTypeLoginTile) )
             },
         }

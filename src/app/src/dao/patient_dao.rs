@@ -62,7 +62,7 @@ impl PatientDAO {
         let query = tmp.replace("{}", &patient_id.to_string());
 
         //tracing::debug!("get_patient_details Query: {}", query);
-        println!("get_patient_details_optional_discharged() Query: {}", query);
+        //println!("get_patient_details_optional_discharged() Query: {}", query);
 
         match sqlx::query(&query)
         .fetch_optional(&self.connection)

@@ -58,7 +58,7 @@ fn test_wcf() {
 /// Tests WebContentFactory::get_patient_details_full_tile()
 /// 
 #[test]
-fn test_wcf_get_patient_details_full_tile() {
+fn _get_patient_details_full_tile() {
     let path = std::env::current_dir().expect("Base path to executable could not be found");
     let newpath = path.display().to_string() + "\\webc\\static\\";
     let wcf = WebContentFactory::new(&newpath, "fake user".to_string());

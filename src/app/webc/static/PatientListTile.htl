@@ -1,6 +1,7 @@
 <link rel="stylesheet" href="/webc/css/login.css">
 <link rel="stylesheet" href="/webc/css/home.css">
 <script src="/webc/js/patientListTile.js" defer></script>
+<div id="MapleHMS::ID=PatientListTile"></div>
 
 <div id="MapleHMS::PatientHeader"></div><p></p>
 

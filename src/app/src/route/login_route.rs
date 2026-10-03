@@ -40,12 +40,13 @@ impl LoginRoute{
     pub async fn login(user_session: Session, req: web::Form<LoginFormData>, app_session: web::Data<session::AppSession>, ) -> impl Responder { // Box<dyn Responder<>> { //
         tracing::debug!("-> /login Requested");
 
+        let username = req.username.clone();
         let cur_db_conn = AuthDAO::new( app_session.get_db_connection() ).await;
         let user_can_login = cur_db_conn.can_user_login(req.username.clone(), req.password.clone()).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
 
         match user_can_login {
             Some (current_user) => {
-            tracing::debug!("User can login: {} redirect to /home", req.username.clone());
+            tracing::debug!("User can login: {} redirect to /home", username);
 
             let uid: i64 = current_user.id;
             let user_perms = cur_db_conn.get_user_permissions( uid ).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
@@ -63,7 +64,7 @@ impl LoginRoute{
             actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SEE_OTHER) 
             }
             None => {
-                tracing::debug!("Login denied for {} redirect back to /<default route>", req.username.clone()); // must use the user from the session as DB was not successful
+                tracing::debug!("Login denied for {} redirect back to /<default route>", username); // must use the user from the session as DB was not successful
 
                 // do not PURGE before this; it will trash the session including this new key
                 let _ignore = user_session.insert(constants::VALIDATION_ERRORS, "Invalid user or password. Please try again.");

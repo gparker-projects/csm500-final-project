@@ -53,7 +53,7 @@ impl FeaturePreferenceDAO {
                                                          //   intervention_type_id: i64,
                                                             upper_limit: usize)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
         tracing::debug!("get_active_feature_preferences_for_user_intervention_level()");
-        println!("get_active_feature_preferences_for_user_intervention_level()");
+        //println!("get_active_feature_preferences_for_user_intervention_level()");
          
         let query_level_0 =  db_query::QRY_ACTIVE_FEATURE_PREFERENCES_FOR_USER_INTERVENTION_LEVEL_ONLY;
 
@@ -63,7 +63,7 @@ impl FeaturePreferenceDAO {
         let query = query_level_3.replace("{limit_rows}", &"3".to_string());
 
         //tracing::debug!("..SELECT sql: {}", query);
-        println!("..SELECT sql: {}", query);
+        //println!("..SELECT sql: {}", query);
 
                      //id, display_order, weight,
                      //  calculation_date, department_id, feature_id, ref_group_id, ref_name

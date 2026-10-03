@@ -12,7 +12,7 @@
 
 use validator::{Validate, ValidationError};
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Clone)]
 pub struct LoginFormData {
     #[serde(rename = "mplUsername")]
     pub username: String,
@@ -20,7 +20,7 @@ pub struct LoginFormData {
     pub password: String,
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Clone)]
 pub struct NLPromptFormData {
     #[serde(rename = "prompt")]
     pub prompt: String
@@ -29,7 +29,7 @@ pub struct NLPromptFormData {
 ///
 /// A generalized form for 80% of web form submission sitautions, so we dont have a ton of minor forms for one-off uses.
 /// 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Clone)]
 pub struct GenericWebFormData {
     pub target_id: String,
 }
@@ -41,7 +41,7 @@ impl GenericWebFormData {
   }
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Clone)]
 pub struct InterventionDataFormBasic {
     pub intervention_type_id: String,
     pub encounter_id: String,
@@ -55,14 +55,14 @@ impl InterventionDataFormBasic {
     }    
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Clone)]
 pub struct InterventionDataFormLink {
     pub intervention_id: String,
     pub encounter_id: String,
     pub patient_id: String,
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Clone)]
 pub struct AdmitFormBasic {
     pub patient_id: String,
     //pub action_flag: String,

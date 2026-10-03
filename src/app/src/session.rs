@@ -14,21 +14,16 @@
 //!  https://docs.rs/actix-session/latest/actix_session/struct.SessionMiddleware.html
 //! 
 //! ---------------------------------------------------------------------------------
-
 use actix_web::cookie::Key;
 use serde::Deserialize;
-//use std::sync::Arc;
+use std::env::VarError;
+use std::fs::read_to_string;
 use std::path::Path;
 use sqlx::postgres::{PgPool};
 
+use crate::constants;
 use crate::ui::tile_factory::{WebContentFactory}; 
 use crate::dto::{user_auth::*};
-use std::fs::read_to_string;
-
-use std::env::VarError;
-
-use crate::constants;
-
 ///
 /// Stores application-wide configuration loaded at startup
 /// 
@@ -97,8 +92,8 @@ impl SysConfig{
         let base_model_data_dir = cargo_manifest_dir.clone()  + constants::DATA_SUB_DIRECTORY;
         let toml_config_file = cargo_manifest_dir.clone()  + constants::SYSTEM_CONFIGURATION_FILE;
 
-        let toml_config_str = read_to_string(toml_config_file.clone()); 
         let mut final_config: SysConfig = Default::default();
+        let toml_config_str = read_to_string(toml_config_file.clone()); 
 
         match toml_config_str {
             Ok(results) => {
@@ -106,18 +101,18 @@ impl SysConfig{
                 let tmp_config = toml::from_str::<SysConfig>( &results );
                 match tmp_config {
                     Ok(ok_config) => {
-                        tracing::info!("Configuration loaded: {}", toml_config_file.clone());
+                        tracing::info!("Configuration loaded");
                         final_config = ok_config;
                     }
                     Err(e) => {
-                        tracing::error!("Error reading from TOML ({}): {}", toml_config_file.clone(), e);
-                        eprintln!("Error reading from TOML ({}): {}", toml_config_file.clone(), e);
+                        tracing::error!("Error reading from TOML: {}", e);
+                        //eprintln!("Error reading from TOML ({}): {}", toml_config_file.clone(), e);
                     },
                 }
             }
             Err(e) => {
-                tracing::error!("Error reading from TOML ({}): {}", toml_config_file.clone(), e);
-                eprintln!("Error reading from TOML ({}): {}", toml_config_file.clone(), e);
+                tracing::error!("Error reading from TOML: {}", e);
+                //eprintln!("Error reading from TOML ({}): {}", toml_config_file.clone(), e);
             },
         }
         final_config.cargo_manifest_dir = cargo_manifest_dir; // override some of the values, with setting obtained elsewhere in by the system
@@ -140,11 +135,19 @@ impl SysConfig{
    pub fn get_application_secret_key(&self) -> Key {
         tracing::info!(">get_application_secret_key()");
 
-        actix_web::cookie::Key::from(
-        std::env::var("SESSION_KEY")
-            .unwrap_or_else(|_| self.clone().session_key )
-            .as_bytes()
-        )
+        // if session key has not been provided in the config, creation of an actix_web session will fail
+        if self.clone().session_key == "".to_string() {
+            tracing::error!("..session_key has not been set in config");
+            // fall back is to create a key that will not persist across system restarts
+            actix_web::cookie::Key::generate()
+        }
+        else  {
+            actix_web::cookie::Key::from(
+            std::env::var("SESSION_KEY")
+                .unwrap_or_else(|_| self.clone().session_key )
+                .as_bytes()
+            )
+        }
     }
 }
 

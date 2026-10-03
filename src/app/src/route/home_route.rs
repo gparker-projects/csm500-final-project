@@ -34,8 +34,9 @@ impl HomeRoute{
     pub async fn route_to_home(app_session: web::Data<session::AppSession>, user_session: Session) -> impl Responder {
         tracing::debug!("-> /home Route Requested");
 
-        let user_session: session::UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
-        let user_display_name = user_session.clone().user_display_name;
+        let user_session_data: session::UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+        let user_display_name = user_session_data.clone().user_display_name;
+        println!("..for user id={}", user_session_data.get_userid_as_i64());
 
         let wcf = &app_session.get_web_content_factory();
         let mut content = wcf.get_home_tile_with_user_identity(user_display_name); // retrieve the page base content
@@ -45,36 +46,37 @@ impl HomeRoute{
         let idao = InterventionDAO::new( app_session.get_db_connection() ).await;
         let edao = EncounterDAO::new( app_session.get_db_connection() ).await;
 
-        let qry_results = dao.get_patients_at_users_site_no_discharge(user_session.get_userid_as_i64()).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
-        match qry_results {
-            Some (patient_list) => {
-            tracing::debug!("Retrieved {} patients:", patient_list.len());
-            let mut pwrap: Vec<PatientWrapper> = Vec::new();
+        // get_patients_at_users_site_no_discharge returns an empty vector if no patients found (i.e. tolerant of empty datasets)
+        let patient_list = dao.get_patients_at_users_site_no_discharge(user_session_data.get_userid_as_i64()).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
+        match patient_list.len() > 0 {
+            true => {
+                tracing::debug!("..Retrieved some patients");
+                //println!("..Retrieved {} patients:", patient_list.len());
+                let mut pwrap: Vec<PatientWrapper> = Vec::new();
 
-            for p in patient_list.clone(){
-                let cur_enc: Encounter = edao.get_current_encounter(p.id.clone()).await.clone(); //get the current encounter for each patient
-                let cur_intv = idao.get_most_recent_vitals(cur_enc.id.clone()).await.expect(constants::DATABASE_ERROR_NOT_FOUND);
+                for p in patient_list.clone(){
+                    let cur_enc: Encounter = edao.get_current_encounter(p.id.clone()).await.clone(); //get the current encounter for each patient
+                    let cur_intv = idao.get_most_recent_vitals(cur_enc.id.clone()).await.expect(constants::DATABASE_ERROR_NOT_FOUND);
 
-                pwrap.push( PatientWrapper{
-                        patient: p.clone(),
-                        current_encounter: cur_enc.clone(),
-                        most_recent_intervention: cur_intv
-                    }
-                );
-                //print!(">> DEBUG Added pid={} e={} i={}", tmp_p, tmp_e, tmp_i);
+                    pwrap.push( PatientWrapper{
+                            patient: p.clone(),
+                            current_encounter: cur_enc.clone(),
+                            most_recent_intervention: cur_intv
+                        }
+                    );
+                }
+                let patient_list_html = SimpleFormatter::get_home_route_summary_of_patients_tile_using_wrapper(pwrap.clone()); 
+                content = content.replace(constants::BODY_TILE_CONTENT_TAG, &patient_list_html);  // replace default string
             }
-            
-            let patient_list_html = SimpleFormatter::get_home_route_summary_of_patients_tile_using_wrapper(pwrap.clone()); 
-            content = content.replace(constants::BODY_TILE_CONTENT_TAG, &patient_list_html);  // replace default string
-
-            let std_menu_html = {MenuFormatter{}}.get_legacy_menu(patient_list.clone(), user_session); 
-            content = content.replace(constants::LEGACY_MENU_TILE_TAG, &std_menu_html);  // replace default string       
-            }
-            None => {
-                tracing::debug!("No patients found");
+            false => {
+                tracing::debug!("..No patients found"); // this is an allowable (though unlikely) logic branch
+                //println!("..No patients found for user id={}", user_session_data.get_userid_as_i64());
             }
         }
-        // and adjust the menu
+
+        // adjust the menu; 
+        let std_menu_html = {MenuFormatter{}}.get_legacy_menu(patient_list.clone(), user_session_data); 
+        content = content.replace(constants::LEGACY_MENU_TILE_TAG, &std_menu_html);  // replace default string
 
         HttpResponse::Ok().body( content )
     }
