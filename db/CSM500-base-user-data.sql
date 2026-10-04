@@ -4,14 +4,15 @@
 --
 -- view using: SELECT id, name, username, email, created_at, password FROM users order by id;
 -- -------------------------------------------------------------------------------------
-INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (1, 'ghouse',   'Dr. Gregory House', 'ghouse@google.com',   '2026-06-06 12:00:00', 'doctor');
-INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (2, 'chath',    'Carol Hathaway',    'chath@google.com',    '2026-06-06 12:00:00', 'nurse1');
-INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (3, 'mma1',     'Mary Medical AssistantOne',       'mma1@google@google.com',  '2026-06-06 12:00:00', 'csm500');
-INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (4, 'mma2',     'Mattie Medical AssistantTwo',      'mma2@google.com',  '2026-06-06 12:00:00', 'csm500');
-INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (5, 'lcuddy',   'Lisa Cuddy',        'lcuddy@google.com',   '2026-06-06 12:00:00', 'admin');
-INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (6, 'rchase',   'Dr. Robert Chase',      'rchase@google.com',   '2026-06-06 12:00:00', 'csm500');
-INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (7, 'dramoray', 'Dr. Drake Ramoray',      'dramoray@google.com', '2026-06-06 12:00:00', 'joey');
-INSERT INTO users (id, username, name, email, created_at, password) OVERRIDING SYSTEM VALUE VALUES (8, 'pporter',  'Peter Porter',      'pporter@google.ca', '2026-06-06 12:00:00', 'csm500');
+INSERT INTO users (id, username, name, email, created_timestamp, password) OVERRIDING SYSTEM VALUE VALUES (1, 'ghouse',   'Dr. Gregory House', 'ghouse@google.com',   '2026-06-06 12:00:00', 'doctor');
+INSERT INTO users (id, username, name, email, created_timestamp, password) OVERRIDING SYSTEM VALUE VALUES (2, 'chath',    'Carol Hathaway',    'chath@google.com',    '2026-06-06 12:00:00', 'nurse1');
+INSERT INTO users (id, username, name, email, created_timestamp, password) OVERRIDING SYSTEM VALUE VALUES (3, 'mma1',     'Mary Medical AssistantOne',       'mma1@google@google.com',  '2026-06-06 12:00:00', 'csm500');
+INSERT INTO users (id, username, name, email, created_timestamp, password) OVERRIDING SYSTEM VALUE VALUES (4, 'mma2',     'Mattie Medical AssistantTwo',      'mma2@google.com',  '2026-06-06 12:00:00', 'csm500');
+INSERT INTO users (id, username, name, email, created_timestamp, password) OVERRIDING SYSTEM VALUE VALUES (5, 'lcuddy',   'Lisa Cuddy',        'lcuddy@google.com',   '2026-06-06 12:00:00', 'admin');
+INSERT INTO users (id, username, name, email, created_timestamp, password) OVERRIDING SYSTEM VALUE VALUES (6, 'rchase',   'Dr. Robert Chase',      'rchase@google.com',   '2026-06-06 12:00:00', 'csm500');
+INSERT INTO users (id, username, name, email, created_timestamp, password) OVERRIDING SYSTEM VALUE VALUES (7, 'dramoray', 'Dr. Drake Ramoray',      'dramoray@google.com', '2026-06-06 12:00:00', 'joey');
+INSERT INTO users (id, username, name, email, created_timestamp, password) OVERRIDING SYSTEM VALUE VALUES (8, 'pporter',  'Peter Porter',      'pporter@google.ca', '2026-06-06 12:00:00', 'csm500');
+INSERT INTO users (id, username, name, email, created_timestamp, password) OVERRIDING SYSTEM VALUE VALUES (9, 'invalid',  'Ian Valid',      'invalid@google.ca', '2026-10-03 12:00:00', 'csm500');
 COMMIT;
 
 -- -------------------------------------------------------------------------------------
@@ -169,3 +170,10 @@ select 'Y', 2, 4, 3, id, 1 from permission where id > 100001;
 -- give Lisa all the Intervention permissions
 insert into user_permission (active_flag, users_id, department_id, role_id, permission_id, site_id) 
 select 'Y', 5, 4, 3, id, 1 from permission where id > 100001;
+
+-- Ian Valid will have... weird permissions for unit testing
+--
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 9, 15, 3, 1, 2);
+INSERT INTO user_permission(active_flag, users_id, department_id, role_id, permission_id, site_id) VALUES ('Y', 9, 15, 3, 2, 2);
+
+COMMIT;

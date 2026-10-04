@@ -31,7 +31,7 @@ use sqlx::postgres::PgPoolOptions;
 const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500";
 const SCREEN_ID_TAG_LOGIN : &str = "<div id=\"MapleHMS::ID=Login\"></div>";
 const SCREEN_ID_TAG_HOME : &str = "<div id=\"MapleHMS::ID=Home\"></div>";
-const SCREEN_ID_TAG_INTERVENTION : &str = "<div id=\"MapleHMS::ID=Intervention\"></div>";
+//const SCREEN_ID_TAG_INTERVENTION : &str = "<div id=\"MapleHMS::ID=Intervention\"></div>";
 const SCREEN_ID_TAG_PATIENT_LIST : &str = "<div id=\"MapleHMS::ID=PatientListTile\"></div>";
 
 
@@ -289,7 +289,7 @@ async fn test_patient_route_route_to_patient_details(){
     let _ignore = user_session.insert(constants::USER_SESSION, get_mock_user_session("1".to_string())); // we will ignore error as this is a unit test
     let app_session = get_mock_app_session().await; // create app session
 
-    let frm = GenericWebFormData { target_id: "1".to_string() };
+    let mut frm = GenericWebFormData { target_id: "1".to_string() };
 
     // Test 1: HomeRoute::route_to_home, standard call with a clinical user
     println!("Test 1: PatientRoute::route_to_patient_details with clinical data (only) user");
@@ -304,12 +304,12 @@ async fn test_patient_route_route_to_patient_details(){
         Err(_e) => assert!( false, "Error Response received" ),
     };
 
-    // Test 2: HomeRoute::route_to_home, standard call with a non-clinical + clinical permissioned user 
+    // Test 2: PatientRoute::route_to_patient_details, standard call with a non-clinical + clinical permissioned user 
     println!("Test 2: PatientRoute::route_to_patient_details: non-clinical data + clinical data permissioned user");
     let mut tmp_us = get_mock_user_session("2".to_string());   // base 
     tmp_us.user_authorizations.granted_permissions.push( Permission::new(1, Permission::ALLOW_CREATE_NON_CLINICAL_INTERVENTION) );
     let _ignore2 = user_session.insert(constants::USER_SESSION, tmp_us); // we will ignore error as this is a unit test
-    
+
     let responder2 = PatientRoute::route_to_patient_details( user_session.clone(), app_session.clone(), web::Form( frm.clone() ) ).await;
     let http_resp2 = responder2.respond_to(&req);
 
@@ -318,6 +318,84 @@ async fn test_patient_route_route_to_patient_details(){
         Ok(item) => {
             // confirm the content of the screen was loaded correctly by detecting a tag only present in the key Tile template file
             assert!( String::from_utf8_lossy(&item).contains( SCREEN_ID_TAG_PATIENT_LIST ), "Response did not contain expected content"); 
+        },
+        Err(_e) => assert!( false, "Error Response received" ),
+    };
+
+    // Test 3: PatientRoute::route_to_patient_details, Patient with no Encounters
+    println!("Test 3: PatientRoute::route_to_patient_details: Patient with no Encounters");
+
+    frm.target_id = "31".to_string(); // known patient 31 does not have any Encounters
+    let responder_test3 = PatientRoute::route_to_patient_details( user_session.clone(), app_session.clone(), web::Form( frm.clone() ) ).await;
+    let http_resp_test3 = responder_test3.respond_to(&req);
+
+    assert_eq!(http_resp_test3.status(), StatusCode::OK, "Status not OK");
+    match to_bytes(http_resp_test3.into_body()).await{
+        Ok(item) => {
+            //println!("Body = {}", String::from_utf8_lossy(&item));
+
+            // confirm the content of the screen was loaded correctly by: locating fake PHN for target patient
+            const SEARCH_TEXT : &str = "name=\"patient_id\" value=\"31\">";
+            assert!( String::from_utf8_lossy(&item).contains( SEARCH_TEXT ), "Response did not contain expected content"); 
+        },
+        Err(_e) => assert!( false, "Error Response received" ),
+    };
+
+    // Test 4: PatientRoute::route_to_patient_details, Patient with no Encounters
+    println!("Test 4: PatientRoute::route_to_patient_details: Patient with many interventions");
+
+    frm.target_id = "1".to_string(); // known patient 1 has > 99 encounters in test data set
+    let responder_test3 = PatientRoute::route_to_patient_details( user_session.clone(), app_session.clone(), web::Form( frm.clone() ) ).await;
+    let http_resp_test3 = responder_test3.respond_to(&req);
+
+    assert_eq!(http_resp_test3.status(), StatusCode::OK, "Status not OK");
+    match to_bytes(http_resp_test3.into_body()).await{
+        Ok(item) => {
+            //println!("Body = {}", String::from_utf8_lossy(&item));
+
+            // confirm the content of the screen was loaded correctly by: locating fake PHN for target patient
+            const SEARCH_TEXT : &str = "name=\"patient_id\" value=\"1\">";
+            assert!( String::from_utf8_lossy(&item).contains( SEARCH_TEXT ), "Response did not contain expected content"); 
+        },
+        Err(_e) => assert!( false, "Error Response received" ),
+    };
+
+// patient 27 is not discharged
+
+    // Test 5: PatientRoute::route_to_patient_details, Patient not discharged
+    /*println!("Test 4: PatientRoute::route_to_patient_details: Patient with many interventions");
+
+    frm.target_id = "9".to_string(); // known patient 1 has > 99 encounters in test data set
+    let responder_test3 = PatientRoute::route_to_patient_details( user_session.clone(), app_session.clone(), web::Form( frm.clone() ) ).await;
+    let http_resp_test3 = responder_test3.respond_to(&req);
+
+    assert_eq!(http_resp_test3.status(), StatusCode::OK, "Status not OK");
+    match to_bytes(http_resp_test3.into_body()).await{
+        Ok(item) => {
+            //println!("Body = {}", String::from_utf8_lossy(&item));
+
+            // confirm the content of the screen was loaded correctly by: locating fake PHN for target patient
+            const SEARCH_TEXT : &str = "name=\"patient_id\" value=\"27\">";
+            assert!( String::from_utf8_lossy(&item).contains( SEARCH_TEXT ), "Response did not contain expected content"); 
+        },
+        Err(_e) => assert!( false, "Error Response received" ),
+    };*/
+
+ // Test 6: PatientRoute::route_to_patient_details, Patient not discharged
+    println!("Test 6: PatientRoute::route_to_patient_details: User does not have any patients at their site (#2)");
+
+    frm.target_id = "9".to_string(); // known patient 1 has > 99 encounters in test data set
+    let responder_test3 = PatientRoute::route_to_patient_details( user_session.clone(), app_session.clone(), web::Form( frm.clone() ) ).await;
+    let http_resp_test3 = responder_test3.respond_to(&req);
+
+    assert_eq!(http_resp_test3.status(), StatusCode::OK, "Status not OK");
+    match to_bytes(http_resp_test3.into_body()).await{
+        Ok(item) => {
+            //println!("Body = {}", String::from_utf8_lossy(&item));
+
+            // confirm the content of the screen was loaded correctly by: locating fake PHN for target patient
+            const SEARCH_TEXT : &str = "No Encounters found";
+            assert!( String::from_utf8_lossy(&item).contains( SEARCH_TEXT ), "Response did not contain expected content"); 
         },
         Err(_e) => assert!( false, "Error Response received" ),
     };

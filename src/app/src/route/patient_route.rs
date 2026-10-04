@@ -59,21 +59,22 @@ impl PatientRoute{
     let cur_intv = idao.get_most_recent_vitals(cur_enc.id).await.expect(constants::DATABASE_ERROR_NOT_FOUND); 
 
     // get encounters for the patient
-    let enc_results = edao.get_encounters(patient_id, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
-    let enc_section: String = match enc_results {
-        Some (encounters) => SimpleFormatter::get_encounter_list_tile(encounters),
-        None => "No Encounters found".to_owned()
-    };
+    let mut enc_section: String = "No Encounters found".to_owned();
+    let enc_results = edao.get_encounters(patient_id, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
+    if enc_results.len() > 0 {
+        enc_section = SimpleFormatter::get_encounter_list_tile(enc_results);
+    }
+
 
     // if the user is allowed to view more details, allow it
     let can_view_clinical_intvs = active_user_session.has_permission(Permission::ALLOW_VIEW_ANY_CLINICAL_DATA) || active_user_session.has_permission(Permission::ALLOW_VIEW_CLINICAL_INTERVENTION);
 
     // get all interventions for the patient
-    let intv_results = idao.get_interventions(cur_enc.id, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
-    let intv_section = match intv_results {
-        Some (intvs) =>  SimpleFormatter::get_intervention_list_for_patient_details_tile(intvs, can_view_clinical_intvs),
-        None => "No Interventions found".to_owned(),
-    };
+    let intv_results = idao.get_interventions(cur_enc.id, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
+    let mut intv_section: String = "No Encounters found".to_owned();
+    if intv_results.len() > 0 {
+        intv_section = SimpleFormatter::get_intervention_list_for_patient_details_tile(intv_results, can_view_clinical_intvs);
+    }
 
     // get patient encounter history
     let patient_results = pdao.get_patient_details_not_discharged( userid, patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );

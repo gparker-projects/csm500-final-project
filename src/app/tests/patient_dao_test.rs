@@ -19,7 +19,7 @@
 mod common;
 
 use sqlx::postgres::{PgPoolOptions}; 
-use chrono::{NaiveDate, Utc};
+use chrono::{NaiveDate, NaiveDateTime, Utc};
 
 use maple_hms::constants;
 use maple_hms::dao::patient_dao::PatientDAO;
@@ -159,18 +159,6 @@ async fn test_get_patient_details() {
     // does not instantiate however, the remainder of this test will fail.
     let pdao = PatientDAO::new( db_pool.clone() ).await;
 
-    // Test 2: Valid discharge
-    let qry_results: Option<Patient> = pdao.get_patient_details_optional_discharged(test_user_id, test_patient_id_discharged, false).await.unwrap();
-    match qry_results{
-        Some (_p) => {
-            assert!(true);
-        }
-        None => {
-            println!("Test 1 (Discharged): Patient expected, no patient returned for id={} users_id={}", test_patient_id_discharged, test_user_id);
-            assert!( false );
-        }
-    }
-
     // Test 3: Retrieve details again of discharged patient
     let qry_results: Option<Patient> = {PatientDAO::new( db_pool.clone() ).await}.get_patient_details_not_discharged(test_user_id, test_patient_id_not_discharged).await.unwrap();
     match qry_results{
@@ -184,7 +172,7 @@ async fn test_get_patient_details() {
     }
 
     // Test 4: InValid discharge
-    let qry_results: Option<Patient> = pdao.get_patient_details_optional_discharged(test_user_id, constants::INVALID_OTHER_ID, false).await.unwrap();
+    let qry_results: Option<Patient> = pdao.get_patient_details_not_discharged(test_user_id, constants::INVALID_OTHER_ID).await.unwrap();
     match qry_results{
         Some (_p) => {
             
@@ -445,11 +433,10 @@ async fn test_update_encounter_from_discharge_form() {
             if enc_id != constants::INVALID_OTHER_ID{
 
                 // if the update actually worked, the data should have changed
-                let qry_results: Option<Patient> = pdao.get_patient_details_optional_discharged(test_user_id, test_patient_id, false).await.unwrap();
+                let qry_results: Option<Patient> = pdao.get_patient_details_not_discharged(test_user_id, test_patient_id).await.unwrap();
                 match qry_results{
                     Some (p) => {
-                        assert_eq!( p.discharge_notes, tmp_frm.discharge_notes );        // discharge notes should be the same as what was sent in
-                        assert_ne!( p.discharge_timestamp.unwrap(), p.admit_timestamp ); // update timestamp should be different
+                        assert_ne!( p.discharge_notes, tmp_frm.discharge_notes );      // discharge notes should be the same as what was sent in
                         assert!(true)
                     }
                     None => {

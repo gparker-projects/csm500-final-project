@@ -43,8 +43,8 @@ impl PatientDAO {
         }
     }  
 
-    /// ### get_patient_details_optional_discharged()
-    ///    Finds and returns the data for a specific patient, as a Patient struct, who may or may not have been discharged
+    /// ### get_patient_details_not_discharged()
+    ///    Finds and returns the data for a specific patient, as a Patient struct, who has NOT been discharged
     /// 
     /// #### Parameters:
     /// * _audit_user_id (i64): the id of the user making the data request, for audit purposes
@@ -54,11 +54,8 @@ impl PatientDAO {
     /// * Option<Patient>: the Patient, if found
     /// * sqlx::Error: An error, if applicable
     /// 
-    pub async fn get_patient_details_optional_discharged(&self, _audit_user_id: i64, patient_id: i64, ignore_discharge: bool) -> Result< Option<Patient>, std::io::Error> {
-        let tmp: String = match ignore_discharge {
-            true => db_query::QRY_SINGLE_PATIENT_DETAILS_STILL_ADMITTED_NOT_DISCHARGED.to_owned(), 
-            false => db_query::QRY_SINGLE_PATIENT_DETAILS_DISREGARD_DISCHARGE.to_owned(),
-        };
+    pub async fn get_patient_details_not_discharged(&self, _audit_user_id: i64, patient_id: i64) -> Result< Option<Patient>, std::io::Error> {
+        let tmp: String = db_query::QRY_SINGLE_PATIENT_DETAILS_STILL_ADMITTED_NOT_DISCHARGED.to_owned();
         let query = tmp.replace("{}", &patient_id.to_string());
 
         //tracing::debug!("get_patient_details Query: {}", query);
@@ -109,26 +106,11 @@ impl PatientDAO {
                 )
             }
             _ => {
-                tracing::debug!("get_patient_details() Query: {}", query);
-                tracing::debug!("No patient found for patient_id = {}", patient_id);
+                //tracing::debug!("get_patient_details() Query: {}", query);
+                tracing::debug!("No patient found for patient"); //_id = {}", patient_id);
                 Ok( None )
             }
         }
-    }
-
-    /// ### get_patient_details_not_discharged()
-    ///    Finds and returns the data for a specific patient, as a Patient struct, who has NOT been discharged
-    /// 
-    /// #### Parameters:
-    /// * _audit_user_id (i64): the id of the user making the data request, for audit purposes
-    /// * patient_id (i64): the id of the patient to be obtained
-    /// 
-    /// #### Returns:
-    /// * Option<Patient>: the Patient, if found
-    /// * sqlx::Error: An error, if applicable
-    /// 
-    pub async fn get_patient_details_not_discharged(&self, _audit_user_id: i64, patient_id: i64) -> Result< Option<Patient>, std::io::Error> {
-        return self.get_patient_details_optional_discharged(_audit_user_id, patient_id, true).await;
     }
 
     /// ### update_encounter_from_discharge_form()
