@@ -75,7 +75,6 @@ async fn test_basic_route_default_route(){
         },
     };
 
-
     // Test 3: BasicRoute::is_it_up_route
     let responder = BasicRoute::is_it_up_route().await;
     let http_resp = responder.respond_to(&req);

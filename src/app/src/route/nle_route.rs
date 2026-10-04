@@ -36,7 +36,7 @@ impl NLERoute{
     /// * Responder (actix_web::response::responder): the HTTP responder (response) for the request
     /// 
     pub async fn natural_language_prompt(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<NLPromptFormData>) -> impl Responder {
-        tracing::info!("-> /nlprompt Requested;  natural_language_prompt();  prompt: \"{}\"", req.prompt);
+        tracing::info!("-> /nlprompt Requested;  natural_language_prompt();");
         println!("-> /nlprompt Requested; natural_language_prompt();  prompt: \"{}\"", req.prompt);
 
         let mut results_sbuf = String::with_capacity(500); // Single heap allocation
@@ -52,6 +52,7 @@ impl NLERoute{
                         remaining_prompt_body_1.to_string().replace("}", "") //we are left with a "}" prefix, which we don't really care about. It will not affect the classification algorithm (currently).
                     }
                     else{
+                        //println!("..remaining_prompt_body={}", remaining_prompt_body.clone().to_string());
                         remaining_prompt_body.to_string() // if we must, we just proceed with the prompt, stripped of most of its prefix.
                     }
                 }
@@ -98,37 +99,25 @@ impl NLERoute{
         let patients_list = pdao.get_patients_at_users_site_no_discharge(userid).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
 
         let referenced_patient = CommandController::get_referenced_patient(patients_list, userid, prompt.clone()).await; // perform a basic search within the prompt for any of the current patients
-
         let mut prompt_final = prompt.clone();
+        let patient_id: i64;
+        if referenced_patient.clone().0 == CommandController::OTHER_PATIENT_FOUND{
+            if default_patient != constants::INVALID_PATIENT_ID {
+                patient_id = default_patient; // if the patient is still invalid, but we have a value patient from the context, provide that instead
+            }
+            else{
+                patient_id = constants::INVALID_PATIENT_ID;
+            }
+        }
+        else{ // must be CommandController::TARGET_PATIENT_FOUND; CommandController::NO_PATIENT can not actually be returned by CommandController::get_referenced_patient()
+            let p: Patient = referenced_patient.clone().1.unwrap(); // pull out the patient's name and adjust the prompt prior to matching
+            prompt_final = prompt.clone().replace(&p.legal_first_name, "patient").replace(&p.legal_last_name, "patient");
+            patient_id = p.id;
+        }
 
-        let patient_id = match referenced_patient.clone().0 {
-            CommandController::OTHER_PATIENT_FOUND => {
-                if default_patient != constants::INVALID_PATIENT_ID {
-                    default_patient // if the patient is still invalid, but we have a value patient from the context, provide that instead
-                }
-                else{
-                    constants::INVALID_PATIENT_ID
-                }
-            },
-            CommandController::TARGET_PATIENT_FOUND =>{
-                let p: Patient = referenced_patient.clone().1.unwrap(); // pull out the patient's name and adjust the prompt prior to matching
-                prompt_final = prompt.clone().replace(&p.legal_first_name, "patient").replace(&p.legal_last_name, "patient");
-                p.id
-            },
-            _ => { // otherwise reduce the list of results.
-                match referenced_patient.clone().1 {
-                    Some(rp) => rp.id,
-                    None => default_patient,// if there was a default patient in the prompt, we return it. Otherwse it gets constants::INVALID_PATIENT_ID by default
-                }
-            },
-        };
-
-        tracing::debug!("..revised prompt: {}", prompt_final.clone());
-        tracing::debug!("..revised patient_id: {}", patient_id);
-        tracing::debug!("..context_level: {}", context_level);
-        println!("..revised prompt: {}", prompt_final.clone());
-        println!("..revised patient_id: {}", patient_id);
-        println!("..context_level: {}", context_level);
+        //println!("..revised prompt: {}", prompt_final.clone());
+        //println!("..revised patient_id: {}", patient_id);
+        //println!("..context_level: {}", context_level);
 
         let classifer_results_final: Vec< (String, f32)> = cmd.get_filtered_classifier_rankings( prompt_final, cur_session.clone().user_authorizations, context_level).await;
 

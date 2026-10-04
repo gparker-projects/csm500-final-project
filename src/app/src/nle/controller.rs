@@ -257,16 +257,18 @@ impl CommandController{
 
         // if the target patient was not found, return the first one and update the status code to OTHER_PATIENT_FOUND
         if result_code == CommandController::NO_PATIENT_FOUND  {
-            println!("...<< target patient was not found, substituting with first patient");
             //if patients_list.len() > 0 { //  a zero-patient list would mean there are none in the facility, which is not realistic
             result_code = CommandController::OTHER_PATIENT_FOUND;
             let p_list = patients_list.clone();
-            result = Some(p_list.first().unwrap().clone()); // this was kind of crazy
-            //}
+            if p_list.len() > 0{
+                println!("...<< target patient was not found, substituting with first patient");
+                result = Some(p_list.first().unwrap().clone()); // this was kind of crazy
+            }
+            else{
+                result = None;
+            }
         }
-
-        println!("..returning patient: {} {}", result.clone().unwrap().legal_first_name, result.clone().unwrap().legal_last_name);
-
+        //println!("..returning patient: {} {}", result.clone().unwrap().legal_first_name, result.clone().unwrap().legal_last_name);
         ( result_code, result )
     }
 
