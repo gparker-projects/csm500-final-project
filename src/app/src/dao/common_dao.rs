@@ -194,7 +194,7 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
         self.get_common_references(Self::REF_TYPE_GROUP_2_INTERVENTION_STATUS.to_string(), true).await
     }
 
-    /// ### get_intervention_types()
+    /// ### get_clinical_and_non_intervention_types()
     ///   Shortcut method to obtain Clinical and Non-Clinical Intervention Type group (id=1) entries from the COMMON REFERENCE TYPE table
     /// 
     /// #### Parameters: n/a
@@ -204,11 +204,9 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
     ///   * (String): short name of the reference list item
     ///   * (String): long name of the reference list item
     /// 
-    /*pub async fn get_intervention_types(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
-        let intv_types = "1, 3".to_string();
-
-        self.get_common_references(intv_types, true).await
-    }*/
+    pub async fn get_clinical_and_non_intervention_types(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
+        self.get_common_references("1, 3".to_string(), true).await
+    }
 
     /// ### get_clinical_intervention_types()
     ///   Shortcut method to obtain Clinical Intervention Type group (id=1) entries from the COMMON REFERENCE TYPE table
@@ -221,9 +219,7 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
     ///   * (String): long name of the reference list item
     /// 
     pub async fn get_clinical_intervention_types(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
-        let intv_types = "1".to_string();
-
-        self.get_common_references(intv_types, true).await
+        self.get_common_references("1".to_string(), true).await
     }
 
  
@@ -238,9 +234,7 @@ pub const REF_TYPE_GROUP_2_INTERVENTION_STATUS: i64 = 2;
     ///   * (String): long name of the reference list item
     /// 
     pub async fn get_non_clinical_intervention_types(&self)-> Result< Option< Vec<(i64, String, String)> >, std::io::Error> {
-        let intv_types = "3".to_string();
-
-        self.get_common_references(intv_types, true).await
+        self.get_common_references("3".to_string(), true).await
     }
 
 

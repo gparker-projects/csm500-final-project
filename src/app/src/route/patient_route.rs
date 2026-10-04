@@ -37,103 +37,98 @@ impl PatientRoute{
     /// * Responder (actix_web::response::responder): the HTTP responder (response) for the request
     /// 
     pub async fn route_to_patient_details(user_session: Session, app_session: web::Data<AppSession>, req: web::Form<GenericWebFormData>) -> impl Responder {
-    tracing::debug!("-> /patientdtls Route Requested: PatientRoute::route_to_patient_details()");
-    println!("-> /patientdtls Route Requested: PatientRoute::route_to_patient_details()");
+        tracing::debug!("-> /patientdtls Route Requested: PatientRoute::route_to_patient_details()");
+        println!("-> /patientdtls Route Requested: PatientRoute::route_to_patient_details()");
 
-    //todo: this should direct to a standard error or login screen when session is lost
-    let active_user_session: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
-    let userid = active_user_session.get_userid_as_i64();
-    let patient_id: i64 = req.get_uid_as_i64();
+        //todo: this should direct to a standard error or login screen when session is lost
+        let active_user_session: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
+        let userid = active_user_session.get_userid_as_i64();
+        let patient_id: i64 = req.get_uid_as_i64();
 
-    // get base patient data
-    let pdao = PatientDAO::new( app_session.get_db_connection() ).await;
-    let idao = InterventionDAO::new( app_session.get_db_connection() ).await;
-    let edao = EncounterDAO::new( app_session.get_db_connection() ).await;
+        println!("..getting results for user_id={} patient(target)_id={}", userid, patient_id);
 
-    // pull out the current Encounter and generate summary tile for it
-    let cur_enc: Encounter = edao.get_current_encounter(patient_id).await.clone();
-    let cur_enc_section = SimpleFormatter::get_single_encounter_summary_tile(cur_enc.clone());
-    let cur_enc_id = cur_enc.clone().id.to_string(); // must be copied here before it moves below
+        // get base patient data
+        let pdao = PatientDAO::new( app_session.get_db_connection() ).await;
+        let idao = InterventionDAO::new( app_session.get_db_connection() ).await;
+        let edao = EncounterDAO::new( app_session.get_db_connection() ).await;
 
-    // pull out the most recent vitals (Intervention of type = "Vitals") and generate summary tile for it
-    let cur_intv = idao.get_most_recent_vitals(cur_enc.id).await.expect(constants::DATABASE_ERROR_NOT_FOUND); 
+        // pull out the current Encounter and generate summary tile for it
+        let cur_enc: Encounter = edao.get_current_encounter(patient_id).await.clone();
+        let cur_enc_section = SimpleFormatter::get_single_encounter_summary_tile(cur_enc.clone());
+        let cur_enc_id = cur_enc.clone().id.to_string(); // must be copied here before it moves below
 
-    // get encounters for the patient
-    let mut enc_section: String = "No Encounters found".to_owned();
-    let enc_results = edao.get_encounters(patient_id, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
-    if enc_results.len() > 0 {
-        enc_section = SimpleFormatter::get_encounter_list_tile(enc_results);
-    }
+        // pull out the most recent vitals (Intervention of type = "Vitals") and generate summary tile for it
+        let cur_intv = idao.get_most_recent_vitals(cur_enc.id).await.expect(constants::DATABASE_ERROR_NOT_FOUND); 
 
-
-    // if the user is allowed to view more details, allow it
-    let can_view_clinical_intvs = active_user_session.has_permission(Permission::ALLOW_VIEW_ANY_CLINICAL_DATA) || active_user_session.has_permission(Permission::ALLOW_VIEW_CLINICAL_INTERVENTION);
-
-    // get all interventions for the patient
-    let intv_results = idao.get_interventions(cur_enc.id, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
-    let mut intv_section: String = "No Encounters found".to_owned();
-    if intv_results.len() > 0 {
-        intv_section = SimpleFormatter::get_intervention_list_for_patient_details_tile(intv_results, can_view_clinical_intvs);
-    }
-
-    // get patient encounter history
-    let patient_results = pdao.get_patient_details_not_discharged( userid, patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
-    let patient_header = match patient_results {
-        Some (patient_details) => {
-            //println!("Patient details obtained"); //: {}", &tile_content);
-
-            let pwrap: PatientWrapper = PatientWrapper{
-                patient: patient_details,
-                current_encounter: cur_enc, 
-                most_recent_intervention: cur_intv
-            };
-
-            SimpleFormatter::get_single_patient_summary( pwrap, -1)
+        // get encounters for the patient
+        let mut enc_section: String = "No Encounters found".to_owned();
+        let enc_results = edao.get_encounters(patient_id, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
+        if enc_results.len() > 0 {
+            enc_section = SimpleFormatter::get_encounter_list_tile(enc_results);
         }
-        None => "No patients found".to_owned()
-    };
 
-    // refresh the patients in the menu (only)
-    let legacy_menu_results = pdao.get_patients_at_users_site_no_discharge(userid).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
-    let legacy_menu = match legacy_menu_results {
-        Some (patients_for_menu_lst) => {
-            {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), patient_id, active_user_session.clone())
+
+        // if the user is allowed to view more details, allow it
+        let can_view_clinical_intvs = active_user_session.has_permission(Permission::ALLOW_VIEW_ANY_CLINICAL_DATA) || active_user_session.has_permission(Permission::ALLOW_VIEW_CLINICAL_INTERVENTION);
+
+        // get all interventions for the patient
+        let intv_results = idao.get_interventions(cur_enc.id, false).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
+        let mut intv_section: String = "No Interventions found".to_owned();
+        if intv_results.len() > 0 {
+            intv_section = SimpleFormatter::get_intervention_list_for_patient_details_tile(intv_results, can_view_clinical_intvs);
         }
-        None => {
-            tracing::debug!("No patients found for legacy menu");
-            constants::LEGACY_MENU_ON_ERROR.to_string()
+
+        // get patient encounter history
+        let patient_results = pdao.get_patient_details_not_discharged( userid, patient_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
+        let patient_header = match patient_results {
+            Some (patient_details) => {
+                //println!("Patient details obtained"); //: {}", &tile_content);
+
+                let pwrap: PatientWrapper = PatientWrapper{
+                    patient: patient_details,
+                    current_encounter: cur_enc, 
+                    most_recent_intervention: cur_intv
+                };
+
+                SimpleFormatter::get_single_patient_summary( pwrap, -1)
+            }
+            None => "Patient Encounter History not found".to_owned()
+        };
+
+        // refresh the patients in the menu (only)
+        let legacy_menu_results = pdao.get_patients_at_users_site_no_discharge(userid).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
+        let mut legacy_menu: String = constants::LEGACY_MENU_ON_ERROR.to_string();
+        if legacy_menu_results.len() > 0 {
+            legacy_menu = {MenuFormatter{}}.get_legacy_menu_with_patient(legacy_menu_results.clone(), patient_id, active_user_session.clone());
         }
-    };
-    
-    // no user should be able to get into the system without a location assigned, so we will not worry about an exception here
-    let item_list: Option<Vec<(i64, String, String)>>;
+        
+        // no user should be able to get into the system without a location assigned, so we will not worry about an exception here
+        // limit the list to intervention types that the user is allowed to use (clinical, non clinical or none)
+        let item_list: Option<Vec<(i64, String, String)>>;
+        if active_user_session.has_permission(Permission::ALLOW_CREATE_CLINICAL_INTERVENTION) && active_user_session.has_permission(Permission::ALLOW_CREATE_NON_CLINICAL_INTERVENTION) { // if user has both, do both
+            item_list = {CommonDAO::new( app_session.get_db_connection() ).await}.get_clinical_and_non_intervention_types().await.unwrap();
+        }
+        else if active_user_session.has_permission(Permission::ALLOW_CREATE_CLINICAL_INTERVENTION) {
+            item_list = {CommonDAO::new( app_session.get_db_connection() ).await}.get_clinical_intervention_types().await.unwrap();
+        }
+        else{ // otherwise only non-Clinical
+            item_list = {CommonDAO::new( app_session.get_db_connection() ).await}.get_non_clinical_intervention_types().await.unwrap();
+        }    
 
-    // limit the list to intervention types that the user is allowed to use (clinical, non clinical or none)
+        let fast_actions_upper_limit = app_session.clone().system_config.get_max_general_fastactions();
+        let pref_list: Option<Vec<FeaturePreference>> = {FeaturePreferenceDAO::new( app_session.get_db_connection() ).await}.get_active_feature_preferences_of_interventions_for_user(userid, fast_actions_upper_limit).await.unwrap();
 
-    if active_user_session.has_permission(Permission::ALLOW_CREATE_CLINICAL_INTERVENTION) && active_user_session.has_permission(Permission::ALLOW_CREATE_NON_CLINICAL_INTERVENTION) { // if user has both, do both
-        item_list = {CommonDAO::new( app_session.get_db_connection() ).await}.get_clinical_intervention_types().await.unwrap();
-    }
-    else if active_user_session.has_permission(Permission::ALLOW_CREATE_CLINICAL_INTERVENTION) {
-        item_list = {CommonDAO::new( app_session.get_db_connection() ).await}.get_clinical_intervention_types().await.unwrap();
-    }
-    else{ // otherwise only non-Clinical
-        item_list = {CommonDAO::new( app_session.get_db_connection() ).await}.get_non_clinical_intervention_types().await.unwrap();
-    }    
+        let consolidated_content = app_session.get_web_content_factory().get_patient_details_full_tile(patient_header,
+                                                                                                            cur_enc_section,
+                                                                                                            enc_section,
+                                                                                                            active_user_session,
+                                                                                                            legacy_menu,
+                                                                                                            intv_section,
+                                                                                                            item_list.unwrap(), 
+                                                                                                            FeaturePreferenceFormatter::get_feature_preference_section(pref_list),
+                                                                                                            patient_id.to_string(),
+                                                                                                            cur_enc_id);
 
-    let fast_actions_upper_limit = app_session.clone().system_config.get_max_general_fastactions();
-    let pref_list: Option<Vec<FeaturePreference>> = {FeaturePreferenceDAO::new( app_session.get_db_connection() ).await}.get_active_feature_preferences_of_interventions_for_user(userid, fast_actions_upper_limit).await.unwrap();
-
-    let consolidated_content = app_session.get_web_content_factory().get_patient_details_full_tile(patient_header,
-                                                                                                           cur_enc_section,
-                                                                                                           enc_section,
-                                                                                                           active_user_session,
-                                                                                                           legacy_menu,
-                                                                                                           intv_section,
-                                                                                                           item_list.unwrap(), 
-                                                                                                           FeaturePreferenceFormatter::get_feature_preference_section(pref_list),
-                                                                                                           patient_id.to_string(),
-                                                                                                           cur_enc_id);
-
-    HttpResponse::Ok().body( consolidated_content )
+        HttpResponse::Ok().body( consolidated_content )
     }
 }

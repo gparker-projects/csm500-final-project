@@ -16,6 +16,15 @@ use maple_hms::dto::patient::Patient;
 use maple_hms::dto::user_auth::{Permission, UserAuthorization};
 use maple_hms::session::{UserSession};
 
+use maple_hms::ui::tile_factory::WebContentFactory;
+use maple_hms::session::*;
+use actix_web::cookie::Key;
+use sqlx::postgres::PgPoolOptions;
+//use maple_hms::dto::user_auth::*;
+use actix_web::web;
+
+pub const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500";
+
 #[cfg(test)]
 
 pub struct EntityFactory;
@@ -262,4 +271,82 @@ impl EntityFactory{
         }
         items
     }
+
+    /// ### get_mock_user_session() 
+    /// 
+    /// Supporting method that sets up an initial mock user session for use by the main tests
+    /// 
+    pub fn get_mock_user_session(user_id: String) -> UserSession{
+        let perm: Permission = Permission::new(1, 1);   // create some base permissions
+        let perm2: Permission = Permission::new(1, Permission::ALLOW_CREATE_CLINICAL_INTERVENTION);
+        let perms: Vec<Permission> = vec![perm, perm2]; // put them in a vector
+        let ua = UserAuthorization { // the vector gets put into the UserAuthorization
+            granted_permissions: perms
+        };
+
+        UserSession { // the UserAuthorization gets  put into the UserSession
+            user_id: user_id, 
+            user_display_name: "TEST, UNIT".to_string(), 
+            email: "test@gmail.com".to_string(), 
+            user_authorizations: ua 
+        }
+    }
+
+    /// ### get_mock_app_session() 
+    /// 
+    /// Supporting method that sets up an initial mock application session for use by the main tests
+    /// 
+    pub async fn get_mock_app_session() -> web::Data<maple_hms::session::AppSession> {
+    // a lot of set up to mimic a live system session
+        let path = std::env::current_dir().expect("Base path to executable could not be found");
+        let newpath = path.display().to_string() + "\\webc\\static\\";
+        let tmp_wcf = WebContentFactory::new(&newpath, "UNIT TEST".to_string());
+
+        // set up PgPool
+        let db_pool = match PgPoolOptions::new()
+            .max_connections(5)
+            .connect(DB_CONN_STR)
+            .await
+        {
+            Ok(pool) => pool,
+            Err(e) => {
+                tracing::debug!("{}", e);
+                assert!(false);
+                panic!("{}", e)
+            },
+        };
+
+        let tmp_cargo_manifest_dir = "\\data\\manifest_dir".to_string();
+        let tmp_command_mapping_file = "command_mapping.csv".to_string();
+        let tmp_language_model_file = "all-MiniLM-L6-v2.onnx".to_string();
+        let tmp_tokenizer_file = "tokenizer.json".to_string();
+        let tmp_model_data_dir = "\\data\\".to_string();
+        let tmp_data_sub_dir = "\\data\\".to_string();
+
+        // set up SysConfig
+        let cfg = SysConfig{
+            app_version: "v1.0Unit_test".to_string(),
+            db_conn_str: DB_CONN_STR.to_string(),
+            cargo_manifest_dir: tmp_cargo_manifest_dir, 
+            model_data_dir: tmp_model_data_dir,
+            command_mapping_file: tmp_command_mapping_file,
+            language_model_file: tmp_language_model_file, 
+            tokenizer_file: tmp_tokenizer_file, 
+            data_sub_dir: tmp_data_sub_dir, 
+            max_general_fastactions: "3".to_string(),
+            max_nle_fastactions: "3".to_string(),
+            website_bind_address: "10.10.10.10:8080".to_string(),
+            session_key: "thisIsAVeryinauthenticSessionKeyOnlyToBeused_forunit_testing".to_string(),
+            max_age_feature_preferences: "30".to_string()
+        };
+
+        // finally: return the initialized AppSession
+        web::Data::new(AppSession {
+            wcf: tmp_wcf, 
+            app_key: Key::generate(),
+            connection: db_pool,
+            system_config: cfg
+        })
+    }
+
 }
