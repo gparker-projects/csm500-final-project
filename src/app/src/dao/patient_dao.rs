@@ -107,7 +107,7 @@ impl PatientDAO {
             }
             _ => {
                 //tracing::debug!("get_patient_details() Query: {}", query);
-                tracing::debug!("No patient found for patient"); //_id = {}", patient_id);
+                tracing::debug!("No patient found"); //_id = {}", patient_id);
                 Ok( None )
             }
         }
@@ -126,13 +126,13 @@ impl PatientDAO {
     /// 
     pub async fn update_encounter_from_discharge_form(&self, form: DischargeDataForm, _audit_user_id: i64)-> Result<i64, sqlx::Error> {
         tracing::debug!("update_encounter_from_discharge_form()");
-        println!("update_encounter_from_discharge_form()");
+        //println!("update_encounter_from_discharge_form()");
 
         let query_level_0 = db_query::UPDATE_ENCOUNTER_FOR_DISCHARGE.to_string();
         let query_level_1 = &query_level_0.replace("{discharge_notes}", &form.discharge_notes.clone().trim());
         let query_level_2 = &query_level_1.replace("{encounter_id}", &form.encounter_id.clone().trim());
 
-        println!("..SQL query:\n{}", query_level_2);
+        //println!("..SQL query:\n{}", query_level_2);
 
         let result = sqlx::query(&query_level_2)
                                                         .fetch_one(&self.connection)

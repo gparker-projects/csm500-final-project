@@ -20,24 +20,6 @@ use maple_hms::ui::data_forms::*;
 use actix_session::SessionExt;
 use actix_web::{body::to_bytes, http::StatusCode, test, web, Responder};
 
-/* 
-use maple_hms::session::*;
-
-use maple_hms::dto::user_auth::*;
-
-use actix_session::SessionExt;
-use actix_web::{body::to_bytes, http::StatusCode, test, web, Responder};
-use actix_web::cookie::Key;
-use sqlx::postgres::PgPoolOptions;
-
-const DB_CONN_STR : &str = "postgres://postgres:csm500@localhost:5432/csm500";
-const SCREEN_ID_TAG_LOGIN : &str = "<div id=\"MapleHMS::ID=Login\"></div>";
-const SCREEN_ID_TAG_HOME : &str = "<div id=\"MapleHMS::ID=Home\"></div>";
-//const SCREEN_ID_TAG_INTERVENTION : &str = "<div id=\"MapleHMS::ID=Intervention\"></div>";
-const SCREEN_ID_TAG_PATIENT_LIST : &str = "<div id=\"MapleHMS::ID=PatientListTile\"></div>";
-*/
-
-//const SCREEN_ID_TAG_NLE_PROMPT : &str = "TBD";
 const VALIDATION_STRING_NO_CONTEXT_1 : &str  = "<div id=\"MapleHMS::NLPCanvas\">";
 const VALIDATION_STRING_NO_CONTEXT_2 : &str  = "nlp_action_2";
 const VALIDATION_STRING_INVALID_PATIENT : &str  = "<div id=\"MapleHMS::NLPCanvas\">";
@@ -48,7 +30,6 @@ const VALIDATION_STRING_CTXTLVL_0B : &str  = VALIDATION_STRING_NO_CONTEXT_2;
 const VALIDATION_STRING_CTXTLVL_1B : &str  = VALIDATION_STRING_NO_CONTEXT_2;
 const VALIDATION_STRING_OTHER_2: &str  = "Update Denny DoNotDischarge";
 const VALIDATION_STRING_MALFORMED: &str  = "value='Update Patient Information' onclick=\"performNLAction(2,-1);";
-
 
 use common::entity_factory::EntityFactory;
 

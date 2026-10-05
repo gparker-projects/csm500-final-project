@@ -65,7 +65,6 @@ pub struct InterventionDataFormLink {
 #[derive(serde::Deserialize, Clone)]
 pub struct AdmitFormBasic {
     pub patient_id: String,
-    //pub action_flag: String,
     pub user_prompt: String,
 }
 
