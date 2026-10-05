@@ -68,7 +68,7 @@ impl AdmitRoute{
     pub async fn route_to_admit_save(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitDataForm>) -> impl Responder {
             tracing::debug!("-> Route Requested: /route_to_admit_SAVE ");
             println!("-> Route Requested: /route_to_admit_SAVE ");
-            println!("..patient_id:{}", req.patient_id.clone());
+            //println!("..patient_id:{}", req.patient_id.clone());
 
             let req_clone0 = req.clone();
             let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
@@ -207,10 +207,10 @@ impl AdmitRoute{
     /// 
     pub async fn route_to_admit_new_no_patient(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitFormBasic>) -> impl Responder {
         tracing::debug!("-> Route Requested: /route_to_admit_new_no_patient");
-        tracing::debug!("..user_prompt:{}", req.user_prompt.clone());
+        //tracing::debug!("..user_prompt:{}", req.user_prompt.clone());
         println!("-> Route Requested: /route_to_admit_new_no_patient");
-        println!("..user_prompt:{}", req.user_prompt.clone());
-        println!("..patient_id:{}", req.patient_id.clone());
+        //println!("..user_prompt:{}", req.user_prompt.clone());
+        //println!("..patient_id:{}", req.patient_id.clone());
 
 
             AdmitRoute::route_to_admit_discharge(app_session, user_session, web::Form(
@@ -237,9 +237,9 @@ impl AdmitRoute{
     /// 
     pub async fn route_to_discharge_patient(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<AdmitFormBasic>) -> impl Responder {
             tracing::debug!("-> Route Requested: /route_to_discharge_patient");
-            tracing::debug!("..user_prompt:{}", req.user_prompt.clone());
+            //tracing::debug!("..user_prompt:{}", req.user_prompt.clone());
             println!("-> Route Requested: /route_to_discharge_patient");
-            println!("..user_prompt:{}", req.user_prompt.clone());
+            //println!("..user_prompt:{}", req.user_prompt.clone());
 
             AdmitRoute::route_to_admit_discharge(app_session, user_session, web::Form(
                 AdmitDataForm {
@@ -292,11 +292,11 @@ impl AdmitRoute{
                 match tmp_patient {
                     Some(mut p) => {
                         if req.clone().user_prompt.len() > 0 {
-                            if discharge && p.discharge_notes.len() == 0 {
-                                p.discharge_notes = req.clone().user_prompt; // if discharging and arriving via prompt, prompt will populate the empty discharge notes
+                            if discharge {
+                                p.discharge_notes = p.discharge_notes + &req.clone().user_prompt; // if discharging and arriving via prompt prompt will be added to the discharge notes
                             }
-                            else if !discharge && p.admit_notes.len() == 0 {
-                                p.admit_notes = req.clone().user_prompt; // if admitting and arriving via prompt, prompt will populate the empty admit notes
+                            else {
+                                p.admit_notes = p.admit_notes + &req.clone().user_prompt; // if admitting and arriving via prompt, prompt will be added to the admit notes
                             }
                         }                    
                         Some(p)
