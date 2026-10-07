@@ -45,44 +45,34 @@ impl InterventionRoute{
         // perform server-side form validation. If not successful, send the user back with some form errors
         let frm_errors = req.validate_fields();
         match frm_errors {
-            Err(e) => {
-                tracing::error!("..!InterventionDataForm > Form errors detected, redirect to view/modify intervention");
-                println!("..!InterventionDataForm > Form errors detected, redirect to view/modify intervention");
-                Self::route_to_view_or_modify_intervention(
-                    app_session.clone(), user_session.clone(), web::Form(
-                        {
-                            let mut tmp_frm = req.clone();
-                            tmp_frm.form_errors = e.message.unwrap().to_string();
-                            tmp_frm // return the form with the updated error message (above)
-                        }
-                    )
-                ).await;
-            },
-            _ => { // "do nothing, because form was valid"
+            Ok( _ignore ) => { // "do nothing, because form was valid"
                 tracing::debug!("..Form validation successful (InterventionDataForm), saving");
                 println!("..Form validation successful (InterventionDataForm), saving");
 
                 let idao = InterventionDAO::new( app_session.get_db_connection() ).await;
-                let results = idao.upsert_intervention_from_intv_form(req_clone0.clone(), user_session_details.get_userid_as_i64()).await;
-                match results {
-                    Ok(intv_id) => {
-                        tracing::debug!("  >Intervention (id={intv_id})] created/updated");
-                        req.0.intervention_id = intv_id.clone().to_string();
+                let intv_id = idao.upsert_intervention_from_intv_form(req_clone0.clone(), user_session_details.get_userid_as_i64()).await.unwrap();
+                if intv_id != constants::INVALID_OTHER_ID {
+                    tracing::debug!("  >Intervention (id={intv_id})] created/updated");
+                    req.0.intervention_id = intv_id.clone().to_string();
 
-                        let type_id: i64 = req_clone0.clone().get_intervention_type_as_i64();
-                        // if save successful, record a feature preference as well
-                        let fpdao = FeaturePreferenceDAO::new( app_session.get_db_connection() ).await;
-                        let _ignore = fpdao.upsert_feature_preference( user_session_details.clone().get_userid_as_i64(), 
-                                                                                    type_id).await.unwrap();
-                    },
-                    Err(e) => {
-                        tracing::debug!("....Error occurred: Intervention not created/updated: {e}");
-                    }
+                    let type_id: i64 = req_clone0.clone().get_intervention_type_as_i64();
+                    // if save successful, record a feature preference as well
+                    let fpdao = FeaturePreferenceDAO::new( app_session.get_db_connection() ).await;
+                    let _ignore = fpdao.upsert_feature_preference( user_session_details.clone().get_userid_as_i64(), 
+                                                                                type_id).await.unwrap();
                 }
-                
+                else {
+                    req.form_errors = "Error occurred: Intervention not created/updated".to_string();
+                    //tracing::debug!("....Error occurred: Intervention not created/updated");
+                    //println!("....Error occurred: Intervention not created/updated");
+                }
             },
-        };
-
+            Err(e) => {
+                tracing::error!("..!InterventionDataForm > Form errors detected, redirect to view/modify intervention");
+                println!("..!InterventionDataForm > Form errors detected, redirect to view/modify intervention");
+                req.form_errors = e.message.unwrap().to_string();
+            },
+        }
         // route back to main form again
         InterventionRoute::route_to_view_or_modify_intervention( app_session, user_session, req ).await
     }
@@ -185,7 +175,6 @@ impl InterventionRoute{
             let tmp_intv = idao.get_intervention(intervention_id).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
             let tmp_intv2 = tmp_intv.clone().unwrap();
             intervention_type_id = tmp_intv2.intervention_type_id;
-
             tmp_intv
         };
         let cur_intv2= cur_intv.clone(); // clone of above object to avoid move below
@@ -194,16 +183,12 @@ impl InterventionRoute{
 
         // refresh the patients in the menu (only)
         let pdao = PatientDAO::new( app_session.get_db_connection() ).await;
-        let legacy_menu_results = pdao.get_patients_at_users_site_no_discharge(userid).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
-        let legacy_menu = match legacy_menu_results {
-            Some (patients_for_menu_lst) => {
-                {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), req.get_patient_id_as_i64(), user_session_details.clone())
-            }
-            None => {
-                //tracing::debug!("No patients found for legacy menu");
-                constants::LEGACY_MENU_ON_ERROR.to_string()
-            }
-        };
+        let mut legacy_menu = constants::LEGACY_MENU_ON_ERROR.to_string();
+
+        let patients_for_menu_lst = pdao.get_patients_at_users_site_no_discharge(userid).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
+        if patients_for_menu_lst.len() > 0 {
+             legacy_menu = {MenuFormatter{}}.get_legacy_menu_with_patient(patients_for_menu_lst.clone(), req.get_patient_id_as_i64(), user_session_details.clone());
+        }
 
         let user_dropdown_list = {AuthDAO::new( app_session.get_db_connection() ).await}.get_user_and_departments_at_current_user_sites(userid ).await.unwrap();
 
@@ -215,24 +200,19 @@ impl InterventionRoute{
         //println!("..get measures (common ref type) for group_id={}", intervention_type_id);
 
         let intv_details_type=  cdao.get_common_references_by_id(intervention_type_id, true).await.unwrap();
-      
         let status_dropdown_list=  cdao.get_intervention_statuses().await.unwrap();
-        let location_results = cdao.get_locations_for_user(userid).await.expect( constants::DATABASE_ERROR_NOT_FOUND );
-        let location_menu = match location_results {
-          Some (loc_list) => {
-              
-              CommonFormatter::get_location_dropdown(loc_list.clone(), 
-                    match intervention_id == constants::NOT_SPECIFIED_ID {
-                      true => constants::DEFAULT_LOCATION_REGISTRATION,
-                      false => cur_intv.unwrap().location_id,
-                    }
-              )
-          }
-          None => {
-              tracing::debug!("No locations found for user. [Userid:{}]", userid);
-              constants::LEGACY_MENU_ON_ERROR.to_string() // when no patient, return default error-expected menu
-          }
-        };
+
+        let mut location_results = cdao.get_locations_for_user(userid).await.expect( constants::DATABASE_ERROR_NOT_FOUND ).unwrap();
+        if location_results.len() == 0 {             
+            location_results = vec![(constants::DEFAULT_LOCATION_REGISTRATION, "Registration".to_string())];
+            tracing::debug!("No locations found for user");
+        }
+        let location_menu = CommonFormatter::get_location_dropdown(location_results.clone(), 
+            match intervention_id == constants::NOT_SPECIFIED_ID {
+                true => constants::DEFAULT_LOCATION_REGISTRATION,
+                false => cur_intv.unwrap().location_id,
+            }
+        );
 
         let fast_actions_upper_limit = app_session.clone().system_config.get_max_general_fastactions();
         let max_age_feature_preferences = app_session.clone().system_config.get_max_age_feature_preferences();
