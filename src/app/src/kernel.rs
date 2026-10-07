@@ -8,16 +8,17 @@
 //! 
 //! ---------------------------------------------------------------------------------
 
+
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{Pool, Postgres};
 use tracing;
-use tracing_subscriber::{ Layer, filter::LevelFilter, layer::SubscriberExt, util::SubscriberInitExt, };
-
+use tracing_subscriber::{ Layer, filter::LevelFilter, layer::SubscriberExt, util::SubscriberInitExt};
 
 #[derive(Default, Clone)]
 pub struct MapleHMSKernel;
 
 impl MapleHMSKernel{
+
     /// ### fn get_static_base_path()
     ///  Obtains the static base path for files from the current system environment variables. This is used for 
     ///  locating files for load.
@@ -40,7 +41,7 @@ impl MapleHMSKernel{
     /// #### Returns:
     /// * Pool<Postgres> - the Postgres database pool connection
     /// 
-    pub async fn init_database_pool( db_url: String ) -> Pool<Postgres> {
+    pub async fn init_database_pool( db_url: String ) -> Option< Pool<Postgres> > {
         let db_pool = match PgPoolOptions::new()
             .max_connections(5)
             .connect(&db_url)
@@ -48,11 +49,11 @@ impl MapleHMSKernel{
         {
             Ok(pool) => {
                 tracing::info!("Database connection established to: http://{}", db_url);
-                pool
+                Some(pool)
             },
             Err(e) => {
                 tracing::error!("{}", e);
-                panic!("{}", e)
+                None
             },
         };
         return db_pool;

@@ -98,6 +98,11 @@ async fn test_basic_route_default_route(){
     let responder = BasicRoute::not_found_route().await;
     let http_resp = responder.respond_to(&req);
     assert_eq!(http_resp.status(), StatusCode::SEE_OTHER, "Page was not redirected as expected");
+
+    // Test 5: BasicRoute::error_route
+    let responder = BasicRoute::error_route().await;
+    let http_resp = responder.respond_to(&req);
+    assert_eq!(http_resp.status(), StatusCode::SERVICE_UNAVAILABLE, "MapleHMS is currently down; no redirection");
 }
 
 /// ### test_login_logout_route()

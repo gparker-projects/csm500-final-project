@@ -60,9 +60,18 @@ async fn main() -> std::io::Result<()> {
     let _ignore = MapleHMSKernel::init_logging();
     let config = SysConfig::new(env::var(constants::CARGO_MANIFEST_DIR));
     let binding_addr = config.clone().website_bind_address;
+    let db_pool;
 
     // establish database connection for entire application here, add to the application session
-    let db_pool = MapleHMSKernel::init_database_pool( config.db_conn_str.clone() ).await;
+    let pool_init = MapleHMSKernel::init_database_pool( config.db_conn_str.clone() ).await;
+    if Some( pool_init.clone() ).is_some() {
+        db_pool = pool_init.unwrap();
+    }
+    else {
+        tracing::error!("System unusable do to failed database connection");
+        BasicRoute::error_route().await;
+        panic!("System unusable do to failed database connection");
+    }
 
     println!("MapleHMS is running! Access via: http://{}", binding_addr.clone());
 

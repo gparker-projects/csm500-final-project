@@ -31,12 +31,22 @@ async fn test_kernal_methods(){
     assert_ne!(logging_file, String::new(), "Test 1: Logging file name invalid");
     assert!(fs::exists(logging_file).unwrap_or(false), "Test 2: Logging file was not created"); // confirms file was actually created
 
-    // Test 3&4 are for the database pool
-    let pool = MapleHMSKernel::init_database_pool( "postgres://postgres:csm500@localhost:5432/csm500".to_string() ).await;
-    assert!(Some( pool.clone() ).is_some(), "Test 3: Database pool not created");
-    assert!(! pool.is_closed(), "Test 4: Database pool not open");
+    // Test 3a and b are for the database pool - valid
+    let pool: Option<sqlx::Pool<sqlx::Postgres>> = MapleHMSKernel::init_database_pool( "postgres://postgres:csm500@localhost:5432/csm500".to_string() ).await;
+    assert!( pool.is_some() , "Test 3a: Database pool not created");
+    assert!(! pool.clone().unwrap().is_closed(), "Test 3b: Database pool not open");
+
+    // Test 4a are for the database pool - invalid; if there is no pool, we can not unwrap, so only one test
+    let pool = MapleHMSKernel::init_database_pool( "postgres://postgres:fake@localhost:666/csm500".to_string() ).await;
+    assert!( pool.is_none() , "Test 4a: Database pool created when it should not have been");
 
     // Test 5 is the path
     let static_path = MapleHMSKernel::get_static_base_path();
     assert_ne!(static_path, String::new(), "Test 5: Static base path not initialized");
+    println!("Test 5 completed");
+
+    // Test 6: run the main()
+    //let value = MapleHMSKernel::main().await.;
+    //assert!( value.is_ok(), "Test 6: Main() did not initialize");
+    //println!("Test 6 completed");
 }

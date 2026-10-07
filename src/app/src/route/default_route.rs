@@ -32,6 +32,20 @@ impl BasicRoute{
         HttpResponse::Ok().body("MapleHMS is Up")
     }
 
+    /// ### error_route()
+    /// 
+    /// Allows a monitoring services to perform a basic "is the application up?" check
+    /// 
+    /// #### Parameters: None
+    /// 
+    /// #### Returns: 
+    /// * Responder: the general responder that allows the system to report system is up using an Ok() response
+    /// 
+    pub async fn error_route() -> impl Responder {
+        tracing::info!("MapleHMS is down");
+        actix_web::web::Redirect::to("/home").using_status_code(StatusCode::SERVICE_UNAVAILABLE)
+    }
+
     /// ### not_found_route()
     ///   Route for processing resource not found / 404 errors
     /// 
