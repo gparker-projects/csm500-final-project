@@ -25,10 +25,6 @@ use actix_session::{storage::CookieSessionStore, SessionMiddleware}; //, storage
 use actix_web::{web, App, HttpServer};
 use std::env;
 
-use sqlx::postgres::{PgPoolOptions};
-use tracing;
-use tracing_subscriber::{ Layer, filter::LevelFilter, layer::SubscriberExt, util::SubscriberInitExt, };
-
 use crate::ui::tile_factory::WebContentFactory;
 use crate::session::*;
 use crate::route::admit_route::AdmitRoute;
@@ -39,8 +35,8 @@ use crate::route::intervention_details_route::InterventionDetailsRoute;
 use crate::route::login_route::LoginRoute;
 use crate::route::patient_route::PatientRoute;
 use crate::route::nle_route::*;
+use crate::kernel::MapleHMSKernel;
 
-// TODO: ideally we'd use an external session store, not just cookies. Until the application is largely working, we'll have to leave this for now. //storage::RedisSessionStore}; 
 mod constants;
 mod dto;
 mod ui;
@@ -48,9 +44,11 @@ mod dao;
 mod nle;
 mod route;
 mod session;
+mod kernel;
 
 /// # Main program
-///  Loads the NLP engine and adds handlers for key paths of the web application
+/// 
+///  Loads the handlers for routes of the web application, as well as performing general kernel initiatialization tasks
 /// 
 /// ### References: Add CORS headers to allow javascript connectivity
 ///  https://docs.rs/actix-cors/latest/actix_cors/struct.Cors.html 
@@ -59,37 +57,14 @@ mod session;
 /// 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
-    init_logging();
+    let _ignore = MapleHMSKernel::init_logging();
     let config = SysConfig::new(env::var(constants::CARGO_MANIFEST_DIR));
     let binding_addr = config.clone().website_bind_address;
 
-    //establish database connection for entire application here, add to the application session
-    let db_url = &config.db_conn_str.clone();
+    // establish database connection for entire application here, add to the application session
+    let db_pool = MapleHMSKernel::init_database_pool( config.db_conn_str.clone() ).await;
 
-    let db_pool = match PgPoolOptions::new()
-        .max_connections(5)
-        .connect(db_url)
-        .await
-    {
-        Ok(pool) => {
-            tracing::info!("Database connection established to: http://{}", db_url);
-            pool
-        },
-        Err(e) => {
-            tracing::error!("{}", e);
-            panic!("{}", e)
-        },
-    };
-
- /* let nle_session: ort::session::Session = Session::builder().expect("Session could not be established")
-                  .with_optimization_level(GraphOptimizationLevel::Level1).expect("No Session")
-                  .with_intra_threads(1).expect("Insufficient threads")
-                  .commit_from_file(&(config.model_data_dir.clone() + &config.language_model_file.clone()) ).expect("File could not be accessed");
-  let shared_session = Arc::new(nle_session);
-*/
     println!("MapleHMS is running! Access via: http://{}", binding_addr.clone());
-
-    let static_path_base = std::env::current_dir().expect("Base path to executable could not be found").display().to_string() + "\\webc\\static\\";
 
     // use the Builder pattern to add one route at a time
     HttpServer::new( move || {
@@ -107,7 +82,7 @@ async fn main() -> std::io::Result<()> {
         )
         .app_data(  // this enclosure allows the session state to be created and made available to all routes. actix_web magic.
             web::Data::new( session::AppSession {
-                    wcf: WebContentFactory::new(&static_path_base, config.app_version.clone()),
+                    wcf: WebContentFactory::new(&MapleHMSKernel::get_static_base_path(), config.app_version.clone()),
                     app_key: tmp_app_key.clone(),
                     connection: db_pool.clone(),
                     system_config: config.clone()//,
@@ -139,33 +114,4 @@ async fn main() -> std::io::Result<()> {
     .bind(binding_addr)? //  "127.0.0.1:8000"
     .run()
     .await
-}
-
-/// ### fn init_logging()
-///   Initializes standard Rust logging for the application, creating a file with name format: maple_hms-%Y-%b-%d_%H%M%S.log
-/// 
-/// #### Parameters: None
-/// 
-/// #### Returns: None
-/// 
-fn init_logging(){
-    // added per recommendation from 0-to-Prod
-    // https://rust.code-maven.com/logging/tracing-to-a-file.html
-    //
-    let log_filename = "maple_hms-".to_owned() + &chrono::Local::now().format("%Y-%b-%d_%H%M%S").to_string() +".log";
-        tracing_subscriber::registry()
-            .with(
-                tracing_subscriber::fmt::layer()
-                    .with_ansi(false)
-                    .with_writer(
-                        std::fs::OpenOptions::new()
-                            .create(true)
-                            .append(true)
-                            .open(log_filename)
-                            .unwrap(),
-                    )
-                    .with_filter(LevelFilter::DEBUG),
-            )
-            .init();
-    tracing::info!("MapleHMS is running!");
 }

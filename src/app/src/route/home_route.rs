@@ -36,7 +36,7 @@ impl HomeRoute{
 
         let user_session_data: session::UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session info
         let user_display_name = user_session_data.clone().user_display_name;
-        println!("..for user id={}", user_session_data.get_userid_as_i64());
+        //println!("..for user id={}", user_session_data.get_userid_as_i64());
 
         let wcf = &app_session.get_web_content_factory();
         let mut content = wcf.get_home_tile_with_user_identity(user_display_name); // retrieve the page base content

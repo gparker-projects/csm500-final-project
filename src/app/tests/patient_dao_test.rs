@@ -19,7 +19,7 @@
 mod common;
 
 use sqlx::postgres::{PgPoolOptions}; 
-use chrono::{NaiveDate, NaiveDateTime, Utc};
+use chrono::{NaiveDate, Utc};
 
 use maple_hms::constants;
 use maple_hms::dao::patient_dao::PatientDAO;

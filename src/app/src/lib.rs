@@ -10,3 +10,4 @@ pub mod ui;
 pub mod route;
 pub mod session;
 pub mod nle;
+pub mod kernel;
