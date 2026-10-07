@@ -293,7 +293,7 @@ async fn test_ins_get_upd_feature_priority_intv_details_level() {
   let test_limit_days = 30;
   let fp_id: i64;
 
-  println!("Testing: get_all_active_feature_preferences_for_user(): first insertion");
+  //println!("Testing: get_all_active_feature_preferences_for_user(): first insertion");
 
   // Test 1: try to create a FeaturePreference
   // instantiate a DAO to prove it can access data, but more importantly, detect unexpected changes to it that will break the application
@@ -313,7 +313,7 @@ async fn test_ins_get_upd_feature_priority_intv_details_level() {
 
   let mut new_fp: FeaturePreference = Default::default(); // use a dummy record to satify the compiler below
 
-  println!("..first get: test_user_id={} test_feature_id={} 5 true", test_user_id, test_feature_id);
+  //println!("..first get: test_user_id={} test_feature_id={} 5 true", test_user_id, test_feature_id);
 
   // Test 3: retrieve intervention detail to see if it was indeed updated
   let qry_results = {FeaturePreferenceDAO::new( db_pool.clone() ).await}.get_active_feature_preferences_of_intervention_details_for_user(test_user_id, test_feature_id, test_limit_days, test_upper_limit).await;

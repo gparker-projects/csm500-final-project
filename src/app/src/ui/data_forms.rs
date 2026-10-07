@@ -362,7 +362,7 @@ impl InterventionDetailsDataForm {
 }
 
 #[allow(non_snake_case)]
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Default, Clone)]
  // these are the names in the forms in Javascript; not worth the time to correct from a warning, given it is dynamically generated and hard to debug
 pub struct InterventionDetailsAddFormBasic {
     pub addFrm_intv_id: String,
@@ -370,6 +370,5 @@ pub struct InterventionDetailsAddFormBasic {
     pub addFrm_patient_id: String,
     pub addFrm_type_id: String,
     pub addFrm_value: String,
-    pub addFrm_notes: String,    
-    //pub add_measure_form_errors: String
+    pub addFrm_notes: String,
 }

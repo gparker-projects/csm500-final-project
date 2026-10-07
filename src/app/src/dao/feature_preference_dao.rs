@@ -50,37 +50,33 @@ impl FeaturePreferenceDAO {
     /// * std::io::Error: An error, if applicable
     /// 
     async fn get_active_feature_preferences_for_user_intervention_level(&self, user_id: i64,
-                                                         //   intervention_type_id: i64,
-                                                            upper_limit: usize)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
+                                                                               upper_limit_age_days: usize,
+                                                                               upper_limit_num_prefs: usize)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
         tracing::debug!("get_active_feature_preferences_for_user_intervention_level()");
         //println!("get_active_feature_preferences_for_user_intervention_level()");
          
         let query_level_0 =  db_query::QRY_ACTIVE_FEATURE_PREFERENCES_FOR_USER_INTERVENTION_LEVEL_ONLY;
 
         let query_level_1 = query_level_0.replace("{users_id}", &user_id.to_string());
-        let query_level_2 = query_level_1.replace("{limit_days}", &"14".to_string());
-        let query_level_3 = query_level_2.replace("{feature_ids}", &"1, 3".to_string());
-        let query = query_level_3.replace("{limit_rows}", &"3".to_string());
+        let query_level_2 = query_level_1.replace("{limit_days}", &upper_limit_age_days.to_string());
+        let query_level_3 = query_level_2.replace("{feature_ids}", &constants::CRT_TOP_LEVEL_INTERVENTION_GRP_IDS.to_string());
+        let query = query_level_3.replace("{limit_rows}", &upper_limit_num_prefs.to_string());
 
         //tracing::debug!("..SELECT sql: {}", query);
         //println!("..SELECT sql: {}", query);
 
-                     //id, display_order, weight,
-                     //  calculation_date, department_id, feature_id, ref_group_id, ref_name
         let rows: Vec<( i64, i32, i32,
                         NaiveDateTime, Option<i64>, i64, i64, String
          )> = sqlx::query_as(&query)
                                                 .fetch_all(&self.connection) 
                                                 .await
                                                 .unwrap_or_default();
-        if rows.is_empty() {
-            // this is an acceptable, known situation. The first time a user uses an FP, they will not already have it.
+        if rows.is_empty() {  // this is an acceptable, known situation. The first time a user uses an FP, they will not already have it.
             return Ok( None );
         }
         else{
             let mut results: Vec<FeaturePreference> = Vec::with_capacity(rows.len());
             let mut lookup: HashSet<String> = HashSet::new();
-            let mut counter: usize = 0;
 
             for row in rows {
                 let tmp_feature_id: i64 = row.5;  //feature_id
@@ -104,12 +100,9 @@ impl FeaturePreferenceDAO {
                     ref_name: row.7
                 };
 
-                if counter < upper_limit{ // !lookup.contains( &tmp_fp.get_unique_key() ) && -- no need for this check, as we are using a Set, which eliminates dups anyway
-                    //println!("...Adding ID={}", &tmp_fp.get_unique_key());
-                    results.push( tmp_fp.clone() );
-                    lookup.insert( tmp_fp.get_unique_key() );
-                    counter = counter + 1;
-                }
+                //println!("...Adding ID={}", &tmp_fp.get_unique_key());
+                results.push( tmp_fp.clone() );
+                lookup.insert( tmp_fp.get_unique_key() );
             }
             return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
         }
@@ -134,7 +127,7 @@ impl FeaturePreferenceDAO {
     pub async fn get_active_feature_preferences_of_intervention_details_for_user(&self, user_id: i64,
                                                                                        intervention_type_id: i64,
                                                                                        limits_days: i64,
-                                                                                       upper_limit: usize)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
+                                                                                       upper_limit_num_prefs: usize)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
         tracing::debug!("get_active_feature_preferences_for_user_intervention_details_level()");
      //   println!("get_active_feature_preferences_for_user_intervention_details_level()");
          
@@ -142,7 +135,7 @@ impl FeaturePreferenceDAO {
         let query_level_1 = query_level_0.replace("{users_id}", &user_id.to_string());
         let query_level_2 = query_level_1.replace("{limit_days}", &limits_days.to_string());
         let query_level_3 = query_level_2.replace("{feature_ids}", &intervention_type_id.to_string());
-        let query = query_level_3.replace("{limit_rows}", &"3".to_string());
+        let query = query_level_3.replace("{limit_rows}", &upper_limit_num_prefs.to_string());
 
         //tracing::debug!("..SELECT sql: {}", query);
         println!("..SELECT sql: {}", query);
@@ -165,7 +158,6 @@ impl FeaturePreferenceDAO {
         else{
             let mut results: Vec<FeaturePreference> = Vec::with_capacity(rows.len());
             let mut lookup: HashSet<String> = HashSet::new();
-            let mut counter: usize = 0;
 
             println!("..{} rows were returned", rows.len());
 
@@ -190,15 +182,8 @@ impl FeaturePreferenceDAO {
                     ref_name: row.7
                 };
 
-                if counter < upper_limit {
-                    results.push( tmp_fp.clone() );
-                    lookup.insert( tmp_fp.get_unique_key() );
-                    counter = counter + 1
-                }
-                else{
-                    println!("..upper_limit already met"); // a do-nothing situation; the max counter having been reached is acceptible
-                }
-                
+                results.push( tmp_fp.clone() );
+                lookup.insert( tmp_fp.get_unique_key() );
             }
             return Ok( Some( results ) ); // because this is in an enclosure we MUST add the return keyword for it to compile
         }
@@ -218,8 +203,8 @@ impl FeaturePreferenceDAO {
     /// * Option< Vec<FeaturePreference> >: the Feature Preferences for the user, if found
     /// * std::io::Error: An error, if applicable
     /// 
-    pub async fn get_active_feature_preferences_of_interventions_for_user(&self, user_id: i64, upper_limit: usize)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
-        self.get_active_feature_preferences_for_user_intervention_level(user_id, upper_limit).await // constants::CRT_ANY_INTERVENTION_GROUP,
+    pub async fn get_active_feature_preferences_of_interventions_for_user(&self, user_id: i64, upper_limit_num_prefs: usize)-> Result< Option< Vec<FeaturePreference> >, std::io::Error> {
+        self.get_active_feature_preferences_for_user_intervention_level(user_id,constants::FEATURE_PREFERENCE_UPPER_AGE_LIMIT_DAYS, upper_limit_num_prefs).await // constants::CRT_ANY_INTERVENTION_GROUP,
     }
 
     /// ### upsert_feature_preference()

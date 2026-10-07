@@ -23,8 +23,6 @@ use actix_session::SessionExt;
 use actix_web::{body::to_bytes, http::StatusCode, test, web, Responder};
 use common::entity_factory::EntityFactory;
 
-const INTV_SCREEN_ID_TAG_1 : &str = "<div id=\"MapleHMS::ID=Intervention\"></div>";
-
 /// ### test_route_to_modify_intervention_basic()
 /// 
 /// Tests:
@@ -41,7 +39,7 @@ async fn test_route_to_modify_intervention_basic(){
 
     let frm_test_1 = InterventionDataFormLink {
         patient_id: "-1".to_string(),
-        intervention_id: "1".to_string(), // invalid, PHN is not 10 digits
+        intervention_id: "1".to_string(),
         encounter_id: "1".to_string(),
 	    //..Default::default()
     };
@@ -51,15 +49,13 @@ async fn test_route_to_modify_intervention_basic(){
     // we're going to loop through them as a vector of tuples. The tuple will be the form and a string to validate
     let all_forms = vec![("Test 1", frm_test_1.clone(), VALIDATION_STRING_TEST_1),];
     for cur_frm in all_forms{
-        // Test 1: InterventionRoute::route_to_modify_intervention_basic
         println!("{} InterventionRoute::route_to_modify_intervention_basic", cur_frm.0);
-
         let responder = InterventionRoute::route_to_modify_intervention_basic( app_session.clone(), user_session.clone(), web::Form( cur_frm.1.clone() ) ).await;
         let http_resp = responder.respond_to(&req);
         assert_eq!(http_resp.status(), StatusCode::OK, "Status not OK");
         match to_bytes(http_resp.into_body()).await{
             Ok(item) => {
-                println!("{} Body = {}", cur_frm.0, String::from_utf8_lossy(&item));
+                //println!("{} Body = {}", cur_frm.0, String::from_utf8_lossy(&item));
                 // confirm the content of the screen was loaded correctly by detecting a tag only present in the key Tile template file
                 assert!( String::from_utf8_lossy(&item).contains( cur_frm.2 ), "Response did not contain expected content"); 
             },
@@ -76,9 +72,9 @@ async fn test_route_to_modify_intervention_basic(){
     assert_eq!(http_resp_test3.status(), StatusCode::OK, "Status not OK");
     match to_bytes(http_resp_test3.into_body()).await{
         Ok(item) => {
-            println!("{} Body = {}", cur_frm.0, String::from_utf8_lossy(&item));
+            //println!("{} Body = {}", cur_frm.0, String::from_utf8_lossy(&item));
             // confirm the content of the screen was loaded correctly by detecting a tag only present in the key Tile template file
-            assert!( String::from_utf8_lossy(&item).contains( cur_frm.2 ), "Response did not contain expected content"); 
+            assert!( String::from_utf8_lossy(&item).contains( cur_frm.2 ), "Response did not contain expected cm ontent"); 
         },
         Err(_e) => assert!( false, "Error Response received" ),
     };
@@ -176,16 +172,13 @@ async fn test_route_to_intervention_save(){
                                                                ("Test 3a", frm_test_3.clone(), VALIDATION_STRING_TEST_3A),
                                                       ];
     for cur_frm in all_forms{
-        // Test 1: InterventionRoute::route_to_add_new_intervention
         println!("{} InterventionRoute::route_to_add_new_intervention", cur_frm.0);
-
-// * InterventionRoute::route_to_intervention_save(app_session: web::Data<AppSession>, user_session: Session, mut req: web::Form<InterventionDataForm>)
         let responder = InterventionRoute::route_to_intervention_save( app_session.clone(), user_session.clone(), web::Form( cur_frm.1.clone() ) ).await;
         let http_resp = responder.respond_to(&req);
         assert_eq!(http_resp.status(), StatusCode::OK, "Status not OK");
         match to_bytes(http_resp.into_body()).await{
             Ok(item) => {
-                println!("{} Body = {}", cur_frm.0, String::from_utf8_lossy(&item));
+                //println!("{} Body = {}", cur_frm.0, String::from_utf8_lossy(&item));
                 // confirm the content of the screen was loaded correctly by detecting a tag only present in the key Tile template file
                 assert!( String::from_utf8_lossy(&item).contains( cur_frm.2 ), "{} - Response did not contain expected content: {}", cur_frm.0, cur_frm.2); 
             },
@@ -193,19 +186,6 @@ async fn test_route_to_intervention_save(){
         };
     }
 }
-
-/// ### test_route_to_view_or_modify_intervention()
-/// 
-/// Tests:
-///   InterventionRoute::route_to_view_or_modify_intervention()
-/// 
-#[actix_web::test]
-async fn test_route_to_view_or_modify_intervention(){ 
-// * InterventionRoute::route_to_view_or_modify_intervention(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<InterventionDataForm>)
-
-
-}
-
 
 /// ### test_route_to_add_new_intervention()
 /// 
@@ -253,10 +233,7 @@ async fn route_to_add_new_intervention(){
                                                                     ("Test 2d", frm_test_2.clone(), VALIDATION_STRING_TEST_2D),
                                                       ];
     for cur_frm in all_forms{
-        // Test 1: InterventionRoute::route_to_add_new_intervention
         println!("{} InterventionRoute::route_to_add_new_intervention", cur_frm.0);
- 
-        // * InterventionRoute::route_to_add_new_intervention(app_session: web::Data<AppSession>, user_session: Session, req: web::Form<InterventionDataFormBasic>)
         let responder = InterventionRoute::route_to_add_new_intervention( app_session.clone(), user_session.clone(), web::Form( cur_frm.1.clone() ) ).await;
         let http_resp = responder.respond_to(&req);
         assert_eq!(http_resp.status(), StatusCode::OK, "Status not OK");

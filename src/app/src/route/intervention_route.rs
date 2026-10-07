@@ -166,7 +166,7 @@ impl InterventionRoute{
         let cur_intv: Option<Intervention>
           = if intervention_id == constants::NOT_SPECIFIED_ID {
             tracing::debug!("   No Intervention specified: create a new Intervention");
-            //println!("   Intervention.intervention_type_id {}", req.clone().intervention_type_id.to_string());
+            println!("   Intervention.intervention_type_id {}", req.clone().intervention_type_id.to_string());
             intervention_type_id = req.clone().intervention_type_id.parse().unwrap(); 
             None
         }

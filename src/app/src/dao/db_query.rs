@@ -221,6 +221,7 @@ pub const QRY_ACTIVE_FEATURE_PREFERENCES_FOR_USER_INTERVENTION_LEVEL_ONLY: &str 
                                                       and crf.Group_id in ({feature_ids})
                                                       and calculation_date >= now() - INTERVAL '{limit_days} days'
                                                     order by calculation_date, weight desc 
+                                                    LIMIT {limit_rows}
                                                                      "##; 
 
 // Note: can not limit rows here because it will cause the results to drop one of the Interventions or Intervention Details, 
@@ -236,6 +237,7 @@ pub const QRY_ACTIVE_FEATURE_PREFERENCES_FOR_USER_INTERVENTION_DETAILS_LEVEL: &s
                                                       and crf.group_id in ({feature_ids})
                                                       and calculation_date >= now() - INTERVAL '{limit_days} days'
                                                     order by calculation_date, weight desc 
+                                                    LIMIT {limit_rows}
                                                                      "##; 
 
 // ------------------------------------------------------------------------------------------

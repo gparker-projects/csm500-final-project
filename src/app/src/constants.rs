@@ -28,6 +28,8 @@ pub const ERROR_READING_TEMPLATE : &str = "Error reading tile template file";
 pub const USER_SESSION : &str = r##"USER_SESSION"##;
 pub const VALIDATION_ERRORS : &str = r##"VALIDATION_ERRORS"##;
 
+pub const FEATURE_PREFERENCE_UPPER_AGE_LIMIT_DAYS: usize = 14;
+
 /// ------------------   ------------------   ------------------   ------------------
 /// Record ID constants
 /// ------------------   ------------------   ------------------   ------------------
@@ -45,6 +47,7 @@ pub const DEFAULT_INTERVENTION_STATUS_NEW: i64 = 13;
 pub const CRT_ANY_INTERVENTION_GROUP: i64 = -1;
 pub const CRT_CLINICAL_INTERVENTION_GRP_ID: i64 = 1;
 pub const CRT_NON_CLINICAL_INTERVENTION_GRP_ID: i64 = 3;
+pub const CRT_TOP_LEVEL_INTERVENTION_GRP_IDS: &str = r##"1, 3"##;
 
 pub const CRT_INTERVENTION_ALERT_TYPE: i64 = 100040;
 

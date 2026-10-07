@@ -55,6 +55,7 @@ impl InterventionDetailsRoute{
                     InterventionDataForm {
                         intervention_id: req.addFrm_intv_id.clone(),
                         patient_id: req.addFrm_patient_id.clone(),
+                        intervention_type_id: "100040".to_string(), // every user should have access to the "Alerts/CCI/SPI" intervention type, as it is for staff safety
                         ..Default::default()
                     }
                 )
@@ -78,23 +79,17 @@ impl InterventionDetailsRoute{
         let mut results: String = constants::INVALID_OTHER_ID.to_string();
         let user_session_details: UserSession = user_session.get(constants::USER_SESSION).unwrap().expect( constants::SESSION_ERROR_INVALID ); // retrieve user session inf
 
-        let idao = InterventionDAO::new( app_session.get_db_connection() ).await;
-        let insert_ivdtls_results = idao.upsert_intervention_details_from_intv_form(req.clone(), user_session_details.get_userid_as_i64()).await;
-        match insert_ivdtls_results {
-            Ok(intv_dtls_id) => {
-                tracing::debug!("..Intervention Details (id={intv_dtls_id})] created/updated");
-                println!("..Intervention Details (id={intv_dtls_id})] created/updated");
+        let idao: InterventionDAO = InterventionDAO::new( app_session.get_db_connection() ).await;
+        let intv_dtls_id = idao.upsert_intervention_details_from_intv_form(req.clone(), user_session_details.get_userid_as_i64()).await.unwrap();
+        if intv_dtls_id != constants::INVALID_OTHER_ID { // upsert_intervention_details_from_intv_form never returns an error, only a wrapped constants::INVALID_OTHER_ID 
+            //tracing::debug!("..Intervention Details (id={intv_dtls_id})] created/updated");
+            //println!("..Intervention Details (id={intv_dtls_id})] created/updated");
+            results = intv_dtls_id.to_string();
+            let type_id = req.clone().get_type_id_as_i64(); // extract type for updating the user's feature preference
 
-                results = intv_dtls_id.to_string();
-                let type_id = req.clone().get_type_id_as_i64(); // extract type for updating the user's feature preference
-
-                // if save successful, record a feature preference as well
-                let fpdao = FeaturePreferenceDAO::new( app_session.get_db_connection() ).await;
-                let _ignore = fpdao.upsert_feature_preference( user_session_details.clone().get_userid_as_i64() , type_id).await.unwrap();
-            },
-            Err(e) => {
-                tracing::debug!("..!Intervention Details not created/updated: {e}");
-            }
+            // if save successful, record a feature preference as well
+            let fpdao = FeaturePreferenceDAO::new( app_session.get_db_connection() ).await;
+            let _ignore = fpdao.upsert_feature_preference( user_session_details.clone().get_userid_as_i64() , type_id).await.unwrap();
         }
 
         // route back to main form again
