@@ -36,7 +36,8 @@ impl Encounter{
     /// 
     /// Note: used by test cases only
     /// 
-    #[allow(dead_code)] pub fn new(id: i64,
+    #[allow(dead_code)] pub fn new(
+            id: i64,
             admit_notes: String,
             admit_timestamp: NaiveDateTime,
             discharge_notes: String,
@@ -65,15 +66,6 @@ impl Encounter{
     pub fn admit_timestamp_for_display(&self) -> String{
         return self.admit_timestamp.format("%d/%m/%Y %H:%M:%S").to_string();
     }
-
-    /*
-    //
-    /// helper method to return the discharge date (entire timestamp) in a format that can be easily displayed
-    /// 
-   pub fn discharge_timestamp_for_display(&self) -> String{
-        return self.discharge_timestamp.unwrap().format("%d/%m/%Y %H:%M:%S").to_string();
-    }*/
-
 }
 
 /// Implements a .to_string() for the Encounter 

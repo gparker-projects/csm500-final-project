@@ -107,8 +107,10 @@ impl InterventionRoute{
         // if there was no encounter provided, we can find the current one, based on the userid
         if tmp_encounter_id == constants::INVALID_OTHER_ID.to_string() {
             let edao = EncounterDAO::new( app_session.get_db_connection() ).await;
-            tmp_encounter_id = edao.get_current_encounter( req.get_patient_id_as_i64() ).await.to_string();
+            let enc = edao.get_current_encounter( req.get_patient_id_as_i64() ).await;
+            
             tracing::debug!("..encounter_id not provided. Found: id={}", tmp_encounter_id);
+            tmp_encounter_id = enc.id.to_string();
         }
         else{
             tmp_encounter_id = req.encounter_id.clone();
