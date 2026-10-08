@@ -1,3 +1,7 @@
+\c csm500
+
+\d+
+
 select 'common_reference_type' as "table name", count(*) from common_reference_type
 union select 'department' as "table name", count(*) from department
 union select 'encounter' as "table name", count(*) from encounter
@@ -10,4 +14,4 @@ union select 'permission' as "table name", count(*) from permission
 union select 'role' as "table name", count(*) from role
 union select 'user_permission' as "table name", count(*) from user_permission
 union select 'site' as "table name", count(*) from role
-union select 'users' as "table name", count(*) from users
+union select 'users' as "table name", count(*) from users;
