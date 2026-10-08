@@ -227,7 +227,7 @@ async fn test_validate_prompt_results_clinical() {
     let valid_prompts  = vec![
                 "high fall risk on admission", "bed alarm activated and signage posted at bedside", // 100040 Alerts/CCI/SPI"
                 "cci flag for aggressive behaviour", "patient has hemophilia", //  100040	"Alerts/CCI/SPI"
-                /*"patient has severe alergy to penicillin", "allergy band applied", // 100043	"Allergies"
+                "patient has severe alergy to penicillin", "allergy band applied", // 100043	"Allergies"
                 "follow-up with dermatologist booked for next wednesday at 10:00", "patient reminded to bring medication and given appointment card", // 100041	"Appointments"
                 "electrolytes and cbc drawn from right antecubital at 1600", "specimen labelled sent to lab", // 100002	"Collect Specimen: Bloodwork"
                 "suspected dehydration, iv fluids started", "urine output reasssessment in four hours", // 2	"create-clinical-intervention"
@@ -257,7 +257,7 @@ async fn test_validate_prompt_results_clinical() {
                 "review recent labs and vitals trend", "potassium remains low and needs replacement", // 9	"view-any-clinical-data"
                 "check active changes to care plan", "wound dressing change at 1700", // 10	"view-clinical-intervention"
                 "discharge summary agrees with previous admission", "patient was sent home on oral antibiotics and referral to gp", // 11	"view-discharge"
-                "check patient orders", "update next of kin address" // 12	"view-non-clinical-intervention" */
+                "check patient orders", "update next of kin address" // 12	"view-non-clinical-intervention" 
             ];
 
     println!("This is test test_validate_prompt_results_clinical()");
